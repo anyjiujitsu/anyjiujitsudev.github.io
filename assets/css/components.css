@@ -1107,3 +1107,39 @@ nav.filters, .filters__inner, .pillRow{
 #eventsSearchSuggest .suggest__item:active{
   background: rgba(0,0,0,0.10);
 }
+
+
+/* =========================================================
+   section: dropdown polish
+   purpose: inset dividers + quick search styling
+   ========================================================= */
+
+.menu__divider{
+  height: 1px;
+  margin: 6px 14px 8px;
+  background: rgba(0,0,0,0.12);
+}
+
+.menu__header--static{
+  padding: 8px 14px 4px;
+}
+
+.menu__header--static .menu__title{
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #6f6f6f;
+}
+
+/* Quick search list bullets */
+.searchSuggest__item{
+  position: relative;
+  padding-left: 18px;
+}
+
+.searchSuggest__item::before{
+  content: "â€¢";
+  position: absolute;
+  left: 6px;
+  color: #9a9a9a;
+}
