@@ -708,12 +708,15 @@ async function init(){
   // Wire YEAR + STATE + EVENT filter pills (Events view)
   wireEventsYearPill(()=>eventRows, render);
   wireEventsStatePill(()=>eventRows, render);
-  wireEventsTypePill(()=>eventRows, render);
-
-  // Wire STATE + OPENS + GUESTS filter pills (Index view)
-  wireIndexStatePill(()=>directoryRows, render);
-  wireIndexOpensPill(()=>directoryRows, render);
-  wireIndexGuestsPill(()=>directoryRows, render);
+  wireEventsTypePill(()=>eventRows, render);  // Wire STATE + OPENS + GUESTS filter pills (Index view)
+  // note: Index UI may be hidden/locked; pill wiring must never crash Events rendering
+  try{
+    wireIndexStatePill(()=>directoryRows, render);
+    wireIndexOpensPill(()=>directoryRows, render);
+    wireIndexGuestsPill(()=>directoryRows, render);
+  }catch(e){
+    console.warn("Index pill wiring skipped:", e);
+  }
   // section: status
   // purpose: clear any previous load errors once data is ready
   $("status").textContent = "";
@@ -725,6 +728,19 @@ async function init(){
 
 init().catch((err)=>{
   console.error(err);
-  $("status").textContent = "Failed to load data";
-  $("eventsStatus").textContent = "Failed to load data";
+
+  // If we already have events rendered, don't overwrite the UI with a scary banner.
+  const evHasContent = ($("eventsRoot") && $("eventsRoot").children && $("eventsRoot").children.length > 0);
+  const hasEventRows  = Array.isArray(eventRows) && eventRows.length > 0;
+  const hasDirRows    = Array.isArray(directoryRows) && directoryRows.length > 0;
+
+  if(evHasContent || hasEventRows){
+    // Clear any previous failure text and keep the rendered content.
+    if($("eventsStatus")) $("eventsStatus").textContent = `${(eventRows || []).length} events`;
+    if($("status")) $("status").textContent = hasDirRows ? `${directoryRows.length} gyms` : "";
+    return;
+  }
+
+  if($("status")) $("status").textContent = "Failed to load data";
+  if($("eventsStatus")) $("eventsStatus").textContent = "Failed to load data";
 });
