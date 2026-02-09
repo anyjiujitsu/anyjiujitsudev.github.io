@@ -1,66 +1,76 @@
 :root{
-  /* section: theme | purpose: core colors */
   --bg: #ebebeb;
   --green: #234c31;
   --row: #e2e4e4;
   --beige: #ebdeca;
-  --shadow: rgba(0, 0, 0, 0.18);
+  --shadow: rgba(0,0,0,0.18);
 
-  /* section: text | purpose: text + muted */
   --text: #111;
-  --muted: rgba(0, 0, 0, 0.55);
+  --muted: rgba(0,0,0,0.55);
 
-  /* section: layout | purpose: radius + page sizing */
   --radius: 14px;
   --radiusPill: 999px;
+
   --pagePad: 14px;
   --maxW: 900px;
 
-  /* section: header | purpose: header sizing */
+  /* section: header tokens | purpose: title sizing */
   --titleSize: 58px;
+
+  /* section: logo tokens | purpose: ANY logo sizing */
   --anyLogoH: 22px;
   --anyLogoMB: 4px;
   --titleTracking: -0.04em;
 
-  /* section: pills | purpose: pill sizing */
+  /* section: pill tokens | purpose: pill sizing */
   --pillH: 36px;
   --pillFont: 14px;
   --pillPadX: 12px;
 
-  /* section: rows | purpose: group + row fonts */
+  /* section: row tokens | purpose: group + row fonts */
   --groupLabelFont: 12px;
   --rowFont: 14px;
 
-  /* section: indicator | purpose: selection dot sizing */
+  /* section: indicator tokens | purpose: selection dot sizing */
   --dotSize: 10px;
-  --pagePad: 3px;
-  --titleSize: 30px;
-  --anyLogoH: 12px;
-  --anyLogoMB: 1px;
-  --pillH: 20px;
-  --pillFont: 9.5px;
-  --pillPadX: 5px;
-  --groupLabelFont: 7.5px;
-  --rowFont: 10px;
-  --radius: 7px;
-  --shadow: rgba(0, 0, 0, 0.10);
-  --dotSize: 6px;
-  --pagePad: 24px;
-  --titleSize: 72px;
-  --pillH: 40px;
-  --pillFont: 14px;
-  --rowFont: 14px;
-
 }
 
-/* section: responsive tokens | purpose: compact mobile density */
+/* Permanent compact mobile density */
 @media (max-width: 430px){
   :root{
+    /* section: mobile tokens | purpose: compact density */
+    --pagePad: 3px;
+
+    /* section: header tokens | purpose: title sizing */
+    --titleSize: 30px;
+    /* section: logo tokens | purpose: ANY logo sizing */
+    --anyLogoH: 12px;
+    --anyLogoMB: 1px;
+
+
+    /* section: pill tokens | purpose: pill sizing */
+    --pillH: 20px;
+    --pillFont: 9.5px;
+    --pillPadX: 5px;
+
+    /* section: row tokens | purpose: group + row fonts */
+    --groupLabelFont: 7.5px;
+    --rowFont: 10px;
+
+    --radius: 7px;
+    --shadow: rgba(0,0,0,0.10);
+
+    --dotSize: 6px;
   }
 }
 
-/* section: responsive tokens | purpose: wide layout adjustments */
 @media (min-width: 900px){
   :root{
+    --pagePad: 24px;
+    --titleSize: 72px;
+
+    --pillH: 40px;
+    --pillFont: 14px;
+    --rowFont: 14px;
   }
 }
