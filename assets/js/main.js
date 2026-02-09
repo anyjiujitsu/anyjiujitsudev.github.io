@@ -6,6 +6,8 @@ import { renderDirectoryGroups, renderEventsGroups } from "./render.js?v=2026020
 let directoryRows = [];
 let eventRows = [];
 
+
+let didRender = false;
 // TEMP: lock app to Events while Index view is being rebuilt
 const VIEW_LOCKED = true;
 
@@ -671,6 +673,7 @@ function wireSearch(){
 }
 
 function render(){
+  didRender = true;
   const evFiltered = filterEvents(eventRows, state);
   renderEventsGroups($("eventsRoot"), evFiltered);
   $("eventsStatus").textContent = `${evFiltered.length} events`;
@@ -708,39 +711,25 @@ async function init(){
   // Wire YEAR + STATE + EVENT filter pills (Events view)
   wireEventsYearPill(()=>eventRows, render);
   wireEventsStatePill(()=>eventRows, render);
-  wireEventsTypePill(()=>eventRows, render);  // Wire STATE + OPENS + GUESTS filter pills (Index view)
-  // note: Index UI may be hidden/locked; pill wiring must never crash Events rendering
+  wireEventsTypePill(()=>eventRows, render);
+
+  // Wire STATE + OPENS + GUESTS filter pills (Index view)
+  // purpose: Index UI should never break Events if elements are missing/hidden
   try{
     wireIndexStatePill(()=>directoryRows, render);
     wireIndexOpensPill(()=>directoryRows, render);
     wireIndexGuestsPill(()=>directoryRows, render);
-  }catch(e){
-    console.warn("Index pill wiring skipped:", e);
+  }catch(err){
+    console.warn("Index pill wiring skipped:", err);
   }
-  // section: status
-  // purpose: clear any previous load errors once data is ready
-  $("status").textContent = "";
-  $("eventsStatus").textContent = "";
-
 
   render();
 }
 
 init().catch((err)=>{
   console.error(err);
-
-  // If we already have events rendered, don't overwrite the UI with a scary banner.
-  const evHasContent = ($("eventsRoot") && $("eventsRoot").children && $("eventsRoot").children.length > 0);
-  const hasEventRows  = Array.isArray(eventRows) && eventRows.length > 0;
-  const hasDirRows    = Array.isArray(directoryRows) && directoryRows.length > 0;
-
-  if(evHasContent || hasEventRows){
-    // Clear any previous failure text and keep the rendered content.
-    if($("eventsStatus")) $("eventsStatus").textContent = `${(eventRows || []).length} events`;
-    if($("status")) $("status").textContent = hasDirRows ? `${directoryRows.length} gyms` : "";
-    return;
-  }
-
-  if($("status")) $("status").textContent = "Failed to load data";
-  if($("eventsStatus")) $("eventsStatus").textContent = "Failed to load data";
+  // If we already rendered successfully, don't overwrite the UI with a generic failure.
+  if(didRender) return;
+  $("status").textContent = "Failed to load data";
+  $("eventsStatus").textContent = "Failed to load data";
 });
