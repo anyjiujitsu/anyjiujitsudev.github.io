@@ -3,29 +3,21 @@ import { state, setView, setIndexQuery, setEventsQuery } from "./state.js?v=2026
 import { filterDirectory, filterEvents } from "./filters.js?v=20260202-321";
 import { renderDirectoryGroups, renderEventsGroups } from "./render.js?v=20260202-321";
 
-/* section: data caches
-   purpose: hold raw/normalized CSV rows in-memory for filtering + render */
 let directoryRows = [];
 let eventRows = [];
 
-/* section: app mode
-   purpose: temporarily force the Events view while Index is being rebuilt */
+// TEMP: lock app to Events while Index view is being rebuilt
 const VIEW_LOCKED = true;
 
-/* section: DOM helpers
-   purpose: small utilities for consistent element access */
 function $(id){ return document.getElementById(id); }
 
-/* section: events parsing
-   purpose: derive menu values (YEAR/STATE/TYPE) from event rows */
+/* ------------------ PILL MENUS (Events: YEAR) ------------------ */
 function parseYearFromEventRow(r){
   const y = String(r?.YEAR ?? "").trim();
   if(y) return y;
-
   const d = String(r?.DATE ?? "").trim();
   const m = d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if(m) return m[3];
-
   const tmp = new Date(d);
   if(!isNaN(tmp)) return String(tmp.getFullYear());
   return "";
@@ -58,8 +50,9 @@ function uniqTypesFromEvents(rows){
   return Array.from(set).sort((a,b)=>a.localeCompare(b));
 }
 
-/* section: directory parsing
-   purpose: derive menu values (STATE) from directory rows */
+
+
+
 function uniqStatesFromDirectory(rows){
   const set = new Set();
   rows.forEach(r=>{
@@ -69,8 +62,41 @@ function uniqStatesFromDirectory(rows){
   return Array.from(set).sort((a,b)=>a.localeCompare(b));
 }
 
-/* section: pill menus
-   purpose: shared menu build/position/dismiss behavior for all pills */
+function buildMenuListIn(listEl, items, selectedSet, onChange){
+  if(!listEl) return;
+  listEl.innerHTML = "";
+  items.forEach(val=>{
+    const row = document.createElement('label');
+    row.className = 'menu__item menu__item--check';
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.className = 'menu__checkbox';
+    cb.checked = selectedSet.has(val);
+    cb.value = val;
+
+    const text = document.createElement('span');
+    text.className = 'menu__itemText';
+    text.textContent = val;
+
+    cb.addEventListener('change', (ev)=>{
+      ev.stopPropagation();
+      if(cb.checked) selectedSet.add(val);
+      else selectedSet.delete(val);
+      onChange();
+    });
+
+    row.appendChild(cb);
+    row.appendChild(text);
+    listEl.appendChild(row);
+  });
+}
+
+
+
+
+
+
 function closeAllMenus(){
   document.querySelectorAll('.menu[data-pill-panel]').forEach(panel=>{
     panel.hidden = true;
@@ -85,16 +111,14 @@ function closeAllMenus(){
 function positionMenu(btnEl, panelEl){
   const vv = window.visualViewport;
   if(!btnEl || !panelEl) return;
-
   const r = btnEl.getBoundingClientRect();
   const pad = 8;
-
   const vw = vv ? vv.width : window.innerWidth;
   const vh = vv ? vv.height : window.innerHeight;
   const vx = vv ? vv.offsetLeft : 0;
   const vy = vv ? vv.offsetTop : 0;
 
-  panelEl.hidden = false; // must be visible to measure
+  panelEl.hidden = false; // show to measure
 
   let left = r.left + vx;
   let top  = r.bottom + pad + vy;
@@ -138,28 +162,13 @@ function wireMenuDismiss(){
   window.addEventListener('resize', ()=>closeAllMenus());
 }
 
-/* section: menu list builder
-   purpose: render checkbox list into a given container element */
-function ensureMenuList(panelEl){
-  if(!panelEl) return null;
-  let listEl = panelEl.querySelector('.menu__list');
-  if(listEl) return listEl;
-
-  // If the menu was scaffolded with a placeholder (e.g., "Coming soon"), remove it
+function buildMenuList(panelEl, items, selectedSet, onToggle){
   panelEl.querySelectorAll('.menu__empty').forEach(n=>n.remove());
+  panelEl.querySelectorAll('.menu__list').forEach(n=>n.remove());
 
-  listEl = document.createElement('div');
-  listEl.className = 'menu__list';
-  panelEl.appendChild(listEl);
-  return listEl;
-}
+  const list = document.createElement('div');
+  list.className = 'menu__list';
 
-function buildMenuListIn(listEl, items, selectedSet, onChange){
-  if(!listEl) return;
-  // Only clear/inject inside the checkbox list container (never the whole menu panel)
-  if(!listEl.classList.contains('menu__list')) return;
-
-  listEl.innerHTML = "";
   items.forEach(val=>{
     const row = document.createElement('label');
     row.className = 'menu__item menu__item--check';
@@ -176,36 +185,38 @@ function buildMenuListIn(listEl, items, selectedSet, onChange){
 
     cb.addEventListener('change', (ev)=>{
       ev.stopPropagation();
+      // keep Set in sync with checkbox state
       if(cb.checked) selectedSet.add(val);
       else selectedSet.delete(val);
-      onChange();
+      onToggle(val, cb.checked);
     });
 
     row.appendChild(cb);
     row.appendChild(text);
-    listEl.appendChild(row);
+    list.appendChild(row);
   });
+
+  panelEl.appendChild(list);
 }
 
-/* section: pill wiring (events)
-   purpose: YEAR / STATE / TYPE checkbox pills on the Events view */
 function wireEventsYearPill(getEventRows, onChange){
   wireMenuDismiss();
 
   const btn = $('eventsPill1Btn');
   const panel = $('eventsPill1Menu');
   const clearBtn = $('eventsPill1Clear');
+
   if(!btn || !panel) return;
 
-  const listEl = ensureMenuList(panel);
   const years = uniqYearsFromEvents(getEventRows());
-  buildMenuListIn(listEl, years, state.events.year, ()=>{
-    setPillHasSelection(btn, state.events.year.size > 0);
+  buildMenuList(panel, years, state.events.year, ()=>{
+    setPillHasSelection(btn, state.events.year.size>0);
     onChange();
   });
-  setPillHasSelection(btn, state.events.year.size > 0);
 
-  const toggle = (e)=>{
+  setPillHasSelection(btn, state.events.year.size>0);
+
+  const toggleYearMenu = (e)=>{
     if(e.type === 'touchend') e.preventDefault();
     e.stopPropagation();
 
@@ -221,8 +232,9 @@ function wireEventsYearPill(getEventRows, onChange){
     }
   };
 
-  btn.addEventListener('click', toggle);
-  btn.addEventListener('touchend', toggle, { passive:false });
+  // Desktop: click. Mobile: touchend fallback.
+  btn.addEventListener('click', toggleYearMenu);
+  btn.addEventListener('touchend', toggleYearMenu, {passive:false});
 
   clearBtn?.addEventListener('click', (e)=>{
     if(e.type === 'touchend') e.preventDefault();
@@ -236,23 +248,25 @@ function wireEventsYearPill(getEventRows, onChange){
   });
 }
 
+
 function wireEventsStatePill(getEventRows, onChange){
   wireMenuDismiss();
 
   const btn = $('eventsPill2Btn');
   const panel = $('eventsPill2Menu');
   const clearBtn = $('eventsPill2Clear');
+
   if(!btn || !panel) return;
 
-  const listEl = ensureMenuList(panel);
   const states = uniqStatesFromEvents(getEventRows());
-  buildMenuListIn(listEl, states, state.events.state, ()=>{
-    setPillHasSelection(btn, state.events.state.size > 0);
+  buildMenuList(panel, states, state.events.state, ()=>{
+    setPillHasSelection(btn, state.events.state.size>0);
     onChange();
   });
-  setPillHasSelection(btn, state.events.state.size > 0);
 
-  const toggle = (e)=>{
+  setPillHasSelection(btn, state.events.state.size>0);
+
+  const toggleStateMenu = (e)=>{
     if(e.type === 'touchend') e.preventDefault();
     e.stopPropagation();
 
@@ -268,8 +282,8 @@ function wireEventsStatePill(getEventRows, onChange){
     }
   };
 
-  btn.addEventListener('click', toggle);
-  btn.addEventListener('touchend', toggle, { passive:false });
+  btn.addEventListener('click', toggleStateMenu);
+  btn.addEventListener('touchend', toggleStateMenu, {passive:false});
 
   clearBtn?.addEventListener('click', (e)=>{
     if(e.type === 'touchend') e.preventDefault();
@@ -283,23 +297,25 @@ function wireEventsStatePill(getEventRows, onChange){
   });
 }
 
+
 function wireEventsTypePill(getEventRows, onChange){
   wireMenuDismiss();
 
   const btn = $('eventsPill3Btn');
   const panel = $('eventsPill3Menu');
   const clearBtn = $('eventsPill3Clear');
+
   if(!btn || !panel) return;
 
-  const listEl = ensureMenuList(panel);
   const types = uniqTypesFromEvents(getEventRows());
-  buildMenuListIn(listEl, types, state.events.type, ()=>{
-    setPillHasSelection(btn, state.events.type.size > 0);
+  buildMenuList(panel, types, state.events.type, ()=>{
+    setPillHasSelection(btn, state.events.type.size>0);
     onChange();
   });
-  setPillHasSelection(btn, state.events.type.size > 0);
 
-  const toggle = (e)=>{
+  setPillHasSelection(btn, state.events.type.size>0);
+
+  const toggleTypeMenu = (e)=>{
     if(e.type === 'touchend') e.preventDefault();
     e.stopPropagation();
 
@@ -315,8 +331,8 @@ function wireEventsTypePill(getEventRows, onChange){
     }
   };
 
-  btn.addEventListener('click', toggle);
-  btn.addEventListener('touchend', toggle, { passive:false });
+  btn.addEventListener('click', toggleTypeMenu);
+  btn.addEventListener('touchend', toggleTypeMenu, {passive:false});
 
   clearBtn?.addEventListener('click', (e)=>{
     if(e.type === 'touchend') e.preventDefault();
@@ -330,8 +346,8 @@ function wireEventsTypePill(getEventRows, onChange){
   });
 }
 
-/* section: view toggle UI
-   purpose: sync view state + UI (and optionally lock to Events) */
+
+
 function setTransition(ms){
   document.body.style.setProperty("--viewTransition", ms + "ms");
 }
@@ -339,7 +355,6 @@ function setTransition(ms){
 function applyProgress(p){
   const clamped = Math.max(0, Math.min(1, p));
   document.body.style.setProperty("--viewProgress", String(clamped));
-
   const viewTitle = $("viewTitle");
   if(viewTitle){
     viewTitle.textContent = (clamped >= 0.5) ? "INDEX" : "EVENTS (DEV)";
@@ -353,20 +368,22 @@ function setViewUI(view){
   $("tabEvents")?.setAttribute("aria-selected", view === "events" ? "true" : "false");
   $("tabIndex")?.setAttribute("aria-selected", view === "index" ? "true" : "false");
 
-  const evFilters  = $("eventsFilters");
-  const idxFilters = $("filters");
-  if(evFilters)  evFilters.hidden  = (view !== "events");
+  // Sticky filter bars (now outside the slider)
+  const evFilters = document.getElementById("eventsFilters");
+  const idxFilters = document.getElementById("filters");
+  if(evFilters) evFilters.hidden = (view !== "events");
   if(idxFilters) idxFilters.hidden = (view !== "index");
 
   const title = $("viewTitle");
   if(title) title.textContent = (view === "events") ? "EVENTS (DEV)" : "INDEX";
 
-  const evStatus  = $("eventsStatus");
+  // Header counts: show the relevant total next to the header title
+  const evStatus = $("eventsStatus");
   const idxStatus = $("status");
-  if(evStatus)  evStatus.hidden  = (view !== "events");
+  if(evStatus) evStatus.hidden = (view !== "events");
   if(idxStatus) idxStatus.hidden = (view !== "index");
 
-  document.title = "ANY N.E. GRAPPLING (DEV)";
+  document.title = (view === "events") ? "ANY N.E. GRAPPLING (DEV)" : "ANY N.E. GRAPPLING (DEV)";
 
   setTransition(260);
   applyProgress(view === "index" ? 1 : 0);
@@ -378,6 +395,7 @@ function wireViewToggle(){
   const viewToggle = $("viewToggle");
   const viewShell  = $("viewShell");
 
+  // View lock: disable toggle + swipe and force Events
   if(VIEW_LOCKED){
     setView("events");
     setViewUI("events");
@@ -386,6 +404,7 @@ function wireViewToggle(){
       viewToggle.classList.add("viewToggle--locked");
       viewToggle.setAttribute("aria-disabled", "true");
     }
+    // keep focus from landing on disabled control
     tabEvents?.setAttribute("tabindex", "-1");
     tabIndex?.setAttribute("tabindex", "-1");
     tabEvents?.setAttribute("aria-disabled", "true");
@@ -400,28 +419,35 @@ function wireViewToggle(){
     let dragging = false;
     let pointerId = null;
 
-    const computeProgressFromX = (clientX)=>{
+    viewToggle.addEventListener("pointerdown", (e) => {
+      dragging = true;
+      pointerId = e.pointerId;
+      viewToggle.setPointerCapture(pointerId);
+      setTransition(0);
+
       const rect = viewToggle.getBoundingClientRect();
       const padding = 4;
       const trackW = rect.width - padding * 2;
       const thumbW = trackW / 2;
       const travel = trackW - thumbW;
 
-      const x = clientX - rect.left - padding;
-      return (x - thumbW / 2) / travel;
-    };
-
-    viewToggle.addEventListener("pointerdown", (e) => {
-      dragging = true;
-      pointerId = e.pointerId;
-      viewToggle.setPointerCapture(pointerId);
-      setTransition(0);
-      applyProgress(computeProgressFromX(e.clientX));
+      const x = e.clientX - rect.left - padding;
+      const p = (x - thumbW / 2) / travel;
+      applyProgress(p);
     });
 
     viewToggle.addEventListener("pointermove", (e) => {
       if(!dragging || e.pointerId !== pointerId) return;
-      applyProgress(computeProgressFromX(e.clientX));
+
+      const rect = viewToggle.getBoundingClientRect();
+      const padding = 4;
+      const trackW = rect.width - padding * 2;
+      const thumbW = trackW / 2;
+      const travel = trackW - thumbW;
+
+      const x = e.clientX - rect.left - padding;
+      const p = (x - thumbW / 2) / travel;
+      applyProgress(p);
     });
 
     const endDrag = (e) => {
@@ -474,24 +500,25 @@ function wireViewToggle(){
   }
 }
 
-/* section: pill wiring (index)
-   purpose: STATE / OPENS / GUESTS checkbox pills on the Index view */
+
+
 function wireIndexOpensPill(getDirectoryRows, onChange){
   wireMenuDismiss();
 
   const btn = $('openMatBtn');
   const panel = $('openMatMenu');
   const clearBtn = $('openMatClear');
+  const listEl = $('openMatList') || panel?.querySelector('.menu__list');
+
   if(!btn || !panel) return;
 
-  const listEl = $('openMatList') || ensureMenuList(panel);
   const items = ["ALL","SATURDAY","SUNDAY"];
-
   buildMenuListIn(listEl, items, state.index.opens, ()=>{
-    setPillHasSelection(btn, state.index.opens.size > 0);
+    setPillHasSelection(btn, state.index.opens.size>0);
     onChange();
   });
-  setPillHasSelection(btn, state.index.opens.size > 0);
+
+  setPillHasSelection(btn, state.index.opens.size>0);
 
   btn.addEventListener('click', (e)=>{
     e.preventDefault();
@@ -521,22 +548,26 @@ function wireIndexOpensPill(getDirectoryRows, onChange){
   });
 }
 
+
+
+
 function wireIndexGuestsPill(getDirectoryRows, onChange){
   wireMenuDismiss();
 
   const btn = $('guestsBtn');
   const panel = $('guestsMenu');
   const clearBtn = $('guestsClear');
+  const listEl = $('guestsList') || panel?.querySelector('.menu__list');
+
   if(!btn || !panel) return;
 
-  const listEl = $('guestsList') || ensureMenuList(panel);
   const items = ["GUESTS WELCOME"];
-
   buildMenuListIn(listEl, items, state.index.guests, ()=>{
-    setPillHasSelection(btn, state.index.guests.size > 0);
+    setPillHasSelection(btn, state.index.guests.size>0);
     onChange();
   });
-  setPillHasSelection(btn, state.index.guests.size > 0);
+
+  setPillHasSelection(btn, state.index.guests.size>0);
 
   btn.addEventListener('click', (e)=>{
     e.preventDefault();
@@ -566,22 +597,24 @@ function wireIndexGuestsPill(getDirectoryRows, onChange){
   });
 }
 
+
 function wireIndexStatePill(getDirectoryRows, onChange){
   wireMenuDismiss();
 
   const btn = $('stateBtn');
   const panel = $('stateMenu');
   const clearBtn = $('stateClear');
+  const listEl = $('stateList') || panel?.querySelector('.menu__list');
+
   if(!btn || !panel) return;
 
-  const listEl = $('stateList') || ensureMenuList(panel);
   const states = uniqStatesFromDirectory(getDirectoryRows());
-
   buildMenuListIn(listEl, states, state.index.states, ()=>{
-    setPillHasSelection(btn, state.index.states.size > 0);
+    setPillHasSelection(btn, state.index.states.size>0);
     onChange();
   });
-  setPillHasSelection(btn, state.index.states.size > 0);
+
+  setPillHasSelection(btn, state.index.states.size>0);
 
   btn.addEventListener('click', (e)=>{
     e.preventDefault();
@@ -611,8 +644,6 @@ function wireIndexStatePill(getDirectoryRows, onChange){
   });
 }
 
-/* section: search wiring
-   purpose: keep search inputs in sync with state and re-render */
 function wireSearch(){
   const idxIn = $("searchInput");
   const evIn  = $("eventsSearchInput");
@@ -621,7 +652,6 @@ function wireSearch(){
     setIndexQuery(e.target.value);
     render();
   });
-
   evIn?.addEventListener("input",(e)=>{
     setEventsQuery(e.target.value);
     render();
@@ -640,28 +670,21 @@ function wireSearch(){
   });
 }
 
-/* section: render
-   purpose: apply filters then render both views (and update counts) */
 function render(){
   const evFiltered = filterEvents(eventRows, state);
   renderEventsGroups($("eventsRoot"), evFiltered);
   $("eventsStatus").textContent = `${evFiltered.length} events`;
 
   let idxFiltered = filterDirectory(directoryRows, state);
-
-  // section: index safety
-  // purpose: ensure Index STATE selection is applied even if filterDirectory is stale/cached
+  // Redundant safeguard: ensure Index STATE selection is applied even if filterDirectory is stale/cached.
   const idxStatesSel = state?.index?.states;
   if(idxStatesSel && idxStatesSel.size){
     idxFiltered = idxFiltered.filter(r => idxStatesSel.has(String(r.STATE ?? "").trim()));
   }
-
   renderDirectoryGroups($("groupsRoot"), idxFiltered);
   $("status").textContent = `${idxFiltered.length} gyms`;
 }
 
-/* section: init
-   purpose: wire UI, load CSV, normalize rows, then render */
 async function init(){
   wireViewToggle();
   wireSearch();
@@ -682,13 +705,20 @@ async function init(){
   directoryRows = dirRaw.map(normalizeDirectoryRow);
   eventRows = evRaw.map(normalizeEventRow);
 
+  // Wire YEAR + STATE + EVENT filter pills (Events view)
   wireEventsYearPill(()=>eventRows, render);
   wireEventsStatePill(()=>eventRows, render);
   wireEventsTypePill(()=>eventRows, render);
 
+  // Wire STATE + OPENS + GUESTS filter pills (Index view)
   wireIndexStatePill(()=>directoryRows, render);
   wireIndexOpensPill(()=>directoryRows, render);
   wireIndexGuestsPill(()=>directoryRows, render);
+  // section: status
+  // purpose: clear any previous load errors once data is ready
+  $("status").textContent = "";
+  $("eventsStatus").textContent = "";
+
 
   render();
 }
