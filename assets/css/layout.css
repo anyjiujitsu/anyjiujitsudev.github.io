@@ -1,0 +1,47 @@
+.app{
+  min-height: 100svh;
+}
+
+/* Sticky header+filters: stable mobile experience */
+.header{
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg);
+  padding-top: env(safe-area-inset-top);
+}
+
+.header__inner{
+  max-width: var(--maxW);
+  margin: 0 auto;
+  padding: 10px var(--pagePad) 6px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap: 12px;
+}
+
+.filters{
+  position: relative;
+  z-index: 40;
+  background: var(--green);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+.filters__inner{
+  max-width: var(--maxW);
+  margin: 0 auto;
+  padding: 10px var(--pagePad);
+  display:flex;
+  gap: 10px;
+  align-items:center;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* content scrolls (body scroll) */
+.content__inner{
+  max-width: var(--maxW);
+  margin: 0 auto;
+  padding: 12px var(--pagePad) 48px;
+}

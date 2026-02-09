@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>ANY N.E. GRAPPING (QA)</title>
+
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/pills.css?v=20260129-302">
+  <link rel="stylesheet" href="assets/css/components.css?v=20260206-303" />
+<!-- IMPORTANT: repo references main.js (no sequence) -->
+  <script type="module" src="assets/js/main.js?v=20260202-321"></script>
+</head>
+
+<body>
+  <div class="app" id="app">
+
+    <!-- Header Area -->
+    <header class="header" id="header">
+      
+      <!-- Logo Area (above header) -->
+    <div aria-label="ANY logo" style="margin:0 0 -10px 0;">
+      <div class="header__inner" style="display:flex;justify-content:flex-start;align-items:flex-end;">
+        <div class="header__logoCrop"><img class="header__logoImage" src="assets/img/any-logo.png" alt="ANY" /></div>
+      </div>
+    </div>
+
+      <div class="header__inner" style="padding-top:0px;">
+        <h1 class="header__title" id="viewTitle" aria-label="Current view">EVENTS (QA)</h1>
+
+        <div class="header__countWrap" id="headerCounts" aria-live="polite">
+          <span id="eventsStatus" class="status header__count">Loading</span>
+          <span id="status" class="status header__count" hidden></span>
+        </div>
+
+        <!-- START ICON ENHANCEMENT TESTING -->
+        <div class="headerSocial" aria-label="Header social links">
+          <a class="headerSocial__link" href="https://www.instagram.com/any.jiujitsu/" target="_blank" rel="noopener" aria-label="Instagram profile">
+            <!-- Instagram (Feather-style) -->
+            <svg class="headerSocial__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <rect x="2.5" y="2.5" width="19" height="19" rx="5" ry="5"></rect>
+              <path d="M16 11.37a4 4 0 1 1-1.1-2.75A4 4 0 0 1 16 11.37z"></path>
+              <circle cx="17.5" cy="6.5" r="0.5"></circle>
+            </svg>
+          </a>
+
+          <a class="headerSocial__link" href="https://ig.me/m/any.jiujitsu" target="_blank" rel="noopener" aria-label="Instagram DM">
+            <!-- DM (paper plane / send) -->
+            <svg class="headerSocial__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </a>
+        </div>
+        <!-- END ICON ENHANCEMENT TESTING -->
+
+        <!-- Toggle: LEFT = EVENTS, RIGHT = INDEX [TESTING HOLD] -->
+        <div class="viewToggle" id="viewToggle" role="tablist" aria-label="View toggle">
+          <button class="viewToggle__tab" id="tabEvents" role="tab" aria-selected="true" type="button">Events</button>
+          <button class="viewToggle__tab" id="tabIndex" role="tab" aria-selected="false" type="button">Index</button>
+          <div class="viewToggle__thumb" aria-hidden="true"></div>
+        </div>
+      </div>
+
+    <!-- Sticky Filter Bars (locked with header) -->
+    <div class="stickyFilters" id="stickyFilters">
+      <nav class="filters" id="eventsFilters" aria-label="Events filters">
+            <div class="filters__inner">
+              <!-- Natural language search -->
+              <div class="pill pill--search">
+                <span class="pill__icon" aria-hidden="true">🔎</span>
+                <input id="eventsSearchInput" class="pill__input" type="text" inputmode="search"
+                       autocomplete="off" autocapitalize="none" spellcheck="false"
+                       placeholder="Search events" />
+                <button id="eventsSearchClear" class="pill__clear" type="button" aria-label="Clear">×</button>
+              </div>
+
+              <!-- Pill 1: YEAR -->
+              <div class="pillSelect" data-filter="eventsYear">
+                <button id="eventsPill1Btn" class="pill pill--select filter-pill" data-pill="eventsYear" type="button" aria-haspopup="menu" aria-expanded="false">
+                  <span class="pill__label" data-pill-title>YEAR</span>
+                  <span class="pill__dot" id="eventsPill1Dot" data-pill-indicator aria-hidden="true"></span>
+                  <span class="pill__caret" aria-hidden="true">▾</span>
+                </button>
+                <div id="eventsPill1Menu" class="menu" data-pill-panel role="menu" aria-label="Year menu" hidden>
+                  <div class="menu__header">
+                    <div class="menu__title">YEAR</div>
+                    <button id="eventsPill1Clear" class="menu__clear" data-pill-clear type="button">Clear</button>
+                  </div>
+                  <div class="menu__empty">Coming soon</div>
+                </div>
+              </div>
+
+              <!-- Pill 2: STATE -->
+              <div class="pillSelect" data-filter="eventsState">
+                <button id="eventsPill2Btn" class="pill pill--select filter-pill" data-pill="eventsState" type="button" aria-haspopup="menu" aria-expanded="false">
+                  <span class="pill__label" data-pill-title>STATE</span>
+                  <span class="pill__dot" id="eventsPill2Dot" data-pill-indicator aria-hidden="true"></span>
+                  <span class="pill__caret" aria-hidden="true">▾</span>
+                </button>
+                <div id="eventsPill2Menu" class="menu" data-pill-panel role="menu" aria-label="State menu" hidden>
+                  <div class="menu__header">
+                    <div class="menu__title">STATE</div>
+                    <button id="eventsPill2Clear" class="menu__clear" data-pill-clear type="button">Clear</button>
+                  </div>
+                  <div class="menu__empty">Coming soon</div>
+                </div>
+              </div>
+
+              <!-- Pill 3: EVENT -->
+              <div class="pillSelect" data-filter="eventsType">
+                <button id="eventsPill3Btn" class="pill pill--select filter-pill" data-pill="eventsType" type="button" aria-haspopup="menu" aria-expanded="false">
+                  <span class="pill__label" data-pill-title>EVENT</span>
+                  <span class="pill__dot" id="eventsPill3Dot" data-pill-indicator aria-hidden="true"></span>
+                  <span class="pill__caret" aria-hidden="true">▾</span>
+                </button>
+                <div id="eventsPill3Menu" class="menu" data-pill-panel role="menu" aria-label="Event menu" hidden>
+                  <div class="menu__header">
+                    <div class="menu__title">EVENT</div>
+                    <button id="eventsPill3Clear" class="menu__clear" data-pill-clear type="button">Clear</button>
+                  </div>
+                  <div class="menu__empty">Coming soon</div>
+                </div>
+              </div>
+            </div>
+          </nav>
+      <nav class="filters" id="filters" hidden aria-label="Filters">
+            <div class="filters__inner">
+              <!-- Natural language search -->
+              <div class="pill pill--search">
+                <span class="pill__icon" aria-hidden="true">🔎</span>
+                <input
+                  id="searchInput"
+                  class="pill__input"
+                  type="text"
+                  inputmode="search"
+                  autocomplete="off"
+                  autocapitalize="none"
+                  spellcheck="false"
+                  placeholder="Search gyms"
+                />
+                <button id="searchClear" class="pill__clear" type="button" aria-label="Clear search">×</button>
+              </div>
+
+              <!-- Pill 1: State -->
+              <div class="pillSelect" data-filter="state">
+                <button id="stateBtn" class="pill pill--select filter-pill" data-pill="states" type="button" aria-haspopup="menu" aria-expanded="false">
+                  <span class="pill__label" id="stateLabel" data-pill-title>STATE</span>
+                  <span class="pill__dot" id="stateDot" data-pill-indicator aria-hidden="true"></span>
+                  <span class="pill__caret" aria-hidden="true">▾</span>
+                </button>
+
+                <div id="stateMenu" class="menu" data-pill-panel role="menu" aria-label="State menu" hidden>
+                  <div class="menu__header">
+                    <div class="menu__title">STATE</div>
+                    <button id="stateClear" class="menu__clear" data-pill-clear type="button">Clear</button>
+                  </div>
+                  <div id="stateList" class="menu__list"></div>
+                </div>
+              </div>
+
+              <!-- Pill 2: Open Mat -->
+              <div class="pillSelect" data-filter="openMat">
+                <button id="openMatBtn" class="pill pill--select filter-pill" data-pill="openMat" type="button" aria-haspopup="menu" aria-expanded="false">
+                  <span class="pill__label" id="openMatLabel" data-pill-title>OPENS</span>
+                  <span class="pill__dot" id="openMatDot" data-pill-indicator aria-hidden="true"></span>
+                  <span class="pill__caret" aria-hidden="true">▾</span>
+                </button>
+
+                <div id="openMatMenu" class="menu" data-pill-panel role="menu" aria-label="Open Mat menu" hidden>
+                  <div class="menu__header">
+                    <div class="menu__title">OPENS</div>
+                    <button id="openMatClear" class="menu__clear" data-pill-clear type="button">Clear</button>
+                  </div>
+                  <div class="menu__list" id="openMatList">
+                    <label class="menu__item">
+                      <input type="checkbox" name="openMat" value="all" />
+                      <span>All</span>
+                    </label>
+                    <label class="menu__item">
+                      <input type="checkbox" name="openMat" value="sat" />
+                      <span>Saturday</span>
+                    </label>
+                    <label class="menu__item">
+                      <input type="checkbox" name="openMat" value="sun" />
+                      <span>Sunday</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pill 3: Guests -->
+              <div class="pillSelect" data-filter="guests">
+                <button id="guestsBtn" class="pill pill--select filter-pill" data-pill="guests" type="button" aria-haspopup="menu" aria-expanded="false">
+                  <span class="pill__label" id="guestsLabel" data-pill-title>GUESTS</span>
+                  <span class="pill__dot" id="guestsDot" data-pill-indicator aria-hidden="true"></span>
+                  <span class="pill__caret" aria-hidden="true">▾</span>
+                </button>
+
+                <div id="guestsMenu" class="menu" data-pill-panel role="menu" aria-label="Guests menu" hidden>
+                  <div class="menu__header">
+                    <div class="menu__title">GUESTS</div>
+                    <button id="guestsClear" class="menu__clear" data-pill-clear type="button">Clear</button>
+                  </div>
+                  <div class="menu__list" id="guestsList">
+                    <label class="menu__item">
+                      <input type="checkbox" name="guests" value="GUESTS WELCOME" />
+                      <span>GUESTS WELCOME</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </nav>
+    </div>
+
+</header>
+
+    <div class="viewShell" id="viewShell">
+      <div class="viewSlider" id="viewSlider">
+
+        <!-- VIEW A: EVENTS (LEFT / FIRST) -->
+        <div class="viewPanel" id="viewEvents" aria-label="Events">
+<main class="content" aria-label="Events">
+            <div class="content__inner">
+<div id="eventsRoot"></div>
+            </div>
+          </main>
+        </div>
+
+        <!-- VIEW B: INDEX (RIGHT / SECOND) -->
+        <div class="viewPanel" id="viewIndex" aria-label="Index">
+<main class="content" id="content" aria-label="Directory">
+            <div class="content__inner">
+<div id="groupsRoot"></div>
+            </div>
+          </main>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
