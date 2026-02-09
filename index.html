@@ -10,17 +10,17 @@
   <link rel="stylesheet" href="assets/css/layout.css" />
   <link rel="stylesheet" href="assets/css/pills.css?v=20260129-302">
   <link rel="stylesheet" href="assets/css/components.css?v=20260206-303" />
-<!-- IMPORTANT: repo references main.js (no sequence) -->
+<!-- section: scripts // purpose: app bootstrap -->
   <script type="module" src="assets/js/main.js?v=20260202-321"></script>
 </head>
 
 <body>
   <div class="app" id="app">
 
-    <!-- Header Area -->
+    <!-- section: header // purpose: logo, title, counts, social, view toggle -->
     <header class="header" id="header">
       
-      <!-- Logo Area (above header) -->
+      <!-- section: logo // purpose: brand mark -->
     <div aria-label="ANY logo" style="margin:0 0 -10px 0;">
       <div class="header__inner" style="display:flex;justify-content:flex-start;align-items:flex-end;">
         <div class="header__logoCrop"><img class="header__logoImage" src="assets/img/any-logo.png" alt="ANY" /></div>
@@ -35,7 +35,7 @@
           <span id="status" class="status header__count" hidden></span>
         </div>
 
-        <!-- START ICON ENHANCEMENT TESTING -->
+        <!-- section: social links // purpose: instagram + dm -->
         <div class="headerSocial" aria-label="Header social links">
           <a class="headerSocial__link" href="https://www.instagram.com/any.jiujitsu/" target="_blank" rel="noopener" aria-label="Instagram profile">
             <!-- Instagram (Feather-style) -->
@@ -54,9 +54,9 @@
             </svg>
           </a>
         </div>
-        <!-- END ICON ENHANCEMENT TESTING -->
+        
 
-        <!-- Toggle: LEFT = EVENTS, RIGHT = INDEX [TESTING HOLD] -->
+        <!-- section: view toggle // purpose: switch between Events and Index -->
         <div class="viewToggle" id="viewToggle" role="tablist" aria-label="View toggle">
           <button class="viewToggle__tab" id="tabEvents" role="tab" aria-selected="true" type="button">Events</button>
           <button class="viewToggle__tab" id="tabIndex" role="tab" aria-selected="false" type="button">Index</button>
@@ -64,7 +64,7 @@
         </div>
       </div>
 
-    <!-- Sticky Filter Bars (locked with header) -->
+    <!-- section: sticky filters // purpose: search + pill filters per view -->
     <div class="stickyFilters" id="stickyFilters">
       <nav class="filters" id="eventsFilters" aria-label="Events filters">
             <div class="filters__inner">
@@ -84,7 +84,7 @@
                   <span class="pill__dot" id="eventsPill1Dot" data-pill-indicator aria-hidden="true"></span>
                   <span class="pill__caret" aria-hidden="true">▾</span>
                 </button>
-                <div id="eventsPill1Menu" class="menu" data-pill-panel role="menu" aria-label="Year menu" hidden>      <div class="menu__list"></div>
+                <div id="eventsPill1Menu" class="menu" data-pill-panel role="menu" aria-label="Year menu" hidden>          <div class="menu__list"></div>
 
                   <div class="menu__header">
                     <div class="menu__title">YEAR</div>
@@ -101,7 +101,7 @@
                   <span class="pill__dot" id="eventsPill2Dot" data-pill-indicator aria-hidden="true"></span>
                   <span class="pill__caret" aria-hidden="true">▾</span>
                 </button>
-                <div id="eventsPill2Menu" class="menu" data-pill-panel role="menu" aria-label="State menu" hidden>      <div class="menu__list"></div>
+                <div id="eventsPill2Menu" class="menu" data-pill-panel role="menu" aria-label="State menu" hidden>          <div class="menu__list"></div>
 
                   <div class="menu__header">
                     <div class="menu__title">STATE</div>
@@ -118,7 +118,7 @@
                   <span class="pill__dot" id="eventsPill3Dot" data-pill-indicator aria-hidden="true"></span>
                   <span class="pill__caret" aria-hidden="true">▾</span>
                 </button>
-                <div id="eventsPill3Menu" class="menu" data-pill-panel role="menu" aria-label="Event menu" hidden>      <div class="menu__list"></div>
+                <div id="eventsPill3Menu" class="menu" data-pill-panel role="menu" aria-label="Event menu" hidden>          <div class="menu__list"></div>
 
                   <div class="menu__header">
                     <div class="menu__title">EVENT</div>
@@ -225,20 +225,20 @@
     <div class="viewShell" id="viewShell">
       <div class="viewSlider" id="viewSlider">
 
-        <!-- VIEW A: EVENTS (LEFT / FIRST) -->
+        <!-- section: view panel // purpose: Events -->
         <div class="viewPanel" id="viewEvents" aria-label="Events">
-<main class="content" aria-label="Events">
+          <main class="content" aria-label="Events">
             <div class="content__inner">
-<div id="eventsRoot"></div>
+                <div id="eventsRoot"></div>
             </div>
           </main>
         </div>
 
-        <!-- VIEW B: INDEX (RIGHT / SECOND) -->
+        <!-- section: view panel // purpose: Index -->
         <div class="viewPanel" id="viewIndex" aria-label="Index">
-<main class="content" id="content" aria-label="Directory">
+          <main class="content" id="content" aria-label="Directory">
             <div class="content__inner">
-<div id="groupsRoot"></div>
+                <div id="groupsRoot"></div>
             </div>
           </main>
         </div>
