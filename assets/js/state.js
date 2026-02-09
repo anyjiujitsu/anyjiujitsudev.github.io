@@ -1,37 +1,50 @@
-// STEP 0 — Skeleton Reset (Iteration 100)
-// State is plain data. No DOM access in this file.
+/* section: app state
+   purpose: single source of truth for UI state (no DOM access in this file) */
 
 export const state = {
-  view: "events", // default now matches spec: Events first (View A)
+  /* section: view
+     purpose: current view ("events" | "index") */
+  view: "events",
 
-  // View B (Index)
+  /* section: index state
+     purpose: search + pills for Index view */
   index: {
     q: "",
-    // pills intentionally inactive in STEP 0
     states: new Set(),
-    opens: new Set(), // "ALL" | "SATURDAY" | "SUNDAY"
-    openMat: "", // deprecated (kept for backward compat)
-    guests: new Set(), // "welcomed" etc.
+    opens: new Set(),  // "ALL" | "SATURDAY" | "SUNDAY"
+    guests: new Set(), // e.g. "GUESTS WELCOME"
   },
 
-  // View A (Events)
+  /* section: events state
+     purpose: search + pills for Events view */
   events: {
     q: "",
     year: new Set(),
     state: new Set(),
-    type: new Set(), // used for Event pill later
+    type: new Set(),
   },
 };
 
+/* section: state mutators
+   purpose: small setters used by main.js and other modules */
+
 export function setView(v){
-  // View lock: Events only (Index view under development)
+  // section: view lock
+  // purpose: keep Events as the only active view while Index is being rebuilt
   state.view = "events";
 }
 
-export function setIndexQuery(q){ state.index.q = String(q ?? ""); }
-export function setEventsQuery(q){ state.events.q = String(q ?? ""); }
+export function setIndexQuery(q){
+  state.index.q = String(q ?? "");
+}
 
-// Helper used later for indicator dots
+export function setEventsQuery(q){
+  state.events.q = String(q ?? "");
+}
+
+/* section: selection checks
+   purpose: used for "hasSelection" indicators (dots) */
+
 export function hasIndexSelections(){
   return state.index.q.trim().length > 0 ||
     state.index.states.size > 0 ||
