@@ -1,78 +1,66 @@
 :root{
+  /* section: theme | purpose: core colors */
   --bg: #ebebeb;
   --green: #234c31;
   --row: #e2e4e4;
   --beige: #ebdeca;
-  --shadow: rgba(0,0,0,0.18);
+  --shadow: rgba(0, 0, 0, 0.18);
 
+  /* section: text | purpose: text + muted */
   --text: #111;
-  --muted: rgba(0,0,0,0.55);
+  --muted: rgba(0, 0, 0, 0.55);
 
+  /* section: layout | purpose: radius + page sizing */
   --radius: 14px;
   --radiusPill: 999px;
-
   --pagePad: 14px;
   --maxW: 900px;
 
-  /* Header */
+  /* section: header | purpose: header sizing */
   --titleSize: 58px;
-
-  /* ANY logo */
   --anyLogoH: 22px;
   --anyLogoMB: 4px;
   --titleTracking: -0.04em;
 
-  /* Pills */
+  /* section: pills | purpose: pill sizing */
   --pillH: 36px;
   --pillFont: 14px;
   --pillPadX: 12px;
 
-  /* Groups + rows */
+  /* section: rows | purpose: group + row fonts */
   --groupLabelFont: 12px;
   --rowFont: 14px;
 
-  /* Indicator dot */
+  /* section: indicator | purpose: selection dot sizing */
   --dotSize: 10px;
+  --pagePad: 3px;
+  --titleSize: 30px;
+  --anyLogoH: 12px;
+  --anyLogoMB: 1px;
+  --pillH: 20px;
+  --pillFont: 9.5px;
+  --pillPadX: 5px;
+  --groupLabelFont: 7.5px;
+  --rowFont: 10px;
+  --radius: 7px;
+  --shadow: rgba(0, 0, 0, 0.10);
+  --dotSize: 6px;
+  --pagePad: 24px;
+  --titleSize: 72px;
+  --pillH: 40px;
+  --pillFont: 14px;
+  --rowFont: 14px;
+
 }
 
-/* Permanent compact mobile density */
+/* section: responsive tokens | purpose: compact mobile density */
 @media (max-width: 430px){
   :root{
-    /* Permanent compact mobile density (iter120) ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â stronger */
-    --pagePad: 3px;
-
-    /* Header */
-    --titleSize: 30px;
-    /* ANY logo */
-    --anyLogoH: 12px;
-    --anyLogoMB: 1px;
-
-
-    /* Pills */
-    --pillH: 20px;
-    --pillFont: 9.5px;
-    --pillPadX: 5px;
-
-    /* Groups + rows */
-    --groupLabelFont: 7.5px;
-    --rowFont: 10px;
-
-    --radius: 7px;
-    --shadow: rgba(0,0,0,0.10);
-
-    --dotSize: 6px;
   }
 }
 
-
-
+/* section: responsive tokens | purpose: wide layout adjustments */
 @media (min-width: 900px){
   :root{
-    --pagePad: 24px;
-    --titleSize: 72px;
-
-    --pillH: 40px;
-    --pillFont: 14px;
-    --rowFont: 14px;
   }
 }
