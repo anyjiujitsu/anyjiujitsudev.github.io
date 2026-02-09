@@ -1044,27 +1044,47 @@ nav.filters, .filters__inner, .pillRow{
   }
 }
 
-
-/* section: past events // purpose: visually de-emphasize inactive items (robust across desktop/mobile) */
-#viewEvents .group--past .row.row--events{
-  color: #777;
-}
-
-#viewEvents .group--past .row.row--events .cell__top{ color: #666; }
-#viewEvents .group--past .row.row--events .cell__sub{ color: #888; }
-
-#viewEvents .group--past .row.row--events .cell--event::before{
-  background: transparent !important;
-}
-
-#viewEvents .group--past .row.row--events .cell--event{
-  background: transparent !important;
-}
-
-
-/* section: past events mobile highlight removal // purpose: remove beige strip on mobile where EVENT column is hidden */
+/* section: past events // purpose: visually de-emphasize inactive items (mobile highlight strip) */
 @media (max-width: 520px){
   #viewEvents .group--past .row.row--events .cell--forwhere::before{
     background: transparent !important;
   }
+}
+
+/* section: search suggestions // purpose: dropdown quick-picks for Events search */
+.suggestWrap{
+  position: relative;
+}
+
+#eventsSearchSuggest.suggest{
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+  padding: 10px;
+  z-index: 80;
+}
+
+#eventsSearchSuggest .suggest__item{
+  width: 100%;
+  display: block;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 12px 12px;
+  border-radius: 12px;
+  font: inherit;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+#eventsSearchSuggest .suggest__item:hover{
+  background: rgba(0,0,0,0.06);
+}
+
+#eventsSearchSuggest .suggest__item:active{
+  background: rgba(0,0,0,0.10);
 }
