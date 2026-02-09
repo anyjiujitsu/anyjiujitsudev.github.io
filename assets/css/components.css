@@ -1157,7 +1157,7 @@ nav.filters, .filters__inner, .pillRow{
 }
 
 .suggest .suggest__item::before{
-  content: "â€¢";
+  content: "•";
   position: absolute;
   margin-left: -18px;
   color: #9a9a9a;
@@ -1228,3 +1228,4 @@ nav.filters, .filters__inner, .pillRow{
     letter-spacing: .05em;
   }
 }
+
