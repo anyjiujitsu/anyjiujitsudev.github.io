@@ -1,8 +1,9 @@
+/* section: app container | purpose: full-height layout */
 .app{
   min-height: 100svh;
 }
 
-/* Sticky header+filters: stable mobile experience */
+/* section: header | purpose: sticky top bar + safe-area padding */
 .header{
   position: sticky;
   top: 0;
@@ -15,31 +16,32 @@
   max-width: var(--maxW);
   margin: 0 auto;
   padding: 10px var(--pagePad) 6px;
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
   gap: 12px;
 }
 
+/* section: filters bar | purpose: sticky controls styling */
 .filters{
   position: relative;
   z-index: 40;
   background: var(--green);
-  box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
 }
 
 .filters__inner{
   max-width: var(--maxW);
   margin: 0 auto;
   padding: 10px var(--pagePad);
-  display:flex;
+  display: flex;
   gap: 10px;
-  align-items:center;
+  align-items: center;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
 
-/* content scrolls (body scroll) */
+/* section: content | purpose: main page padding + width */
 .content__inner{
   max-width: var(--maxW);
   margin: 0 auto;
