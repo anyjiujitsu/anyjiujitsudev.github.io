@@ -1,71 +1,74 @@
+/* section: tokens | purpose: global design variables */
 :root{
+  /* section: theme | purpose: core colors */
   --bg: #ebebeb;
   --green: #234c31;
   --row: #e2e4e4;
   --beige: #ebdeca;
   --shadow: rgba(0,0,0,0.18);
 
+  /* section: text | purpose: base + muted text */
   --text: #111;
   --muted: rgba(0,0,0,0.55);
 
+  /* section: layout | purpose: radius + spacing */
   --radius: 14px;
   --radiusPill: 999px;
-
   --pagePad: 14px;
   --maxW: 900px;
 
-  /* Header */
+  /* section: header | purpose: title sizing */
   --titleSize: 58px;
 
-  /* ANY logo */
+  /* section: logo | purpose: ANY logo sizing */
   --anyLogoH: 22px;
   --anyLogoMB: 4px;
   --titleTracking: -0.04em;
 
-  /* Pills */
+  /* section: pills | purpose: pill sizing */
   --pillH: 36px;
   --pillFont: 14px;
   --pillPadX: 12px;
 
-  /* Groups + rows */
+  /* section: rows | purpose: group + row typography */
   --groupLabelFont: 12px;
   --rowFont: 14px;
 
-  /* Indicator dot */
+  /* section: indicator | purpose: selection dot */
   --dotSize: 10px;
 }
 
-/* Permanent compact mobile density */
+/* section: responsive tokens | purpose: compact mobile density */
 @media (max-width: 430px){
   :root{
-    /* Permanent compact mobile density (iter120) ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â stronger */
     --pagePad: 3px;
 
-    /* Header */
+    /* section: header | purpose: mobile title sizing */
     --titleSize: 30px;
-    /* ANY logo */
+
+    /* section: logo | purpose: mobile ANY logo */
     --anyLogoH: 12px;
     --anyLogoMB: 1px;
 
-
-    /* Pills */
+    /* section: pills | purpose: compact pills */
     --pillH: 20px;
     --pillFont: 9.5px;
     --pillPadX: 5px;
 
-    /* Groups + rows */
+    /* section: rows | purpose: compact typography */
     --groupLabelFont: 7.5px;
     --rowFont: 10px;
 
+    /* section: layout | purpose: compact radius + shadow */
     --radius: 7px;
     --shadow: rgba(0,0,0,0.10);
 
+    /* section: indicator | purpose: compact dot */
     --dotSize: 6px;
   }
 }
 
-
-
+/* section: responsive tokens | purpose: wide layout */
 @media (min-width: 900px){
   :root{
     --pagePad: 24px;
