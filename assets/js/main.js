@@ -675,7 +675,7 @@ function wireSearch(){
 
 /* section: search suggestions // purpose: quick-pick common search tokens for Events */
 function wireSearchSuggestions(){
-  const wrap = $("eventsSearchWrap");
+  const wrap  = $("eventsSearchWrap");
   const input = $("eventsSearchInput");
   const panel = $("eventsSearchSuggest");
   if(!wrap || !input || !panel) return;
@@ -687,7 +687,6 @@ function wireSearchSuggestions(){
     if(!panel.hasAttribute("hidden")) panel.setAttribute("hidden","");
   };
 
-  // Open when user clicks into the input (only if nothing typed yet)
   input.addEventListener("focus", ()=>{
     if(!String(input.value || "").trim()) open();
   });
@@ -695,12 +694,10 @@ function wireSearchSuggestions(){
     if(!String(input.value || "").trim()) open();
   });
 
-  // If they start typing, hide suggestions (keeps UI clean)
   input.addEventListener("input", ()=>{
     if(String(input.value || "").trim()) close();
   });
 
-  // Click a suggestion -> populate search, trigger filter, close
   panel.addEventListener("click", (e)=>{
     const btn = e.target.closest("button[data-value]");
     if(!btn) return;
@@ -715,13 +712,11 @@ function wireSearchSuggestions(){
     input.blur();
   });
 
-  // Click outside closes it
   document.addEventListener("pointerdown", (e)=>{
     if(wrap.contains(e.target)) return;
     close();
   }, true);
 
-  // Escape closes
   input.addEventListener("keydown", (e)=>{
     if(e.key === "Escape") close();
   });
@@ -747,7 +742,6 @@ async function init(){
   wireViewToggle();
   wireSearch();
   wireSearchSuggestions();
-
   if(!state.view) state.view = "events";
   setView("events");
   state.view = "events";
