@@ -1054,9 +1054,24 @@ nav.filters, .filters__inner, .pillRow{
 /* section: search suggestions // purpose: dropdown quick-picks for Events search */
 .suggestWrap{
   position: relative;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+/* Mobile: keep Events search pill width behavior unchanged */
+@media (max-width: 520px){
+  .suggestWrap{
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .suggestWrap > .pill--search{
+    flex: 1 1 auto;
+    min-width: 0;
+  }
 }
 
 #eventsSearchSuggest.suggest{
+  color: inherit;
   position: absolute;
   top: calc(100% + 10px);
   left: 0;
@@ -1079,6 +1094,10 @@ nav.filters, .filters__inner, .pillRow{
   font: inherit;
   letter-spacing: 0.02em;
   cursor: pointer;
+  color: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #eventsSearchSuggest .suggest__item:hover{
