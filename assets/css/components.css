@@ -1045,14 +1045,18 @@ nav.filters, .filters__inner, .pillRow{
 }
 
 
-/* section: past events // purpose: visually de-emphasize inactive items (scoped + non-layout) */
-#viewEvents .group--past .row.row--events,
-#viewEvents .group--past .row.row--events .cell__top,
-#viewEvents .group--past .row.row--events .cell__sub{
+/* section: past events // purpose: visually de-emphasize inactive items (robust across desktop/mobile) */
+#viewEvents .group--past .row.row--events{
   color: #777;
 }
 
-#viewEvents .group--past .row.row--events .cell--event,
+#viewEvents .group--past .row.row--events .cell__top{ color: #666; }
+#viewEvents .group--past .row.row--events .cell__sub{ color: #888; }
+
 #viewEvents .group--past .row.row--events .cell--event::before{
+  background: transparent !important;
+}
+
+#viewEvents .group--past .row.row--events .cell--event{
   background: transparent !important;
 }
