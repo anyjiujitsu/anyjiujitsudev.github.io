@@ -1,8 +1,12 @@
-// render104.js — Restore original DOM/CSS contract + Events grouped by Month-Year
-// Exports MUST match main.js imports: renderDirectoryGroups, renderEventsGroups
+/* section: render (Index + Events)
+   purpose: build DOM rows + grouped sections for Index and Events views
+   notes: exports must match main.js imports (renderDirectoryGroups, renderEventsGroups) */
 
 export function renderStateMenu(stateListEl, allStates, selectedSet){
+  /* section: menu render
+     purpose: render STATE checkbox list into a provided container */
   if(!stateListEl) return;
+
   stateListEl.innerHTML = "";
   for(const code of allStates){
     const label = document.createElement("label");
@@ -22,9 +26,11 @@ export function renderStateMenu(stateListEl, allStates, selectedSet){
   }
 }
 
-// -------------------- INDEX (group by STATE) --------------------
+/* section: Index groups (by STATE)
+   purpose: render directory rows grouped by state */
 export function renderDirectoryGroups(root, rows){
   if(!root) return;
+
   const grouped = groupByKey(rows, (r)=> (r.STATE || "—").toUpperCase());
   root.innerHTML = "";
 
@@ -50,6 +56,8 @@ export function renderDirectoryGroups(root, rows){
 }
 
 function renderIndexRow(r){
+  /* section: Index row
+     purpose: one directory row using existing DOM/CSS contract */
   const row = document.createElement("div");
   row.className = "row";
 
@@ -78,15 +86,16 @@ function renderIndexRow(r){
 }
 
 function composeDays(r){
+  /* section: Index days
+     purpose: display Sat/Sun schedule in a compact single line */
   const parts = [];
-  if(r.SAT) parts.push(`Sat. ${r.SAT}`);
-  else parts.push("Sat.");
-  if(r.SUN) parts.push(`Sun. ${r.SUN}`);
-  else parts.push("Sun.");
+  parts.push(r.SAT ? `Sat. ${r.SAT}` : "Sat.");
+  parts.push(r.SUN ? `Sun. ${r.SUN}` : "Sun.");
   return parts.join("  ");
 }
 
-// -------------------- EVENTS (group by MONTH YEAR) --------------------
+/* section: Events groups (by MONTH YEAR)
+   purpose: render events rows grouped by month/year with sorting */
 export function renderEventsGroups(root, rows){
   if(!root) return;
 
@@ -122,50 +131,23 @@ export function renderEventsGroups(root, rows){
 }
 
 function renderEventRow(r){
+  /* section: Events row
+     purpose: one events row using existing DOM/CSS contract (4 cells) */
   const row = document.createElement("div");
   row.className = "row row--events";
 
-  // DATE displayed as MM/DD/YY (fallback to original if parse fails)
+  // DATE displayed as MM/DD/YY (fallback to raw if parse fails)
   const rawDate = String(r.DATE ?? "").trim();
   const parsed = rawDate ? parseEventDate(rawDate) : null;
   const dateText = parsed
-    ? `${String(parsed.getMonth() + 1).padStart(2,'0')}/${String(parsed.getDate()).padStart(2,'0')}/${String(parsed.getFullYear()).slice(-2)}`
+    ? `${String(parsed.getMonth() + 1).padStart(2,"0")}/${String(parsed.getDate()).padStart(2,"0")}/${String(parsed.getFullYear()).slice(-2)}`
     : (rawDate || "—");
 
-    // NEW rule:
-// - If CREATED is blank OR cannot be parsed => treat as not new (render placeholder).
-// - If CREATED is older than (today - 4 days) => not new.
-// - If CREATED is within the last 4 days => show *NEW.
-const createdRaw = String(r.CREATED ?? "").trim();
+  // section: NEW flag
+  // purpose: show *NEW only if CREATED is within last 4 days (local midnight cutoff)
+  const showNew = shouldShowNew(r.CREATED);
 
-const createdDate = (() => {
-  if (!createdRaw) return null;
-
-  // Try native Date.parse first (handles ISO and many common formats)
-  const ms = Date.parse(createdRaw);
-  if (!Number.isNaN(ms)) return new Date(ms);
-
-  // Fallback: reuse parseEventDate if available in this file (handles MM/DD[/YY] style)
-  try {
-    if (typeof parseEventDate === "function"){
-      const d = parseEventDate(createdRaw);
-      if (d) return d;
-    }
-  } catch(e) {}
-
-  return null;
-})();
-
-const cutoff = (() => {
-  const now = new Date();
-  // Use local midnight to avoid time-of-day edge cases
-  const mid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  mid.setDate(mid.getDate() - 4);
-  return mid;
-})();
-
-const showNew = !!(createdDate && createdDate >= cutoff);
-// 1) EVENT + (placeholder) NEW field
+  // 1) EVENT + NEW (subline)
   const c1 = document.createElement("div");
   c1.className = "cell cell--event";
   c1.innerHTML = `
@@ -173,19 +155,16 @@ const showNew = !!(createdDate && createdDate >= cutoff);
     ${showNew ? `<div class="cell__sub cell__new">*NEW</div>` : `<div class="cell__sub cell__new">&nbsp;</div>`}
   `;
 
-  // 2) FOR + WHERE
+  // 2) EVENT inline + FOR + WHERE
   const c2 = document.createElement("div");
   c2.className = "cell cell--forwhere";
-  const newRaw = (r.NEW ?? r.NEW_FIELD ?? r.NEWFLAG ?? "");
-  const newShown = String(newRaw).trim() || "—";
   c2.innerHTML = `
-    <div class="cell__eventInlineWrap"><span class="cell__eventInline">${escapeHtml(r.EVENT || "—")}</span>${showNew ? `<span class="cell__newInline">*NEW</span>` : `<span class="cell__newInline">&nbsp;</span>`}</div>
+    <div class="cell__eventInlineWrap">
+      <span class="cell__eventInline">${escapeHtml(r.EVENT || "—")}</span>
+      ${showNew ? `<span class="cell__newInline">*NEW</span>` : `<span class="cell__newInline">&nbsp;</span>`}
+    </div>
     <div class="cell__top cell__for">${escapeHtml(r.FOR || "—")}</div>
-    <div class="cell__sub cell__where">${(() => {
-      const raw = (r.WHERE ?? r.GYM ?? "");
-      const t = String(raw).trim();
-      return escapeHtml(t || "HOSTED LOCATION");
-    })()}</div>
+    <div class="cell__sub cell__where">${escapeHtml(getWhereText(r))}</div>
   `;
 
   // 3) CITY + STATE
@@ -212,8 +191,46 @@ const showNew = !!(createdDate && createdDate >= cutoff);
   return row;
 }
 
+function getWhereText(r){
+  /* section: WHERE fallback
+     purpose: display a friendly placeholder when WHERE/GYM is blank */
+  const raw = (r.WHERE ?? r.GYM ?? "");
+  const t = String(raw).trim();
+  return t || "HOSTED LOCATION";
+}
+
+function shouldShowNew(createdRaw){
+  /* section: NEW logic
+     purpose: true if CREATED parses and is within last 4 days */
+  const raw = String(createdRaw ?? "").trim();
+  if(!raw) return false;
+
+  const createdDate = parseCreatedDate(raw);
+  if(!createdDate) return false;
+
+  const cutoff = localMidnightDaysAgo(4);
+  return createdDate >= cutoff;
+}
+
+function parseCreatedDate(str){
+  // Try native parse first (handles ISO and many common formats)
+  const ms = Date.parse(str);
+  if(!Number.isNaN(ms)) return new Date(ms);
+
+  // Fallback: MM/DD/YYYY style
+  return parseEventDate(str);
+}
+
+function localMidnightDaysAgo(days){
+  const now = new Date();
+  const mid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  mid.setDate(mid.getDate() - days);
+  return mid;
+}
 
 function groupEventsByMonth(rows){
+  /* section: Events grouping
+     purpose: Map rows to Month-Year keys and sort groups by earliest date (desc) */
   const m = new Map();
 
   for(const r of rows){
@@ -224,7 +241,7 @@ function groupEventsByMonth(rows){
   }
 
   // sort groups by their earliest valid date (descending). Unknown last.
-  const entries = [...m.entries()].sort((a,b)=>{
+  return [...m.entries()].sort((a,b)=>{
     if(a[0] === "Unknown Date") return 1;
     if(b[0] === "Unknown Date") return -1;
 
@@ -234,8 +251,6 @@ function groupEventsByMonth(rows){
     const tb = db ? db.getTime() : -Infinity;
     return tb - ta;
   });
-
-  return entries;
 }
 
 function minDateIn(list){
@@ -249,16 +264,17 @@ function minDateIn(list){
 }
 
 function parseEventDate(s){
+  /* section: date parse
+     purpose: accept MM/DD/YYYY or fall back to Date() for other parseable formats */
   const str = String(s ?? "").trim();
   if(!str) return null;
 
-  // Accept MM/DD/YYYY (or M/D/YYYY)
   const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
   if(m){
     const mm = Number(m[1]);
     const dd = Number(m[2]);
     const yy = Number(m[3]);
-    const d = new Date(yy, mm-1, dd);
+    const d = new Date(yy, mm - 1, dd);
     return isNaN(d) ? null : d;
   }
 
@@ -270,7 +286,8 @@ function formatMonthYear(d){
   return d.toLocaleString("en-US", { month: "long", year: "numeric" });
 }
 
-// -------------------- shared helpers --------------------
+/* section: shared helpers
+   purpose: grouping + XSS-safe text injection */
 function groupByKey(rows, keyFn){
   const m = new Map();
   for(const r of rows){
