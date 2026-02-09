@@ -140,8 +140,24 @@ function wireMenuDismiss(){
 
 /* section: menu list builder
    purpose: render checkbox list into a given container element */
+function ensureMenuList(panelEl){
+  if(!panelEl) return null;
+  let listEl = panelEl.querySelector('.menu__list');
+  if(listEl) return listEl;
+
+  // If the menu was scaffolded with a placeholder (e.g., "Coming soon"), remove it
+  panelEl.querySelectorAll('.menu__empty').forEach(n=>n.remove());
+
+  listEl = document.createElement('div');
+  listEl.className = 'menu__list';
+  panelEl.appendChild(listEl);
+  return listEl;
+}
+
 function buildMenuListIn(listEl, items, selectedSet, onChange){
   if(!listEl) return;
+  // Only clear/inject inside the checkbox list container (never the whole menu panel)
+  if(!listEl.classList.contains('menu__list')) return;
 
   listEl.innerHTML = "";
   items.forEach(val=>{
@@ -181,7 +197,7 @@ function wireEventsYearPill(getEventRows, onChange){
   const clearBtn = $('eventsPill1Clear');
   if(!btn || !panel) return;
 
-  const listEl = panel.querySelector('.menu__list') || panel;
+  const listEl = ensureMenuList(panel);
   const years = uniqYearsFromEvents(getEventRows());
   buildMenuListIn(listEl, years, state.events.year, ()=>{
     setPillHasSelection(btn, state.events.year.size > 0);
@@ -228,7 +244,7 @@ function wireEventsStatePill(getEventRows, onChange){
   const clearBtn = $('eventsPill2Clear');
   if(!btn || !panel) return;
 
-  const listEl = panel.querySelector('.menu__list') || panel;
+  const listEl = ensureMenuList(panel);
   const states = uniqStatesFromEvents(getEventRows());
   buildMenuListIn(listEl, states, state.events.state, ()=>{
     setPillHasSelection(btn, state.events.state.size > 0);
@@ -275,7 +291,7 @@ function wireEventsTypePill(getEventRows, onChange){
   const clearBtn = $('eventsPill3Clear');
   if(!btn || !panel) return;
 
-  const listEl = panel.querySelector('.menu__list') || panel;
+  const listEl = ensureMenuList(panel);
   const types = uniqTypesFromEvents(getEventRows());
   buildMenuListIn(listEl, types, state.events.type, ()=>{
     setPillHasSelection(btn, state.events.type.size > 0);
@@ -468,7 +484,7 @@ function wireIndexOpensPill(getDirectoryRows, onChange){
   const clearBtn = $('openMatClear');
   if(!btn || !panel) return;
 
-  const listEl = $('openMatList') || panel.querySelector('.menu__list') || panel;
+  const listEl = $('openMatList') || ensureMenuList(panel);
   const items = ["ALL","SATURDAY","SUNDAY"];
 
   buildMenuListIn(listEl, items, state.index.opens, ()=>{
@@ -513,7 +529,7 @@ function wireIndexGuestsPill(getDirectoryRows, onChange){
   const clearBtn = $('guestsClear');
   if(!btn || !panel) return;
 
-  const listEl = $('guestsList') || panel.querySelector('.menu__list') || panel;
+  const listEl = $('guestsList') || ensureMenuList(panel);
   const items = ["GUESTS WELCOME"];
 
   buildMenuListIn(listEl, items, state.index.guests, ()=>{
@@ -558,7 +574,7 @@ function wireIndexStatePill(getDirectoryRows, onChange){
   const clearBtn = $('stateClear');
   if(!btn || !panel) return;
 
-  const listEl = $('stateList') || panel.querySelector('.menu__list') || panel;
+  const listEl = $('stateList') || ensureMenuList(panel);
   const states = uniqStatesFromDirectory(getDirectoryRows());
 
   buildMenuListIn(listEl, states, state.index.states, ()=>{
