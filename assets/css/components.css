@@ -1060,3 +1060,11 @@ nav.filters, .filters__inner, .pillRow{
 #viewEvents .group--past .row.row--events .cell--event{
   background: transparent !important;
 }
+
+
+/* section: past events mobile highlight removal // purpose: remove beige strip on mobile where EVENT column is hidden */
+@media (max-width: 520px){
+  #viewEvents .group--past .row.row--events .cell--forwhere::before{
+    background: transparent !important;
+  }
+}
