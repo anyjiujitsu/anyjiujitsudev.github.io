@@ -1111,17 +1111,32 @@ nav.filters, .filters__inner, .pillRow{
 
 /* =========================================================
    section: dropdown polish
-   purpose: inset dividers + quick search styling
+   purpose: inset divider under dropdown headers + quick search header/bullets
    ========================================================= */
 
+/* Inset divider under every pill menu header (non-edge-to-edge) */
+.menu__header{
+  position: relative;
+}
+
+.menu__header::after{
+  content: "";
+  display: block;
+  height: 1px;
+  margin: 8px 14px 0;
+  background: rgba(0,0,0,0.12);
+}
+
+/* Shared divider element (used by search suggest header) */
 .menu__divider{
   height: 1px;
   margin: 6px 14px 8px;
   background: rgba(0,0,0,0.12);
 }
 
+/* Static header used inside the Quick Searches suggest box */
 .menu__header--static{
-  padding: 8px 14px 4px;
+  padding: 10px 14px 6px;
 }
 
 .menu__header--static .menu__title{
@@ -1131,15 +1146,37 @@ nav.filters, .filters__inner, .pillRow{
   color: #6f6f6f;
 }
 
-/* Quick search list bullets */
-.searchSuggest__item{
-  position: relative;
-  padding-left: 18px;
+/* Quick Searches dropdown (search suggestions) */
+.suggest{
+  /* match pill menu feel */
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+  overflow: hidden;
 }
 
-.searchSuggest__item::before{
+.suggest .suggest__item{
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px 10px 32px; /* room for bullet */
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.suggest .suggest__item::before{
   content: "â€¢";
   position: absolute;
-  left: 6px;
+  margin-left: -18px;
   color: #9a9a9a;
+}
+
+/* Hover / active polish */
+.suggest .suggest__item:hover{
+  background: rgba(0,0,0,0.04);
 }
