@@ -1217,8 +1217,8 @@ nav.filters, .filters__inner, .pillRow{
   top: 50%;
   transform: translateY(-50%);
   color: #b0b0b0;
-  font-size: 14px;
-  line-height: 1;
+  font-size: 11px;
+  line-height: .5;
 }
 
 /* Mobile: keep the Quick Searches header from wrapping */
@@ -1228,5 +1228,6 @@ nav.filters, .filters__inner, .pillRow{
     letter-spacing: .05em;
   }
 }
+
 
 
