@@ -94,12 +94,37 @@ function composeDays(r){
   return parts.join("  ");
 }
 
-/* section: Events groups (by MONTH YEAR)
-   purpose: render events rows grouped by month/year with sorting */
+/* section: Events groups (UPCOMING first, then PAST)
+   purpose: render events rows grouped by month/year with priority ordering:
+            1) Upcoming (today or later), grouped by Month-Year ascending
+            2) Past (before today), grouped by Month-Year ascending
+            3) Unknown date (unparseable), last
+   note: no explicit "Upcoming/Past" headers; groups are simply ordered */
 export function renderEventsGroups(root, rows){
   if(!root) return;
 
-  const grouped = groupEventsByMonth(rows);
+  const todayMidnight = localMidnight();
+
+  const upcoming = [];
+  const past = [];
+  const unknown = [];
+
+  for(const r of rows){
+    const d = parseEventDate(r.DATE);
+    if(!d){
+      unknown.push(r);
+      continue;
+    }
+    if(d < todayMidnight) past.push(r);
+    else upcoming.push(r);
+  }
+
+  const groupedUpcoming = groupEventsByMonthAscending(upcoming);
+  const groupedPast = groupEventsByMonthAscending(past);
+  const groupedUnknown = groupEventsByMonthAscending(unknown);
+
+  const grouped = [...groupedUpcoming, ...groupedPast, ...groupedUnknown];
+
   root.innerHTML = "";
 
   for(const [labelText, list] of grouped){
@@ -222,15 +247,19 @@ function parseCreatedDate(str){
 }
 
 function localMidnightDaysAgo(days){
-  const now = new Date();
-  const mid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const mid = localMidnight();
   mid.setDate(mid.getDate() - days);
   return mid;
 }
 
-function groupEventsByMonth(rows){
-  /* section: Events grouping
-     purpose: Map rows to Month-Year keys and sort groups by earliest date (desc) */
+function localMidnight(){
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+function groupEventsByMonthAscending(rows){
+  /* section: Events grouping (ascending)
+     purpose: map rows to Month-Year keys and sort groups by earliest valid date (asc) */
   const m = new Map();
 
   for(const r of rows){
@@ -240,16 +269,16 @@ function groupEventsByMonth(rows){
     m.get(key).push(r);
   }
 
-  // sort groups by their earliest valid date (descending). Unknown last.
+  // sort groups by their earliest valid date (ascending). Unknown last.
   return [...m.entries()].sort((a,b)=>{
     if(a[0] === "Unknown Date") return 1;
     if(b[0] === "Unknown Date") return -1;
 
     const da = minDateIn(a[1]);
     const db = minDateIn(b[1]);
-    const ta = da ? da.getTime() : -Infinity;
-    const tb = db ? db.getTime() : -Infinity;
-    return tb - ta;
+    const ta = da ? da.getTime() : Number.POSITIVE_INFINITY;
+    const tb = db ? db.getTime() : Number.POSITIVE_INFINITY;
+    return ta - tb;
   });
 }
 
