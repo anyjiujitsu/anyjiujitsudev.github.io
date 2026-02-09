@@ -1114,19 +1114,6 @@ nav.filters, .filters__inner, .pillRow{
    purpose: inset divider under dropdown headers + quick search header/bullets
    ========================================================= */
 
-/* Inset divider under every pill menu header (non-edge-to-edge) */
-.menu__header{
-  position: relative;
-}
-
-.menu__header::after{
-  content: "";
-  display: block;
-  height: 1px;
-  margin: 8px 14px 0;
-  background: rgba(0,0,0,0.12);
-}
-
 /* Shared divider element (used by search suggest header) */
 .menu__divider{
   height: 1px;
@@ -1179,4 +1166,65 @@ nav.filters, .filters__inner, .pillRow{
 /* Hover / active polish */
 .suggest .suggest__item:hover{
   background: rgba(0,0,0,0.04);
+}
+
+
+/* =========================================================
+   section: dropdown polish (v2)
+   purpose: inset divider under pill headers + quick search bullets + mobile fit
+   ========================================================= */
+
+/* Inset divider under every pill menu header (non-edge-to-edge)
+   Uses background line so it works on flex containers across browsers. */
+.menu__header{
+  background-image: linear-gradient(rgba(0,0,0,0.12), rgba(0,0,0,0.12));
+  background-repeat: no-repeat;
+  background-size: calc(100% - 28px) 1px; /* 14px inset on both sides */
+  background-position: 14px calc(100% - 0px);
+}
+
+/* Shared divider element (used by search suggest header) */
+.menu__divider{
+  height: 1px;
+  margin: 6px 14px 8px;
+  background: rgba(0,0,0,0.12);
+}
+
+/* Static header used inside the Quick Searches suggest box */
+.menu__header--static{
+  padding: 10px 14px 6px;
+  background-image: none; /* avoid double divider */
+}
+
+.menu__header--static .menu__title{
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #6f6f6f;
+  white-space: nowrap; /* prevent wrapping on small screens */
+}
+
+/* Quick Searches dropdown (search suggestions) */
+.suggest .suggest__item{
+  position: relative; /* required for bullet positioning */
+  padding-left: 32px; /* room for bullet */
+}
+
+.suggest .suggest__item::before{
+  content: "â€¢";
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #b0b0b0;
+  font-size: 14px;
+  line-height: 1;
+}
+
+/* Mobile: keep the Quick Searches header from wrapping */
+@media (max-width: 520px){
+  .menu__header--static .menu__title{
+    font-size: 11px;
+    letter-spacing: .05em;
+  }
 }
