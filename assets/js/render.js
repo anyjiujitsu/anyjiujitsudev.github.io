@@ -32,7 +32,7 @@ export function renderDirectoryGroups(root, rows){
 
   for(const [labelText, list] of grouped){
     const group = document.createElement("section");
-    group.className = "group";
+    group.className = "group" + (isPast ? " group--past" : "");
 
     const label = document.createElement("div");
     label.className = "group__label";
@@ -131,7 +131,7 @@ export function renderEventsGroups(root, rows){
     root.appendChild(hdr);
 
     for(const g of pastGroups){
-      renderEventGroup(root, g, "desc");
+      renderEventGroup(root, g, "desc", true);
     }
   }
 
@@ -141,11 +141,11 @@ export function renderEventsGroups(root, rows){
   }
 }
 
-function renderEventGroup(root, groupTuple, dir){
+function renderEventGroup(root, groupTuple, dir, isPast=false){
   const [labelText, list] = groupTuple;
 
   const group = document.createElement("section");
-  group.className = "group";
+  group.className = "group" + (isPast ? " group--past" : "");
 
   const label = document.createElement("div");
   label.className = "group__label";
