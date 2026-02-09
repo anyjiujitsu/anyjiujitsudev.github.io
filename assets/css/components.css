@@ -1045,3 +1045,23 @@ nav.filters, .filters__inner, .pillRow{
 }
 
 
+/* section: past events // purpose: visually de-emphasize inactive items */
+#viewEvents .group--past .row.row--events .cell--event::before{
+  background: transparent;
+}
+
+#viewEvents .group--past .row.row--events{
+  color: #777;
+}
+
+#viewEvents .group--past .row.row--events .cell__top{
+  color: #666;
+}
+
+#viewEvents .group--past .row.row--events .cell__sub{
+  color: #888;
+}
+
+#viewEvents .group--past .row.row--events{
+  opacity: 0.92;
+}
