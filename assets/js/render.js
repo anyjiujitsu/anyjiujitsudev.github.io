@@ -55,10 +55,15 @@ function renderIndexRow(r){
   const row = document.createElement("div");
   row.className = "row";
 
+  // INDEX view only: on mobile, clamp long IG handles to stabilize the first column.
+  // We keep the full value available via the title attribute.
+  const igFull = (r.IG || "").toString();
+  const igDisplay = shouldClampIg() ? clampChars(igFull, 26) : igFull;
+
   const a = document.createElement("div");
   a.innerHTML = `
     <div class="cell__name">${escapeHtml(r.NAME)}</div>
-    <div class="cell__ig">${escapeHtml(r.IG)}</div>
+    <div class="cell__ig" title="${escapeHtml(igFull)}">${escapeHtml(igDisplay)}</div>
   `;
 
   const b = document.createElement("div");
@@ -77,6 +82,22 @@ function renderIndexRow(r){
   row.appendChild(b);
   row.appendChild(c);
   return row;
+}
+
+function shouldClampIg(){
+  // Match the CSS breakpoint used for INDEX mobile layout.
+  try{
+    return !!(window.matchMedia && window.matchMedia("(max-width: 520px)").matches);
+  } catch {
+    return false;
+  }
+}
+
+function clampChars(str, maxChars){
+  const s = String(str ?? "");
+  if(s.length <= maxChars) return s;
+  // Use three dots ("...") per your UI expectation.
+  return s.slice(0, maxChars).replace(/\s+$/g, "") + "...";
 }
 
 function composeDays(r){
