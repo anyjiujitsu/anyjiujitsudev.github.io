@@ -15,6 +15,16 @@ export const state = {
     guests: new Set(), // e.g. "GUESTS WELCOME"
   },
 
+  /* section: index-events state
+     purpose: Events-clone pipeline for Index view (Phase 1)
+     note: initially mirrors Events filters; later can diverge */
+  indexEvents: {
+    q: "",
+    year: new Set(),
+    state: new Set(),
+    type: new Set(),
+  },
+
   /* section: events state
      purpose: search + pills for Events view */
   events: {
@@ -40,6 +50,10 @@ export function setIndexQuery(q){
 
 export function setEventsQuery(q){
   state.events.q = String(q ?? "");
+}
+
+export function setIndexEventsQuery(q){
+  state.indexEvents.q = String(q ?? "");
 }
 
 /* section: selection checks
