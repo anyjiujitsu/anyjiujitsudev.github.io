@@ -1217,8 +1217,8 @@ nav.filters, .filters__inner, .pillRow{
   top: 50%;
   transform: translateY(-50%);
   color: #b0b0b0;
-  font-size: 11px;
-  line-height: .5;
+  font-size: 14px;
+  line-height: 1;
 }
 
 /* Mobile: keep the Quick Searches header from wrapping */
@@ -1230,4 +1230,28 @@ nav.filters, .filters__inner, .pillRow{
 }
 
 
+/* =========================================================
+   section: quick searches typography
+   purpose: match pill dropdown option sizing + spacing
+   ========================================================= */
 
+.suggest .suggest__item{
+  font-size: 13px;
+  line-height: 1.15;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.suggest .suggest__item::before{
+  font-size: 12px;
+}
+
+/* Match pill menu header weight/spacing a bit tighter */
+.menu__header--static{
+  padding-top: 8px;
+  padding-bottom: 6px;
+}
+
+.menu__header--static .menu__title{
+  font-size: 11px;
+}
