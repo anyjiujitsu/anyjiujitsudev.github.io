@@ -233,7 +233,7 @@ function renderIndexEventRow(r){
       ${showOta ? `<span class="cell__newInline">OTA</span>` : `<span class="cell__newInline">&nbsp;</span>`}
     </div>
     <div class="cell__top cell__for">${escapeHtml(r.FOR || "—")}</div>
-    <div class="cell__sub cell__where">${escapeHtml(r.WHERE || "—")}</div>
+    <div class="cell__sub cell__where">${renderIndexIgLink(r.WHERE)}</div>
   `;
 
   const c3 = document.createElement("div");
@@ -437,4 +437,18 @@ function escapeHtml(s){
     .replaceAll(">","&gt;")
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
+}
+
+function renderIndexIgLink(whereVal){
+  const raw = String(whereVal ?? "").trim();
+  if(!raw || raw === "—") return escapeHtml(raw || "—");
+
+  // Display always with leading '@', but build URL without '@'
+  const handle = raw.replace(/^@+/, "").trim();
+  if(!handle) return "—";
+
+  const href = `https://www.instagram.com/${encodeURIComponent(handle)}/`;
+  const label = `@${handle}`;
+
+  return `<a class="cell__whereLink" href="${href}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
 }
