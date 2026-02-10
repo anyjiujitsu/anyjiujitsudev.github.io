@@ -1157,7 +1157,7 @@ nav.filters, .filters__inner, .pillRow{
 }
 
 .suggest .suggest__item::before{
-  content: "•";
+  content: "â€¢";
   position: absolute;
   margin-left: -18px;
   color: #9a9a9a;
@@ -1211,7 +1211,7 @@ nav.filters, .filters__inner, .pillRow{
 }
 
 .suggest .suggest__item::before{
-  content: "•";
+  content: "â€¢";
   position: absolute;
   left: 14px;
   top: 50%;
@@ -1254,4 +1254,32 @@ nav.filters, .filters__inner, .pillRow{
 
 .menu__header--static .menu__title{
   font-size: 11px;
+}
+
+
+/* =========================================================
+   section: quick searches typography (force)
+   purpose: ensure sizing/spacing overrides apply (specificity)
+   ========================================================= */
+
+#eventsSearchSuggest .suggest__item,
+#eventsSearchSuggest .suggest .suggest__item{
+  font-size: 13px !important;
+  line-height: 1.15 !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+#eventsSearchSuggest .suggest__item::before,
+#eventsSearchSuggest .suggest .suggest__item::before{
+  font-size: 12px !important;
+}
+
+#eventsSearchSuggest .menu__header--static{
+  padding-top: 8px !important;
+  padding-bottom: 6px !important;
+}
+
+#eventsSearchSuggest .menu__header--static .menu__title{
+  font-size: 11px !important;
 }
