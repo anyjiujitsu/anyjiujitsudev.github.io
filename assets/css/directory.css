@@ -218,7 +218,7 @@
 
 /* Slightly tighter icon sizing on very small screens */
 @media (max-width: 520px){
-#viewEvents{ --evRowPadY: 5px; }
+  #viewEvents{ --evRowPadY: 5px; }
 
   #viewEvents{ --evRowPadX: 7px; }
 
@@ -1240,15 +1240,24 @@
   }
 }
 
-/* Index-only: IG handle link styling (desktop + mobile)
-   Keep underline always visible so it reads as a hyperlink. */
-#viewIndex .cell__whereLink{
-  color: inherit;
-  text-decoration: underline !important;
-  text-underline-offset: 2px;
-}
 
-#viewIndex .cell__whereLink:hover,
-#viewIndex .cell__whereLink:focus{
-  text-decoration-thickness: 2px;
+/* =========================================================
+   INDEX (mobile) â€” ensure IG underline is visible
+   Some mobile browsers clip underlines inside overflow/ellipsis containers.
+   This targets both possible markup patterns:
+   - <a class="cell__where ...">
+   - <div class="cell__where"><a ...></a></div>
+   ========================================================= */
+@media (max-width: 520px){
+  #viewIndex a.cell__where,
+  #viewIndex .cell__where a,
+  #viewIndex a.cell__ig,
+  #viewIndex .cell__ig a,
+  #viewIndex .cell__whereLink{
+    text-decoration: underline !important;
+    text-underline-offset: 2px;
+    display: inline-block; /* keeps underline inside the box */
+    padding-bottom: 1px;   /* prevents underline clipping */
+    line-height: 1.15;
+  }
 }
