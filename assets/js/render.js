@@ -227,22 +227,13 @@ function renderIndexEventRow(r){
 
   const c2 = document.createElement("div");
   c2.className = "cell cell--forwhere";
-
-  // INDEX view only: make IG handle (WHERE) clickable to Instagram.
-  // Keep markup isolated to Index renderer so EVENTS view is unaffected.
-  const igRaw = String(r.WHERE || "").trim();
-  const igHandle = igRaw.replace(/^@+/, "").replace(/\/+$/g, "");
-  const igHref = igHandle ? `https://www.instagram.com/${encodeURIComponent(igHandle)}/` : "";
-  const whereHtml = igHref
-    ? `<a class="cell__sub cell__where" href="${igHref}" target="_blank" rel="noopener noreferrer">${escapeHtml(igRaw)}</a>`
-    : `<div class="cell__sub cell__where">${escapeHtml(igRaw || "—")}</div>`;
   c2.innerHTML = `
     <div class="cell__eventInlineWrap">
       <span class="cell__eventInline">${escapeHtml(r.EVENT || "—")}</span>
       ${showOta ? `<span class="cell__newInline">OTA</span>` : `<span class="cell__newInline">&nbsp;</span>`}
     </div>
     <div class="cell__top cell__for">${escapeHtml(r.FOR || "—")}</div>
-    ${whereHtml}
+    <div class="cell__sub cell__where">${escapeHtml(r.WHERE || "—")}</div>
   `;
 
   const c3 = document.createElement("div");
