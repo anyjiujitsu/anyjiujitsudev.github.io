@@ -1233,7 +1233,7 @@
   #viewIndex .cell__ig,
   #viewIndex .cell__where{
     display: block;
-    max-width: 26ch;
+    max-width: 28ch;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
