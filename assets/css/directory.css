@@ -218,7 +218,7 @@
 
 /* Slightly tighter icon sizing on very small screens */
 @media (max-width: 520px){
-  #viewEvents{ --evRowPadY: 5px; }
+#viewEvents{ --evRowPadY: 5px; }
 
   #viewEvents{ --evRowPadX: 7px; }
 
@@ -1239,7 +1239,6 @@
     text-overflow: ellipsis;
   }
 }
-
 
 /* Index-only: IG handle link styling (desktop + mobile)
    Keep underline always visible so it reads as a hyperlink. */
