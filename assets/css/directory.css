@@ -114,11 +114,23 @@
 
 
 @media (max-width: 520px){
-  /* Mobile: tighten Sat/Sun label/value gutter so the calendar icon spacing
-     matches the other columns (reduce perceived gap to values). */
+  /* Mobile: keep SAT/SUN close to the calendar icon (match other column icon spacing).
+     On mobile, the last column can be wide; if its contents are right-aligned,
+     it creates a large empty gap between the icon and the Sat/Sun lines.
+     We left-anchor this cell on mobile only while preserving the no-shift grid. */
+  #viewIndex .row.row--events .cell--daydate{
+    text-align: left;
+  }
+
   #viewIndex .row.row--events .cell--daydate .cell__dayline{
     grid-template-columns: 26px 1fr;
     column-gap: 4px;
+    justify-items: start;
+  }
+
+  /* Override desktop/default alignment that pushes the label to the far right */
+  #viewIndex .row.row--events .cell--daydate .dayLabel{
+    justify-self: start;
   }
 }
 
