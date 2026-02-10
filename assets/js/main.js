@@ -1,7 +1,7 @@
 import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260209-801";
 import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery } from "./state.js?v=20260209-801";
 import { filterDirectory, filterEvents } from "./filters.js?v=20260209-801";
-import { renderDirectoryGroups, renderEventsGroups } from "./render.js?v=20260209-801";
+import { renderDirectoryGroups, renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260209-801";
 
 let directoryRows = [];
 let eventRows = [];
@@ -13,6 +13,53 @@ const VIEW_LOCKED = false;
 
 function $(id){ return document.getElementById(id); }
 
+
+/* ------------------ INDEX REMAP (directory.csv -> events-style rows) ------------------ */
+function dirToIndexEventRow(r){
+  return {
+    // left-most label
+    EVENT: "TEXT HOLD",
+    // mapped fields
+    FOR: r.NAME || "",
+    WHERE: r.IG || "",
+    CITY: r.CITY || "",
+    STATE: r.STATE || "",
+    DAY: r.SAT || "",
+    DATE: r.SUN || "",
+    OTA: (r.OTA || "").toUpperCase(),
+    // keep for compatibility
+    CREATED: ""
+  };
+}
+
+function filterIndexDirectoryAsEvents(rows, idxState){
+  // idxState has: { q, year:Set, state:Set, type:Set }
+  const q = String(idxState?.q ?? "").trim().toLowerCase();
+  const stateSet = idxState?.state instanceof Set ? idxState.state : new Set();
+  const typeSet  = idxState?.type  instanceof Set ? idxState.type  : new Set();
+  const yearSet  = idxState?.year  instanceof Set ? idxState.year  : new Set();
+
+  return rows.filter(r=>{
+    if(q){
+      const hay = `${r.EVENT} ${r.FOR} ${r.WHERE} ${r.CITY} ${r.STATE} ${r.DAY} ${r.DATE} ${r.OTA}`.toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    if(stateSet.size){
+      const s = String(r.STATE || "").trim().toUpperCase();
+      if(!stateSet.has(s)) return false;
+    }
+    // For now, YEAR pill does not apply to directory rows (SAT/SUN are not dates)
+    if(yearSet.size){
+      // ignore YEAR filtering safely
+    }
+    // EVENT pill: treat as filtering on the placeholder event label
+    if(typeSet.size){
+      const t = String(r.EVENT || "").trim();
+      if(!typeSet.has(t)) return false;
+    }
+    return true;
+  });
+}
 function activeEventsState(){
   return (state.view === "index") ? state.indexEvents : state.events;
 }
@@ -782,10 +829,11 @@ function render(){
   renderEventsGroups($("eventsRoot"), evFiltered);
   $("eventsStatus").textContent = `${evFiltered.length} events`;
 
-  // Index view (Phase 1): render Events-style UI into a separate container (independent filters)
-  const idxEvFiltered = filterEvents(eventRows, { events: state.indexEvents });
-  renderEventsGroups($("indexEventsRoot"), idxEvFiltered);
-  $("status").textContent = `${idxEvFiltered.length} events`;
+  // Index view (Phase 2): render Directory rows using Events-style cards (independent filters + independent data)
+  const idxRows = directoryRows.map(dirToIndexEventRow);
+  const idxFiltered = filterIndexDirectoryAsEvents(idxRows, state.indexEvents);
+  renderIndexEventsGroups($("indexEventsRoot"), idxFiltered);
+  $("status").textContent = `${idxFiltered.length} events`;
 }
 
 async function init(){
