@@ -1241,13 +1241,15 @@
 }
 
 
-/* ---------- IG hyperlink styling (INDEX only) ---------- */
-#viewIndex a.cell__where{
+/* Index-only: IG handle link styling (desktop + mobile)
+   Keep underline always visible so it reads as a hyperlink. */
+#viewIndex .cell__whereLink{
   color: inherit;
-  text-decoration: underline;
+  text-decoration: underline !important;
   text-underline-offset: 2px;
 }
 
-#viewIndex a.cell__where:hover{
+#viewIndex .cell__whereLink:hover,
+#viewIndex .cell__whereLink:focus{
   text-decoration-thickness: 2px;
 }
