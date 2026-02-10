@@ -505,6 +505,26 @@
   }
 }
 
+/* =======================================================================
+   INDEX view ONLY
+   purpose: prevent long IG handles from expanding column 1 on mobile
+   rule: clamp IG to ~26 characters and allow grid items to shrink
+   scope: #viewIndex only (does not affect EVENTS view)
+   ======================================================================= */
+@media (max-width: 520px){
+  /* Allow grid children to shrink below their min-content width */
+  #viewIndex .row > div{ min-width: 0; }
+
+  /* Clamp IG text so it can't blow out the first column */
+  #viewIndex .cell__ig{
+    display: block;
+    max-width: 26ch;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 /* section: past events // purpose: visually de-emphasize inactive items (mobile highlight strip) */
 @media (max-width: 520px){
   #viewEvents .group--past .row.row--events .cell--forwhere::before{
