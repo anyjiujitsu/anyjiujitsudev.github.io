@@ -1,7 +1,7 @@
-import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260209-501";
-import { state, setView, setIndexQuery, setEventsQuery } from "./state.js?v=20260209-501";
-import { filterDirectory, filterEvents } from "./filters.js?v=20260209-501";
-import { renderDirectoryGroups, renderEventsGroups } from "./render.js?v=20260209-501";
+import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260209-601";
+import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery } from "./state.js?v=20260209-601";
+import { filterDirectory, filterEvents } from "./filters.js?v=20260209-601";
+import { renderDirectoryGroups, renderEventsGroups } from "./render.js?v=20260209-601";
 
 let directoryRows = [];
 let eventRows = [];
@@ -373,8 +373,9 @@ function setViewUI(view){
   // Sticky filter bars (now outside the slider)
   const evFilters = document.getElementById("eventsFilters");
   const idxFilters = document.getElementById("filters");
-  if(evFilters) evFilters.hidden = (view !== "events");
-  if(idxFilters) idxFilters.hidden = (view !== "index");
+  if(evFilters) evFilters.hidden = false;
+  if(idxFilters) idxFilters.hidden = true;
+  // Phase 1: Index uses Events filter bar for a 1:1 UI match
 
   const title = $("viewTitle");
   if(title) title.textContent = (view === "events") ? "EVENTS (DEV)" : "INDEX";
@@ -652,6 +653,7 @@ function wireSearch(){
 
   idxIn?.addEventListener("input",(e)=>{
     setIndexQuery(e.target.value);
+    setIndexEventsQuery(e.target.value);
     render();
   });
   evIn?.addEventListener("input",(e)=>{
@@ -661,6 +663,7 @@ function wireSearch(){
 
   $("searchClear")?.addEventListener("click", ()=>{
     setIndexQuery("");
+    setIndexEventsQuery("");
     if(idxIn) idxIn.value = "";
     render();
   });
@@ -722,20 +725,32 @@ function wireSearchSuggestions(){
   });
 }
 
+function cloneSet(src){
+  return new Set(Array.from(src || []));
+}
+
+function syncIndexEventsFromEvents(){
+  // Phase 1: keep Index's events-clone filters synced to Events so the UI stays 1:1.
+  // Later you can remove this sync and wire Index controls to state.indexEvents independently.
+  state.indexEvents.q = String(state?.events?.q ?? "");
+  state.indexEvents.year = cloneSet(state?.events?.year);
+  state.indexEvents.state = cloneSet(state?.events?.state);
+  state.indexEvents.type = cloneSet(state?.events?.type);
+}
+
 function render(){
   didRender = true;
+
+  // Events view
   const evFiltered = filterEvents(eventRows, state);
   renderEventsGroups($("eventsRoot"), evFiltered);
   $("eventsStatus").textContent = `${evFiltered.length} events`;
 
-  let idxFiltered = filterDirectory(directoryRows, state);
-  // Redundant safeguard: ensure Index STATE selection is applied even if filterDirectory is stale/cached.
-  const idxStatesSel = state?.index?.states;
-  if(idxStatesSel && idxStatesSel.size){
-    idxFiltered = idxFiltered.filter(r => idxStatesSel.has(String(r.STATE ?? "").trim()));
-  }
-  renderDirectoryGroups($("groupsRoot"), idxFiltered);
-  $("status").textContent = `${idxFiltered.length} gyms`;
+  // Index view (Phase 1): render the SAME events UI into a separate container
+  syncIndexEventsFromEvents();
+  const idxEvFiltered = filterEvents(eventRows, { events: state.indexEvents });
+  renderEventsGroups($("indexEventsRoot"), idxEvFiltered);
+  $("status").textContent = `${idxEvFiltered.length} events`;
 }
 
 async function init(){
