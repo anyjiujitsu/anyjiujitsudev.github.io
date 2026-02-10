@@ -29,9 +29,9 @@ export const state = {
    purpose: small setters used by main.js and other modules */
 
 export function setView(v){
-  // section: view lock
-  // purpose: keep Events as the only active view while Index is being rebuilt
-  state.view = "events";
+  // section: view
+  // purpose: switch between "events" and "index" (default to events if unknown)
+  state.view = (v === "index") ? "index" : "events";
 }
 
 export function setIndexQuery(q){
