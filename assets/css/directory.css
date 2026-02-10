@@ -89,6 +89,29 @@
   text-transform: uppercase;
 }
 
+/* INDEX: Sat/Sun stack (match CITY/NAME for labels, STATE/IG for values) */
+#viewIndex .row.row--events .cell--daydate .cell__dayline{
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+#viewIndex .row.row--events .cell--daydate .dayLabel{
+  font-weight: 700;           /* match .cell__top (CITY/NAME) */
+  font-size: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+  text-transform: none;       /* prevent MOBILE/"sub" uppercase feel */
+}
+
+#viewIndex .row.row--events .cell--daydate .dayValue{
+  font-size: 12px;            /* match .cell__sub (STATE/IG) */
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
 /* Tighten tracking specifically for numeric DATE line */
 #viewEvents .row.row--events .cell--daydate .cell__sub,
 #viewIndex .row.row--events .cell--daydate .cell__sub{
@@ -192,46 +215,19 @@
 /* Slightly tighter icon sizing on very small screens */
 @media (max-width: 520px){
   #viewEvents{ --evRowPadY: 5px; }
-  #viewIndex{ --evRowPadY: 5px; }
 
   #viewEvents{ --evRowPadX: 7px; }
-  #viewIndex{ --evRowPadX: 7px; }
 
   #viewEvents{ --evIconPad: 18px; --evIconLeft: 4px; --evIconSize: 11px; }
-  #viewIndex{ --evIconPad: 18px; --evIconLeft: 4px; --evIconSize: 11px; }
 
   #viewEvents .row.row--events .cell--forwhere::after,
   #viewEvents .row.row--events .cell--citystate::before,
-  #viewEvents .row.row--events .cell--daydate::before,
-  #viewIndex .row.row--events .cell--forwhere::after,
-  #viewIndex .row.row--events .cell--citystate::before,
-  #viewIndex .row.row--events .cell--daydate::before{
+  #viewEvents .row.row--events .cell--daydate::before{
     left: var(--evIconLeft);
     width: var(--evIconSize);
     height: var(--evIconSize);
   }
-
-
-/* Index mobile: keep Sat/Sun typography consistent with desktop (no uppercase/spacing) */
-#viewIndex .row.row--events .cell--daydate .cell__top,
-#viewIndex .row.row--events .cell--daydate .cell__sub{
-  text-transform: none;
-  letter-spacing: normal;
-  font-size: 13px;
-  line-height: 1.15;
 }
-#viewIndex .row.row--events .cell--daydate .dayLabel{
-  font-weight: 700;
-  color: var(--text);
-  text-transform: none;
-  letter-spacing: normal;
-}
-#viewIndex .row.row--events .cell--daydate .dayValue{
-  font-weight: 500;
-  color: var(--muted);
-}
-}
-
 
 #viewEvents .row.row--events .cell--daydate,
 #viewIndex .row.row--events .cell--daydate{
@@ -362,9 +358,7 @@
 /* Mobile alignment: lower columns 2 & 3 to align with the FOR/WHERE stack (below EVENT/NEW strip) */
 @media (max-width: 520px){
   #viewEvents .row.row--events .cell--citystate,
-  #viewEvents .row.row--events .cell--daydate,
-  #viewIndex  .row.row--events .cell--citystate,
-  #viewIndex  .row.row--events .cell--daydate{
+  #viewEvents .row.row--events .cell--daydate{
     padding-top: 10px;
   }
 }
@@ -406,8 +400,7 @@
 
 /* EVENTS: mobile NEW emphasis (iter309) */
 @media (max-width: 520px){
-  #viewEvents .cell__eventInlineWrap .cell__newInline,
-  #viewIndex  .cell__eventInlineWrap .cell__newInline{
+  #viewEvents .cell__eventInlineWrap .cell__newInline{
     font-size: calc(15px + 2px);
   }
 }
@@ -510,8 +503,7 @@
 
 /* section: past events // purpose: visually de-emphasize inactive items (mobile highlight strip) */
 @media (max-width: 520px){
-  #viewEvents .group--past .row.row--events .cell--forwhere::before,
-  #viewIndex  .group--past .row.row--events .cell--forwhere::before{
+  #viewEvents .group--past .row.row--events .cell--forwhere::before{
     background: transparent !important;
   }
 }
