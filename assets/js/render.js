@@ -230,7 +230,7 @@ function renderIndexEventRow(r){
   c2.innerHTML = `
     <div class="cell__eventInlineWrap">
       <span class="cell__eventInline">${escapeHtml(r.EVENT || "—")}</span>
-      ${showOta ? `<span class="cell__newInline">OTA</span>` : `<span class="cell__newInline">&nbsp;</span>`}
+      ${showOta ? `<span class="cell__newInline">ALLOWED</span>` : `<span class="cell__newInline">NOT ALLOWED</span>`}
     </div>
     <div class="cell__top cell__for">${escapeHtml(r.FOR || "—")}</div>
     <div class="cell__sub cell__where">${renderIndexIgLink(r.WHERE)}</div>
@@ -317,7 +317,7 @@ function renderEventRow(r){
   c2.innerHTML = `
     <div class="cell__eventInlineWrap">
       <span class="cell__eventInline">${escapeHtml(r.EVENT || "—")}</span>
-      ${showNew ? `<span class="cell__newInline">*NEW</span>` : `<span class="cell__newInline">&nbsp;</span>`}
+      ${showNew ? `<span class="cell__newInline">*NEW</span>` : `<span class="cell__newInline">NOT ALLOWED</span>`}
     </div>
     <div class="cell__top cell__for">${escapeHtml(r.FOR || "—")}</div>
     <div class="cell__sub cell__where">${escapeHtml(getWhereText(r))}</div>
