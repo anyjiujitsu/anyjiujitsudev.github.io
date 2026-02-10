@@ -731,10 +731,460 @@
   }
 }
 
+/* =========================================================
+   INDEX mobile parity with EVENTS
+   (mirrors the Events card rules from components.css so Index is 1:1)
+   ========================================================= */
 
-/* ---- components603 override: Index events clone should NOT hide event cells ---- */
-#viewIndex #indexEventsRoot .cell--event{ display:block; }
+#viewIndex .cell__eventInlineWrap{
+  display:none; /* shown on mobile only */
+  gap: 10px;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+#viewIndex .cell__eventInlineWrap .cell__eventInline,
+#viewIndex .cell__eventInlineWrap .cell__newInline{
+  font-size: 12px;          /* smaller than main text */
+  line-height: 1.05;
+  color: var(--muted);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+
+  font-weight: 700;
+}
+
+/* EVENTS: desktop NEW field (iter308) */
+#viewIndex .row.row--events .cell__sub.cell__new{
+  color: #D16C4E;
+  font-style: italic;
+
+  font-weight: 700;
+}
+
+#viewIndex .cell__eventInlineWrap .cell__newInline{
+  color: #D16C4E;
+  font-style: italic;
+}
+
+#viewIndex .row.row--events{
+  padding: var(--evRowPadY) var(--evRowPadX);
+
+  display: grid;
+  grid-template-columns: 165px 1.7fr 1.35fr 96px;
+  column-gap: 12px;
+  align-items: center;
+}
+
+#viewIndex .table .row.row--events{
+  border-top: 0;
+  position: relative;
+  isolation: isolate;
+}
+
+#viewIndex .table .row.row--events + .row.row--events::before{
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: rgba(0,0,0,0.06);
+  z-index: 30;
+  pointer-events: none;
+}
+
+#viewIndex .row.row--events .cell__top{
+  font-weight: 700;
+}
+
+#viewIndex .row.row--events .cell--forwhere .cell__top{
+  letter-spacing: -0.02em;
+  font-stretch: ; /* TESTFONT */
+}
+
+#viewIndex .row.row--events .cell__sub{
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Tighten tracking specifically for numeric DATE line */
+#viewIndex .row.row--events .cell--daydate .cell__sub{
+  letter-spacing: 0.04em;
+}
+
+#viewIndex{
+  --evIconPad: 24px;
+  --evIconLeft: 6px;
+  --evIconSize: 13px;
+  --evIconOpacity: 0.65;
+
+  --evRowPadY: 8px;
+  --evRowPadX: 6px;
+
+  /* Background "bleed" so the TYPE tint reaches the rounded edge like legacy */
+  --evRowBleedX: calc(var(--evRowPadX) + 1px);
+  --evRowBleedY: calc(var(--evRowPadY) + 2px);
+}
+
+#viewIndex .row.row--events .cell--forwhere,
+#viewIndex .row.row--events .cell--citystate,
+#viewIndex .row.row--events .cell--daydate{
+  position: relative;
+  padding-left: var(--evIconPad); /* room for icon */
+}
+
+#viewIndex .row.row--events .cell--forwhere::after{
+  content: "";
+  position: absolute;
+  left: var(--evIconLeft);
+  top: 50%;
+  width: var(--evIconSize);
+  height: var(--evIconSize);
+  transform: translateY(-50%);
+  background: var(--muted);
+  opacity: var(--evIconOpacity);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M3%2021h18%22/%3E%3Cpath%20d=%22M5%2021V5a2%202%200%200%201%202-2h6a2%202%200%200%201%202%202v16%22/%3E%3Cpath%20d=%22M9%207h0%22/%3E%3Cpath%20d=%22M9%2011h0%22/%3E%3Cpath%20d=%22M9%2015h0%22/%3E%3Cpath%20d=%22M13%207h0%22/%3E%3Cpath%20d=%22M13%2011h0%22/%3E%3Cpath%20d=%22M13%2015h0%22/%3E%3Cpath%20d=%22M17%2021V9h2v12%22/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center;
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M3%2021h18%22/%3E%3Cpath%20d=%22M5%2021V5a2%202%200%200%201%202-2h6a2%202%200%200%201%202%202v16%22/%3E%3Cpath%20d=%22M9%207h0%22/%3E%3Cpath%20d=%22M9%2011h0%22/%3E%3Cpath%20d=%22M9%2015h0%22/%3E%3Cpath%20d=%22M13%207h0%22/%3E%3Cpath%20d=%22M13%2011h0%22/%3E%3Cpath%20d=%22M13%2015h0%22/%3E%3Cpath%20d=%22M17%2021V9h2v12%22/%3E%3C/svg%3E");
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  mask-position: center;
+  pointer-events: none;
+  z-index: 3;
+}
+
+#viewIndex .row.row--events .cell--citystate::before{
+  content: "";
+  position: absolute;
+  left: var(--evIconLeft);
+  top: 50%;
+  width: var(--evIconSize);
+  height: var(--evIconSize);
+  transform: translateY(-50%);
+  background: var(--muted);
+  opacity: var(--evIconOpacity);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M12%2021s7-4.5%207-11a7%207%200%201%200-14%200c0%206.5%207%2011%207%2011z%22/%3E%3Ccircle%20cx=%2212%22%20cy=%2210%22%20r=%222.2%22/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center;
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M12%2021s7-4.5%207-11a7%207%200%201%200-14%200c0%206.5%207%2011%207%2011z%22/%3E%3Ccircle%20cx=%2212%22%20cy=%2210%22%20r=%222.2%22/%3E%3C/svg%3E");
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  mask-position: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+#viewIndex .row.row--events .cell--daydate::before{
+  content: "";
+  position: absolute;
+  left: var(--evIconLeft);
+  top: 50%;
+  width: var(--evIconSize);
+  height: var(--evIconSize);
+  transform: translateY(-50%);
+  background: var(--muted);
+  opacity: var(--evIconOpacity);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Crect%20x=%223.5%22%20y=%224.5%22%20width=%2217%22%20height=%2216%22%20rx=%222%22/%3E%3Cpath%20d=%22M7%203.5v3%22/%3E%3Cpath%20d=%22M17%203.5v3%22/%3E%3Cpath%20d=%22M3.5%209h17%22/%3E%3Cpath%20d=%22M8%2013h3%22/%3E%3Cpath%20d=%22M8%2016h3%22/%3E%3Cpath%20d=%22M13%2013h3%22/%3E%3Cpath%20d=%22M13%2016h3%22/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center;
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Crect%20x=%223.5%22%20y=%224.5%22%20width=%2217%22%20height=%2216%22%20rx=%222%22/%3E%3Cpath%20d=%22M7%203.5v3%22/%3E%3Cpath%20d=%22M17%203.5v3%22/%3E%3Cpath%20d=%22M3.5%209h17%22/%3E%3Cpath%20d=%22M8%2013h3%22/%3E%3Cpath%20d=%22M8%2016h3%22/%3E%3Cpath%20d=%22M13%2013h3%22/%3E%3Cpath%20d=%22M13%2016h3%22/%3E%3C/svg%3E");
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  mask-position: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Slightly tighter icon sizing on very small screens */
+@media (max-width: 520px){
+  #viewIndex{ --evRowPadY: 5px; }
+
+  #viewIndex{ --evRowPadX: 7px; }
+
+  #viewIndex{ --evIconPad: 18px; --evIconLeft: 4px; --evIconSize: 11px; }
+
+  #viewIndex .row.row--events .cell--forwhere::after,
+  #viewIndex .row.row--events .cell--citystate::before,
+  #viewIndex .row.row--events .cell--daydate::before{
+    left: var(--evIconLeft);
+    width: var(--evIconSize);
+    height: var(--evIconSize);
+  }
+}
+
+#viewIndex .row.row--events .cell--daydate{
+  text-align: left;
+  justify-self: start;
+}
+
+/* EVENTS view   subtle highlighted first column (matches legacy reference) */
+#viewIndex .row.row--events .cell--event{
+  position: relative;
+}
+#viewIndex .row.row--events .cell--event::before{
+  content: "";
+  position: absolute;
+  left: calc(-1 * var(--evRowBleedX));
+  right: 0;
+  top: calc(-1 * var(--evRowBleedY));
+  bottom: calc(-1 * var(--evRowBleedY));
+  background: rgba(232, 221, 198, 0.85);
+  border-radius: 0 0 0 0;
+  z-index: 0;
+  pointer-events: none;
+}
+#viewIndex .row.row--events .cell--event > *{
+  position: relative;
+  z-index: 1;
+}
 
 
-/* Ensure Index renders event cards (older Index styles hid them) */
-#viewIndex .cell--event{ display:block; }
+@media (max-width: 520px){
+  #viewIndex{
+    --evRowPadX: 5px;
+    --evRowBleedX: calc(var(--evRowPadX) + 1px);
+  }
+  #viewIndex .row.row--events{
+    grid-template-columns: 1.6fr 1fr 66px;
+    column-gap: 10px;
+  }
+
+#viewIndex .cell--event{ display:none; }
+#viewIndex .cell__eventInlineWrap{ display:flex; }
+#viewIndex .row.row--events .cell--forwhere{
+  position: relative;
+}
+#viewIndex .row.row--events .cell--forwhere::before{
+  content: "";
+  position: absolute;
+  left: calc(-1 * var(--evRowBleedX));
+  right: 0;
+  top: calc(-1 * var(--evRowBleedY));
+  bottom: calc(-1 * var(--evRowBleedY));
+  background: rgba(232, 221, 198, 0.85);
+  border-radius: 0 0 0 0;
+  z-index: 0;
+  pointer-events: none;
+}
+#viewIndex .row.row--events .cell--forwhere > *{
+  position: relative;
+  z-index: 1;
+}
+
+  #viewIndex .row.row--events .cell__sub{
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 520px){
+  /* Set Events-only row font baseline for all non EVENT/NEW fields */
+  #viewIndex{
+    --rowFont: 8px;
+  }
+
+  /* Ensure Events rows and cell lines inherit the baseline */
+  #viewIndex .row.row--events{
+    font-size: var(--rowFont);
+  }
+  #viewIndex .row.row--events .cell__top,
+  #viewIndex .row.row--events .cell__sub{
+    font-size: inherit;
+  }
+
+  /* EVENT + NEW inline strip */
+  #viewIndex .row.row--events .cell__eventInline{
+    font-size: 6px;
+  }
+  #viewIndex .row.row--events .cell__newInline{
+    font-size: 4px;
+  }
+}
+
+/* EVENTS cardbody: tighten tracking for width-sensitive fields */
+#viewIndex .cell__where,
+#viewIndex .cell__state,
+#viewIndex .cell__date,
+#viewIndex .cell__for{
+  letter-spacing: -0.035em;
+}
+
+/* NOTE: Render uses .cell--citystate (middle) and .cell--daydate (right). */
+#viewIndex .row.row--events .cell--citystate,
+#viewIndex .row.row--events .cell--daydate{
+  padding-left: var(--evIconPad); /* icon + consistent text gap */
+}
+
+/* Mobile alignment: lower columns 2 & 3 to align with the FOR/WHERE stack (below EVENT/NEW strip) */
+@media (max-width: 520px){
+  #viewIndex .row.row--events .cell--citystate,
+  #viewIndex .row.row--events .cell--daydate{
+    padding-top: 10px;
+  }
+}
+
+#viewIndex{
+  --evForWhereShiftX: 4px;
+}
+#viewIndex .row.row--events .cell--forwhere{
+  padding-left: calc(var(--evIconPad) - var(--evForWhereShiftX));
+}
+#viewIndex .row.row--events .cell--forwhere::after{
+  left: calc(var(--evIconLeft) - var(--evForWhereShiftX));
+}
+
+#viewIndex{
+  --evMidShift: 8px;
+}
+
+#viewIndex .row.row--events .cell--citystate{
+  padding-left: calc(var(--evIconPad) - var(--evMidShift));
+}
+
+#viewIndex .row.row--events .cell--citystate::before{
+  left: calc(var(--evIconLeft) - var(--evMidShift));
+}
+
+@media (max-width: 520px){
+  #viewIndex .row.row--events .cell--citystate::before{
+    left: calc(var(--evIconLeft) - var(--evMidShift));
+  }
+}
+
+/* EVENTS: mobile NEW emphasis (iter309) */
+@media (max-width: 520px){
+  #viewIndex .cell__eventInlineWrap .cell__newInline{
+    font-size: calc(15px + 2px);
+  }
+}
+
+.viewToggle.viewToggle--locked{
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.viewToggle.viewToggle--locked .viewToggle__tab{
+  pointer-events: none;
+}
+.viewToggle.viewToggle--locked .viewToggle__thumb{
+  opacity: 0.85;
+}
+
+
+@media (min-width: 769px){
+  /* Desktop-only: slightly reduce NEW label size */
+  #viewIndex .row.row--events .cell__sub.cell__new,
+  #viewIndex .cell__eventInlineWrap .cell__newInline{
+    font-size: 11px;
+  }
+}
+
+
+/* EVENTS pill only: display options in UPPERCASE (display-only) */
+#eventsPill3Menu .menu__item{
+  text-transform: uppercase;
+}
+
+.header__inner{
+  position: relative;
+}
+
+/* Position in the "blue box" area: to the LEFT of the viewToggle, without moving anything */
+.headerSocial{
+  position: absolute;
+  top: 50%;
+  /* Nudge DOWN into the visual "blue box" without affecting layout (absolute/out-of-flow). */
+  transform: translateY(-50%) translateY(10px);
+  /* Move icons visually to the RIGHT by reducing the right offset. */
+  right: calc(var(--pagePad) + 190px);
+  display: flex;
+  gap: 10px;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.headerSocial__link{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green);
+  opacity: 1;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.headerSocial__link:hover{ opacity: 0.65; }
+
+.headerSocial__icon{
+  width: 20px;
+  height: 20px;
+  display: block;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Keep placement sane on smaller widths (avoid overlapping the counts/toggle) */
+@media (max-width: 900px){
+  .headerSocial{ right: calc(var(--pagePad) + 175px); }
+}
+@media (max-width: 560px){
+  .headerSocial{ right: calc(var(--pagePad) + 165px); gap: 8px; transform: translateY(-50%) translateY(8px); }
+  .headerSocial__icon{ width: 18px; height: 18px; }
+}
+
+/* MOBILE override: move icons to top-right (goal layout) */
+@media (max-width: 640px){
+  .headerSocial{
+    /* dock to top-right of the header row */
+    top: -23px;
+    right: 14px;
+
+    transform: none;
+  }
+
+  .headerSocial a{
+    /* keep your slight scaling change (adjust if you want) */
+    transform: scale(0.70);
+    transform-origin: center;
+  }
+}
+
+/* section: past events // purpose: visually de-emphasize inactive items (mobile highlight strip) */
+@media (max-width: 520px){
+  #viewIndex .group--past .row.row--events .cell--forwhere::before{
+    background: transparent !important;
+  }
+}
+
+/* section: search suggestions // purpose: dropdown quick-picks for Events search */
+.suggestWrap{
+  position: relative;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+/* Mobile: keep Events search pill width behavior unchanged */
+@media (max-width: 520px){
+  .suggestWrap{
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .suggestWrap > .pill--search{
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+
+/* ---- Index parity: ensure TYPE column visibility matches Events (desktop only) ---- */
+@media (min-width: 521px){
+  #viewIndex #indexEventsRoot .cell--event{ display:block; }
+}
