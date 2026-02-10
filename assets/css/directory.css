@@ -1042,6 +1042,16 @@
   letter-spacing: -0.035em;
 }
 
+/* INDEX-only: IG handle becomes a link; keep it looking like normal text. */
+#viewIndex a.cell__where{
+  color: inherit;
+  text-decoration: none;
+}
+#viewIndex a.cell__where:hover,
+#viewIndex a.cell__where:focus-visible{
+  text-decoration: underline;
+}
+
 /* NOTE: Render uses .cell--citystate (middle) and .cell--daydate (right). */
 #viewIndex .row.row--events .cell--citystate,
 #viewIndex .row.row--events .cell--daydate{
