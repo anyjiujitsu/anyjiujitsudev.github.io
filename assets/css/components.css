@@ -1285,3 +1285,14 @@ nav.filters, .filters__inner, .pillRow{
 }
 
 
+/* =========================================================
+   section: past events desktop highlight (force)
+   purpose: ensure beige accent is removed for past events on desktop
+   ========================================================= */
+
+@media (min-width: 521px){
+  #viewEvents .group--past .row.row--events .cell--event,
+  #viewEvents .group--past .row.row--events .cell--event::before{
+    background: transparent !important;
+  }
+}
