@@ -1,7 +1,7 @@
-import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260209-601";
-import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery } from "./state.js?v=20260209-601";
-import { filterDirectory, filterEvents } from "./filters.js?v=20260209-601";
-import { renderDirectoryGroups, renderEventsGroups } from "./render.js?v=20260209-601";
+import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260209-801";
+import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery } from "./state.js?v=20260209-801";
+import { filterDirectory, filterEvents } from "./filters.js?v=20260209-801";
+import { renderDirectoryGroups, renderEventsGroups } from "./render.js?v=20260209-801";
 
 let directoryRows = [];
 let eventRows = [];
@@ -12,6 +12,25 @@ let didRender = false;
 const VIEW_LOCKED = false;
 
 function $(id){ return document.getElementById(id); }
+
+function activeEventsState(){
+  return (state.view === "index") ? state.indexEvents : state.events;
+}
+
+function setActiveEventsQuery(val){
+  if(state.view === "index") setIndexEventsQuery(val);
+  else setEventsQuery(val);
+}
+
+function refreshEventsPillDots(){
+  const s = activeEventsState();
+  const b1 = $("eventsPill1Btn");
+  const b2 = $("eventsPill2Btn");
+  const b3 = $("eventsPill3Btn");
+  if(b1) setPillHasSelection(b1, s.year.size>0);
+  if(b2) setPillHasSelection(b2, s.state.size>0);
+  if(b3) setPillHasSelection(b3, s.type.size>0);
+}
 
 /* ------------------ PILL MENUS (Events: YEAR) ------------------ */
 function parseYearFromEventRow(r){
@@ -210,15 +229,19 @@ function wireEventsYearPill(getEventRows, onChange){
 
   if(!btn || !panel) return;
 
-  const years = uniqYearsFromEvents(getEventRows());
-  buildMenuList(panel, years, state.events.year, ()=>{
-    setPillHasSelection(btn, state.events.year.size>0);
-    onChange();
-  });
+  const rebuild = ()=>{
+    const sel = activeEventsState().year;
+    const items = uniqYearsFromEvents(getEventRows());
+    buildMenuList(panel, items, sel, ()=>{
+      setPillHasSelection(btn, sel.size>0);
+      onChange();
+    });
+    setPillHasSelection(btn, sel.size>0);
+  };
 
-  setPillHasSelection(btn, state.events.year.size>0);
+  rebuild();
 
-  const toggleYearMenu = (e)=>{
+  const toggleMenu = (e)=>{
     if(e.type === 'touchend') e.preventDefault();
     e.stopPropagation();
 
@@ -226,6 +249,8 @@ function wireEventsYearPill(getEventRows, onChange){
     closeAllMenus();
 
     if(!expanded){
+      // rebuild right before opening so checked boxes/dot match the active view
+      rebuild();
       btn.setAttribute('aria-expanded','true');
       positionMenu(btn, panel);
     } else {
@@ -234,21 +259,21 @@ function wireEventsYearPill(getEventRows, onChange){
     }
   };
 
-  // Desktop: click. Mobile: touchend fallback.
-  btn.addEventListener('click', toggleYearMenu);
-  btn.addEventListener('touchend', toggleYearMenu, {passive:false});
+  // Desktop: click. Mobile: touchend
+  btn.addEventListener('click', toggleMenu);
+  btn.addEventListener('touchend', toggleMenu, { passive:false });
 
   clearBtn?.addEventListener('click', (e)=>{
-    if(e.type === 'touchend') e.preventDefault();
+    e.preventDefault();
     e.stopPropagation();
-
-    state.events.year.clear();
-    setPillHasSelection(btn, false);
-    panel.querySelectorAll('input.menu__checkbox').forEach(cb=>{ cb.checked = false; });
-    onChange();
+    const sel = activeEventsState().year;
+    sel.clear();
+    rebuild();
     closeAllMenus();
+    onChange();
   });
 }
+
 
 
 function wireEventsStatePill(getEventRows, onChange){
@@ -260,15 +285,19 @@ function wireEventsStatePill(getEventRows, onChange){
 
   if(!btn || !panel) return;
 
-  const states = uniqStatesFromEvents(getEventRows());
-  buildMenuList(panel, states, state.events.state, ()=>{
-    setPillHasSelection(btn, state.events.state.size>0);
-    onChange();
-  });
+  const rebuild = ()=>{
+    const sel = activeEventsState().state;
+    const items = uniqStatesFromEvents(getEventRows());
+    buildMenuList(panel, items, sel, ()=>{
+      setPillHasSelection(btn, sel.size>0);
+      onChange();
+    });
+    setPillHasSelection(btn, sel.size>0);
+  };
 
-  setPillHasSelection(btn, state.events.state.size>0);
+  rebuild();
 
-  const toggleStateMenu = (e)=>{
+  const toggleMenu = (e)=>{
     if(e.type === 'touchend') e.preventDefault();
     e.stopPropagation();
 
@@ -276,6 +305,8 @@ function wireEventsStatePill(getEventRows, onChange){
     closeAllMenus();
 
     if(!expanded){
+      // rebuild right before opening so checked boxes/dot match the active view
+      rebuild();
       btn.setAttribute('aria-expanded','true');
       positionMenu(btn, panel);
     } else {
@@ -284,20 +315,21 @@ function wireEventsStatePill(getEventRows, onChange){
     }
   };
 
-  btn.addEventListener('click', toggleStateMenu);
-  btn.addEventListener('touchend', toggleStateMenu, {passive:false});
+  // Desktop: click. Mobile: touchend
+  btn.addEventListener('click', toggleMenu);
+  btn.addEventListener('touchend', toggleMenu, { passive:false });
 
   clearBtn?.addEventListener('click', (e)=>{
-    if(e.type === 'touchend') e.preventDefault();
+    e.preventDefault();
     e.stopPropagation();
-
-    state.events.state.clear();
-    setPillHasSelection(btn, false);
-    panel.querySelectorAll('input.menu__checkbox').forEach(cb=>{ cb.checked = false; });
-    onChange();
+    const sel = activeEventsState().state;
+    sel.clear();
+    rebuild();
     closeAllMenus();
+    onChange();
   });
 }
+
 
 
 function wireEventsTypePill(getEventRows, onChange){
@@ -309,15 +341,19 @@ function wireEventsTypePill(getEventRows, onChange){
 
   if(!btn || !panel) return;
 
-  const types = uniqTypesFromEvents(getEventRows());
-  buildMenuList(panel, types, state.events.type, ()=>{
-    setPillHasSelection(btn, state.events.type.size>0);
-    onChange();
-  });
+  const rebuild = ()=>{
+    const sel = activeEventsState().type;
+    const items = uniqTypesFromEvents(getEventRows());
+    buildMenuList(panel, items, sel, ()=>{
+      setPillHasSelection(btn, sel.size>0);
+      onChange();
+    });
+    setPillHasSelection(btn, sel.size>0);
+  };
 
-  setPillHasSelection(btn, state.events.type.size>0);
+  rebuild();
 
-  const toggleTypeMenu = (e)=>{
+  const toggleMenu = (e)=>{
     if(e.type === 'touchend') e.preventDefault();
     e.stopPropagation();
 
@@ -325,6 +361,8 @@ function wireEventsTypePill(getEventRows, onChange){
     closeAllMenus();
 
     if(!expanded){
+      // rebuild right before opening so checked boxes/dot match the active view
+      rebuild();
       btn.setAttribute('aria-expanded','true');
       positionMenu(btn, panel);
     } else {
@@ -333,20 +371,21 @@ function wireEventsTypePill(getEventRows, onChange){
     }
   };
 
-  btn.addEventListener('click', toggleTypeMenu);
-  btn.addEventListener('touchend', toggleTypeMenu, {passive:false});
+  // Desktop: click. Mobile: touchend
+  btn.addEventListener('click', toggleMenu);
+  btn.addEventListener('touchend', toggleMenu, { passive:false });
 
   clearBtn?.addEventListener('click', (e)=>{
-    if(e.type === 'touchend') e.preventDefault();
+    e.preventDefault();
     e.stopPropagation();
-
-    state.events.type.clear();
-    setPillHasSelection(btn, false);
-    panel.querySelectorAll('input.menu__checkbox').forEach(cb=>{ cb.checked = false; });
-    onChange();
+    const sel = activeEventsState().type;
+    sel.clear();
+    rebuild();
     closeAllMenus();
+    onChange();
   });
 }
+
 
 
 
@@ -380,6 +419,9 @@ function setViewUI(view){
   const title = $("viewTitle");
   if(title) title.textContent = (view === "events") ? "EVENTS (DEV)" : "INDEX";
 
+  const evIn = $("eventsSearchInput");
+  if(evIn) evIn.value = String(activeEventsState().q || "");
+
   // Header counts: show the relevant total next to the header title
   const evStatus = $("eventsStatus");
   const idxStatus = $("status");
@@ -389,6 +431,8 @@ function setViewUI(view){
   document.title = (view === "events") ? "ANY N.E. GRAPPLING (DEV)" : "ANY N.E. GRAPPLING (DEV)";
 
   setTransition(260);
+  refreshEventsPillDots();
+
   applyProgress(view === "index" ? 1 : 0);
 }
 
@@ -657,7 +701,7 @@ function wireSearch(){
     render();
   });
   evIn?.addEventListener("input",(e)=>{
-    setEventsQuery(e.target.value);
+    setActiveEventsQuery(e.target.value);
     render();
   });
 
@@ -669,7 +713,7 @@ function wireSearch(){
   });
 
   $("eventsSearchClear")?.addEventListener("click", ()=>{
-    setEventsQuery("");
+    setActiveEventsQuery("");
     if(evIn) evIn.value = "";
     render();
   });
@@ -709,7 +753,7 @@ function wireSearchSuggestions(){
 
     const val = btn.getAttribute("data-value") || "";
     input.value = val;
-    setEventsQuery(val);
+    setActiveEventsQuery(val);
     input.dispatchEvent(new Event("input", { bubbles: true }));
     close();
     input.blur();
@@ -729,14 +773,6 @@ function cloneSet(src){
   return new Set(Array.from(src || []));
 }
 
-function syncIndexEventsFromEvents(){
-  // Phase 1: keep Index's events-clone filters synced to Events so the UI stays 1:1.
-  // Later you can remove this sync and wire Index controls to state.indexEvents independently.
-  state.indexEvents.q = String(state?.events?.q ?? "");
-  state.indexEvents.year = cloneSet(state?.events?.year);
-  state.indexEvents.state = cloneSet(state?.events?.state);
-  state.indexEvents.type = cloneSet(state?.events?.type);
-}
 
 function render(){
   didRender = true;
@@ -746,8 +782,7 @@ function render(){
   renderEventsGroups($("eventsRoot"), evFiltered);
   $("eventsStatus").textContent = `${evFiltered.length} events`;
 
-  // Index view (Phase 1): render the SAME events UI into a separate container
-  syncIndexEventsFromEvents();
+  // Index view (Phase 1): render Events-style UI into a separate container (independent filters)
   const idxEvFiltered = filterEvents(eventRows, { events: state.indexEvents });
   renderEventsGroups($("indexEventsRoot"), idxEvFiltered);
   $("status").textContent = `${idxEvFiltered.length} events`;
