@@ -225,11 +225,11 @@ function renderIndexEventRow(r){
   const c4 = document.createElement("div");
   c4.className = "cell cell--daydate";
   c4.innerHTML = `
-    <div class="cell__sub cell__day">
+    <div class="cell__dayline">
       <span class="dayLabel">Sat:</span>
-      <span class="dayValue">${escapeHtml(String(r.DAY || "—"))}</span>
+      <span class="dayValue">${escapeHtml(r.DAY || "—")}</span>
     </div>
-    <div class="cell__sub cell__date">
+    <div class="cell__dayline">
       <span class="dayLabel">Sun:</span>
       <span class="dayValue">${escapeHtml(String(r.DATE || "—"))}</span>
     </div>
