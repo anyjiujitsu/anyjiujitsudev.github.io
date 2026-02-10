@@ -44,8 +44,7 @@
   padding: var(--evRowPadY) var(--evRowPadX);
 
   display: grid;
-  /* Give the right-most column a touch more room (DAY/DATE or Sat/Sun). */
-  grid-template-columns: 165px 1.7fr 1.28fr 108px;
+  grid-template-columns: 165px 1.7fr 1.35fr 96px;
   column-gap: 12px;
   align-items: center;
 }
@@ -103,20 +102,19 @@
    - keep inline layout on both desktop + mobile; prevent overflow/truncation
 */
 #viewIndex .row.row--events .cell--daydate .cell__dayline{
-  /* Prevent label shifting when the value is short/empty by using a
-     fixed label column + flexible value column. */
-  display: grid;
-  grid-template-columns: 34px 1fr;
-  column-gap: 6px;
+  display: flex;
+  justify-content: flex-end;
   align-items: baseline;
+  gap: 6px;
   min-width: 0;
 }
 
 #viewIndex .row.row--events .cell--daydate .dayLabel{
-  justify-self: end;
+  flex: 0 0 auto;
 }
 
 #viewIndex .row.row--events .cell--daydate .dayValue{
+  flex: 0 1 auto;
   min-width: 0;
   display: inline-block;
   white-space: nowrap;
@@ -274,8 +272,7 @@
   }
   #viewEvents .row.row--events,
 #viewIndex .row.row--events{
-    /* Slightly wider right-most column for Sat/Sun (or DAY/DATE) on mobile */
-    grid-template-columns: 1.55fr 1fr 74px;
+    grid-template-columns: 1.6fr 1fr 66px;
     column-gap: 10px;
   }
 
@@ -396,42 +393,6 @@
 #viewEvents .row.row--events .cell--citystate::before,
 #viewIndex .row.row--events .cell--citystate::before{
   left: calc(var(--evIconLeft) - var(--evMidShift));
-}
-
-/* Reclaim a bit of usable width in the right-most column by tightening
-   the built-in icon padding just for DAY/DATE (and Index Sat/Sun). */
-#viewIndex{
-  --evRightShift: 8px;
-}
-#viewIndex .row.row--events .cell--daydate{
-  padding-left: calc(var(--evIconPad) - var(--evRightShift));
-}
-#viewIndex .row.row--events .cell--daydate::before{
-  left: calc(var(--evIconLeft) - var(--evRightShift));
-}
-@media (max-width: 520px){
-  #viewIndex{ --evRightShift: 6px; }
-}
-
-/* Reclaim a bit of usable width in the right-most column by tightening
-   the built-in icon padding just for DAY/DATE (and Index Sat/Sun). */
-#viewEvents,
-#viewIndex{
-  --evRightShift: 8px;
-}
-
-#viewEvents .row.row--events .cell--daydate,
-#viewIndex .row.row--events .cell--daydate{
-  padding-left: calc(var(--evIconPad) - var(--evRightShift));
-}
-#viewEvents .row.row--events .cell--daydate::before,
-#viewIndex .row.row--events .cell--daydate::before{
-  left: calc(var(--evIconLeft) - var(--evRightShift));
-}
-
-@media (max-width: 520px){
-  #viewEvents,
-  #viewIndex{ --evRightShift: 6px; }
 }
 
 @media (max-width: 520px){
@@ -836,8 +797,7 @@
   padding: var(--evRowPadY) var(--evRowPadX);
 
   display: grid;
-  /* Give the right-most column a touch more room (DAY/DATE or Sat/Sun). */
-  grid-template-columns: 165px 1.7fr 1.28fr 108px;
+  grid-template-columns: 165px 1.7fr 1.35fr 96px;
   column-gap: 12px;
   align-items: center;
 }
@@ -1019,8 +979,7 @@
     --evRowBleedX: calc(var(--evRowPadX) + 1px);
   }
   #viewIndex .row.row--events{
-    /* Slightly wider right-most column for Sat/Sun (or DAY/DATE) on mobile */
-    grid-template-columns: 1.55fr 1fr 74px;
+    grid-template-columns: 1.6fr 1fr 66px;
     column-gap: 10px;
   }
 
@@ -1087,18 +1046,6 @@
 #viewIndex .row.row--events .cell--citystate,
 #viewIndex .row.row--events .cell--daydate{
   padding-left: var(--evIconPad); /* icon + consistent text gap */
-}
-
-/* Index: tighten only the right-most column so Sat/Sun has a bit more room */
-#viewIndex{ --evRightShift: 8px; }
-#viewIndex .row.row--events .cell--daydate{
-  padding-left: calc(var(--evIconPad) - var(--evRightShift));
-}
-#viewIndex .row.row--events .cell--daydate::before{
-  left: calc(var(--evIconLeft) - var(--evRightShift));
-}
-@media (max-width: 520px){
-  #viewIndex{ --evRightShift: 6px; }
 }
 
 /* Mobile alignment: lower columns 2 & 3 to align with the FOR/WHERE stack (below EVENT/NEW strip) */
