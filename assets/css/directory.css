@@ -112,6 +112,28 @@
   font-weight: 400;
 }
 
+
+/* Mobile: keep Sat/Sun inline, but constrain value like STATE/IG (no stacking) */
+@media (max-width: 520px){
+  #viewIndex .row.row--events .cell--daydate .cell__dayline{
+    display:flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 6px;
+  }
+  #viewIndex .row.row--events .cell--daydate .dayLabel{
+    flex: 0 0 auto;
+  }
+  #viewIndex .row.row--events .cell--daydate .dayValue{
+    flex: 1 1 auto;
+    min-width: 0;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
 /* Tighten tracking specifically for numeric DATE line */
 #viewEvents .row.row--events .cell--daydate .cell__sub,
 #viewIndex .row.row--events .cell--daydate .cell__sub{
