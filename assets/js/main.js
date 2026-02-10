@@ -1,25 +1,30 @@
-import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260210-809";
-import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery } from "./state.js?v=20260210-809";
-import { filterDirectory, filterEvents } from "./filters.js?v=20260210-809";
-import { renderDirectoryGroups, renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260210-809";
+// main.js
+// purpose: app bootstrap + data loading + view wiring + render orchestration
+
+import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260210-900";
+import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery } from "./state.js?v=20260210-900";
+import { filterEvents } from "./filters.js?v=20260210-900";
+import { renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260210-900";
+
+import { $ } from "./utils/dom.js?v=20260210-900";
+import {
+  initEventsPills,
+  initIndexPills,
+  refreshEventsPillDots,
+} from "./ui/pills.js?v=20260210-900";
+import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260210-900";
 
 let directoryRows = [];
 let eventRows = [];
-
 
 let didRender = false;
 // View lock removed: enable slider + Index view
 const VIEW_LOCKED = false;
 
-function $(id){ return document.getElementById(id); }
-
-
 /* ------------------ INDEX REMAP (directory.csv -> events-style rows) ------------------ */
 function dirToIndexEventRow(r){
   return {
-    // left-most label
     EVENT: "Drop Ins:",
-    // mapped fields
     FOR: r.NAME || "",
     WHERE: r.IG || "",
     CITY: r.CITY || "",
@@ -27,13 +32,11 @@ function dirToIndexEventRow(r){
     DAY: r.SAT || "",
     DATE: r.SUN || "",
     OTA: (r.OTA || "").toUpperCase(),
-    // keep for compatibility
     CREATED: ""
   };
 }
 
 function filterIndexDirectoryAsEvents(rows, idxState){
-  // idxState has: { q, year:Set, state:Set, type:Set }
   const q = String(idxState?.q ?? "").trim().toLowerCase();
   const stateSet = idxState?.state instanceof Set ? idxState.state : new Set();
   const typeSet  = idxState?.type  instanceof Set ? idxState.type  : new Set();
@@ -48,10 +51,8 @@ function filterIndexDirectoryAsEvents(rows, idxState){
       const s = String(r.STATE || "").trim().toUpperCase();
       if(!stateSet.has(s)) return false;
     }
-    // For now, YEAR pill does not apply to directory rows (SAT/SUN are not dates)
-    if(yearSet.size){
-      // ignore YEAR filtering safely
-    }
+    // YEAR pill does not apply to directory rows (SAT/SUN are not dates)
+    if(yearSet.size){ /* ignore safely */ }
     // EVENT pill: treat as filtering on the placeholder event label
     if(typeSet.size){
       const t = String(r.EVENT || "").trim();
@@ -60,6 +61,7 @@ function filterIndexDirectoryAsEvents(rows, idxState){
     return true;
   });
 }
+
 function activeEventsState(){
   return (state.view === "index") ? state.indexEvents : state.events;
 }
@@ -69,373 +71,7 @@ function setActiveEventsQuery(val){
   else setEventsQuery(val);
 }
 
-function refreshEventsPillDots(){
-  const s = activeEventsState();
-  const b1 = $("eventsPill1Btn");
-  const b2 = $("eventsPill2Btn");
-  const b3 = $("eventsPill3Btn");
-  if(b1) setPillHasSelection(b1, s.year.size>0);
-  if(b2) setPillHasSelection(b2, s.state.size>0);
-  if(b3) setPillHasSelection(b3, s.type.size>0);
-}
-
-/* ------------------ PILL MENUS (Events: YEAR) ------------------ */
-function parseYearFromEventRow(r){
-  const y = String(r?.YEAR ?? "").trim();
-  if(y) return y;
-  const d = String(r?.DATE ?? "").trim();
-  const m = d.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if(m) return m[3];
-  const tmp = new Date(d);
-  if(!isNaN(tmp)) return String(tmp.getFullYear());
-  return "";
-}
-
-function uniqYearsFromEvents(rows){
-  const set = new Set();
-  rows.forEach(r=>{
-    const y = parseYearFromEventRow(r);
-    if(y) set.add(y);
-  });
-  return Array.from(set).sort((a,b)=>Number(b)-Number(a));
-}
-
-function uniqStatesFromEvents(rows){
-  const set = new Set();
-  rows.forEach(r=>{
-    const s = String(r.STATE ?? "").trim();
-    if(s) set.add(s);
-  });
-  return Array.from(set).sort((a,b)=>a.localeCompare(b));
-}
-
-function uniqTypesFromEvents(rows){
-  const set = new Set();
-  rows.forEach(r=>{
-    const t = String(r.TYPE ?? "").trim();
-    if(t) set.add(t);
-  });
-  return Array.from(set).sort((a,b)=>a.localeCompare(b));
-}
-
-
-
-
-function uniqStatesFromDirectory(rows){
-  const set = new Set();
-  rows.forEach(r=>{
-    const s = String(r.STATE ?? "").trim();
-    if(s) set.add(s);
-  });
-  return Array.from(set).sort((a,b)=>a.localeCompare(b));
-}
-
-function buildMenuListIn(listEl, items, selectedSet, onChange){
-  if(!listEl) return;
-  listEl.innerHTML = "";
-  items.forEach(val=>{
-    const row = document.createElement('label');
-    row.className = 'menu__item menu__item--check';
-
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.className = 'menu__checkbox';
-    cb.checked = selectedSet.has(val);
-    cb.value = val;
-
-    const text = document.createElement('span');
-    text.className = 'menu__itemText';
-    text.textContent = val;
-
-    cb.addEventListener('change', (ev)=>{
-      ev.stopPropagation();
-      if(cb.checked) selectedSet.add(val);
-      else selectedSet.delete(val);
-      onChange();
-    });
-
-    row.appendChild(cb);
-    row.appendChild(text);
-    listEl.appendChild(row);
-  });
-}
-
-
-
-
-
-
-function closeAllMenus(){
-  document.querySelectorAll('.menu[data-pill-panel]').forEach(panel=>{
-    panel.hidden = true;
-    panel.style.left = '';
-    panel.style.top  = '';
-  });
-  document.querySelectorAll('.pill.filter-pill[aria-expanded="true"]').forEach(btn=>{
-    btn.setAttribute('aria-expanded','false');
-  });
-}
-
-function positionMenu(btnEl, panelEl){
-  const vv = window.visualViewport;
-  if(!btnEl || !panelEl) return;
-  const r = btnEl.getBoundingClientRect();
-  const pad = 8;
-  const vw = vv ? vv.width : window.innerWidth;
-  const vh = vv ? vv.height : window.innerHeight;
-  const vx = vv ? vv.offsetLeft : 0;
-  const vy = vv ? vv.offsetTop : 0;
-
-  panelEl.hidden = false; // show to measure
-
-  let left = r.left + vx;
-  let top  = r.bottom + pad + vy;
-
-  const pr = panelEl.getBoundingClientRect();
-  const w = pr.width;
-  const h = pr.height;
-
-  if(left + w + pad > vw) left = Math.max(pad, vw - w - pad);
-  if(left < pad) left = pad;
-
-  if(top + h + pad > vh){
-    const above = r.top - h - pad;
-    if(above >= pad) top = above;
-    else top = Math.max(pad, vh - h - pad);
-  }
-
-  panelEl.style.left = Math.round(left) + "px";
-  panelEl.style.top  = Math.round(top) + "px";
-}
-
-function setPillHasSelection(btnEl, has){
-  if(!btnEl) return;
-  btnEl.setAttribute('data-has-selection', has ? 'true' : 'false');
-}
-
-function wireMenuDismiss(){
-  if(wireMenuDismiss._did) return;
-  wireMenuDismiss._did = true;
-
-  document.addEventListener('click', (e)=>{
-    const t = e.target;
-    if(t && (t.closest('.pillSelect') || t.closest('.menu') || t.closest('.pill.filter-pill'))) return;
-    closeAllMenus();
-  });
-
-  document.addEventListener('keydown', (e)=>{
-    if(e.key === 'Escape') closeAllMenus();
-  });
-
-  window.addEventListener('resize', ()=>closeAllMenus());
-}
-
-function buildMenuList(panelEl, items, selectedSet, onToggle){
-  panelEl.querySelectorAll('.menu__empty').forEach(n=>n.remove());
-  panelEl.querySelectorAll('.menu__list').forEach(n=>n.remove());
-
-  const list = document.createElement('div');
-  list.className = 'menu__list';
-
-  items.forEach(val=>{
-    const row = document.createElement('label');
-    row.className = 'menu__item menu__item--check';
-
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.className = 'menu__checkbox';
-    cb.checked = selectedSet.has(val);
-    cb.value = val;
-
-    const text = document.createElement('span');
-    text.className = 'menu__itemText';
-    text.textContent = val;
-
-    cb.addEventListener('change', (ev)=>{
-      ev.stopPropagation();
-      // keep Set in sync with checkbox state
-      if(cb.checked) selectedSet.add(val);
-      else selectedSet.delete(val);
-      onToggle(val, cb.checked);
-    });
-
-    row.appendChild(cb);
-    row.appendChild(text);
-    list.appendChild(row);
-  });
-
-  panelEl.appendChild(list);
-}
-
-function wireEventsYearPill(getEventRows, onChange){
-  wireMenuDismiss();
-
-  const btn = $('eventsPill1Btn');
-  const panel = $('eventsPill1Menu');
-  const clearBtn = $('eventsPill1Clear');
-
-  if(!btn || !panel) return;
-
-  const rebuild = ()=>{
-    const sel = activeEventsState().year;
-    const items = uniqYearsFromEvents(getEventRows());
-    buildMenuList(panel, items, sel, ()=>{
-      setPillHasSelection(btn, sel.size>0);
-      onChange();
-    });
-    setPillHasSelection(btn, sel.size>0);
-  };
-
-  rebuild();
-
-  const toggleMenu = (e)=>{
-    if(e.type === 'touchend') e.preventDefault();
-    e.stopPropagation();
-
-    const expanded = btn.getAttribute('aria-expanded') === 'true';
-    closeAllMenus();
-
-    if(!expanded){
-      // rebuild right before opening so checked boxes/dot match the active view
-      rebuild();
-      btn.setAttribute('aria-expanded','true');
-      positionMenu(btn, panel);
-    } else {
-      btn.setAttribute('aria-expanded','false');
-      panel.hidden = true;
-    }
-  };
-
-  // Desktop: click. Mobile: touchend
-  btn.addEventListener('click', toggleMenu);
-  btn.addEventListener('touchend', toggleMenu, { passive:false });
-
-  clearBtn?.addEventListener('click', (e)=>{
-    e.preventDefault();
-    e.stopPropagation();
-    const sel = activeEventsState().year;
-    sel.clear();
-    rebuild();
-    closeAllMenus();
-    onChange();
-  });
-}
-
-
-
-function wireEventsStatePill(getEventRows, onChange){
-  wireMenuDismiss();
-
-  const btn = $('eventsPill2Btn');
-  const panel = $('eventsPill2Menu');
-  const clearBtn = $('eventsPill2Clear');
-
-  if(!btn || !panel) return;
-
-  const rebuild = ()=>{
-    const sel = activeEventsState().state;
-    const items = uniqStatesFromEvents(getEventRows());
-    buildMenuList(panel, items, sel, ()=>{
-      setPillHasSelection(btn, sel.size>0);
-      onChange();
-    });
-    setPillHasSelection(btn, sel.size>0);
-  };
-
-  rebuild();
-
-  const toggleMenu = (e)=>{
-    if(e.type === 'touchend') e.preventDefault();
-    e.stopPropagation();
-
-    const expanded = btn.getAttribute('aria-expanded') === 'true';
-    closeAllMenus();
-
-    if(!expanded){
-      // rebuild right before opening so checked boxes/dot match the active view
-      rebuild();
-      btn.setAttribute('aria-expanded','true');
-      positionMenu(btn, panel);
-    } else {
-      btn.setAttribute('aria-expanded','false');
-      panel.hidden = true;
-    }
-  };
-
-  // Desktop: click. Mobile: touchend
-  btn.addEventListener('click', toggleMenu);
-  btn.addEventListener('touchend', toggleMenu, { passive:false });
-
-  clearBtn?.addEventListener('click', (e)=>{
-    e.preventDefault();
-    e.stopPropagation();
-    const sel = activeEventsState().state;
-    sel.clear();
-    rebuild();
-    closeAllMenus();
-    onChange();
-  });
-}
-
-
-
-function wireEventsTypePill(getEventRows, onChange){
-  wireMenuDismiss();
-
-  const btn = $('eventsPill3Btn');
-  const panel = $('eventsPill3Menu');
-  const clearBtn = $('eventsPill3Clear');
-
-  if(!btn || !panel) return;
-
-  const rebuild = ()=>{
-    const sel = activeEventsState().type;
-    const items = uniqTypesFromEvents(getEventRows());
-    buildMenuList(panel, items, sel, ()=>{
-      setPillHasSelection(btn, sel.size>0);
-      onChange();
-    });
-    setPillHasSelection(btn, sel.size>0);
-  };
-
-  rebuild();
-
-  const toggleMenu = (e)=>{
-    if(e.type === 'touchend') e.preventDefault();
-    e.stopPropagation();
-
-    const expanded = btn.getAttribute('aria-expanded') === 'true';
-    closeAllMenus();
-
-    if(!expanded){
-      // rebuild right before opening so checked boxes/dot match the active view
-      rebuild();
-      btn.setAttribute('aria-expanded','true');
-      positionMenu(btn, panel);
-    } else {
-      btn.setAttribute('aria-expanded','false');
-      panel.hidden = true;
-    }
-  };
-
-  // Desktop: click. Mobile: touchend
-  btn.addEventListener('click', toggleMenu);
-  btn.addEventListener('touchend', toggleMenu, { passive:false });
-
-  clearBtn?.addEventListener('click', (e)=>{
-    e.preventDefault();
-    e.stopPropagation();
-    const sel = activeEventsState().type;
-    sel.clear();
-    rebuild();
-    closeAllMenus();
-    onChange();
-  });
-}
-
-
-
-
+/* ------------------ VIEW TOGGLE ------------------ */
 function setTransition(ms){
   document.body.style.setProperty("--viewTransition", ms + "ms");
 }
@@ -469,17 +105,16 @@ function setViewUI(view){
   const evIn = $("eventsSearchInput");
   if(evIn) evIn.value = String(activeEventsState().q || "");
 
-  // Header counts: show the relevant total next to the header title
+  // Header counts
   const evStatus = $("eventsStatus");
   const idxStatus = $("status");
   if(evStatus) evStatus.hidden = (view !== "events");
   if(idxStatus) idxStatus.hidden = (view !== "index");
 
-  document.title = (view === "events") ? "ANY N.E. GRAPPLING (DEV)" : "ANY N.E. GRAPPLING (DEV)";
+  document.title = "ANY N.E. GRAPPLING (DEV)";
 
   setTransition(260);
-  refreshEventsPillDots();
-
+  refreshEventsPillDots({ $, activeEventsState });
   applyProgress(view === "index" ? 1 : 0);
 }
 
@@ -493,12 +128,10 @@ function wireViewToggle(){
   if(VIEW_LOCKED){
     setView("events");
     setViewUI("events");
-
     if(viewToggle){
       viewToggle.classList.add("viewToggle--locked");
       viewToggle.setAttribute("aria-disabled", "true");
     }
-    // keep focus from landing on disabled control
     tabEvents?.setAttribute("tabindex", "-1");
     tabIndex?.setAttribute("tabindex", "-1");
     tabEvents?.setAttribute("aria-disabled", "true");
@@ -532,7 +165,6 @@ function wireViewToggle(){
 
     viewToggle.addEventListener("pointermove", (e) => {
       if(!dragging || e.pointerId !== pointerId) return;
-
       const rect = viewToggle.getBoundingClientRect();
       const padding = 4;
       const trackW = rect.width - padding * 2;
@@ -547,10 +179,8 @@ function wireViewToggle(){
     const endDrag = (e) => {
       if(!dragging) return;
       if(e && pointerId != null && e.pointerId !== pointerId) return;
-
       dragging = false;
       pointerId = null;
-
       setTransition(260);
       const p = Number(getComputedStyle(document.body).getPropertyValue("--viewProgress")) || 0;
       setViewUI(p >= 0.5 ? "index" : "events");
@@ -579,7 +209,6 @@ function wireViewToggle(){
 
       const dx = x - startX;
       const dy = y - startY;
-
       if(Math.abs(dy) > Math.abs(dx)) return;
 
       const delta = -dx / window.innerWidth;
@@ -594,233 +223,7 @@ function wireViewToggle(){
   }
 }
 
-
-
-function wireIndexOpensPill(getDirectoryRows, onChange){
-  wireMenuDismiss();
-
-  const btn = $('openMatBtn');
-  const panel = $('openMatMenu');
-  const clearBtn = $('openMatClear');
-  const listEl = $('openMatList') || panel?.querySelector('.menu__list');
-
-  if(!btn || !panel) return;
-
-  const items = ["ALL","SATURDAY","SUNDAY"];
-  buildMenuListIn(listEl, items, state.index.opens, ()=>{
-    setPillHasSelection(btn, state.index.opens.size>0);
-    onChange();
-  });
-
-  setPillHasSelection(btn, state.index.opens.size>0);
-
-  btn.addEventListener('click', (e)=>{
-    e.preventDefault();
-    e.stopPropagation();
-
-    const expanded = btn.getAttribute('aria-expanded') === 'true';
-    closeAllMenus();
-
-    if(!expanded){
-      btn.setAttribute('aria-expanded','true');
-      positionMenu(btn, panel);
-    } else {
-      btn.setAttribute('aria-expanded','false');
-      panel.hidden = true;
-    }
-  });
-
-  clearBtn?.addEventListener('click', (e)=>{
-    e.preventDefault();
-    e.stopPropagation();
-
-    state.index.opens.clear();
-    setPillHasSelection(btn, false);
-    panel.querySelectorAll('input.menu__checkbox').forEach(cb=>{ cb.checked = false; });
-    onChange();
-    closeAllMenus();
-  });
-}
-
-
-
-
-function wireIndexGuestsPill(getDirectoryRows, onChange){
-  wireMenuDismiss();
-
-  const btn = $('guestsBtn');
-  const panel = $('guestsMenu');
-  const clearBtn = $('guestsClear');
-  const listEl = $('guestsList') || panel?.querySelector('.menu__list');
-
-  if(!btn || !panel) return;
-
-  const items = ["GUESTS WELCOME"];
-  buildMenuListIn(listEl, items, state.index.guests, ()=>{
-    setPillHasSelection(btn, state.index.guests.size>0);
-    onChange();
-  });
-
-  setPillHasSelection(btn, state.index.guests.size>0);
-
-  btn.addEventListener('click', (e)=>{
-    e.preventDefault();
-    e.stopPropagation();
-
-    const expanded = btn.getAttribute('aria-expanded') === 'true';
-    closeAllMenus();
-
-    if(!expanded){
-      btn.setAttribute('aria-expanded','true');
-      positionMenu(btn, panel);
-    } else {
-      btn.setAttribute('aria-expanded','false');
-      panel.hidden = true;
-    }
-  });
-
-  clearBtn?.addEventListener('click', (e)=>{
-    e.preventDefault();
-    e.stopPropagation();
-
-    state.index.guests.clear();
-    setPillHasSelection(btn, false);
-    panel.querySelectorAll('input.menu__checkbox').forEach(cb=>{ cb.checked = false; });
-    onChange();
-    closeAllMenus();
-  });
-}
-
-
-function wireIndexStatePill(getDirectoryRows, onChange){
-  wireMenuDismiss();
-
-  const btn = $('stateBtn');
-  const panel = $('stateMenu');
-  const clearBtn = $('stateClear');
-  const listEl = $('stateList') || panel?.querySelector('.menu__list');
-
-  if(!btn || !panel) return;
-
-  const states = uniqStatesFromDirectory(getDirectoryRows());
-  buildMenuListIn(listEl, states, state.index.states, ()=>{
-    setPillHasSelection(btn, state.index.states.size>0);
-    onChange();
-  });
-
-  setPillHasSelection(btn, state.index.states.size>0);
-
-  btn.addEventListener('click', (e)=>{
-    e.preventDefault();
-    e.stopPropagation();
-
-    const expanded = btn.getAttribute('aria-expanded') === 'true';
-    closeAllMenus();
-
-    if(!expanded){
-      btn.setAttribute('aria-expanded','true');
-      positionMenu(btn, panel);
-    } else {
-      btn.setAttribute('aria-expanded','false');
-      panel.hidden = true;
-    }
-  });
-
-  clearBtn?.addEventListener('click', (e)=>{
-    e.preventDefault();
-    e.stopPropagation();
-
-    state.index.states.clear();
-    setPillHasSelection(btn, false);
-    panel.querySelectorAll('input.menu__checkbox').forEach(cb=>{ cb.checked = false; });
-    onChange();
-    closeAllMenus();
-  });
-}
-
-function wireSearch(){
-  const idxIn = $("searchInput");
-  const evIn  = $("eventsSearchInput");
-
-  idxIn?.addEventListener("input",(e)=>{
-    setIndexQuery(e.target.value);
-    setIndexEventsQuery(e.target.value);
-    render();
-  });
-  evIn?.addEventListener("input",(e)=>{
-    setActiveEventsQuery(e.target.value);
-    render();
-  });
-
-  $("searchClear")?.addEventListener("click", ()=>{
-    setIndexQuery("");
-    setIndexEventsQuery("");
-    if(idxIn) idxIn.value = "";
-    render();
-  });
-
-  $("eventsSearchClear")?.addEventListener("click", ()=>{
-    setActiveEventsQuery("");
-    if(evIn) evIn.value = "";
-    render();
-  });
-}
-
-
-/* section: search suggestions // purpose: quick-pick common search tokens for Events */
-function wireSearchSuggestions(){
-  const wrap  = $("eventsSearchWrap");
-  const input = $("eventsSearchInput");
-  const panel = $("eventsSearchSuggest");
-  if(!wrap || !input || !panel) return;
-
-  const open = ()=>{
-    if(panel.hasAttribute("hidden")) panel.removeAttribute("hidden");
-  };
-  const close = ()=>{
-    if(!panel.hasAttribute("hidden")) panel.setAttribute("hidden","");
-  };
-
-  input.addEventListener("focus", ()=>{
-    if(!String(input.value || "").trim()) open();
-  });
-  input.addEventListener("click", ()=>{
-    if(!String(input.value || "").trim()) open();
-  });
-
-  input.addEventListener("input", ()=>{
-    if(String(input.value || "").trim()) close();
-  });
-
-  panel.addEventListener("click", (e)=>{
-    const btn = e.target.closest("button[data-value]");
-    if(!btn) return;
-    e.preventDefault();
-    e.stopPropagation();
-
-    const val = btn.getAttribute("data-value") || "";
-    input.value = val;
-    setActiveEventsQuery(val);
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-    close();
-    input.blur();
-  });
-
-  document.addEventListener("pointerdown", (e)=>{
-    if(wrap.contains(e.target)) return;
-    close();
-  }, true);
-
-  input.addEventListener("keydown", (e)=>{
-    if(e.key === "Escape") close();
-  });
-}
-
-function cloneSet(src){
-  return new Set(Array.from(src || []));
-}
-
-
+/* ------------------ RENDER ------------------ */
 function render(){
   didRender = true;
 
@@ -829,19 +232,30 @@ function render(){
   renderEventsGroups($("eventsRoot"), evFiltered);
   $("eventsStatus").textContent = `${evFiltered.length} events`;
 
-  // Index view (Phase 2): render Directory rows using Events-style cards (independent filters + independent data)
+  // Index view (Phase 2): render Directory rows using Events-style cards
   const idxRows = directoryRows.map(dirToIndexEventRow);
   const idxFiltered = filterIndexDirectoryAsEvents(idxRows, state.indexEvents);
   renderIndexEventsGroups($("indexEventsRoot"), idxFiltered);
   $("status").textContent = `${idxFiltered.length} events`;
 }
 
+/* ------------------ INIT ------------------ */
 async function init(){
   wireViewToggle();
-  wireSearch();
-  wireSearchSuggestions();
+
+  wireSearch({
+    $,
+    setIndexQuery,
+    setIndexEventsQuery,
+    setActiveEventsQuery,
+    render,
+  });
+  wireSearchSuggestions({
+    $,
+    setActiveEventsQuery,
+  });
+
   if(!state.view) state.view = "events";
-  // Respect current state.view and sync UI (slider position + filter bars)
   setViewUI(state.view);
 
   $("status").textContent = "Loading...";
@@ -855,17 +269,22 @@ async function init(){
   directoryRows = dirRaw.map(normalizeDirectoryRow);
   eventRows = evRaw.map(normalizeEventRow);
 
-  // Wire YEAR + STATE + EVENT filter pills (Events view)
-  wireEventsYearPill(()=>eventRows, render);
-  wireEventsStatePill(()=>eventRows, render);
-  wireEventsTypePill(()=>eventRows, render);
+  // Events pills
+  initEventsPills({
+    $,
+    getEventRows: ()=>eventRows,
+    activeEventsState,
+    onChange: render,
+  });
 
-  // Wire STATE + OPENS + GUESTS filter pills (Index view)
-  // purpose: Index UI should never break Events if elements are missing/hidden
+  // Index pills (kept defensive)
   try{
-    wireIndexStatePill(()=>directoryRows, render);
-    wireIndexOpensPill(()=>directoryRows, render);
-    wireIndexGuestsPill(()=>directoryRows, render);
+    initIndexPills({
+      $,
+      state,
+      getDirectoryRows: ()=>directoryRows,
+      onChange: render,
+    });
   }catch(err){
     console.warn("Index pill wiring skipped:", err);
   }
@@ -875,7 +294,6 @@ async function init(){
 
 init().catch((err)=>{
   console.error(err);
-  // If we already rendered successfully, don't overwrite the UI with a generic failure.
   if(didRender) return;
   $("status").textContent = "Failed to load data";
   $("eventsStatus").textContent = "Failed to load data";
