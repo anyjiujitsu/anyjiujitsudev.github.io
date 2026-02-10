@@ -210,7 +210,28 @@
     width: var(--evIconSize);
     height: var(--evIconSize);
   }
+
+
+/* Index mobile: keep Sat/Sun typography consistent with desktop (no uppercase/spacing) */
+#viewIndex .row.row--events .cell--daydate .cell__top,
+#viewIndex .row.row--events .cell--daydate .cell__sub{
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 13px;
+  line-height: 1.15;
 }
+#viewIndex .row.row--events .cell--daydate .dayLabel{
+  font-weight: 700;
+  color: var(--text);
+  text-transform: none;
+  letter-spacing: normal;
+}
+#viewIndex .row.row--events .cell--daydate .dayValue{
+  font-weight: 500;
+  color: var(--muted);
+}
+}
+
 
 #viewEvents .row.row--events .cell--daydate,
 #viewIndex .row.row--events .cell--daydate{
