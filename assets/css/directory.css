@@ -505,26 +505,6 @@
   }
 }
 
-/* =======================================================================
-   INDEX view ONLY
-   purpose: prevent long IG handles from expanding column 1 on mobile
-   rule: clamp IG to ~26 characters and allow grid items to shrink
-   scope: #viewIndex only (does not affect EVENTS view)
-   ======================================================================= */
-@media (max-width: 520px){
-  /* Allow grid children to shrink below their min-content width */
-  #viewIndex .row > div{ min-width: 0; }
-
-  /* Clamp IG text so it can't blow out the first column */
-  #viewIndex .cell__ig{
-    display: block;
-    max-width: 26ch;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-
 /* section: past events // purpose: visually de-emphasize inactive items (mobile highlight strip) */
 @media (max-width: 520px){
   #viewEvents .group--past .row.row--events .cell--forwhere::before{
@@ -1240,4 +1220,22 @@
 #viewIndex .row.row--events .cell--forwhere::after{
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Crect%20x=%223.5%22%20y=%223.5%22%20width=%2217%22%20height=%2217%22%20rx=%225%22/%3E%3Ccircle%20cx=%2212%22%20cy=%2212%22%20r=%223.2%22/%3E%3Cpath%20d=%22M17.5%206.7h0%22/%3E%3C/svg%3E");
   mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Crect%20x=%223.5%22%20y=%223.5%22%20width=%2217%22%20height=%2217%22%20rx=%225%22/%3E%3Ccircle%20cx=%2212%22%20cy=%2212%22%20r=%223.2%22/%3E%3Cpath%20d=%22M17.5%206.7h0%22/%3E%3C/svg%3E");
+}
+
+/* INDEX-only (mobile): clamp long IG / handle text so it cannot expand the first column.
+   Uses 26ch as an approximate 26-character visual width and shows ellipsis when clipped.
+   Scoped to #viewIndex so EVENTS view is not affected. */
+@media (max-width: 520px){
+  #viewIndex .row > div{ min-width: 0; }
+  #viewIndex .cell--forwhere{ min-width: 0; }
+
+  /* Directory "IG" may render as .cell__ig (directory layout) OR as .cell__where (events-style layout). */
+  #viewIndex .cell__ig,
+  #viewIndex .cell__where{
+    display: block;
+    max-width: 26ch;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
