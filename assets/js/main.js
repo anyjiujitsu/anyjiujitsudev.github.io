@@ -398,7 +398,7 @@ function applyProgress(p){
   document.body.style.setProperty("--viewProgress", String(clamped));
   const viewTitle = $("viewTitle");
   if(viewTitle){
-    viewTitle.textContent = (clamped >= 0.5) ? "INDEX" : "EVENTS (DEV)";
+    viewTitle.textContent = (clamped >= 0.5) ? "INDEX (DEV)" : "EVENTS (DEV)";
   }
   return clamped;
 }
