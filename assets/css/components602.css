@@ -1350,3 +1350,7 @@ nav.filters,
     background: transparent !important;
   }
 }
+
+
+/* ---- components603 override: Index events clone should NOT hide event cells ---- */
+#viewIndex #indexEventsRoot .cell--event{ display:block; }
