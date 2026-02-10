@@ -216,13 +216,14 @@ function renderIndexEventRow(r){
   const row = document.createElement("div");
   row.className = "row row--events";
 
-  const showOta = String(r.OTA || "").trim().toUpperCase() === "Y";
+  const otaVal = String(r.OTA || "").trim().toUpperCase();
+  const otaLabel = otaVal === "Y" ? "ALLOWED" : (otaVal === "N" ? "NOT ALLOWED" : "");
 
   const c1 = document.createElement("div");
   c1.className = "cell cell--event";
   c1.innerHTML = `
     <div class="cell__top cell__event">${escapeHtml(r.EVENT || "—")}</div>
-    ${showOta ? `<div class="cell__sub cell__new">OTA</div>` : `<div class="cell__sub cell__new">&nbsp;</div>`}
+    ${otaLabel ? `<div class="cell__sub cell__new">${escapeHtml(otaLabel)}</div>` : `<div class="cell__sub cell__new">&nbsp;</div>`}
   `;
 
   const c2 = document.createElement("div");
@@ -230,7 +231,7 @@ function renderIndexEventRow(r){
   c2.innerHTML = `
     <div class="cell__eventInlineWrap">
       <span class="cell__eventInline">${escapeHtml(r.EVENT || "—")}</span>
-      ${showOta ? `<span class="cell__newInline">WELCOMED</span>` : `<span class="cell__newInline">&nbsp;</span>`}
+      ${otaLabel ? `<span class="cell__newInline">${escapeHtml(otaLabel)}</span>` : `<span class="cell__newInline">&nbsp;</span>`}
     </div>
     <div class="cell__top cell__for">${escapeHtml(r.FOR || "—")}</div>
     <div class="cell__sub cell__where">${renderIndexIgLink(r.WHERE)}</div>
