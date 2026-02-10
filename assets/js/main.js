@@ -18,7 +18,7 @@ function $(id){ return document.getElementById(id); }
 function dirToIndexEventRow(r){
   return {
     // left-most label
-    EVENT: "TEXT HOLD",
+    EVENT: "Drop Ins:",
     // mapped fields
     FOR: r.NAME || "",
     WHERE: r.IG || "",
