@@ -112,6 +112,16 @@
   min-width: 0;
 }
 
+
+@media (max-width: 520px){
+  /* Mobile: tighten Sat/Sun label/value gutter so the calendar icon spacing
+     matches the other columns (reduce perceived gap to values). */
+  #viewIndex .row.row--events .cell--daydate .cell__dayline{
+    grid-template-columns: 26px 1fr;
+    column-gap: 4px;
+  }
+}
+
 #viewIndex .row.row--events .cell--daydate .dayLabel{
   justify-self: end;
 }
