@@ -1157,7 +1157,7 @@ nav.filters, .filters__inner, .pillRow{
 }
 
 .suggest .suggest__item::before{
-  content: "•";
+  content: "+";
   position: absolute;
   margin-left: -18px;
   color: #9a9a9a;
@@ -1211,7 +1211,7 @@ nav.filters, .filters__inner, .pillRow{
 }
 
 .suggest .suggest__item::before{
-  content: "•";
+  content: "+";
   position: absolute;
   left: 14px;
   top: 50%;
@@ -1283,4 +1283,5 @@ nav.filters, .filters__inner, .pillRow{
 #eventsSearchSuggest .menu__header--static .menu__title{
   font-size: 11px !important;
 }
+
 
