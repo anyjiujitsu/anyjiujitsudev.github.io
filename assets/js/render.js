@@ -224,14 +224,17 @@ function renderIndexEventRow(r){
 
   const c4 = document.createElement("div");
   c4.className = "cell cell--daydate";
+  // Index view mapping: SAT -> DAY, SUN -> DATE (see main.js dirToIndexEventRow)
+  const sat = String(r.DAY ?? "").trim() || "—";
+  const sun = String(r.DATE ?? "").trim() || "—";
   c4.innerHTML = `
     <div class="cell__dayline">
-      <span class="dayLabel">Sat:</span>
-      <span class="dayValue">${escapeHtml(r.DAY || "—")}</span>
+      <span class="cell__top dayLabel">Sat:</span>
+      <span class="cell__sub dayValue">${escapeHtml(sat)}</span>
     </div>
     <div class="cell__dayline">
-      <span class="dayLabel">Sun:</span>
-      <span class="dayValue">${escapeHtml(String(r.DATE || "—"))}</span>
+      <span class="cell__top dayLabel">Sun:</span>
+      <span class="cell__sub dayValue">${escapeHtml(sun)}</span>
     </div>
   `;
 
