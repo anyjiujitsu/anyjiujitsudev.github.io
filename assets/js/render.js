@@ -81,9 +81,8 @@ function renderIndexRow(r){
 
 function composeDays(r){
   const parts = [];
-  // Index view: show explicit labels before the SAT/SUN values
-  parts.push(r.SAT ? `Sat: ${r.SAT}` : "Sat:");
-  parts.push(r.SUN ? `Sun: ${r.SUN}` : "Sun:");
+  parts.push(r.SAT ? `Sat. ${r.SAT}` : "Sat.");
+  parts.push(r.SUN ? `Sun. ${r.SUN}` : "Sun.");
   return parts.join("  ");
 }
 
@@ -226,8 +225,8 @@ function renderIndexEventRow(r){
   const c4 = document.createElement("div");
   c4.className = "cell cell--daydate";
   c4.innerHTML = `
-    <div class="cell__top cell__day">${escapeHtml(r.DAY || "—")}</div>
-    <div class="cell__sub cell__date">${escapeHtml(String(r.DATE || "—"))}</div>
+    <div class="cell__top cell__day">${escapeHtml(`Sat: ${String(r.DAY || "—")}`)}</div>
+    <div class="cell__sub cell__date">${escapeHtml(`Sun: ${String(r.DATE || "—")}`)}</div>
   `;
 
   row.appendChild(c1);
