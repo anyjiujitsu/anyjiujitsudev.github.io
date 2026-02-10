@@ -220,20 +220,28 @@
 
 /* Slightly tighter icon sizing on very small screens */
 @media (max-width: 520px){
-  #viewEvents{ --evRowPadY: 5px; }
+  /* IMPORTANT: apply to BOTH views so Index mobile matches Events mobile */
+  #viewEvents,
+  #viewIndex{ --evRowPadY: 5px; }
 
-  #viewEvents{ --evRowPadX: 7px; }
+  #viewEvents,
+  #viewIndex{ --evRowPadX: 7px; }
 
-  #viewEvents{ --evIconPad: 18px; --evIconLeft: 4px; --evIconSize: 11px; }
+  #viewEvents,
+  #viewIndex{ --evIconPad: 18px; --evIconLeft: 4px; --evIconSize: 11px; }
 
   #viewEvents .row.row--events .cell--forwhere::after,
+  #viewIndex  .row.row--events .cell--forwhere::after,
   #viewEvents .row.row--events .cell--citystate::before,
-  #viewEvents .row.row--events .cell--daydate::before{
+  #viewIndex  .row.row--events .cell--citystate::before,
+  #viewEvents .row.row--events .cell--daydate::before,
+  #viewIndex  .row.row--events .cell--daydate::before{
     left: var(--evIconLeft);
     width: var(--evIconSize);
     height: var(--evIconSize);
   }
 }
+
 
 #viewEvents .row.row--events .cell--daydate,
 #viewIndex .row.row--events .cell--daydate{
