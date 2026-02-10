@@ -1015,6 +1015,21 @@
   letter-spacing: -0.035em;
 }
 
+/* Index SAT/SUN stack: make labels consistent, and make both values share the lighter "sub" style */
+#viewIndex .row.row--events .cell--daydate .dayLabel{
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+#viewIndex .row.row--events .cell--daydate .dayValue{
+  font-weight: 400;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 /* NOTE: Render uses .cell--citystate (middle) and .cell--daydate (right). */
 #viewIndex .row.row--events .cell--citystate,
 #viewIndex .row.row--events .cell--daydate{
