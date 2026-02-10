@@ -1246,14 +1246,20 @@
   color: inherit;
 }
 
-/* ---------- INDEX (mobile) underline for IG link only ----------
-   Minimal fix: does not touch clamp, sizing, or desktop rules.
---------------------------------------------------------------- */
+}
+
+
+/* ---------- INDEX (mobile) IG underline ----------
+   Mobile browsers (esp. iOS) can fail to paint text-decoration underlines inside overflow/ellipsis boxes.
+   So we render the underline as a border on the actual IG <a> element.
+   INDEX-only + mobile-only. Does NOT affect EVENTS.
+--------------------------------------------------- */
 @media (max-width: 520px){
-  #viewIndex a.cell__where,
-  #viewIndex .cell__where a{
+  #viewIndex a.cell__whereLink{
     color: inherit;
-    text-decoration: underline;
-    text-underline-offset: 2px;
+    text-decoration: none;              /* avoid unreliable mobile underline painting */
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 1px;               /* keeps border visible */
+    display: inline-block;             /* ensures border paints */
   }
 }
