@@ -1,15 +1,15 @@
-import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260202-321";
-import { state, setView, setIndexQuery, setEventsQuery } from "./state.js?v=20260202-321";
-import { filterDirectory, filterEvents } from "./filters.js?v=20260202-321";
-import { renderDirectoryGroups, renderEventsGroups } from "./render.js?v=20260202-321";
+import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260209-501";
+import { state, setView, setIndexQuery, setEventsQuery } from "./state.js?v=20260209-501";
+import { filterDirectory, filterEvents } from "./filters.js?v=20260209-501";
+import { renderDirectoryGroups, renderEventsGroups } from "./render.js?v=20260209-501";
 
 let directoryRows = [];
 let eventRows = [];
 
 
 let didRender = false;
-// TEMP: lock app to Events while Index view is being rebuilt
-const VIEW_LOCKED = true;
+// View lock removed: enable slider + Index view
+const VIEW_LOCKED = false;
 
 function $(id){ return document.getElementById(id); }
 
@@ -743,9 +743,8 @@ async function init(){
   wireSearch();
   wireSearchSuggestions();
   if(!state.view) state.view = "events";
-  setView("events");
-  state.view = "events";
-  setViewUI("events");
+  // Respect current state.view and sync UI (slider position + filter bars)
+  setViewUI(state.view);
 
   $("status").textContent = "Loading...";
   $("eventsStatus").textContent = "Loading...";
