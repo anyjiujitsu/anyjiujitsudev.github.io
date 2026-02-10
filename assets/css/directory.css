@@ -192,14 +192,20 @@
 /* Slightly tighter icon sizing on very small screens */
 @media (max-width: 520px){
   #viewEvents{ --evRowPadY: 5px; }
+  #viewIndex{ --evRowPadY: 5px; }
 
   #viewEvents{ --evRowPadX: 7px; }
+  #viewIndex{ --evRowPadX: 7px; }
 
   #viewEvents{ --evIconPad: 18px; --evIconLeft: 4px; --evIconSize: 11px; }
+  #viewIndex{ --evIconPad: 18px; --evIconLeft: 4px; --evIconSize: 11px; }
 
   #viewEvents .row.row--events .cell--forwhere::after,
   #viewEvents .row.row--events .cell--citystate::before,
-  #viewEvents .row.row--events .cell--daydate::before{
+  #viewEvents .row.row--events .cell--daydate::before,
+  #viewIndex .row.row--events .cell--forwhere::after,
+  #viewIndex .row.row--events .cell--citystate::before,
+  #viewIndex .row.row--events .cell--daydate::before{
     left: var(--evIconLeft);
     width: var(--evIconSize);
     height: var(--evIconSize);
@@ -335,7 +341,9 @@
 /* Mobile alignment: lower columns 2 & 3 to align with the FOR/WHERE stack (below EVENT/NEW strip) */
 @media (max-width: 520px){
   #viewEvents .row.row--events .cell--citystate,
-  #viewEvents .row.row--events .cell--daydate{
+  #viewEvents .row.row--events .cell--daydate,
+  #viewIndex  .row.row--events .cell--citystate,
+  #viewIndex  .row.row--events .cell--daydate{
     padding-top: 10px;
   }
 }
@@ -377,7 +385,8 @@
 
 /* EVENTS: mobile NEW emphasis (iter309) */
 @media (max-width: 520px){
-  #viewEvents .cell__eventInlineWrap .cell__newInline{
+  #viewEvents .cell__eventInlineWrap .cell__newInline,
+  #viewIndex  .cell__eventInlineWrap .cell__newInline{
     font-size: calc(15px + 2px);
   }
 }
@@ -480,7 +489,8 @@
 
 /* section: past events // purpose: visually de-emphasize inactive items (mobile highlight strip) */
 @media (max-width: 520px){
-  #viewEvents .group--past .row.row--events .cell--forwhere::before{
+  #viewEvents .group--past .row.row--events .cell--forwhere::before,
+  #viewIndex  .group--past .row.row--events .cell--forwhere::before{
     background: transparent !important;
   }
 }
@@ -1015,23 +1025,6 @@
   letter-spacing: -0.035em;
 }
 
-/* Index SAT/SUN stack: make labels consistent, and make both values share the lighter "sub" style */
-#viewIndex .row.row--events .cell--daydate .dayLabel{
-  font-weight: 700;
-  color: var(--text);
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-#viewIndex .row.row--events .cell--daydate .dayValue{
-  font-weight: 400;
-  color: var(--muted);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-/* Make the first line (Sat) not inherit the usual .cell__sub top-margin */
-
 /* NOTE: Render uses .cell--citystate (middle) and .cell--daydate (right). */
 #viewIndex .row.row--events .cell--citystate,
 #viewIndex .row.row--events .cell--daydate{
@@ -1210,30 +1203,4 @@
 #viewIndex .row.row--events .cell--forwhere::after{
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Crect%20x=%223.5%22%20y=%223.5%22%20width=%2217%22%20height=%2217%22%20rx=%225%22/%3E%3Ccircle%20cx=%2212%22%20cy=%2212%22%20r=%223.2%22/%3E%3Cpath%20d=%22M17.5%206.7h0%22/%3E%3C/svg%3E");
   mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Crect%20x=%223.5%22%20y=%223.5%22%20width=%2217%22%20height=%2217%22%20rx=%225%22/%3E%3Ccircle%20cx=%2212%22%20cy=%2212%22%20r=%223.2%22/%3E%3Cpath%20d=%22M17.5%206.7h0%22/%3E%3C/svg%3E");
-}
-
-
-/* Index view: Sat/Sun stacked field typography alignment */
-#viewIndex .row.row--events .cell--daydate .cell__top.cell__day,
-#viewIndex .row.row--events .cell--daydate .cell__sub.cell__day{
-  font-size: 12px;
-  line-height: 1.15;
-}
-
-/* Prevent the "sub" defaults (uppercase/tracking/muted) from affecting Sat/Sun labels/values */
-#viewIndex .row.row--events .cell--daydate .cell__sub.cell__day{
-  text-transform: none;
-  letter-spacing: 0;
-  color: inherit;
-}
-
-#viewIndex .row.row--events .cell--daydate .dayLabel{
-  font-weight: 700;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-#viewIndex .row.row--events .cell--daydate .dayValue{
-  font-weight: 500;
-  color: var(--muted);
 }
