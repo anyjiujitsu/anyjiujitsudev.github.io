@@ -440,7 +440,7 @@
   left: calc(var(--evIconLeft) - var(--evRightShift));
 }
 @media (max-width: 520px){
-  #viewIndex{ --evRightShift: 6px; }
+  #viewIndex{ --evRightShift: 8px; }
 }
 
 /* Reclaim a bit of usable width in the right-most column by tightening
@@ -461,7 +461,7 @@
 
 @media (max-width: 520px){
   #viewEvents,
-  #viewIndex{ --evRightShift: 6px; }
+  #viewIndex{ --evRightShift: 8px; }
 }
 
 @media (max-width: 520px){
@@ -1128,7 +1128,7 @@
   left: calc(var(--evIconLeft) - var(--evRightShift));
 }
 @media (max-width: 520px){
-  #viewIndex{ --evRightShift: 6px; }
+  #viewIndex{ --evRightShift: 8px; }
 }
 
 /* Mobile alignment: lower columns 2 & 3 to align with the FOR/WHERE stack (below EVENT/NEW strip) */
