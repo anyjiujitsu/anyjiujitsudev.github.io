@@ -112,28 +112,6 @@
   min-width: 0;
 }
 
-
-@media (max-width: 520px){
-  /* Mobile: keep SAT/SUN close to the calendar icon (match other column icon spacing).
-     On mobile, the last column can be wide; if its contents are right-aligned,
-     it creates a large empty gap between the icon and the Sat/Sun lines.
-     We left-anchor this cell on mobile only while preserving the no-shift grid. */
-  #viewIndex .row.row--events .cell--daydate{
-    text-align: left;
-  }
-
-  #viewIndex .row.row--events .cell--daydate .cell__dayline{
-    grid-template-columns: 26px 1fr;
-    column-gap: 4px;
-    justify-items: start;
-  }
-
-  /* Override desktop/default alignment that pushes the label to the far right */
-  #viewIndex .row.row--events .cell--daydate .dayLabel{
-    justify-self: start;
-  }
-}
-
 #viewIndex .row.row--events .cell--daydate .dayLabel{
   justify-self: end;
 }
@@ -165,11 +143,13 @@
 #viewIndex .row.row--events .cell--forwhere,
 #viewEvents .row.row--events .cell--citystate,
 #viewIndex .row.row--events .cell--citystate,
+#viewEvents .row.row--events .cell--daydate,
 #viewIndex .row.row--events .cell--daydate{
   position: relative;
   padding-left: var(--evIconPad); /* room for icon */
 }
 
+#viewEvents .row.row--events .cell--forwhere::after,
 #viewIndex .row.row--events .cell--forwhere::after{
   content: "";
   position: absolute;
@@ -192,6 +172,7 @@
   z-index: 3;
 }
 
+#viewEvents .row.row--events .cell--citystate::before,
 #viewIndex .row.row--events .cell--citystate::before{
   content: "";
   position: absolute;
@@ -239,29 +220,22 @@
 
 /* Slightly tighter icon sizing on very small screens */
 @media (max-width: 520px){
-  /* IMPORTANT: apply to BOTH views so Index mobile matches Events mobile */
-  #viewEvents,
-  #viewIndex{ --evRowPadY: 5px; }
+  #viewEvents{ --evRowPadY: 5px; }
 
-  #viewEvents,
-  #viewIndex{ --evRowPadX: 7px; }
+  #viewEvents{ --evRowPadX: 7px; }
 
-  #viewEvents,
-  #viewIndex{ --evIconPad: 18px; --evIconLeft: 4px; --evIconSize: 11px; }
+  #viewEvents{ --evIconPad: 18px; --evIconLeft: 4px; --evIconSize: 11px; }
 
   #viewEvents .row.row--events .cell--forwhere::after,
-  #viewIndex  .row.row--events .cell--forwhere::after,
   #viewEvents .row.row--events .cell--citystate::before,
-  #viewIndex  .row.row--events .cell--citystate::before,
-  #viewEvents .row.row--events .cell--daydate::before,
-  #viewIndex  .row.row--events .cell--daydate::before{
+  #viewEvents .row.row--events .cell--daydate::before{
     left: var(--evIconLeft);
     width: var(--evIconSize);
     height: var(--evIconSize);
   }
 }
 
-
+#viewEvents .row.row--events .cell--daydate,
 #viewIndex .row.row--events .cell--daydate{
   text-align: left;
   justify-self: start;
@@ -309,6 +283,7 @@
 #viewIndex .cell--event{ display:none; }
 #viewEvents .cell__eventInlineWrap,
 #viewIndex .cell__eventInlineWrap{ display:flex; }
+#viewEvents .row.row--events .cell--forwhere,
 #viewIndex .row.row--events .cell--forwhere{
   position: relative;
 }
@@ -382,6 +357,7 @@
 /* NOTE: Render uses .cell--citystate (middle) and .cell--daydate (right). */
 #viewEvents .row.row--events .cell--citystate,
 #viewIndex .row.row--events .cell--citystate,
+#viewEvents .row.row--events .cell--daydate,
 #viewIndex .row.row--events .cell--daydate{
   padding-left: var(--evIconPad); /* icon + consistent text gap */
 }
@@ -394,24 +370,30 @@
   }
 }
 
+#viewEvents,
 #viewIndex{
   --evForWhereShiftX: 4px;
 }
+#viewEvents .row.row--events .cell--forwhere,
 #viewIndex .row.row--events .cell--forwhere{
   padding-left: calc(var(--evIconPad) - var(--evForWhereShiftX));
 }
+#viewEvents .row.row--events .cell--forwhere::after,
 #viewIndex .row.row--events .cell--forwhere::after{
   left: calc(var(--evIconLeft) - var(--evForWhereShiftX));
 }
 
+#viewEvents,
 #viewIndex{
   --evMidShift: 8px;
 }
 
+#viewEvents .row.row--events .cell--citystate,
 #viewIndex .row.row--events .cell--citystate{
   padding-left: calc(var(--evIconPad) - var(--evMidShift));
 }
 
+#viewEvents .row.row--events .cell--citystate::before,
 #viewIndex .row.row--events .cell--citystate::before{
   left: calc(var(--evIconLeft) - var(--evMidShift));
 }
@@ -428,12 +410,33 @@
   left: calc(var(--evIconLeft) - var(--evRightShift));
 }
 @media (max-width: 520px){
-  /* INDEX mobile: match right column icon/text spacing to middle column */
-  #viewIndex{ --evRightShift: var(--evMidShift); }
+  #viewIndex{ --evRightShift: 6px; }
+}
+
+/* Reclaim a bit of usable width in the right-most column by tightening
+   the built-in icon padding just for DAY/DATE (and Index Sat/Sun). */
+#viewEvents,
+#viewIndex{
+  --evRightShift: 8px;
+}
+
+#viewEvents .row.row--events .cell--daydate,
+#viewIndex .row.row--events .cell--daydate{
+  padding-left: calc(var(--evIconPad) - var(--evRightShift));
+}
+#viewEvents .row.row--events .cell--daydate::before,
+#viewIndex .row.row--events .cell--daydate::before{
+  left: calc(var(--evIconLeft) - var(--evRightShift));
 }
 
 @media (max-width: 520px){
-  #viewIndex .row.row--events .cell--citystate::before{
+  #viewEvents,
+  #viewIndex{ --evRightShift: 6px; }
+}
+
+@media (max-width: 520px){
+  #viewEvents .row.row--events .cell--citystate::before,
+#viewIndex .row.row--events .cell--citystate::before{
     left: calc(var(--evIconLeft) - var(--evMidShift));
   }
 }
@@ -1095,8 +1098,7 @@
   left: calc(var(--evIconLeft) - var(--evRightShift));
 }
 @media (max-width: 520px){
-  /* INDEX mobile: match right column icon/text spacing to middle column */
-  #viewIndex{ --evRightShift: var(--evMidShift); }
+  #viewIndex{ --evRightShift: 6px; }
 }
 
 /* Mobile alignment: lower columns 2 & 3 to align with the FOR/WHERE stack (below EVENT/NEW strip) */
