@@ -1,7 +1,7 @@
-import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260210-805";
-import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery } from "./state.js?v=20260210-805";
-import { filterDirectory, filterEvents } from "./filters.js?v=20260210-805";
-import { renderDirectoryGroups, renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260210-805";
+import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260210-807";
+import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery } from "./state.js?v=20260210-807";
+import { filterDirectory, filterEvents } from "./filters.js?v=20260210-807";
+import { renderDirectoryGroups, renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260210-807";
 
 let directoryRows = [];
 let eventRows = [];
