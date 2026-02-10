@@ -81,8 +81,9 @@ function renderIndexRow(r){
 
 function composeDays(r){
   const parts = [];
-  parts.push(r.SAT ? `Sat. ${r.SAT}` : "Sat.");
-  parts.push(r.SUN ? `Sun. ${r.SUN}` : "Sun.");
+  // Index view: show explicit labels before the SAT/SUN values
+  parts.push(r.SAT ? `Sat: ${r.SAT}` : "Sat:");
+  parts.push(r.SUN ? `Sun: ${r.SUN}` : "Sun:");
   return parts.join("  ");
 }
 
