@@ -141,6 +141,77 @@ export function renderEventsGroups(root, rows){
   }
 }
 
+
+/* section: Index events-style groups (directory remap)
+   purpose: render directory rows using the exact Events card markup, but without date parsing/grouping */
+export function renderIndexEventsGroups(root, rows){
+  if(!root) return;
+
+  root.innerHTML = "";
+
+  const group = document.createElement("section");
+  group.className = "group";
+
+  const label = document.createElement("div");
+  label.className = "group__label";
+  label.textContent = "DIRECTORY";
+
+  const table = document.createElement("div");
+  table.className = "table";
+
+  for(const r of rows){
+    table.appendChild(renderIndexEventRow(r));
+  }
+
+  group.appendChild(label);
+  group.appendChild(table);
+  root.appendChild(group);
+}
+
+function renderIndexEventRow(r){
+  const row = document.createElement("div");
+  row.className = "row row--events";
+
+  const showOta = String(r.OTA || "").trim().toUpperCase() === "Y";
+
+  const c1 = document.createElement("div");
+  c1.className = "cell cell--event";
+  c1.innerHTML = `
+    <div class="cell__top cell__event">${escapeHtml(r.EVENT || "—")}</div>
+    ${showOta ? `<div class="cell__sub cell__new">OTA</div>` : `<div class="cell__sub cell__new">&nbsp;</div>`}
+  `;
+
+  const c2 = document.createElement("div");
+  c2.className = "cell cell--forwhere";
+  c2.innerHTML = `
+    <div class="cell__eventInlineWrap">
+      <span class="cell__eventInline">${escapeHtml(r.EVENT || "—")}</span>
+      ${showOta ? `<span class="cell__newInline">OTA</span>` : `<span class="cell__newInline">&nbsp;</span>`}
+    </div>
+    <div class="cell__top cell__for">${escapeHtml(r.FOR || "—")}</div>
+    <div class="cell__sub cell__where">${escapeHtml(r.WHERE || "—")}</div>
+  `;
+
+  const c3 = document.createElement("div");
+  c3.className = "cell cell--citystate";
+  c3.innerHTML = `
+    <div class="cell__top cell__city">${escapeHtml(r.CITY || "—")}</div>
+    <div class="cell__sub cell__state">${escapeHtml(r.STATE || "—")}</div>
+  `;
+
+  const c4 = document.createElement("div");
+  c4.className = "cell cell--daydate";
+  c4.innerHTML = `
+    <div class="cell__top cell__day">${escapeHtml(r.DAY || "—")}</div>
+    <div class="cell__sub cell__date">${escapeHtml(String(r.DATE || "—"))}</div>
+  `;
+
+  row.appendChild(c1);
+  row.appendChild(c2);
+  row.appendChild(c3);
+  row.appendChild(c4);
+  return row;
+}
 function renderEventGroup(root, groupTuple, dir, isPast=false){
   const [labelText, list] = groupTuple;
 
