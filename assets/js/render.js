@@ -149,23 +149,46 @@ export function renderIndexEventsGroups(root, rows){
 
   root.innerHTML = "";
 
-  const group = document.createElement("section");
-  group.className = "group";
-
-  const label = document.createElement("div");
-  label.className = "group__label";
-  label.textContent = "DIRECTORY";
-
-  const table = document.createElement("div");
-  table.className = "table";
-
+  // Group by STATE (ascending), then CITY (ascending) within each state.
+  // This view is meant to mirror the Events layout, but use directory data.
+  const map = new Map();
   for(const r of rows){
-    table.appendChild(renderIndexEventRow(r));
+    const key = (r.STATE || "—").toString().trim().toUpperCase() || "—";
+    if(!map.has(key)) map.set(key, []);
+    map.get(key).push(r);
   }
 
-  group.appendChild(label);
-  group.appendChild(table);
-  root.appendChild(group);
+  const stateKeys = Array.from(map.keys()).sort((a,b) => a.localeCompare(b, undefined, {sensitivity:"base"}));
+  for(const state of stateKeys){
+    const list = map.get(state) || [];
+    list.sort((a,b) => {
+      const ac = (a.CITY || "").toString().trim();
+      const bc = (b.CITY || "").toString().trim();
+      const cmp = ac.localeCompare(bc, undefined, {sensitivity:"base"});
+      if(cmp) return cmp;
+      const an = (a.FOR || "").toString().trim();
+      const bn = (b.FOR || "").toString().trim();
+      return an.localeCompare(bn, undefined, {sensitivity:"base"});
+    });
+
+    const group = document.createElement("section");
+    group.className = "group";
+
+    const label = document.createElement("div");
+    label.className = "group__label";
+    label.textContent = state;
+
+    const table = document.createElement("div");
+    table.className = "table";
+
+    for(const r of list){
+      table.appendChild(renderIndexEventRow(r));
+    }
+
+    group.appendChild(label);
+    group.appendChild(table);
+    root.appendChild(group);
+  }
 }
 
 function renderIndexEventRow(r){
