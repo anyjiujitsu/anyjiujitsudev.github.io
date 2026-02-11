@@ -203,6 +203,7 @@ export function initEventsPills({ $, getEventRows, activeEventsState, isIndexVie
 
     const rebuild = ()=>{
       const sel = activeEventsState().year;
+      // Index view repurposes Pill 1 as OPENS (Sat/Sun availability)
       const items = (typeof isIndexView === "function" && isIndexView()) ? ["SATURDAY","SUNDAY","BOTH"] : uniqYearsFromEvents(getEventRows());
       buildMenuList(panel, items, sel, ()=>{
         setPillHasSelection(btn, sel.size>0);
