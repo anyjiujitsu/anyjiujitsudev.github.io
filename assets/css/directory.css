@@ -113,11 +113,182 @@
 }
 
 #viewIndex .row.row--events .cell--daydate .dayLabel{
-  display: inline-block;
-  width: 4ch;           /* aligns Sat:/Sun: by character width */
-  text-align: right;    /* clean column edge */
+  flex: 0 0 auto;
 }
 
+#viewIndex .row.row--events .cell--daydate .dayValue{
+  flex: 0 1 auto;
+  min-width: 0;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Index view only: keep SAT/SUN two-line vertical spacing matching Events view */
+#viewIndex .row.row--events .cell--daydate .cell__dayline{
+  line-height: 1.1;
+}
+#viewIndex .row.row--events .cell--daydate .cell__dayline + .cell__dayline{
+  margin-top: 2px; /* matches .cell__sub margin-top in Events view */
+}
+
+#viewEvents,
+#viewIndex{
+  --evIconPad: 24px;
+  --evIconLeft: 6px;
+  --evIconSize: 13px;
+  --evIconOpacity: 0.65;
+
+  --evRowPadY: 8px;
+  --evRowPadX: 6px;
+
+  /* Background "bleed" so the TYPE tint reaches the rounded edge like legacy */
+  --evRowBleedX: calc(var(--evRowPadX) + 1px);
+  --evRowBleedY: calc(var(--evRowPadY) + 2px);
+}
+
+#viewEvents .row.row--events .cell--forwhere,
+#viewIndex .row.row--events .cell--forwhere,
+#viewEvents .row.row--events .cell--citystate,
+#viewIndex .row.row--events .cell--citystate,
+#viewEvents .row.row--events .cell--daydate,
+#viewIndex .row.row--events .cell--daydate{
+  position: relative;
+  padding-left: var(--evIconPad); /* room for icon */
+}
+
+/* Index view only: nudge the 3rd (DAY/DATE) column's contents further left.
+   This continues the same successful approach (moving the content block),
+   without changing card width or Events tab column sizing. */
+#viewIndex .row.row--events .cell--daydate{
+  padding-left: 16px; /* one more incremental left shift */
+}
+
+
+#viewEvents .row.row--events .cell--forwhere::after,
+#viewIndex .row.row--events .cell--forwhere::after{
+  content: "";
+  position: absolute;
+  left: var(--evIconLeft);
+  top: 50%;
+  width: var(--evIconSize);
+  height: var(--evIconSize);
+  transform: translateY(-50%);
+  background: var(--muted);
+  opacity: var(--evIconOpacity);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M3%2021h18%22/%3E%3Cpath%20d=%22M5%2021V5a2%202%200%200%201%202-2h6a2%202%200%200%201%202%202v16%22/%3E%3Cpath%20d=%22M9%207h0%22/%3E%3Cpath%20d=%22M9%2011h0%22/%3E%3Cpath%20d=%22M9%2015h0%22/%3E%3Cpath%20d=%22M13%207h0%22/%3E%3Cpath%20d=%22M13%2011h0%22/%3E%3Cpath%20d=%22M13%2015h0%22/%3E%3Cpath%20d=%22M17%2021V9h2v12%22/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center;
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M3%2021h18%22/%3E%3Cpath%20d=%22M5%2021V5a2%202%200%200%201%202-2h6a2%202%200%200%201%202%202v16%22/%3E%3Cpath%20d=%22M9%207h0%22/%3E%3Cpath%20d=%22M9%2011h0%22/%3E%3Cpath%20d=%22M9%2015h0%22/%3E%3Cpath%20d=%22M13%207h0%22/%3E%3Cpath%20d=%22M13%2011h0%22/%3E%3Cpath%20d=%22M13%2015h0%22/%3E%3Cpath%20d=%22M17%2021V9h2v12%22/%3E%3C/svg%3E");
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  mask-position: center;
+  pointer-events: none;
+  z-index: 3;
+}
+
+#viewEvents .row.row--events .cell--citystate::before,
+#viewIndex .row.row--events .cell--citystate::before{
+  content: "";
+  position: absolute;
+  left: var(--evIconLeft);
+  top: 50%;
+  width: var(--evIconSize);
+  height: var(--evIconSize);
+  transform: translateY(-50%);
+  background: var(--muted);
+  opacity: var(--evIconOpacity);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M12%2021s7-4.5%207-11a7%207%200%201%200-14%200c0%206.5%207%2011%207%2011z%22/%3E%3Ccircle%20cx=%2212%22%20cy=%2210%22%20r=%222.2%22/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center;
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Cpath%20d=%22M12%2021s7-4.5%207-11a7%207%200%201%200-14%200c0%206.5%207%2011%207%2011z%22/%3E%3Ccircle%20cx=%2212%22%20cy=%2210%22%20r=%222.2%22/%3E%3C/svg%3E");
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  mask-position: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+#viewEvents .row.row--events .cell--daydate::before,
+#viewIndex .row.row--events .cell--daydate::before{
+  content: "";
+  position: absolute;
+  left: var(--evIconLeft);
+  top: 50%;
+  width: var(--evIconSize);
+  height: var(--evIconSize);
+  transform: translateY(-50%);
+  background: var(--muted);
+  opacity: var(--evIconOpacity);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Crect%20x=%223.5%22%20y=%224.5%22%20width=%2217%22%20height=%2216%22%20rx=%222%22/%3E%3Cpath%20d=%22M7%203.5v3%22/%3E%3Cpath%20d=%22M17%203.5v3%22/%3E%3Cpath%20d=%22M3.5%209h17%22/%3E%3Cpath%20d=%22M8%2013h3%22/%3E%3Cpath%20d=%22M8%2016h3%22/%3E%3Cpath%20d=%22M13%2013h3%22/%3E%3Cpath%20d=%22M13%2016h3%22/%3E%3C/svg%3E");
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  -webkit-mask-position: center;
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22black%22%20stroke-width=%221.8%22%20stroke-linecap=%22round%22%20stroke-linejoin=%22round%22%3E%3Crect%20x=%223.5%22%20y=%224.5%22%20width=%2217%22%20height=%2216%22%20rx=%222%22/%3E%3Cpath%20d=%22M7%203.5v3%22/%3E%3Cpath%20d=%22M17%203.5v3%22/%3E%3Cpath%20d=%22M3.5%209h17%22/%3E%3Cpath%20d=%22M8%2013h3%22/%3E%3Cpath%20d=%22M8%2016h3%22/%3E%3Cpath%20d=%22M13%2013h3%22/%3E%3Cpath%20d=%22M13%2016h3%22/%3E%3C/svg%3E");
+  mask-repeat: no-repeat;
+  mask-size: contain;
+  mask-position: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Slightly tighter icon sizing on very small screens */
+@media (max-width: 520px){
+  #viewEvents{ --evRowPadY: 5px; }
+
+  #viewEvents{ --evRowPadX: 7px; }
+
+  #viewEvents{ --evIconPad: 18px; --evIconLeft: 4px; --evIconSize: 11px; }
+
+  #viewEvents .row.row--events .cell--forwhere::after,
+  #viewEvents .row.row--events .cell--citystate::before,
+  #viewEvents .row.row--events .cell--daydate::before{
+    left: var(--evIconLeft);
+    width: var(--evIconSize);
+    height: var(--evIconSize);
+  }
+}
+
+#viewEvents .row.row--events .cell--daydate,
+#viewIndex .row.row--events .cell--daydate{
+  text-align: left;
+  justify-self: start;
+}
+
+/* EVENTS view   subtle highlighted first column (matches legacy reference) */
+#viewEvents .row.row--events .cell--event,
+#viewIndex .row.row--events .cell--event{
+  position: relative;
+}
+#viewEvents .row.row--events .cell--event::before,
+#viewIndex .row.row--events .cell--event::before{
+  content: "";
+  position: absolute;
+  left: calc(-1 * var(--evRowBleedX));
+  right: 0;
+  top: calc(-1 * var(--evRowBleedY));
+  bottom: calc(-1 * var(--evRowBleedY));
+  background: rgba(232, 221, 198, 0.85);
+  border-radius: 0 0 0 0;
+  z-index: 0;
+  pointer-events: none;
+}
+#viewEvents .row.row--events .cell--event > *,
+#viewIndex .row.row--events .cell--event > *{
+  position: relative;
+  z-index: 1;
+}
+
+
+@media (max-width: 520px){
+  #viewEvents,
+#viewIndex{
+    --evRowPadX: 5px;
+    --evRowBleedX: calc(var(--evRowPadX) + 1px);
+  }
   #viewEvents .row.row--events,
 #viewIndex .row.row--events{
     grid-template-columns: 1.6fr 1fr 66px;
@@ -1145,8 +1316,11 @@
 */
 #viewIndex .row.row--events .cell--daydate .dayLabel{
   display: inline-block;
-  width: 4ch;           /* aligns Sat:/Sun: by character width */
-  text-align: right;    /* clean column edge */
+  width: 36px; /* desktop/tablet */
 }
 
+@media (max-width: 520px){
+  #viewIndex .row.row--events .cell--daydate .dayLabel{
+    width: 30px; /* mobile: same alignment, tighter spacing */
+  }
 }
