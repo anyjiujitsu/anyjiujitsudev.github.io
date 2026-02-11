@@ -1324,3 +1324,16 @@
     width: 30px; /* mobile: same alignment, tighter spacing */
   }
 }
+
+/* --- Index view: tighten SAT/SUN value spacing on mobile (Index ONLY) ---
+   Goal: values start closer to "Sat:" / "Sun:" while keeping alignment.
+   This does NOT affect Events tab.
+*/
+@media (max-width: 520px){
+  #viewIndex .row.row--events .cell--daydate .cell__dayline{
+    gap: 3px; /* was 6px; tighter labelâ†’value spacing */
+  }
+  #viewIndex .row.row--events .cell--daydate .dayLabel{
+    width: 22px; /* tighter reserved label width on mobile */
+  }
+}
