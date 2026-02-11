@@ -1331,9 +1331,19 @@
 */
 @media (max-width: 520px){
   #viewIndex .row.row--events .cell--daydate .cell__dayline{
-    gap: 3px; /* was 6px; tighter labelâ†’value spacing */
+    gap: 3px; /* was 6px; tighter labelÃ¢â€ â€™value spacing */
   }
   #viewIndex .row.row--events .cell--daydate .dayLabel{
     width: 22px; /* tighter reserved label width on mobile */
+  }
+}
+/* ============================
+   Index view (DESKTOP ONLY)
+   Purpose: Nudge last column values slightly left (does not affect Events view or mobile)
+   ============================ */
+@media (min-width: 769px){
+  /* Index rows are 3-column grid; third child holds Sat/Sun + OTA */
+  #viewIndex .row:not(.row--events) > div:nth-child(3){
+    transform: translateX(-6px);
   }
 }
