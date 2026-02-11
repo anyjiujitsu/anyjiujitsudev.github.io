@@ -1274,3 +1274,11 @@
     display: inline-block;             /* ensures border paints */
   }
 }
+
+/* --- Final nudge (Index only) ---
+   Placed at end + !important to ensure it overrides any later padding rules.
+   Moves the 3rd (DAY/DATE) column contents left without changing grid columns or Events view.
+*/
+#viewIndex .row.row--events .cell--daydate{
+  padding-left: 16px !important;
+}
