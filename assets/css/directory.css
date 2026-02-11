@@ -1340,13 +1340,10 @@
 
 /* ================================
    DESKTOP ONLY â€” INDEX VIEW ONLY
-   Shift last column VALUES slightly left (Sat/Sun values)
-   - Does NOT affect Events view (scoped to #viewIndex)
-   - Does NOT affect mobile/tablet (min-width: 901px)
+   Increased left shift of Sat/Sun values
 ================================== */
 @media (min-width: 901px){
-  #viewIndex .row.row--events .cell--daydate .dayValue{
-    display: inline-block;
-    transform: translateX(-6px) !important;
+  #viewIndex .cell--daydate .dayValue{
+    transform: translateX(-12px);
   }
 }
