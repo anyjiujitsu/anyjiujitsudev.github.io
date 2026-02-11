@@ -154,7 +154,7 @@
    This continues the same successful approach (moving the content block),
    without changing card width or Events tab column sizing. */
 #viewIndex .row.row--events .cell--daydate{
-  padding-left: 20px; /* was var(--evIconPad) = 24px */
+  padding-left: 16px; /* one more incremental left shift */
 }
 
 
