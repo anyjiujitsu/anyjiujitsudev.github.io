@@ -37,14 +37,10 @@ export function wireSearchSuggestions({ $, setActiveEventsQuery, isEventsView })
   const panel = $("eventsSearchSuggest");
   if(!wrap || !input || !panel) return;
 
-
-  // Disable suggestions when not in EVENTS view (Index view, etc.)
-  if (typeof isEventsView === "function" && !isEventsView()) {
-    panel.setAttribute("hidden", "");
-    return;
-  }
+  const canSuggest = () => (typeof isEventsView !== "function") ? true : !!isEventsView();
 
   const open = ()=>{
+    if(!canSuggest()) return;
     if(panel.hasAttribute("hidden")) panel.removeAttribute("hidden");
   };
   const close = ()=>{
@@ -52,17 +48,21 @@ export function wireSearchSuggestions({ $, setActiveEventsQuery, isEventsView })
   };
 
   input.addEventListener("focus", ()=>{
+    if(!canSuggest()) return;
     if(!String(input.value || "").trim()) open();
   });
   input.addEventListener("click", ()=>{
+    if(!canSuggest()) return;
     if(!String(input.value || "").trim()) open();
   });
 
   input.addEventListener("input", ()=>{
+    if(!canSuggest()) { close(); return; }
     if(String(input.value || "").trim()) close();
   });
 
   panel.addEventListener("click", (e)=>{
+    if(!canSuggest()) { close(); return; }
     const btn = e.target.closest("button[data-value]");
     if(!btn) return;
     e.preventDefault();
