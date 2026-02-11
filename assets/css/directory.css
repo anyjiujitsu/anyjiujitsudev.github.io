@@ -1276,9 +1276,15 @@
 }
 
 /* --- Final nudge (Index only) ---
-   Placed at end + !important to ensure it overrides any later padding rules.
-   Moves the 3rd (DAY/DATE) column contents left without changing grid columns or Events view.
+   Move the entire 3rd (DAY/DATE) column cluster left *while keeping the icon-to-text spacing unchanged*.
+   We do that by shifting BOTH:
+   - the cell padding-left (text start)
+   - the icon left position (pseudo-element)
+   This does NOT change grid columns, card width, or Events view.
 */
 #viewIndex .row.row--events .cell--daydate{
-  padding-left: 16px !important;
+  padding-left: 16px !important; /* 8px left from the shared 24px */
+}
+#viewIndex .row.row--events .cell--daydate::before{
+  left: -2px !important; /* keeps the same ~5px gap between icon and text */
 }
