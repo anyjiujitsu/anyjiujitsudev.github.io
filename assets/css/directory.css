@@ -125,6 +125,14 @@
   text-overflow: ellipsis;
 }
 
+/* Index view only: keep SAT/SUN two-line vertical spacing matching Events view */
+#viewIndex .row.row--events .cell--daydate .cell__dayline{
+  line-height: 1.1;
+}
+#viewIndex .row.row--events .cell--daydate .cell__dayline + .cell__dayline{
+  margin-top: 2px; /* matches .cell__sub margin-top in Events view */
+}
+
 #viewEvents,
 #viewIndex{
   --evIconPad: 24px;
