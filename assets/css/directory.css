@@ -1310,8 +1310,17 @@
   left: calc(var(--evIconLeft) - var(--evRightShift)) !important;
 }
 
-/* Index view only: align SUN value start with SAT value start */
+/* Index view only: align SUN value start with SAT value start (responsive)
+   Desktop looked perfect at 36px, but on mobile that width can push the value too far right.
+   So we keep 36px on desktop/tablet and tighten slightly on mobile while preserving alignment.
+*/
 #viewIndex .row.row--events .cell--daydate .dayLabel{
   display: inline-block;
-  width: 36px; /* aligns Sat: and Sun: value starts */
+  width: 36px; /* desktop/tablet */
+}
+
+@media (max-width: 520px){
+  #viewIndex .row.row--events .cell--daydate .dayLabel{
+    width: 30px; /* mobile: same alignment, tighter spacing */
+  }
 }
