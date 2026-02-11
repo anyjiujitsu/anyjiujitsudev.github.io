@@ -191,7 +191,7 @@ export function refreshEventsPillDots({ $, activeEventsState }){
   if(b3) setPillHasSelection(b3, s.type.size>0);
 }
 
-export function initEventsPills({ $, getEventRows, activeEventsState, onChange }){
+export function initEventsPills({ $, getEventRows, activeEventsState, isIndexView, onChange }){
   wireMenuDismiss();
 
   // YEAR
@@ -295,7 +295,7 @@ export function initEventsPills({ $, getEventRows, activeEventsState, onChange }
 
     const rebuild = ()=>{
       const sel = activeEventsState().type;
-      const items = uniqTypesFromEvents(getEventRows());
+      const items = (typeof isIndexView === "function" && isIndexView()) ? ["ALLOWED"] : uniqTypesFromEvents(getEventRows());
       buildMenuList(panel, items, sel, ()=>{
         setPillHasSelection(btn, sel.size>0);
         onChange();
@@ -427,7 +427,7 @@ export function initIndexPills({ $, state, getDirectoryRows, onChange }){
     const listEl = $("guestsList") || panel?.querySelector('.menu__list');
     if(!btn || !panel) return;
 
-    const items = ["ALLOWED"];
+    const items = ["GUESTS WELCOME"];
     buildMenuListIn(listEl, items, state.index.guests, ()=>{
       setPillHasSelection(btn, state.index.guests.size>0);
       onChange();
