@@ -103,7 +103,10 @@
 */
 #viewIndex .row.row--events .cell--daydate .cell__dayline{
   display: flex;
-  justify-content: flex-end;
+  /* Index view only: pull the 3rd (rightmost) column's contents left within
+     its existing grid column, without changing overall card width or any
+     Events-tab column sizing. */
+  justify-content: flex-start;
   align-items: baseline;
   gap: 6px;
   min-width: 0;
