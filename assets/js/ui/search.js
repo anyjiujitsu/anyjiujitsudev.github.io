@@ -31,11 +31,18 @@ export function wireSearch({ $, setIndexQuery, setIndexEventsQuery, setActiveEve
 }
 
 /* section: search suggestions // purpose: quick-pick common search tokens for Events */
-export function wireSearchSuggestions({ $, setActiveEventsQuery }){
+export function wireSearchSuggestions({ $, setActiveEventsQuery, isEventsView }){
   const wrap  = $("eventsSearchWrap");
   const input = $("eventsSearchInput");
   const panel = $("eventsSearchSuggest");
   if(!wrap || !input || !panel) return;
+
+
+  // Disable suggestions when not in EVENTS view (Index view, etc.)
+  if (typeof isEventsView === "function" && !isEventsView()) {
+    panel.setAttribute("hidden", "");
+    return;
+  }
 
   const open = ()=>{
     if(panel.hasAttribute("hidden")) panel.removeAttribute("hidden");
