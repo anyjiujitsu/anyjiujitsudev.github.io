@@ -1309,3 +1309,9 @@
 #viewIndex .row.row--events .cell--daydate::before{
   left: calc(var(--evIconLeft) - var(--evRightShift)) !important;
 }
+
+/* Index view only: align SUN value start with SAT value start */
+#viewIndex .row.row--events .cell--daydate .dayLabel{
+  display: inline-block;
+  width: 36px; /* aligns Sat: and Sun: value starts */
+}
