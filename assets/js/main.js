@@ -1,18 +1,18 @@
 // main.js
 // purpose: app bootstrap + data loading + view wiring + render orchestration
 
-import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260210-900";
-import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery } from "./state.js?v=20260210-900";
-import { filterEvents } from "./filters.js?v=20260210-900";
-import { renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260210-900";
+import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260210-907";
+import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery } from "./state.js?v=20260210-907";
+import { filterEvents } from "./filters.js?v=20260210-907";
+import { renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260210-907";
 
-import { $ } from "./utils/dom.js?v=20260210-900";
+import { $ } from "./utils/dom.js?v=20260210-907";
 import {
   initEventsPills,
   initIndexPills,
   refreshEventsPillDots,
-} from "./ui/pills.js?v=20260210-900";
-import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260210-900";
+} from "./ui/pills.js?v=20260210-907";
+import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260210-907";
 
 let directoryRows = [];
 let eventRows = [];
@@ -53,8 +53,7 @@ function filterIndexDirectoryAsEvents(rows, idxState){
     }
     // YEAR pill does not apply to directory rows (SAT/SUN are not dates)
     if(yearSet.size){ /* ignore safely */ }
-    // EVENT pill redirected to OTA
-    // Any active selection means OTA === "Y"
+    // EVENT pill (Index view repurposed): any selection => OTA === "Y"
     if(typeSet.size){
       const ota = String(r.OTA || "").trim().toUpperCase();
       if(ota !== "Y") return false;
@@ -102,6 +101,20 @@ function setViewUI(view){
 
   const title = $("viewTitle");
   if(title) title.textContent = (view === "events") ? "EVENTS (DEV)" : "INDEX";
+
+
+  // Events filter bar is shared across views (Phase 1).
+  // Update Pill 3 copy depending on view: Events = EVENT, Index = DROP IN (option label = ALLOWED).
+  (function(){
+    const pill3Btn = document.getElementById("eventsPill3Btn");
+    const pill3Menu = document.getElementById("eventsPill3Menu");
+    const btnLabel = pill3Btn?.querySelector('[data-pill-title]');
+    const menuTitle = pill3Menu?.querySelector('.menu__title');
+    const isIndex = view === "index";
+    if(btnLabel) btnLabel.textContent = isIndex ? "DROP IN" : "EVENT";
+    if(menuTitle) menuTitle.textContent = isIndex ? "DROP IN" : "EVENT";
+    if(pill3Menu) pill3Menu.setAttribute("aria-label", isIndex ? "Drop In menu" : "Event menu");
+  })();
 
   const evIn = $("eventsSearchInput");
   if(evIn) evIn.value = String(activeEventsState().q || "");
