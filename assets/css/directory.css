@@ -110,6 +110,7 @@
   align-items: baseline;
   gap: 6px;
   min-width: 0;
+  padding-left: 8px; /* incremental nudge further left */
 }
 
 #viewIndex .row.row--events .cell--daydate .dayLabel{
