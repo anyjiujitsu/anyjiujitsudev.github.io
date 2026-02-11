@@ -306,7 +306,7 @@ function render(){
   const idxRows = directoryRows.map(dirToIndexEventRow);
   const idxFiltered = filterIndexDirectoryAsEvents(idxRows, state.indexEvents);
   renderIndexEventsGroups($("indexEventsRoot"), idxFiltered);
-  $("status").textContent = `${idxFiltered.length} events`;
+  $("status").textContent = `${idxFiltered.length} gyms`;
 }
 
 /* ------------------ INIT ------------------ */
