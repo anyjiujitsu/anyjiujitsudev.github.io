@@ -203,7 +203,7 @@ export function initEventsPills({ $, getEventRows, activeEventsState, isIndexVie
 
     const rebuild = ()=>{
       const sel = activeEventsState().year;
-      const items = uniqYearsFromEvents(getEventRows());
+      const items = (typeof isIndexView === "function" && isIndexView()) ? ["SAT","SUN","BOTH"] : uniqYearsFromEvents(getEventRows());
       buildMenuList(panel, items, sel, ()=>{
         setPillHasSelection(btn, sel.size>0);
         onChange();
