@@ -1340,10 +1340,18 @@
 
 /* ================================
    DESKTOP ONLY â€” INDEX VIEW ONLY
-   Increased left shift of Sat/Sun values
+   Move the entire DAY/DATE column block (icon + Sat/Sun labels + values) left,
+   and undo the prior value-only shift to prevent crowding.
+   This does NOT affect Events view and does NOT affect mobile.
 ================================== */
 @media (min-width: 901px){
-  #viewIndex .cell--daydate .dayValue{
+  /* Shift whole column (includes ::before calendar icon) */
+  #viewIndex .row.row--events .cell--daydate{
     transform: translateX(-12px);
+  }
+
+  /* Ensure values are not shifted independently (prevents crowding) */
+  #viewIndex .row.row--events .cell--daydate .dayValue{
+    transform: none;
   }
 }
