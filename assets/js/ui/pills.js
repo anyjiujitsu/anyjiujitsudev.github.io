@@ -191,7 +191,7 @@ export function refreshEventsPillDots({ $, activeEventsState }){
   if(b3) setPillHasSelection(b3, s.type.size>0);
 }
 
-export function initEventsPills({ $, getEventRows, activeEventsState, onChange }){
+export function initEventsPills({ $, getEventRows, activeEventsState, isIndexView = ()=>false, onChange }){
   wireMenuDismiss();
 
   // YEAR
@@ -295,7 +295,7 @@ export function initEventsPills({ $, getEventRows, activeEventsState, onChange }
 
     const rebuild = ()=>{
       const sel = activeEventsState().type;
-      const items = uniqTypesFromEvents(getEventRows());
+      const items = isIndexView() ? ["OTA"] : uniqTypesFromEvents(getEventRows());
       buildMenuList(panel, items, sel, ()=>{
         setPillHasSelection(btn, sel.size>0);
         onChange();
