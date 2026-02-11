@@ -132,16 +132,19 @@
   background: #fff;
   box-shadow: 0 3px 6px rgba(0,0,0,0.14);
   transform: translateX(calc(var(--viewProgress, 0) * 100%));
-  transition: transform var(--viewTransition, 220ms) cubic-bezier(.22,.61,.36,1);
+  transition: transform var(--viewTransition, 220ms) ease;
 }
 
 /* SLIDER */
-.viewShell{ overflow: hidden; }
+.viewShell{ overflow: hidden;
+  touch-action: pan-y;
+  overscroll-behavior-x: contain;
+}
 .viewSlider{
   display:flex;
   width: 200%;
   transform: translateX(calc(var(--viewProgress, 0) * -50%));
-  transition: transform var(--viewTransition, 240ms) cubic-bezier(.22,.61,.36,1);
+  transition: transform var(--viewTransition, 240ms) ease;
   will-change: transform;
 }
 .viewPanel{ width: 50%; min-width: 50%; }
