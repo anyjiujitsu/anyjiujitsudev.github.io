@@ -265,6 +265,8 @@ function wireViewToggle(){
     let startX = 0, startY = 0, startP = 0;
     let lastX = 0, lastT = 0, vx = 0;
     let lockedAxis = ""; // "", "x", "y"
+    let rafId = 0;
+    let pendingP = null;
     viewShell.addEventListener("touchstart", (e) => {
       if(e.touches.length !== 1) return;
       startX = e.touches[0].clientX;
@@ -305,11 +307,32 @@ function wireViewToggle(){
       lastT = now;
 
       const delta = -dx / window.innerWidth;
-      applyProgress(startP + delta);
+      const nextP = startP + delta;
+      pendingP = nextP;
+      if(!rafId){
+        rafId = requestAnimationFrame(() => {
+          rafId = 0;
+          if(pendingP !== null){
+            applyProgress(pendingP);
+            pendingP = null;
+          }
+        });
+      }
     }, { passive: false });
 
     viewShell.addEventListener("touchend", () => {
       setTransition(220);
+
+      // Flush any pending rAF progress update before we decide which view to commit
+      if(rafId){
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+      if(pendingP !== null){
+        applyProgress(pendingP);
+        pendingP = null;
+      }
+
       const p = Number(getComputedStyle(document.body).getPropertyValue("--viewProgress")) || 0;
 
       // More sensitive commit: shorter swipe distance + quick flick support
