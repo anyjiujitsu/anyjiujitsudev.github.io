@@ -1,18 +1,18 @@
 // main.js
 // purpose: app bootstrap + data loading + view wiring + render orchestration
 
-import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260210-908";
-import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery } from "./state.js?v=20260210-908";
-import { filterEvents } from "./filters.js?v=20260210-908";
-import { renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260210-908";
+import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260210-909";
+import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery } from "./state.js?v=20260210-909";
+import { filterEvents } from "./filters.js?v=20260210-909";
+import { renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260210-909";
 
-import { $ } from "./utils/dom.js?v=20260210-908";
+import { $ } from "./utils/dom.js?v=20260210-909";
 import {
   initEventsPills,
   initIndexPills,
   refreshEventsPillDots,
-} from "./ui/pills.js?v=20260210-908";
-import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260210-908";
+} from "./ui/pills.js?v=20260210-909";
+import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260210-909";
 
 let directoryRows = [];
 let eventRows = [];
@@ -55,8 +55,8 @@ function filterIndexDirectoryAsEvents(rows, idxState){
     if(yearSet.size){
       const hasSat = String(r.DAY || "").trim() !== "";
       const hasSun = String(r.DATE || "").trim() !== "";
-      const wantSat  = yearSet.has("SAT");
-      const wantSun  = yearSet.has("SUN");
+      const wantSat  = yearSet.has("SATURDAY");
+      const wantSun  = yearSet.has("SUNDAY");
       const wantBoth = yearSet.has("BOTH") || (wantSat && wantSun);
 
       if(wantBoth){
@@ -130,6 +130,30 @@ function setViewUI(view){
     if(btnLabel) btnLabel.textContent = isIndex ? "OPENS" : "YEAR";
     if(menuTitle) menuTitle.textContent = isIndex ? "OPENS" : "YEAR";
     if(pill1Menu) pill1Menu.setAttribute("aria-label", isIndex ? "Opens menu" : "Year menu");
+  })();
+
+  // Index view wants pill order: STATE first, OPENS second.
+  // Events view keeps: YEAR first, STATE second.
+  (function(){
+    const wrapYear  = document.querySelector('.pillSelect[data-filter="eventsYear"]');
+    const wrapState = document.querySelector('.pillSelect[data-filter="eventsState"]');
+    const parent = wrapYear?.parentElement;
+    if(!wrapYear || !wrapState || !parent) return;
+    const isIndex = view === "index";
+
+    // Ensure desired order by re-inserting nodes.
+    // (DOM insertion moves the node; no clones.)
+    if(isIndex){
+      // STATE before OPENS
+      if(wrapState.nextElementSibling !== wrapYear){
+        parent.insertBefore(wrapState, wrapYear);
+      }
+    } else {
+      // YEAR before STATE
+      if(wrapYear.nextElementSibling !== wrapState){
+        parent.insertBefore(wrapYear, wrapState);
+      }
+    }
   })();
 
   // Update Pill 3 copy depending on view: Events = EVENT, Index = DROP IN (option label = ALLOWED).
