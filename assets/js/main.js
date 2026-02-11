@@ -1,18 +1,18 @@
 // main.js
 // purpose: app bootstrap + data loading + view wiring + render orchestration
 
-import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260210-900";
-import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery } from "./state.js?v=20260210-900";
-import { filterEvents } from "./filters.js?v=20260210-900";
-import { renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260210-900";
+import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260210-904";
+import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery } from "./state.js?v=20260210-904";
+import { filterEvents } from "./filters.js?v=20260210-904";
+import { renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260210-904";
 
-import { $ } from "./utils/dom.js?v=20260210-900";
+import { $ } from "./utils/dom.js?v=20260210-904";
 import {
   initEventsPills,
   initIndexPills,
   refreshEventsPillDots,
-} from "./ui/pills.js?v=20260210-900";
-import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260210-900";
+} from "./ui/pills.js?v=20260210-904";
+import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260210-904";
 
 let directoryRows = [];
 let eventRows = [];
@@ -53,10 +53,10 @@ function filterIndexDirectoryAsEvents(rows, idxState){
     }
     // YEAR pill does not apply to directory rows (SAT/SUN are not dates)
     if(yearSet.size){ /* ignore safely */ }
-    // EVENT pill: treat as filtering on the placeholder event label
+    // EVENT pill (Index view): repurpose TYPE selection as OTA filter (any selection => OTA === "Y")
     if(typeSet.size){
-      const t = String(r.EVENT || "").trim();
-      if(!typeSet.has(t)) return false;
+      const ota = String(r.OTA || "").trim().toUpperCase();
+      if(ota !== "Y") return false;
     }
     return true;
   });
