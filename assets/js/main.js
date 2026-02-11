@@ -263,33 +263,73 @@ function wireViewToggle(){
 
   if(viewShell){
     let startX = 0, startY = 0, startP = 0;
+    let axis = null;          // "x" | "y"
+    let isSwiping = false;
+    let pendingP = 0;
+    let rafId = 0;
+
+    const flushProgress = () => {
+      rafId = 0;
+      applyProgress(pendingP);
+    };
 
     viewShell.addEventListener("touchstart", (e) => {
       if(e.touches.length !== 1) return;
+      axis = null;
+      isSwiping = false;
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
       startP = Number(getComputedStyle(document.body).getPropertyValue("--viewProgress")) || 0;
-      setTransition(0);
+      pendingP = startP;
+      setTransition(0); // CSS uses --viewTransition for transform timing
     }, { passive: true });
 
     viewShell.addEventListener("touchmove", (e) => {
       if(e.touches.length !== 1) return;
+
       const x = e.touches[0].clientX;
       const y = e.touches[0].clientY;
 
       const dx = x - startX;
       const dy = y - startY;
-      if(Math.abs(dy) > Math.abs(dx)) return;
+
+      // Decide intent once (small deadzone to avoid jitter)
+      if(!axis){
+        const adx = Math.abs(dx);
+        const ady = Math.abs(dy);
+        if(adx < 8 && ady < 8) return;
+        axis = (adx > ady) ? "x" : "y";
+      }
+
+      // Let native vertical scroll behave normally
+      if(axis === "y") return;
+
+      // Horizontal swipe: prevent browser scroll/overscroll and update smoothly
+      e.preventDefault();
+      isSwiping = true;
 
       const delta = -dx / window.innerWidth;
-      applyProgress(startP + delta);
-    }, { passive: true });
+      pendingP = startP + delta;
 
-    viewShell.addEventListener("touchend", () => {
+      if(!rafId) rafId = requestAnimationFrame(flushProgress);
+    }, { passive: false });
+
+    const endSwipe = () => {
+      if(rafId){
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+      if(!isSwiping) return;
+
       setTransition(260);
       const p = Number(getComputedStyle(document.body).getPropertyValue("--viewProgress")) || 0;
       setViewUI(p >= 0.5 ? "index" : "events");
-    }, { passive: true });
+      isSwiping = false;
+      axis = null;
+    };
+
+    viewShell.addEventListener("touchend", endSwipe, { passive: true });
+    viewShell.addEventListener("touchcancel", endSwipe, { passive: true });
   }
 }
 
