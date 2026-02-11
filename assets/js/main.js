@@ -263,73 +263,74 @@ function wireViewToggle(){
 
   if(viewShell){
     let startX = 0, startY = 0, startP = 0;
-    let axis = null;          // "x" | "y"
-    let isSwiping = false;
-    let pendingP = 0;
-    let rafId = 0;
-
-    const flushProgress = () => {
-      rafId = 0;
-      applyProgress(pendingP);
-    };
-
+    let lastX = 0, lastT = 0, vx = 0;
+    let lockedAxis = ""; // "", "x", "y"
     viewShell.addEventListener("touchstart", (e) => {
       if(e.touches.length !== 1) return;
-      axis = null;
-      isSwiping = false;
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
       startP = Number(getComputedStyle(document.body).getPropertyValue("--viewProgress")) || 0;
-      pendingP = startP;
-      setTransition(0); // CSS uses --viewTransition for transform timing
+
+      lastX = startX;
+      lastT = performance.now();
+      vx = 0;
+      lockedAxis = "";
+
+      setTransition(0);
     }, { passive: true });
 
     viewShell.addEventListener("touchmove", (e) => {
       if(e.touches.length !== 1) return;
-
       const x = e.touches[0].clientX;
       const y = e.touches[0].clientY;
 
       const dx = x - startX;
       const dy = y - startY;
 
-      // Decide intent once (small deadzone to avoid jitter)
-      if(!axis){
-        const adx = Math.abs(dx);
-        const ady = Math.abs(dy);
-        if(adx < 8 && ady < 8) return;
-        axis = (adx > ady) ? "x" : "y";
+      // Deadzone + axis lock to avoid jitter from tiny diagonal movement
+      if(!lockedAxis){
+        if(Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        lockedAxis = (Math.abs(dx) >= Math.abs(dy)) ? "x" : "y";
       }
+      if(lockedAxis === "y") return;
 
-      // Let native vertical scroll behave normally
-      if(axis === "y") return;
-
-      // Horizontal swipe: prevent browser scroll/overscroll and update smoothly
+      // Prevent the page from trying to scroll while we are swiping horizontally
       e.preventDefault();
-      isSwiping = true;
+
+      // Velocity (px/ms) for "quick flick" commits
+      const now = performance.now();
+      const dt = Math.max(1, now - lastT);
+      vx = (x - lastX) / dt;
+      lastX = x;
+      lastT = now;
 
       const delta = -dx / window.innerWidth;
-      pendingP = startP + delta;
-
-      if(!rafId) rafId = requestAnimationFrame(flushProgress);
+      applyProgress(startP + delta);
     }, { passive: false });
 
-    const endSwipe = () => {
-      if(rafId){
-        cancelAnimationFrame(rafId);
-        rafId = 0;
-      }
-      if(!isSwiping) return;
-
-      setTransition(260);
+    viewShell.addEventListener("touchend", () => {
+      setTransition(220);
       const p = Number(getComputedStyle(document.body).getPropertyValue("--viewProgress")) || 0;
-      setViewUI(p >= 0.5 ? "index" : "events");
-      isSwiping = false;
-      axis = null;
-    };
 
-    viewShell.addEventListener("touchend", endSwipe, { passive: true });
-    viewShell.addEventListener("touchcancel", endSwipe, { passive: true });
+      // More sensitive commit: shorter swipe distance + quick flick support
+      const FLICK_V = 0.45; // px/ms
+      const EDGE_T  = 0.35; // distance from edge to switch
+
+      // Quick flick wins (left = index, right = events)
+      if(Math.abs(vx) > FLICK_V){
+        setViewUI(vx < 0 ? "index" : "events");
+        return;
+      }
+
+      // Otherwise: commit based on how far you pulled from the *starting* view edge
+      if(startP >= 0.5){
+        // started on index (p ~ 1) -> switch earlier when p drops below 1-EDGE_T
+        setViewUI(p <= (1 - EDGE_T) ? "events" : "index");
+      }else{
+        // started on events (p ~ 0) -> switch earlier when p rises above EDGE_T
+        setViewUI(p >= EDGE_T ? "index" : "events");
+      }
+    }, { passive: true });
   }
 }
 
