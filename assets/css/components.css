@@ -132,7 +132,7 @@
   background: #fff;
   box-shadow: 0 3px 6px rgba(0,0,0,0.14);
   transform: translateX(calc(var(--viewProgress, 0) * 100%));
-  transition: transform 220ms ease;
+  transition: transform var(--viewTransition, 220ms) cubic-bezier(.22,.61,.36,1);
 }
 
 /* SLIDER */
@@ -141,7 +141,7 @@
   display:flex;
   width: 200%;
   transform: translateX(calc(var(--viewProgress, 0) * -50%));
-  transition: transform 240ms ease;
+  transition: transform var(--viewTransition, 240ms) cubic-bezier(.22,.61,.36,1);
   will-change: transform;
 }
 .viewPanel{ width: 50%; min-width: 50%; }
