@@ -1275,16 +1275,29 @@
   }
 }
 
-/* --- Final nudge (Index only) ---
-   Move the entire 3rd (DAY/DATE) column cluster left *while keeping the icon-to-text spacing unchanged*.
-   We do that by shifting BOTH:
-   - the cell padding-left (text start)
-   - the icon left position (pseudo-element)
-   This does NOT change grid columns, card width, or Events view.
-*/
-#viewIndex .row.row--events .cell--daydate{
-  padding-left: 16px !important; /* 8px left from the shared 24px */
-}
 #viewIndex .row.row--events .cell--daydate::before{
   left: -2px !important; /* keeps the same ~5px gap between icon and text */
+}
+
+/* --- Right column (Index only) shift ---
+   Goal:
+   - Keep the icon-to-text spacing identical on desktop AND mobile
+   - Nudge the entire DAY/DATE (rightmost) column cluster further left
+   - Do NOT change grid columns, card/body width, or Events view
+
+   Approach:
+   - Apply the same shift amount to BOTH the cell padding-left (text start)
+     and the icon pseudo-element left position.
+   - Use variables so mobile icon sizing/padding overrides remain consistent.
+*/
+#viewIndex{
+  --evRightShift: 10px; /* increased slightly for one more left shift */
+}
+
+#viewIndex .row.row--events .cell--daydate{
+  padding-left: calc(var(--evIconPad) - var(--evRightShift)) !important;
+}
+
+#viewIndex .row.row--events .cell--daydate::before{
+  left: calc(var(--evIconLeft) - var(--evRightShift)) !important;
 }
