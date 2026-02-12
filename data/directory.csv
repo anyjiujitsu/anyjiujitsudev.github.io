@@ -1,375 +1,388 @@
-STATE,CITY,NAME,IG,SAT,SUN,OTA,CREATED
-New Hampshire,Derry,Primal Jiu Jitsu,primaljiujitsuacademy,10:00AM,,,
-Connecticut,Monroe,Cruvinel Brothers,cruvinelbrothers,,,,
-Connecticut,Stratford,Cruvinel Brothers,cruvinelbros,,,,
-Massachusetts,W. Springfield,Gabriel Gladiator,gabrielgladiator.tc,,,,
-Massachusetts,West Boylston,Integrated Martial Arts,ima.worcester,,,,
-Maine,Westbrook,Alexey Pickerell BJJ,alexeypickerellbjj,,,,
-Rhode Island,Providence,Brown University GAMMA,brownugamma,,,,
-Connecticut,Bridgeport,CT Submission Grappling,connecticutsubmissiongrappling,,12:00PM,y,
-Connecticut,Tolland,Secret Pages BJJ,secret_pages_bjj,9:00AM,,y,
-Massachusetts,Hanover,Thurston Academy,thurston_academy,,10:00AM,,
-Massachusetts,Marblehead,First Colony BJJ,firstcolonybjj,9:00AM,,,
-Massachusetts,Woburn,Fenix BJJ,fenixbjjwoburn,11:00AM,,,
-New Hampshire,Exeter,Kevin Watson BJJ,kevinwatsonbjj,10:30AM,6:00PM,,
-Connecticut,Wallingford,Jitsu Academy CT,jitsuacademyct,,,,
-Massachusetts,Boston,Travis Stevens Academy,travisstevensjiujitsu,,,,
-Massachusetts,Southbridge,Combate Real School,crjjschool,,,,
-Maine,Freeport,Empire BJJ,empirebjjmaine,,,,
-Rhode Island,Cranston,Balleto Advanced Training,balletoadvancedtraining,,,,
-Rhode Island,Providence,Tim Burrill BJJ,timburrillbjj,11:30AM,,,
-Connecticut,Fairfield,Radius Martial Arts 10P,radiusmartialarts,,,,
-Massachusetts,Boston (Dorchester),Level Ground MMA,levelgroundmma,,,,
-New Hampshire,Littleton,Resiliency Martial Arts,adam_laclair,,,,
-New Hampshire,Londonderry,Off Your Back Jiu Jitsu,offyourbackbjj.academy,,,,
-Rhode Island,Jamestown,Ocean State BJJ,oceanstatebjj,,,,
-Rhode Island,Providence,Tim Burrill BJJ,timburrillbrazilianjiujitsu,,,,
-Massachusetts,West Bridgewater,Luiz Paulo Brazilian Jiu Jitsu,luizpaulojiujitsuwb,,,,
-Massachusetts,Lowell,River Hawk Brazilian Jiu Jitsu,umlbjj,,,,
-Connecticut,Manchester,Manchester Brazilian Jiu-Jitsu,manchesterbjj,,,,
-Maine,South Portland,Choi Institute of Martial Arts,choi_institute_mma,,,,
-Connecticut,West Haven,Dandelion Jiujitsu & Wrestling,dandelionbjj,,9:00AM,,
-Massachusetts,Westborough,Alliance Jiu Jitsu Westborough,alliancewestborough,12:00PM,,,
-Connecticut,Newtown,Rapadura BJJ / Double Five BJJ,rapadura_bjj,,,,
-Connecticut,Waterford,Crossroads Brazilian Jiu Jitsu,crossroadsbjj,,,,
-Massachusetts,Boston,Citadel Martial Arts & Fitness,citadelmartialarts,,,,
-Massachusetts,Danvers,Brazilian Top Team North Shore,btt_north_shore,,,,
-Massachusetts,Falmouth,Daniel Gracie Academy Falmouth,danielgraciefalmouth,,,,
-Massachusetts,Medford,Sigma Martial Arts and Fitness,sigmamartialartsfitness,,,,
-Massachusetts,Norwood,Luiz Paulo Brazilian Jiu Jitsu,luizpaulojiujitsu,,,,
-Massachusetts,Plymouth,Daniel Gracie Academy Plymouth,danielgracieplymouth,,,,
-Massachusetts,Springfield,Springfield Submission Society,springfieldmabjjsociety,,,,
-Massachusetts,Watertown,Theodorou Academy of Jiu Jitsu,theodorouacademyjiujitsu,,,,
-Massachusetts,Worcester,Worcester Martial Arts Academy,worcester_martial_arts_academy,,,,
-Maine,Rangeley,Kingsguard Brazilian Jiu Jitsu,kingsguard_bjj,,,,
-New Hampshire,Concord,Averill's Martial Arts Academy,averills_martial_arts_academy,,,,
-Massachusetts,Somerville,Brazilian Martial Arts Center,bmacboston,,,,
-New Hampshire,Brentwood,Dark Arts Jiu Jitsu Brentwood,darkartsjiujitsu_brentwood,11:00AM,,,
-Connecticut,Willington,Agoge Jiu Jitsu and Muay Thai,agogejjmt,,12:30PM,,
-Massachusetts,Peabody,Gentle Art Dojo (North Shore),gadnorthshore,,10:00AM,,
-Connecticut,Prospect,Technique Brazilian Jiu-Jitsu,technique_bjj,,,,
-Massachusetts,Framingham,Alliance Jiu Jitsu Framingham,alliancejiujitsuframingham,,,,
-Massachusetts,Hanover,Daniel Gracie Academy Hanover,danielgraciehanover,,,,
-Massachusetts,Hyannis,Daniel Gracie Academy Hyannis,danielgraciehyannis,,,,
-Massachusetts,Natick,Bay State Brazilian Jiu-Jitsu,baystatebjj,,,,
-Massachusetts,Natick,Alpha Nerds Training Facility,alphanerdsfacility,,,,
-Massachusetts,Norwood,Connor’s Martial Arts Academy,connorsmartialartsacademy,,,,
-Massachusetts,Orleans,Daniel Gracie Academy Orleans,danielgracieorleans,,,,
-Maine,Portland,Blue Wave Brazilian Jiu-Jitsu,bluewavebjj,,,,
-Massachusetts,Worcester,Worcester MMA (Abusado Team),worcester_mma,,10:00AM,,
-Vermont,South Burlington,High Hat Brazilian Jiu-Jitsu,highhatbrazilianjiujitsu,,11:00AM,,
-Connecticut,Glastonbury,Silverback Training Facility,silverbacktrainingfacility,,,,
-Connecticut,Manchester,FlowState Fighting & Fitness,flowstatefightingandfitness,,,,
-Massachusetts,Chelmsford,Gentle Art Dojo (Chelmsford),gadchelmsford,,,,
-Massachusetts,Lynn,Seaside Jiu-Jitsu (BTT Lynn),seasidejiujitsu,,,,
-Massachusetts,Tyngsboro,Team Flo Brazilian Jiu Jitsu,team_flo_bjj,,,,
-New Hampshire,Derry,Start Brazilian Jiu Jitsu NH,start_bjj_nh,,,,
-Rhode Island,Pawtucket,Team Santos Fighting Academy,teamsantos_bjj_mma,,,,
-Vermont,Brattleboro,Gracie Jiu-Jitsu Brattleboro,brattleborojiujitsu,,,,
-New Hampshire,Plaistow,Spero's Brazilian Jiu-Jitsu,btt_plaistow,,,,
-Vermont,Burlington,Green Mountain Martial Arts,greenmountainmartialarts,,,,
-Massachusetts,Boston (Back Bay),Brazilian Top Team Back Bay,bttbackbay,,10:00AM,,
-Massachusetts,Brookline,Florian Martial Arts Center,florianmartialarts,12:00AM,,,
-Massachusetts,Clinton,Alchemy Brazilian Jiu-Jitsu,alchemy_brazilian_jiujitsu,,10:00AM,,
-Maine,South Portland,Gracie Barra South Portland,gbsouthportland,,8:00AM,,
-New Hampshire,Bedford,Aqueous Brazilian Jiu-Jitsu,aqueousbjj,8:00AM,8:00AM,,
-Connecticut,Fairfield,FIT CLUB BJJ & Self-Defense,fitclubbjj,,,,
-Connecticut,Greenwich,Greenwich Jiu Jitsu Academy,greenwichjiujitsuacademy,,,,
-Connecticut,North Haven,Ultimate Mixed Martial Arts,ultimatemmabjj,,,,
-Connecticut,West Hartford,Underdog Mixed Martial Arts,underdogmmact,,,,
-Massachusetts,Boston,BU Brazilian Jiu-Jitsu Club,bostonubjj,,,,
-Massachusetts,Hanover,Torrent Brazilian Jiu-Jitsu,torrent_bjj,,,,
-Massachusetts,Hyannis,Brazilian Top Team Cape Cod,bttcapecod,,,,
-Massachusetts,Littleton,Gentle Art Dojo (Littleton),gadlittleton,,,,
-Massachusetts,Melrose,Nirvana Brazilian Jiu Jitsu,nirvanabrazilianjiujitsu,,,,
-Massachusetts,Wakefield,Defensive Edge Martial Arts,defensiveedge,,,,
-Massachusetts,Westford,Brazilian Top Team Westford,bttwestford,,,,
-Massachusetts,Westminster,Mantis Boxing (Randy Brown),randybrownmantisboxer,,,,
-New Hampshire,Nashua,Bazzani Brazilian Jiu-Jitsu,bazzanimartialarts,,,,
-Massachusetts,Arlington,Boston Submission Fighting,bostonsubmissionfighting,11:00AM,10:00AM,y,
-Massachusetts,Bedford,Bernardo Faria BJJ Academy,bernardofariabjjacademy,1:00PM,11:30AM,,
-Massachusetts,Brighton (Boston),Submit Your Friend Academy,syfabjj,11:00AM,,,
-Massachusetts,Marlborough,Exodus Brazilian Jiu Jitsu,exodus.jiujitsu,8:30AM,8:30AM,,
-Massachusetts,Taunton,Morselli Jiu Jitsu Academy,morsellijj,10:00AM,,y,
-New Hampshire,Concord,Leverage Jiu-Jitsu Academy,leverage_jiujitsu_nh,,10:00AM,y,
-Connecticut,Danbury,Kore Integrated Combatives,korecombatives,,,,
-Connecticut,New Britain,Modern Self Defense Center,modernselfdefense,,,,
-Connecticut,New London,Whaling City Athletic Club,whalingcity.athleticclub,,,,
-Massachusetts,Bridgewater,Brazilian Jiu-Jitsu at BSU,bjj_bsu,,,,
-Massachusetts,Hyannis,Hyannis Mixed Martial Arts,hyannis_mixed_martial_arts,,,,
-Massachusetts,North Andover,Brabos Brazilian Jiu Jitsu,brabosbrazillianjj,,,,
-Massachusetts,Weymouth,Dedeco Brazilian Jiu-Jitsu,dedecobjj,,,n,
-Maine,Ellsworth,Acadia Brazilian Jiu-Jitsu,acadia_brazilian_jiu_jitsu,,,,
-New Hampshire,Seabrook,Flow With The Go Jiu-Jitsu,flowwiththegojiujitsu,,,,
-Rhode Island,West Warwick,Rilion Gracie Rhode Island,riliongracie.ri,,,,
-New Hampshire,Derry,Professional Martial Arts,pmaderry,,,,
-Massachusetts,Boston (Back Bay),Brazilian Top Team Boston,bttboston,12:00PM,,,
-Massachusetts,Rowley,Brazilian Top Team Rowley,bttrowley,,11:00AM,,
-New Hampshire,Londonderry,Valle Brazilian Jiu Jitsu,valle_jiujitsu,10:00AM,,,
-Connecticut,Mansfield,Uconn Brazilian Jiu-Jitsu,uconnbjj,,,,
-Connecticut,Oakville,CT Combat Training Center,ct_combat,,,,
-Massachusetts,Ashland,Selva Brazilian Jiu Jitsu,selva_bjj,,,,
-Massachusetts,Revere,Brazilian Top Team Revere,bttrevere,,,,
-Massachusetts,Rockland,South Shore Sportfighting,sssportfighting,,,,
-Maine,Brunswick,First Class Fitness & MMA,fcfmma,,,,
-Maine,Lewiston,Central Maine BJJ (CMBJJ),centralmainebjj,,,,
-Rhode Island,Lincoln,Fierce Academy RI MMA BJJ,fierceacademyri,,,,
-Rhode Island,Pawtucket,Tri Force Training Center,triforcetrainingcenter,,,,
-Rhode Island,Westerly,Brausa Carlson Gracie BJJ,projeto_brausa,,,,
-Massachusetts,Beverly,Invictus Training Center,invictustrainingcenter,11:00AM,10:00AM,,
-Massachusetts,Fall River,Regiment Training Center,regiment_training_center,,10:00AM,,
-Massachusetts,Natick,Versus Jiu-Jitsu Academy,versusjiujitsuma,12:00PM,,,
-Maine,Augusta,Black Bear BJJ & Fitness,blackbear_bjj,,5:00PM,,
-Maine,Houlton,Aroostook Grappling Club,aroostookbjj,10:00AM,,,
-Maine,Rockland,Flow Brazilian Jiu Jitsu,flowbjj_maine,10:00AM,,,
-Vermont,Essex Junction,Gracie Jiu Jitsu Vermont,gracie_jiu_jitsu_vermont,11:00AM,,,
-Connecticut,Farmington,Gracie Farmington Valley,gfvjiujitsu,,,,
-Connecticut,Hebron,Hebron BJJ (Bushido BJJ),hebronbjj,,,,
-Connecticut,Milford,Fighting Arts Academy CT,faa_ct,,,,
-Connecticut,New Haven,Carlson Gracie Jiu-Jitsu,carlsongraciect,,,,
-Connecticut,Suffield,Full Circle Martial Arts,fullcirclect,,,,
-Connecticut,Tolland,IDP Jiujitsu and Fitness,submission_piracy,,,,
-Connecticut,West Hartford,Plus One Defense Systems,plusonedefensesystems,,,,
-Massachusetts,New Bedford,South Coast Self Defense,southcoastselfdefensema,,,,
-Massachusetts,North Attleboro,Monkey King Martial Arts,monkeykingmmx,,,,
-Massachusetts,Scituate,Gracie Barra South Shore,gbsouthshore,,,,
-Massachusetts,"Swampscott, MA",New England Warrior Arts,newenglandwarriorarts,,,,
-Massachusetts,Woburn,FUJI Martial Arts Woburn,fujima_woburn,,,,
-Maine,Farmingdale,Team Lawton Martial Arts,teamlawtonmartialarts,,,,
-Connecticut,Hamden,Soulcraft / Macarra BJJ,macarra_bjj_hamden,11:00AM,11:00AM,,
-Massachusetts,Boston,Back 2 Basics Jiu Jitsu,b2basics_jiujitsu,,11:00AM,,
-Massachusetts,Danvers,20000 Leagues Jiu Jitsu,20000_leagues_jiu_jitsu_,8:00AM,,,
-Massachusetts,Somerville,617 Brazilian Jiu Jitsu,617bjj,12:00PM,,,
-New Hampshire,Concord,New England BJJ Academy,nebjjacademy,12:00PM,,,
-Connecticut,Litchfield,Gracie Litchfield Hills,glhjiujitsu,,,,
-Connecticut,Middlebury,Campanella Martial Arts,campanellamartialarts,,,,
-Connecticut,Orange,Black Wolf Martial Arts,blackwolfmartialarts,,,,
-Connecticut,Plainville,Plainville Martial Arts,pmabjj,,,,
-Massachusetts,Boston (Jamaica Plain),JP Martial Arts Academy,jpmartialartsacademy,,,,
-Massachusetts,Dedham,Gracie Jiu Jitsu Dedham,graciejiujitsudedham,,,,
-Massachusetts,Lynn,Brazilian Top Team Lynn,btt.lynn,,,,
-Massachusetts,Quincy,Gracie Jiu Jitsu Quincy,graciejiujitsuquincy,,,,
-Massachusetts,Salem,North Shore BJJ Academy,northshorebjj,,,,
-Massachusetts,Waltham,Atlas Jiu Jitsu Waltham,atlasjiujitsuwaltham,,,,
-Massachusetts,Watertown,Kimura BJJ USA Official,kimurabjjusaofficial,,,,
-Massachusetts,Westborough,Integrated Martial Arts,integrated_martialarts,,,,
-Massachusetts,Woburn,Team Forsa / BJJ Boston,teamforsabjj,,,,
-Maine,Sanford,Clandestine Submissions,clandestinesubmissions,,,,
-Massachusetts,Charlton,Gracie BJJ and Fitness,hondojjusa,,,,
-Vermont,Middlebury,Middlebury AJJ Academy,middlebury_jiujitsu,,,,
-Massachusetts,Braintree,Gracie Barra Braintree,gbbraintree,1:00PM,,,
-Massachusetts,Nantucket,Werdum Training Center,werdum.nantucket,12:30PM,,,
-Massachusetts,Whitman,Giannetti Martial Arts,giannettimartialarts,,9:00AM,y,
-New Hampshire,Exeter,Hero Jiu Jitsu Academy,herojiujitsu,10:00AM,11:00AM,,
-New Hampshire,Laconia,Lakes Region Vale Tudo,lakesregionvaletudo,,10:30AM,,
-New Hampshire,Littleton,Fenix Highlanders Club,fenixhighlanders,,9:00AM,,
-Connecticut,Bethel,Teixeira MMA & Fitness,teixeirammaandfitness,,,,
-Connecticut,Cromwell,TRITAC Training Center,tritactrainingcenter,,,,
-Connecticut,Wallingford,Performance Combat MMA,performance_combat_mike,,,,
-Massachusetts,Manchester,Checkmate Martial Arts,checkmate_martial_arts,,,,
-Massachusetts,Marlborough,Soneca BJJ Marlborough,sonecabjj_marlboro,,,,
-New Hampshire,North Hampton,Heavy Mettle Jiu Jitsu,heavymettlejj,,,n,
-Vermont,Londonderry,Team Jucão Vermont BJJ,teamjucaovermontbjj,,,,
-Massachusetts,North Adams,Steeple City JiuJitsu,steeplecityjiujitsu,11:00AM,,,
-Massachusetts,Northborough,Daniel Gracie Academy,danielgracieacademy,11:00AM,10:00AM,,
-Massachusetts,Springfield,Fighting Arts Academy,fightingartsacademy,10:45AM,,,
-Connecticut,Oakville,Viana Bros Fight Club,vianabrosfightclub,,,,
-Connecticut,Stamford,Ground Work Jiu-Jitsu,groundworkjiujitsu,,,,
-Massachusetts,Hudson,Hudson Combat Academy,hudsoncombatacademy,,,,
-Massachusetts,Mendon,Blue Collar Jiu Jitsu,bluecollar_bjj,,,,
-Massachusetts,North Reading,Imperium Martial Arts,imperium_martial_arts,,,,
-Massachusetts,Tewksbury,Daniel Gracie Academy,danielgracienorthshore,,,,
-Massachusetts,W. Springfield,Battleground JiuJitsu,battlegroundjiujitsu,,,,
-Massachusetts,Waltham,Snake Pit New England,snakepitnewengland,,,,
-Massachusetts,Webster,Team Link BJJ and MMA,team_link_webster_bjj_and_mma,,,,
-Maine,Westbrook,De La Riva Alexey BJJ,delariva_alexeybjj,,,,
-Connecticut,Seymour,Black Hole Jiu Jitsu,blackholejj.ct,11:00AM,6:30PM,,
-Massachusetts,Andover,Gracie Barra Andover,graciebarraandover,,12:00PM,,
-Massachusetts,Boston,Combat Sports Boston,combatsportsboston,,12:00PM,,
-Massachusetts,Cambridge,Ginsberg Academy BJJ,ginsbergbjj,9:00AM,,,
-Massachusetts,Hudson,Upper Level JiuJitsu,upperlevelhudson,,4:00PM,,
-Massachusetts,Lowell,The Paradigm Academy,theparadigmacademy,,9:00AM,,
-Massachusetts,Lowell,The Paradigm Academy,theparadigmacademy,,6:30PM,,
-Massachusetts,Marlborough,Gorilla Martial Arts,gorilla_martial_arts_,11:00AM,,,
-Maine,Portland,The Academy Portland,theacademymaine,1:00PM,,,
-Rhode Island,East Providence,Playground Jiu Jitsu,playgroundjiujitsu,11:00AM,,y,
-Connecticut,Glastonbury,Royce Gracie Academy,rgjjnct,,,,
-Connecticut,Madison,Black Wolf Shoreline,blackwolfmartialarts_shoreline,,,,
-Connecticut,South Windsor,CT Jiujitsu Kobukai ,kobukai_jj_sw,,,,
-Connecticut,Waterbury,IMB of CT Boxing/MMA,imbct,,,,
-Massachusetts,Gloucester,DF Fitness MA Center,dffitnessmacenter,,,,
-Massachusetts,Stoughton,Maxx Training Center,maxx_center,,,,
-Massachusetts,Westborough,Jamaica’s Ground BJJ,jamaicas_groundbjj,,,,
-Massachusetts,Worcester,Soneca BJJ Worcester,sonecabjj_worcester,,,,
-New Hampshire,Brentwood,Conquer Self Defense,conquerselfdefense,,,,
-New Hampshire,Conway,Nomad Grappling Club,nomad_grappling_club,,,,
-New Hampshire,Nashua,Karasu Tengu Academy,ktacademy_nashua,,,,
-New Hampshire,Salem,New England Top Team,newenglandtopteam,,,,
-Rhode Island,Johnston,Rising Sun Jiu-Jitsu,risingsunjiujitsu,,,,
-Rhode Island,Newport,Newport Martial Arts,newportmartialartsri,,,,
-Rhode Island,Providence,Burke's Martial Arts,burkesmartialarts,,,,
-Rhode Island,Warwick,Cortes BJJ & Fitness,cortesbjj_ri,,,,
-Vermont,Williston,Rodrigo Medeiros BJJ,bjjrevolutionteamofficial,,,,
-Massachusetts,Boston,Gracie Barra Boston,gbbostonbjj,1:00PM,,,
-Massachusetts,Millis,Mohawk Martial Arts,mohawmartialarts,9:00AM,,,
-Massachusetts,Waltham,Virtue Martial Arts,virtue_martialarts,2:00PM,,,
-Rhode Island,Wakefield,GT Fighting Academy,gtfightingacademy,9:00AM,9:00AM,,
-Connecticut,Bristol,Ascension Athletics,ascensionathleticsct,,,,
-Connecticut,Manchester,Team Legacy 860 MMA,teamlegacy860mma,,,,
-Massachusetts,Ashland,SoulFight Jiu Jitsu,soulfightjiujitsu,,,,
-Massachusetts,Devens,Mass BJJ The Valley,massbjjthevalley,,,,
-Massachusetts,Methuen,BJJ Boston 24/7/365,bjj__boston,,,,
-Massachusetts,New Bedford,Fight Sports Boston,fightsportsbostonbjj,,,,
-Massachusetts,Westfield,Team Link Westfield,teamlinkwestfield,,,,
-New Hampshire,Rochester,Forged Self Defense,forgedselfdefense,,,,
-Massachusetts,Agawam,Ironhold Jiu Jitsu,ironhold_jiujitsu_,9:30AM,,,
-Massachusetts,Wakefield,Team Fight Academy,teamfightacademy,12:00PM,,,
-Maine,Oakland,Bear Clan JiuJitsu,bearclan_jiujitsu,11:00AM,,,
-New Hampshire,Hudson,Precision JiuJitsu,precision_jiujitsu,,10:00AM,y,
-New Hampshire,Londonderry,Brazilian Top Team,btt_londonderry,12:00PM,,,
-Connecticut,Monroe,Redzone Jiut Jitsu,redzonejiujitsu,,,,
-Connecticut,New Britain,Heavy Hitters Club,heavyhitters.club,,,,
-Connecticut,Shelton,Endure BJJ Academy,endurebjjacademy,,,,
-Connecticut,Trumbull,Essencia Jiu Jitsu,essenciajj,,,,
-Connecticut,Vernon,Gonzalez Grappling,gonzalezgrapplingllc,,,,
-Connecticut,Woodbury,Soulcraft JiuJitsu,scissorhandsbjj,,,,
-Massachusetts,Arlington,Mass BJJ Arlington,massbjj,,,,
-Massachusetts,Lakeville,Lakeville MMA Club,lakevillemma,,,,
-Massachusetts,Marlborough,Fight For Life BJJ,fight4lifebjj,,,,
-Massachusetts,Millbury,5 Stones Jiu Jitsu,5stonesjiujitsu,,,,
-Massachusetts,North Billerica,ICON Jiu Jitsu USA,iconbjjusa,,,,
-Massachusetts,Plainville,Darkside Jiu-Jitsu,darksidejiujitsu,,,,
-Massachusetts,South Boston,Broadway Jiu-Jitsu,broadwayjiujitsu,,,,
-Massachusetts,Southbridge,Mom's Basement MMA,moms_basement_mma,,,,
-Maine,Saco,Evolution Athletix,evoathletix,,,,
-Maine,South Portland,Southern Maine BJJ,southernmaine_bjj,,,,
-Rhode Island,South Kingstown,Pride Martial Arts,pridemartialartsri,,,,
-Vermont,Winooski,Combat Fitness MMA,combatfitnessmmavt,,,,
-New Hampshire,Milford,Balance Point BJJ,balancepoint.bjj,,,,
-Massachusetts,North Andover,North Andover BJJ,northandoverbjj,,,,
-Connecticut,Stamford,Cesar Pereira BJJ,bjjstamfordct,,,,
-Connecticut,Bridgeport,Marcelo Garcia JJ,bridgeport_marcelogarciajj,,11:00AM,,
-Connecticut,Danbury,American Top Team,attconnecticut,12:00PM,,,
-Connecticut,Norwalk,Gracie Sports BJJ,graciesportsbjj,11:30AM,,,
-Massachusetts,Westwood,The Lab Jiu-Jitsu,the_lab_jiu_jitsu_westwood,11:00AM,11:00AM,,
-New Hampshire,North Hampton,Granite State BJJ,granitestatebjj,11:00AM,9:00AM,,
-New Hampshire,Rochester,Sanders Jiu Jitsu,sandersbjjacademy,,10:00AM,,
-Vermont,Hardwick,Kingdom Jiu-Jitsu,kingdom.jiu.jitsu,9:45AM,4:00PM,,
-Massachusetts,Easthampton,New City Jiujitsu,newcityjiujitsu,,,,
-Rhode Island,Newport,Mission First BJJ,missionfirstbjj,,,n,
-Rhode Island,Pawtucket,Tri-Force MMA/BJJ,triforcemmabjj,,,,
-Vermont,Killington,Warriors Path MMA,warriorspathmma,,,,
-Rhode Island,Providence,Death Kitty Dojo,deathkittydojo,11:30AM,,,
-Massachusetts,Salem,Forged Krav Maga,forged_bjj_kravmaga,,,,
-Massachusetts,South Boston,South Boston BJJ,southbostonbjj,,9:00AM,,
-Maine,Blue Hills,Three Points BJJ,threepointsbjj,10:00AM,,,
-Maine,Windham,Gracie Gym Maine,graciegymmaine,12:00PM,,,
-Vermont,Barre,Granite City MMA,granitecitymma,11:00AM,,,
-Connecticut,Brooklyn,Team Squared BJJ,squared_bjj_brooklyn,,,,
-Connecticut,Fairfield,Hammer Jiu Jitsu,hammerjiujitsu,,,,
-Connecticut,Higganum,Kairos Jiu Jitsu,kairosjiujitsu,,,,
-Massachusetts,Billerica,Snake Pit Boston,snakepitboston,,,,
-Massachusetts,Fairhaven,Danny Savery BJJ,dannysaverybjjfairhaven,,,,
-Massachusetts,Gloucester,Sakura Jiu Jitsu,sakura_bjj_ma,,,,
-Massachusetts,Ludlow,Team Link Ludlow,teamlinkludlow,,,,
-Massachusetts,Pittsfield,Dosier Jiu Jitsu,dosierjiujitsu,,,,
-Massachusetts,Somerset,Danny Savery BJJ,dannysaverybjjsomerset,,,,
-New Hampshire,Manchester,Gracie Jiu-Jitsu,graciejiujitsumanchester,,,,
-Rhode Island,Bristol,Danny Savery BJJ,dannysaverybjjbristol,,,,
-Rhode Island,West Warwick,Fight Factory RI,fightfactoryri,,,,
-Vermont,White River Junction,Upper Valley BJJ,uppervalleybjj,,,,
-Connecticut,Stamford,Summit JiuJitsu,summit.jiujitsu,11:00AM,,,
-Massachusetts,Attleboro,Ronin Jiu-Jitsu,roninjiujitsu,10:00AM,10:00AM,,
-Massachusetts,Fitchburg,ZTeam Jiu-Jitsu,zteamjiujitsu,10:00AM,10:00AM,,
-Maine,Ellsworth,Rolls Jiu Jitsu,rollsjiujitsu,10:00AM,,,
-New Hampshire,East Hampstead,Limitless Pride,limitlesspride,,10:30AM,y,
-Rhode Island,Smithfield,Renzo Gracie RI,renzogracieri,10:30AM,,,
-Connecticut,Berlin,Gracie Jiujitsu,gracie_jiujitsu_ct,,,,
-Connecticut,New Haven,Ronin New Haven,roninnewhaven,,,,
-Connecticut,Windham,Frog Bridge MMA,frogbridgemma,,,,
-Massachusetts,Fitchburg,Newaza BJJ Club,newazajiujitsu,,,,
-Massachusetts,Framingham,Dragon Lair MMA,dragon_lair_mma,,,,
-Massachusetts,Haverhill,Binda Jiu Jitsu,bindajiujitsu,,,,
-Massachusetts,Peabody,BTT New England,bttnewengland,,,,
-Massachusetts,Sandwich,Forge Jiu-Jitsu,_forge_jiujitsu_,,,,
-Maine,Brewer,Titan Athletics,titan.athletics,,,,
-New Hampshire,Lebanon,UNITA Jiu Jitsu,unitabjj,,,,
-Rhode Island,East Providence,EP Martial Arts,epmartialarts,,,,
-Rhode Island,North Providence,Folgo Jiu Jitsu,folgojj,,,,
-Massachusetts,Newton,ATOM Jiu-Jitsu,atom_bjj,11:00AM,,y,
-Massachusetts,Springfield,Vaca BJJ & MMA,vacabjjmma_gym,9:30AM,,,
-Maine,Portland,Stonecoast BJJ,stonecoastbjj,10:45AM,,,
-Rhode Island,Providence,Providence BJJ,providencebjj,11:30AM,6:00PM,y,
-Connecticut,Danbury,TMC BJJ School,tmcdanburybjj,,,,
-Connecticut,Groton,The Roughhouse,roughhousejj,,,,
-Connecticut,North Franklin,Rogers Academy,rogersmartialarts,,,,
-Connecticut,Southington,Solid Base BJJ,solidbasebjj,,,,
-Connecticut,Waterbury,PSDTC Warriors,psdtc,,,,
-Massachusetts,Boston,UFC GYM Boston,ufcgymboston,,,,
-Massachusetts,North Dartmouth,SBG East Coast,sbgeastcoast,,,,
-Massachusetts,Norwell,Kaizen Norwell,kaizennorwell,,,,
-Massachusetts,Randolph,Energy Fitness,energyfitnessma,,,,
-Massachusetts,Tewksbury,2002 Jiu Jitsu,2002jiujitsu,,,,
-Massachusetts,Waltham,Watch City MMA,watch_city_mma,,,,
-Massachusetts,Woburn,617 BJJ Woburn,gc.jiujitsuacademy,,,,
-Maine,Bar Harbor,Bar Harbor BJJ,bar_harbor_bjj,,,,
-Maine,Gray,Carll Clan BJJ,carllclanbjj,,,,
-New Hampshire,Nashua,Gate City MMA,gatecitymma,2:00PM,,,
-New Hampshire,Swanzey,Monadnock BJJ,monadnockbrazilianjiujitsu,11:00AM,,,
-Massachusetts,Peabody,BST Jiu Jitsu,bst_jiu_jitsu,,,,
-Massachusetts,Vineyard Haven,Blitz Fitness,blitzfitnessofmv,,,,
-Massachusetts,Waltham,WatchCity MMA,watchcitymma,,,,
-New Hampshire,Moultonborough,Hook Fight Co,hookfightco,,,,
-New Hampshire,Newington,Port City BJJ,port_city_bjj,,,,
-Massachusetts,Hanover,PQ Jiu Jitsu,pqjiujitsu,,6:00PM,y,
-Massachusetts,Hyannis,Cristyan BJJ,cristyanbjj,1:00PM,,,
-Massachusetts,Newton,Gracie Barra,gracie_barra_jiujitsu,12:30PM,,,
-Massachusetts,Norwood,Elements MMA,elements_mma,11:00AM,,,
-Massachusetts,Peabody,Gracie Barra,gbpeabody,12:00PM,,,
-New Hampshire,Windham,Renzo Gracie,renzogracienh,11:00AM,9:00AM,,
-Rhode Island,Coventry,Coventry BJJ,coventryribjj,,11:00AM,,
-Connecticut,Glastonbury,F.I.T.E. Fit,fitefit1,,,,
-Connecticut,Milford,Renzo Gracie,renzograciemilford,,,,
-Massachusetts,Hyannis,Sardinha BJJ,sardinhabjjcapecod,,,,
-Massachusetts,Leominster,Cesario Team,bjjleominster,,,,
-Massachusetts,Milford,Terrinha BJJ,tdtbjj,,,,
-Massachusetts,Quincy,Trifecta MMA,trifectamma,,,,
-Maine,Biddeford,Team Moreira,team_moreira_biddeford,,,,
-New Hampshire,Hooksett,Team Link NH,tjsosd,,,,
-Rhode Island,Exeter,Elevate Dojo,elevatedojo,,,,
-Vermont,Williston,Vermont BJJ,vermontbjj,12:00PM,,,
-Vermont,Rutland,Rutland AJJ,rutland_ajj,10:30AM,,,
-Massachusetts,Dorchester,Empower BJJ,empowerbjjusa,11:00AM,,,
-Massachusetts,East Bridgewater,IN Jiujitsu,injiujitsu,,10:00AM,y,
-Massachusetts,Littleton,Unit 232 HQ,unit232.hq,,10:00 AM,y,
-Massachusetts,Marlborough,Phoenix BJJ,phoenix_jj_official,12:00PM,12:00PM,,
-New Hampshire,Manchester,Burgess MMA,youtalkwetrain,,10:00AM,,
-Connecticut,Colchester,360 Defense,360defensecolchester,,,,
-Massachusetts,Holden,Squared BJJ,squaredbjjholden,,,,
-Massachusetts,Leominster,Squared BJJ,squaredbjjleominster,,,,
-Massachusetts,Medford,Mau Mau BJJ,maumaubjjacademy,,,,
-Maine,Bangor,Young's MMA,youngsmma,,,,
-Maine,Farmington,Foundry BJJ,foundryfarmington,,,,
-New Hampshire,Nashua,Triumph BJJ,teamtriumphbjj,,,,
-Massachusetts,Stoughton,Boston BJJ,bostonbjjstoughton,,,,
-Massachusetts,Woburn,Boston BJJ,bostonbjjwoburn,11:30AM,,,
-Massachusetts,Canton,Lauzon MMA,lauzonmmacanton,,,,
-Massachusetts,Raynham,Lauzon MMA,lauzonmma,,,,
-New Hampshire,Somersworth,Nostos MMA,nostosmma,,,,
-Massachusetts,Tewksbury,Fenix BJJ,fenixbjjtewksbury,,10:00AM,,
-Massachusetts,Brockton,Orion BJJ,orionbjj,,7:00PM,y,
-Maine,Portland,Recon MMA,recon.portland,9:00AM,9:00AM,,
-Connecticut,Bridgeport,Iron Lion,iron_lion_team_,,,,
-Massachusetts,Boston,All 1 MMA,all1mma,,,,
-Massachusetts,Newton,Day 1 BJJ,day1_jiujitsu_newton,,,,
-Massachusetts,Northampton,Team Link,teamlinknoho,,,,
-Massachusetts,West Roxbury (Boston),Viver MMA,viver.mma,,,,
-Vermont,Burlington,Grind BJJ,grind.bjj,,,,
-Massachusetts,Acton,Mass BJJ,mass_bjj,,12:00PM,,
-Massachusetts,Middleboro,REAL BJJ,realbjjma,10:00AM,,,
-Vermont,St. Albans,The Club,theclubvt,9:45AM,,,
-Connecticut,Wesport,The Dojo,thedojoct,,,,
-Connecticut,Windsor,MMA Barn,mmabarn,,,,
-Massachusetts,Amherst,NESF MMA,nesfmma,,,,
-Vermont,Bennington,Toad BJJ,toadbjj,,,,
-Massachusetts,Bellingham,USMMA,usmma,,,,
+STATE,CITY,NAME,IG,SAT,SUN,OTA,CREATED,LAT,LON
+Connecticut,Bridgeport,CT Submission Grappling,connecticutsubmissiongrappling,,12:00PM,y,,41.187393,-73.195757
+Massachusetts,Worcester,Worcester Martial Arts Academy,worcester_martial_arts_academy,,,,,42.269478,-71.807783
+Connecticut,Madison,Black Wolf Shoreline,blackwolfmartialarts_shoreline,,,,,41.344479,-72.624543
+New Hampshire,Concord,Averill's Martial Arts Academy,averills_martial_arts_academy,,,,,43.232493,-71.561252
+Massachusetts,Webster,Team Link BJJ and MMA,teamlinkbjjandmmawebster,,,,,42.047075,-71.845805
+Rhode Island,Providence,Tim Burrill BJJ,timburrillbrazilianjiujitsu,,,,,41.823056,-71.418784
+Connecticut,Manchester,FlowState Fighting & Fitness,flowstatefightingandfitness,9:00AM,,y,,41.77524,-72.524434
+New Hampshire,Brentwood,Dark Arts Jiu Jitsu Brentwood,darkartsjiujitsu_brentwood,11:00AM,,,,42.983723,-71.053998
+Massachusetts,Framingham,Alliance Jiu Jitsu Framingham,alliancejiujitsuframingham,,,,,42.307905,-71.436196
+Connecticut,East Hartford,Silverback Training Facility,silverbacktrainingfacility,,,,,41.760695,-72.607646
+Massachusetts,Clinton,Alchemy Brazilian Jiu-Jitsu,alchemy_brazilian_jiujitsu,,10:00AM,,,42.411887,-71.690005
+Massachusetts,Hyannis,Hyannis Mixed Martial Arts,hyannis_mixed_martial_arts,,,,,41.661478,-70.356951
+Maine,Ellsworth,Acadia Brazilian Jiu-Jitsu,acadia_brazilian_jiu_jitsu,8:30AM,,,,44.58293,-68.480094
+Connecticut,Bridgeport,Marcelo Garcia JJ,bridgeport_marcelogarciajj,,11:00AM,,,41.187393,-73.195757
+Massachusetts,Westwood,The Lab Jiu-Jitsu,the_lab_jiu_jitsu_westwood,11:00AM,11:00AM,,,42.219645,-71.216768
+New Hampshire,Swanzey,Monadnock BJJ,monadnockbrazilianjiujitsu,11:00AM,,,,42.858271,-72.29636
+Massachusetts,Norwood,Connor’s Martial Arts Academy,connorsmartialartsacademy,,,,,42.187364,-71.195971
+Vermont,Williston,Rodrigo Medeiros BJJ,bjjrevolutionteamofficial,,,,,44.429166,-73.09631
+Massachusetts,Watertown,Theodorou Academy of Jiu Jitsu,theodorouacademyjiujitsu,,,,,42.369451,-71.177925
+Vermont,South Burlington,High Hat Brazilian Jiu-Jitsu,highhatbrazilianjiujitsu,,11:00AM,,,44.436469,-73.182623
+Vermont,Burlington,Green Mountain Martial Arts,greenmountainmartialarts,,,,,44.491927,-73.238882
+Connecticut,Greenwich,Greenwich Jiu Jitsu Academy,greenwichjiujitsuacademy,,,,,41.045366,-73.634018
+Massachusetts,Melrose,Nirvana Brazilian Jiu Jitsu,nirvanabrazilianjiujitsu,,,,,42.455723,-71.059019
+Massachusetts,Arlington,Boston Submission Fighting,bostonsubmissionfighting,11:00AM,10:00AM,y,,42.418722,-71.163912
+Connecticut,New London,Whaling City Athletic Club,whalingcity.athleticclub,7:00AM,,,,41.332957,-72.096176
+Massachusetts,Fall River,Regiment Training Center,regiment_training_center,,10:00AM,,,41.725351,-71.094162
+Vermont,Essex Junction,Gracie Jiu Jitsu Vermont,gracie_jiu_jitsu_vermont,11:00AM,,,,44.490288,-73.114121
+Massachusetts,Danvers,20000 Leagues Jiu Jitsu,20000_leagues_jiu_jitsu_,8:00AM,,,,42.574174,-70.950516
+New Hampshire,Manchester,Gracie Jiu-Jitsu,graciejiujitsumanchester,,,,,42.984941,-71.444131
+Rhode Island,Cranston,Balleto Advanced Training,balletoadvancedtraining,,,,,41.769734,-71.485049
+Massachusetts,Medford,Sigma Martial Arts and Fitness,sigmamartialartsfitness,,,,,42.423844,-71.109231
+Massachusetts,Springfield,Springfield Submission Society,springfieldmabjjsociety,,,,,42.115454,-72.539978
+Massachusetts,Bedford,Bernardo Faria BJJ Academy,bernardofariabjjacademy,1:00PM,11:30AM,,,42.499332,-71.281901
+Massachusetts,New Bedford,South Coast Self Defense,southcoastselfdefensema,,,,,41.661303,-70.937913
+Connecticut,Wallingford,Performance Combat MMA,performance_combat_mike,,,,,41.458657,-72.804516
+Massachusetts,Fairhaven,Danny Savery BJJ,dannysaverybjjfairhaven,,,,,41.633667,-70.871362
+New Hampshire,Londonderry,Off Your Back Jiu Jitsu,offyourbackbjj.academy,,,,,42.879789,-71.392326
+Rhode Island,Pawtucket,Tri Force Training Center,triforcetrainingcenter,,,,,41.874824,-71.373323
+Massachusetts,Beverly,Invictus Training Center,invictustrainingcenter,11:00AM,10:00AM,,,42.556659,-70.84496
+Massachusetts,Westborough,Integrated Martial Arts,integrated_martialarts,1:00PM,,,,42.268426,-71.613309
+Maine,Sanford,Clandestine Submissions,clandestinesubmissions,,,,,43.424142,-70.757859
+Massachusetts,Manchester,Checkmate Martial Arts,checkmate_martial_arts,,,,,42.269728,-72.934495
+Massachusetts,Tewksbury,Daniel Gracie Academy,danielgracienorthshore,,,,,42.612088,-71.227845
+Massachusetts,Somerset,Danny Savery BJJ,dannysaverybjjsomerset,,,,,41.738483,-71.165053
+Maine,Biddeford,Team Moreira,team_moreira_biddeford,,,,,43.438733,-70.392943
+New Hampshire,Derry,Primal Jiu Jitsu,primaljiujitsuacademy,10:00AM,,,,42.887613,-71.282047
+Massachusetts,Boston,Travis Stevens Academy,travisstevensjiujitsu,,,,,42.338551,-71.018253
+Massachusetts,Westminster,Mantis Boxing,randybrownmantisboxer,,,,,42.5546,-71.90544
+New Hampshire,Seabrook,Flow With The Go Jiu-Jitsu,flowwiththegojiujitsu,10:00AM,10:00AM,,,42.883123,-70.860823
+Connecticut,West Hartford,Plus One Defense Systems,plusonedefensesystems,12:30PM,,,,41.766568,-72.754944
+Massachusetts,"Swampscott, MA",New England Warrior Arts,newenglandwarriorarts,,,,,42.468059,-70.89126
+Maine,Farmingdale,Team Lawton Martial Arts,teamlawtonmartialarts,,,,,44.260548,-69.827805
+Connecticut,Middlebury,Campanella Martial Arts,campanellamartialarts,,,,,41.524691,-73.123016
+Connecticut,Bethel,Teixeira MMA & Fitness,teixeirammaandfitness,,,,,41.369778,-73.389503
+Massachusetts,North Reading,Imperium Martial Arts,imperium_martial_arts,10:30AM,10:00AM,,,42.578401,-71.084448
+Massachusetts,Marlborough,Gorilla Martial Arts,gorilla_martial_arts_,11:00AM,,,,42.349617,-71.547214
+Rhode Island,Bristol,Danny Savery BJJ,dannysaverybjjbristol,,,,,41.67573,-71.273331
+Massachusetts,Newton,Gracie Barra,gracie_barra_jiujitsu,12:30PM,,,,42.331768,-71.2084
+Massachusetts,Falmouth,Daniel Gracie Academy,danielgraciefalmouth,,,,,41.594889,-70.599245
+Massachusetts,Plymouth,Daniel Gracie Academy,danielgracieplymouth,,,,,41.894085,-70.61861
+New Hampshire,Concord,Leverage Jiu-Jitsu Academy,leverage_jiujitsu_nh,,10:00AM,y,,43.232493,-71.561252
+Connecticut,Orange,Black Wolf Martial Arts,blackwolfmartialarts,,10:00AM,,,41.284951,-73.024637
+Massachusetts,Jamaica Plain,JP Martial Arts Academy,jpmartialartsacademy,,,,,42.338551,-71.018253
+Massachusetts,Dedham,Gracie Jiu Jitsu Dedham,graciejiujitsudedham,,,,,42.246872,-71.179462
+Massachusetts,Quincy,Gracie Jiu Jitsu Quincy,graciejiujitsuquincy,,,,,42.261006,-71.008988
+Massachusetts,Waltham,Atlas Jiu Jitsu Waltham,atlasjiujitsuwaltham,,,,,42.388921,-71.242268
+Massachusetts,Watertown,Kimura BJJ USA Official,kimurabjjusaofficial,,,,,42.369451,-71.177925
+Massachusetts,Whitman,Giannetti Martial Arts,giannettimartialarts,,9:00AM,y,,42.078974,-70.93939
+Connecticut,Cromwell,TRITAC Training Center,tritactrainingcenter,,,,,41.616609,-72.66156
+Massachusetts,W. Springfield,Battleground JiuJitsu,battlegroundjiujitsu,12:00PM,,,,42.115454,-72.539978
+New Hampshire,Conway,Nomad Grappling Club,nomad_grappling_club,,,,,44.005785,-71.06517
+Rhode Island,Newport,Newport Martial Arts,newportmartialartsri,,,,,41.476681,-71.319627
+Connecticut,Bristol,Ascension Athletics,ascensionathleticsct,,,,,41.681578,-72.940749
+Massachusetts,New Bedford,Fight Sports Boston,fightsportsbostonbjj,12:00PM,,,,41.661303,-70.937913
+Connecticut,Vernon,Gonzalez Grappling,gonzalezgrapplingllc,,,,,41.837561,-72.45904
+Connecticut,Brooklyn,Team Squared BJJ,squared_bjj_brooklyn,,,,,41.787243,-71.957401
+Connecticut,Colchester,360 Defense,360defensecolchester,,,,,41.557271,-72.344247
+Massachusetts,Leominster,Squared BJJ,squaredbjjleominster,,,,,42.520876,-71.770611
+Massachusetts,Newton,Day 1 BJJ,day1_jiujitsu_newton,12:00PM,11:00AM,,,42.331768,-71.2084
+Massachusetts,W. Springfield,Gabriel Gladiator,gabrielgladiator.tc,,,,,42.115454,-72.539978
+Massachusetts,West Bridgewater,Luiz Paulo Brazilian Jiu Jitsu,luizpaulojiujitsuwb,,,,,42.021617,-71.026717
+Massachusetts,Westborough,Alliance Jiu Jitsu,alliancewestborough,12:00PM,,,,42.268426,-71.613309
+Massachusetts,Hanover,Daniel Gracie Academy,danielgraciehanover,10:30AM,,,,42.122956,-70.85631
+Massachusetts,Hyannis,Daniel Gracie Academy,danielgraciehyannis,,,,,41.661478,-70.356951
+Massachusetts,Orleans,Daniel Gracie Academy,danielgracieorleans,,,,,41.765676,-69.966195
+Vermont,Brattleboro,Gracie Jiu-Jitsu Brattleboro,brattleborojiujitsu,,,,,42.860187,-72.633078
+Vermont,Middlebury,Middlebury AJJ Academy,middlebury_jiujitsu,,,,,44.0019,-73.119047
+New Hampshire,Laconia,Lakes Region Vale Tudo,lakesregionvaletudo,,10:30AM,,,43.576535,-71.482263
+Vermont,Londonderry,Team Jucão Vermont BJJ,teamjucaovermontbjj,,,,,43.201068,-72.798579
+Massachusetts,North Adams,Steeple City JiuJitsu,steeplecityjiujitsu,11:00AM,,,,42.675565,-73.118114
+Massachusetts,Northborough,Daniel Gracie Academy,danielgracieacademy,11:00AM,10:00AM,,,42.323342,-71.646236
+Massachusetts,Springfield,Fighting Arts Academy,fightingartsacademy,10:45AM,,,,42.115454,-72.539978
+Massachusetts,Hudson,Hudson Combat Academy,hudsoncombatacademy,11:00AM,,,,42.389071,-71.545864
+Massachusetts,Worcester,Soneca BJJ Worcester,sonecabjj_worcester,,,,,42.269478,-71.807783
+Massachusetts,Salem,Forged Krav Maga,forged_bjj_kravmaga,,,,,42.499248,-70.898204
+Massachusetts,Marlborough,Phoenix BJJ,phoenix_jj_official,12:00PM,12:00PM,,,42.349617,-71.547214
+Maine,South Portland,Choi Institute of Martial Arts,choi_institute_mma,,,,,43.631402,-70.285989
+Massachusetts,Boston,Citadel Martial Arts & Fitness,citadelmartialarts,,,,,42.338551,-71.018253
+Massachusetts,Natick,Alpha Nerds Training Facility,alphanerdsfacility,,,,,42.284822,-71.348811
+Rhode Island,Pawtucket,Team Santos Fighting Academy,teamsantos_bjj_mma,,,,,41.874824,-71.373323
+Massachusetts,Brookline,Florian Martial Arts Center,florianmartialarts,12:00PM,,,,42.323853,-71.142003
+New Hampshire,Nashua,Bazzani Brazilian Jiu-Jitsu,bazzanimartialarts,,,,,42.749074,-71.490544
+Massachusetts,North Andover,Brabos Brazilian Jiu Jitsu,brabosbrazillianjj,,,,,42.673909,-71.091334
+Connecticut,Hamden,Soulcraft / Macarra BJJ,macarra_bjj_hamden,11:00AM,11:00AM,,,41.397329,-72.922226
+Massachusetts,Marlborough,Soneca BJJ Marlborough,sonecabjj_marlboro,,,,,42.349617,-71.547214
+Connecticut,Oakville,Viana Bros Fight Club,vianabrosfightclub,,,,,41.588972,-73.090475
+Connecticut,Stamford,Ground Work Jiu-Jitsu,groundworkjiujitsu,,,,,41.079611,-73.54608
+Massachusetts,Waltham,Snake Pit New England,snakepitnewengland,,,,,42.388921,-71.242268
+Maine,Westbrook,De La Riva Alexey BJJ,delariva_alexeybjj,,,,,43.70792,-70.352602
+Massachusetts,Andover,Gracie Barra Andover,gbandover_,,12:00PM,,,42.648044,-71.161751
+Massachusetts,Boston,Combat Sports Boston,combatsportsboston,,12:00PM,,,42.338551,-71.018253
+Massachusetts,Lowell,The Paradigm Academy,theparadigmacademy,,9:00AM,,,42.638995,-71.32102
+Massachusetts,Lowell,The Paradigm Academy,theparadigmacademy,,6:30PM,,,42.638995,-71.32102
+Rhode Island,East Providence,Playground Jiu Jitsu,playgroundjiujitsu,11:00AM,,y,,41.800433,-71.359258
+Massachusetts,Westborough,Jamaica’s Ground BJJ,jamaicas_groundbjj,,,,,42.268426,-71.613309
+New Hampshire,Brentwood,Conquer Self Defense,conquerselfdefense,,10:00AM,,,42.983723,-71.053998
+Massachusetts,Waltham,Virtue Martial Arts,virtue_martialarts,2:00PM,,,,42.388921,-71.242268
+Massachusetts,Agawam,Ironhold Jiu Jitsu,ironhold_jiujitsu_,9:30AM,,,,42.063891,-72.652959
+New Hampshire,Hudson,Precision JiuJitsu,precision_jiujitsu,,10:00AM,y,,42.760497,-71.409393
+Rhode Island,South Kingstown,Pride Martial Arts,pridemartialartsri,,,,,41.410847,-71.547469
+Vermont,Winooski,Combat Fitness MMA,combatfitnessmmavt,12:00PM,,y,,44.495587,-73.184857
+Connecticut,Berlin,Gracie Jiujitsu,gracie_jiujitsu_ct,,,,,41.605451,-72.778497
+Massachusetts,Woburn,617 BJJ Woburn,gc.jiujitsuacademy,12:00PM,,,,42.488703,-71.154383
+Connecticut,Milford,Renzo Gracie,renzograciemilford,,,,,41.225086,-73.06111
+Massachusetts,Hyannis,Sardinha BJJ,sardinhabjjcapecod,,,,,41.661478,-70.356951
+Massachusetts,Stoughton,Boston BJJ,bostonbjjstoughton,,,,,42.119006,-71.10365
+Connecticut,Fairfield,Radius Martial Arts 10P,radiusmartialarts,,,,,41.17594,-73.272046
+Massachusetts,Norwood,Luiz Paulo Brazilian Jiu Jitsu,luizpaulojiujitsu,,,,,42.187364,-71.195971
+Connecticut,New Britain,Modern Self Defense Center,modernselfdefense,,,,,41.676555,-72.786161
+Connecticut,Tolland,IDP Jiujitsu and Fitness,submission_piracy,,,,,41.883019,-72.358869
+Massachusetts,Boston,Back 2 Basics Jiu Jitsu,b2basics_jiujitsu,,11:00AM,,,42.338551,-71.018253
+Massachusetts,Gloucester,DF Fitness MA Center,dffitnessmacenter,10:00AM,,,,42.62885,-70.685875
+New Hampshire,Salem,New England Top Team,newenglandtopteam,,,,,42.788267,-71.221725
+Rhode Island,Johnston,Rising Sun Jiu-Jitsu,risingsunjiujitsu,,,,,41.82744,-71.519879
+Rhode Island,Providence,Burke's Martial Arts,burkesmartialarts,,,,,41.823056,-71.418784
+Rhode Island,Wakefield,GT Fighting Academy,gtfightingacademy,9:00AM,9:00AM,,,41.446096,-71.500318
+Massachusetts,Ashland,SoulFight Jiu Jitsu,soulfightjiujitsu,,11:00AM,,,42.257755,-71.473526
+Massachusetts,Westfield,Team Link Westfield,teamlinkwestfield,,,,,42.138838,-72.755911
+New Hampshire,Rochester,Forged Self Defense,forgedselfdefense,,,,,43.298493,-70.977005
+Maine,Oakland,Bear Clan JiuJitsu,bearclan_jiujitsu,11:00AM,,,,44.579276,-69.733234
+Connecticut,New Britain,Heavy Hitters Club,heavyhitters.club,,,,,41.676555,-72.786161
+Massachusetts,Southbridge,Mom's Basement MMA,moms_basement_mma,10:00AM,11:00AM,y,,42.059737,-72.033908
+Maine,South Portland,Southern Maine BJJ,southernmaine_bjj,,,,,43.631402,-70.285989
+New Hampshire,Rochester,Sanders Jiu Jitsu,sandersbjjacademy,,10:00AM,,,43.298493,-70.977005
+Vermont,Hardwick,Kingdom Jiu-Jitsu,kingdom.jiu.jitsu,9:45AM,4:00PM,,,44.519932,-72.348176
+Connecticut,North Franklin,Rogers Academy,rogersmartialarts,,,,,41.621212,-72.142609
+Maine,Farmington,Foundry BJJ,foundryfarmington,,,,,44.676935,-70.141491
+Massachusetts,Tewksbury,Fenix BJJ,fenixbjjtewksbury,,10:00AM,,,42.612088,-71.227845
+Connecticut,Monroe,Cruvinel Brothers,cruvinelbrothers,,,,,41.339236,-73.222828
+Connecticut,Tolland,Secret Pages BJJ,secret_pages_bjj,9:00AM,,y,,41.883019,-72.358869
+Massachusetts,Hanover,Thurston Academy,thurston_academy,,10:00AM,,,42.122956,-70.85631
+Massachusetts,Natick,Versus Jiu-Jitsu Academy,versusjiujitsuma,12:00PM,,,,42.284822,-71.348811
+Massachusetts,Nantucket,Werdum Training Center,werdum.nantucket,12:30PM,,,,41.293392,-70.102164
+New Hampshire,Littleton,Fenix Highlanders Club,fenixhighlanders,,9:00AM,,,44.343351,-71.795118
+Massachusetts,Hudson,Upper Level JiuJitsu,upperlevelhudson,,4:00PM,,,42.389071,-71.545864
+New Hampshire,Nashua,Karasu Tengu Academy,ktacademy_nashua,,,,,42.749074,-71.490544
+Massachusetts,Millis,Mohawk Martial Arts,mohawmartialarts,9:00AM,,,,42.173103,-71.363756
+Connecticut,Manchester,Team Legacy 860 MMA,teamlegacy860mma,,,,,41.77524,-72.524434
+Massachusetts,Devens,Mass BJJ The Valley,massbjjthevalley,,9:00AM,,,42.543366,-71.614028
+Massachusetts,Wakefield,Team Fight Academy,teamfightacademy,12:00PM,,,,42.504361,-71.064061
+Connecticut,Shelton,Endure BJJ Academy,endurebjjacademy,,,,,41.304577,-73.139215
+Massachusetts,Plainville,Darkside Jiu-Jitsu,darksidejiujitsu,,,,,42.012838,-71.336188
+Massachusetts,South Boston,Broadway Jiu-Jitsu,broadwayjiujitsu,,,,,42.338551,-71.018253
+New Hampshire,Milford,Balance Point BJJ,balancepoint.bjj,,,,,42.818645,-71.673354
+Massachusetts,Sandwich,Forge Jiu-Jitsu,_forge_jiujitsu_,,,,,41.7132,-70.485737
+Massachusetts,Vineyard Haven,Blitz Fitness,blitzfitnessofmv,,,,,41.457176,-70.607459
+Massachusetts,Holden,Squared BJJ,squaredbjjholden,,,,,42.355801,-71.862574
+Massachusetts,Medford,Mau Mau BJJ,maumaubjjacademy,,,,,42.423844,-71.109231
+Massachusetts,Danvers,BTT North Shore,btt_north_shore,,,,,42.574174,-70.950516
+Massachusetts,Lynn,Seaside Jiu-Jitsu/BTT Lynn,seasidejiujitsu,,,,,42.474766,-70.962035
+Maine,South Portland,Gracie Barra South Portland,gbsouthportland,,8:00AM,,,43.631402,-70.285989
+Massachusetts,Marlborough,Exodus Brazilian Jiu Jitsu,exodus.jiujitsu,8:30AM,8:30AM,,,42.349617,-71.547214
+Rhode Island,West Warwick,Rilion Gracie Rhode Island,riliongracie.ri,9:00AM,,,,41.679601,-71.521114
+Massachusetts,Rockland,South Shore Sportfighting,sssportfighting,,,,,42.129251,-70.908736
+Maine,Lewiston,Central Maine BJJ,centralmainebjj,,,,,44.089513,-70.172095
+Rhode Island,Lincoln,Fierce Academy RI MMA BJJ,fierceacademyri,,,,,41.915455,-71.449815
+Connecticut,New Haven,Carlson Gracie Jiu-Jitsu,carlsongraciect,,,,,41.310809,-72.924953
+Maine,Portland,The Academy Portland,theacademymaine,1:00PM,,,,43.633157,-70.185305
+New Hampshire,Londonderry,Brazilian Top Team,btt_londonderry,12:00PM,,,,42.879789,-71.392326
+Connecticut,Monroe,Redzone Jiut Jitsu,redzonejiujitsu,,,,,41.339236,-73.222828
+Connecticut,Woodbury,Soulcraft JiuJitsu,scissorhandsbjj,,,,,41.561632,-73.206096
+Massachusetts,Millbury,5 Stones Jiu Jitsu,5stonesjiujitsu,,,,,42.192246,-71.777649
+Massachusetts,North Andover,North Andover BJJ,northandoverbjj,,,,,42.673909,-71.091334
+Connecticut,Norwalk,Gracie Sports HQ,graciesportsbjj,11:30AM,,,,41.092739,-73.419796
+New Hampshire,North Hampton,Granite State BJJ,granitestatebjj,11:00AM,9:00AM,,,42.979934,-70.829441
+Massachusetts,Easthampton,New City Jiujitsu,newcityjiujitsu,,,,,42.265435,-72.670813
+Rhode Island,Newport,Mission First BJJ,missionfirstbjj,,,n,,41.476681,-71.319627
+Vermont,Killington,Warriors Path MMA,warriorspathmma,,,,,43.657594,-72.784406
+Connecticut,Stamford,Summit JiuJitsu,summit.jiujitsu,11:00AM,,,,41.079611,-73.54608
+Massachusetts,Framingham,Dragon Lair MMA,dragon_lair_mma,,,,,42.307905,-71.436196
+Maine,Brewer,Titan Athletics,titan.athletics,,,,,44.784461,-68.734559
+Massachusetts,Randolph,Energy Fitness,energyfitnessma,,,,,42.178993,-71.052654
+Massachusetts,Woburn,Boston BJJ,bostonbjjwoburn,11:30AM,,,,42.488703,-71.154383
+Massachusetts,Canton,Lauzon MMA,lauzonmmacanton,,,,,42.175737,-71.125385
+Connecticut,Bridgeport,Iron Lion,iron_lion_team_,,9:00AM,,,41.187393,-73.195757
+Massachusetts,Marblehead,First Colony BJJ,firstcolonybjj,9:00AM,,,,42.495629,-70.83582
+Massachusetts,Woburn,Fenix BJJ,fenixbjjwoburn,11:00AM,,,,42.488703,-71.154383
+New Hampshire,Exeter,Kevin Watson BJJ,kevinwatsonbjj,10:30AM,6:00PM,,,42.988453,-70.961542
+Connecticut,Wallingford,Jitsu Academy CT,jitsuacademyct,,,,,41.458657,-72.804516
+Maine,Freeport,Empire BJJ,empirebjjmaine,11:00AM,,,,43.844826,-70.089953
+Massachusetts,Dorchester,Level Ground MMA,levelgroundmma,,,,,42.269728,-72.934495
+Maine,Rangeley,Kingsguard BJJ,kingsguard_bjj,,,,,44.969379,-70.724751
+Connecticut,North Haven,Ultimate MMA,ultimatemmabjj,,,,,41.381465,-72.856371
+Connecticut,Danbury,Kore Integrated Combatives,korecombatives,,,,,41.398741,-73.478103
+New Hampshire,Londonderry,Valle Brazilian Jiu Jitsu,valle_jiujitsu,10:00AM,,,,42.879789,-71.392326
+Rhode Island,Westerly,Brausa Carlson Gracie BJJ,projeto_brausa,,,,,41.323428,-71.802458
+Massachusetts,Mendon,Blue Collar Jiu Jitsu,bluecollar_bjj,,,,,42.09387,-71.544519
+Connecticut,Seymour,Black Hole Jiu Jitsu,blackholejj.ct,11:00AM,6:30PM,,,41.385466,-73.083641
+Connecticut,Danbury,American Top Team,attconnecticut,12:00PM,,,,41.398741,-73.478103
+Rhode Island,Pawtucket,Tri-Force MMA/BJJ,triforcemmabjj,,,,,41.874824,-71.373323
+Rhode Island,Providence,Death Kitty Dojo,deathkittydojo,11:30AM,,,,41.823056,-71.418784
+Massachusetts,South Boston,South Boston BJJ,southbostonbjj,,9:00AM,,,42.338551,-71.018253
+Maine,Blue Hills,Three Points BJJ,threepointsbjj,10:00AM,,,,44.402138,-68.527718
+Maine,Windham,Gracie Gym Maine,graciegymmaine,12:00PM,,,,43.794689,-70.405329
+Vermont,Barre,Granite City MMA,granitecitymma,11:00AM,,,,44.199088,-72.507979
+Connecticut,Fairfield,Hammer Jiu Jitsu,hammerjiujitsu,12:00PM,,,,41.17594,-73.272046
+Connecticut,Higganum,Kairos Jiu Jitsu,kairosjiujitsu,,10:00AM,,,41.490703,-72.557768
+Massachusetts,Billerica,Snake Pit Boston,snakepitboston,,,,,42.559674,-71.260948
+Massachusetts,Ludlow,Team Link Ludlow,teamlinkludlow,,,,,42.183577,-72.457812
+Massachusetts,Pittsfield,Dosier Jiu Jitsu,dosierjiujitsu,,,,,42.45184,-73.260685
+Rhode Island,West Warwick,Fight Factory RI,fightfactoryri,,,,,41.679601,-71.521114
+Vermont,White River Junction,Upper Valley BJJ,uppervalleybjj,,,,,43.650026,-72.329173
+New Hampshire,East Hampstead,Limitless Pride,limitlesspride,,10:30AM,y,,42.881061,-71.171883
+Massachusetts,Fitchburg,Newaza BJJ Club,newazajiujitsu,,,,,42.601977,-71.81587
+Massachusetts,Springfield,Vaca BJJ & MMA,vacabjjmma_gym,9:30AM,,,,42.115454,-72.539978
+Massachusetts,Waltham,Watch City MMA,watch_city_mma,,,,,42.388921,-71.242268
+Maine,Bar Harbor,Bar Harbor BJJ,bar_harbor_bjj,,,y,,44.39747,-68.263808
+New Hampshire,Manchester,Burgess MMA,youtalkwetrain,,10:00AM,,,42.984941,-71.444131
+New Hampshire,Nashua,Triumph BJJ,teamtriumphbjj,,,,,42.749074,-71.490544
+Maine,Portland,Recon MMA,recon.portland,9:00AM,9:00AM,,,43.633157,-70.185305
+Massachusetts,West Boylston,Integrated Martial Arts,ima.worcester,,10:00AM,,,42.369417,-71.785036
+Rhode Island,Providence,Tim Burrill BJJ,timburrillbjj,11:30AM,,,,41.823056,-71.418784
+Rhode Island,Jamestown,Ocean State BJJ,oceanstatebjj,,,,,41.51973,-71.371076
+Connecticut,Manchester,Manchester BJJ,manchesterbjj,,,,,41.77524,-72.524434
+Connecticut,Waterford,Crossroads BJJ,crossroadsbjj,,,,,41.351686,-72.146834
+Massachusetts,Peabody,Gentle Art Dojo,gadnorthshore,,10:00AM,,,42.53431,-70.969443
+Connecticut,Prospect,Technique Brazilian Jiu-Jitsu,technique_bjj,,,,,41.499247,-72.975634
+Massachusetts,Worcester,Worcester MMA,worcester_mma,,10:00AM,,,42.269478,-71.807783
+Massachusetts,Chelmsford,Gentle Art Dojo,gadchelmsford,,,,,42.597055,-71.3697
+Connecticut,West Hartford,Underdog MMA,underdogmmact,,11:00AM,,,41.766568,-72.754944
+Connecticut,West Hartford,Underdog MMA,underdogmmact,,6:00PM,,,41.766568,-72.754944
+Massachusetts,Wakefield,Defensive Edge Martial Arts,defensiveedge,,11:15AM,,,42.504361,-71.064061
+Maine,Augusta,Black Bear BJJ & Fitness,blackbear_bjj,,5:00PM,,,44.334904,-69.734199
+Maine,Rockland,Flow Brazilian Jiu Jitsu,flowbjj_maine,10:00AM,,,,44.123883,-69.130452
+Massachusetts,North Attleboro,Monkey King Martial Arts,monkeykingmmx,,,,,41.970454,-71.33493
+Massachusetts,Woburn,FUJI Martial Arts Woburn,fujima_woburn,,,,,42.488703,-71.154383
+Massachusetts,Salem,North Shore BJJ Academy,northshorebjj,,,,,42.499248,-70.898204
+New Hampshire,North Hampton,Heavy Mettle Jiu Jitsu,heavymettlejj,,8:30AM,n,,42.979934,-70.829441
+Connecticut,South Windsor,CT Jiujitsu Kobukai ,kobukai_jj_sw,,,,,41.83809,-72.577836
+Massachusetts,Marlborough,Fight For Life BJJ,fight4lifebjj,,,,,42.349617,-71.547214
+Connecticut,Stamford,Cesar Pereira BJJ,bjjstamfordct,,,,,41.079611,-73.54608
+Massachusetts,Gloucester,Sakura Jiu Jitsu,sakura_bjj_ma,,,,,42.62885,-70.685875
+Massachusetts,Attleboro,Ronin Jiu-Jitsu,roninjiujitsu,10:00AM,10:00AM,,,41.931653,-71.294503
+Massachusetts,Fitchburg,ZTeam Jiu-Jitsu,zteamjiujitsu,10:00AM,10:00AM,,,42.601977,-71.81587
+Maine,Ellsworth,Rolls Jiu Jitsu,rollsjiujitsu,10:00AM,,,,44.58293,-68.480094
+Rhode Island,Smithfield,Renzo Gracie RI,renzogracieri,10:30AM,,,,41.900945,-71.52889
+Connecticut,New Haven,Ronin New Haven,roninnewhaven,11:30AM,,,,41.310809,-72.924953
+Connecticut,Windham,Frog Bridge MMA,frogbridgemma,,,,,41.714475,-72.168667
+Massachusetts,Haverhill,Binda Jiu Jitsu,bindajiujitsu,,,,,42.782945,-71.087436
+Massachusetts,Peabody,BTT New England,bttnewengland,,,,,42.53431,-70.969443
+Rhode Island,East Providence,EP Martial Arts,epmartialarts,10:00AM,5:00PM,,,41.800433,-71.359258
+Maine,Portland,Stonecoast BJJ,stonecoastbjj,10:45AM,,,,43.633157,-70.185305
+Rhode Island,Providence,Providence BJJ,providencebjj,11:30AM,6:00PM,y,,41.823056,-71.418784
+Connecticut,Danbury,TMC BJJ School,tmcdanburybjj,,,,,41.398741,-73.478103
+Massachusetts,Norwell,Kaizen Norwell,kaizennorwell,,,,,42.164569,-70.818844
+Massachusetts,Peabody,BST Jiu Jitsu,bst_jiu_jitsu,,,,,42.53431,-70.969443
+New Hampshire,Newington,Port City BJJ,port_city_bjj,,,,,43.085924,-70.827443
+New Hampshire,Windham,Renzo Gracie,renzogracienh,11:00AM,9:00AM,,,42.811092,-71.302688
+Rhode Island,Coventry,Coventry BJJ,coventryribjj,,11:00AM,,,41.698325,-71.662734
+Massachusetts,Leominster,Cesario Team,bjjleominster,,,,,42.520876,-71.770611
+Massachusetts,Dorchester,Empower BJJ,empowerbjjusa,11:00AM,,,,42.269728,-72.934495
+Connecticut,Stratford,Cruvinel Brothers,cruvinelbros,,,,,41.205688,-73.127986
+New Hampshire,Littleton,Resiliency Martial Arts,adam_laclair,,,,,44.343351,-71.795118
+Connecticut,West Haven,Dandelion Jiujitsu & Wrestling,dandelionbjj,,9:00AM,,,41.272121,-72.967497
+Connecticut,Newtown,Rapadura BJJ,rapadura_bjj,,,,,41.399503,-73.293982
+Massachusetts,Tyngsboro,Team Flo Brazilian Jiu Jitsu,team_flo_bjj,,,,,42.667762,-71.42882
+New Hampshire,Derry,Start Brazilian Jiu Jitsu NH,start_bjj_nh,,,,,42.887613,-71.282047
+New Hampshire,Plaistow,Spero's Brazilian Jiu-Jitsu,btt_plaistow,,,,,42.845597,-71.09326
+Massachusetts,Littleton,Gentle Art Dojo,gadlittleton,,,,,42.535931,-71.490569
+Maine,Houlton,Aroostook Grappling Club,aroostookbjj,10:00AM,,,,46.140385,-67.842346
+Connecticut,Suffield,Full Circle Martial Arts,fullcirclect,,,,,41.999915,-72.678751
+Massachusetts,Scituate,Gracie Barra South Shore,gbsouthshore,,,,,42.205062,-70.742978
+New Hampshire,Concord,New England BJJ Academy,nebjjacademy,12:00PM,,,,43.232493,-71.561252
+Massachusetts,Woburn,Team Forsa / BJJ Boston,teamforsabjj,,,,,42.488703,-71.154383
+New Hampshire,Exeter,Hero Jiu Jitsu Academy,herojiujitsu,10:00AM,11:00AM,,,42.988453,-70.961542
+Rhode Island,Warwick,Cortes BJJ & Fitness,cortesbjj_ri,,,,,41.703085,-71.42031
+Massachusetts,Lakeville,Lakeville MMA Club,lakevillemma,,,,,41.834384,-70.956826
+Connecticut,Groton,The Roughhouse,roughhousejj,,,,,41.347718,-72.031345
+Connecticut,Southington,Solid Base BJJ,solidbasebjj,,10:30AM,,,41.60716,-72.87876
+Massachusetts,Boston,UFC GYM Boston,ufcgymboston,,,,,42.338551,-71.018253
+Massachusetts,North Dartmouth,SBG East Coast,sbgeastcoast,,,,,41.56651,-70.958229
+Massachusetts,Tewksbury,2002 Jiu Jitsu,2002jiujitsu,,,,,42.612088,-71.227845
+Maine,Gray,Carll Clan BJJ,carllclanbjj,,,,,43.90492,-70.367727
+Massachusetts,Norwood,Elements MMA,elements_mma,11:00AM,,,,42.187364,-71.195971
+Massachusetts,Northampton,Team Link,teamlinknoho,,,,,42.327044,-72.67463
+Rhode Island,Providence,Brown University GAMMA,brownugamma,,,,,41.823056,-71.418784
+Massachusetts,Natick,Bay State Brazilian Jiu-Jitsu,baystatebjj,,,,,42.284822,-71.348811
+Maine,Portland,Blue Wave Brazilian Jiu-Jitsu,bluewavebjj,,,,,43.633157,-70.185305
+Massachusetts,Hanover,Torrent Brazilian Jiu-Jitsu,torrent_bjj,10:00AM,,,,42.122956,-70.85631
+Massachusetts,Westford,Brazilian Top Team Westford,bttwestford,,,,,42.585541,-71.44025
+Connecticut,Farmington,Gracie Farmington Valley,gfvjiujitsu,,11:00AM,,,41.729774,-72.842031
+Connecticut,Litchfield,Gracie Litchfield Hills,glhjiujitsu,,,,,41.740937,-73.192751
+Massachusetts,Braintree,Gracie Barra Braintree,gbbraintree,1:00PM,,,,42.206188,-71.00232
+Massachusetts,Cambridge,Ginsberg Academy BJJ,ginsbergbjj,9:00AM,,,,42.376043,-71.11868
+Massachusetts,Stoughton,Maxx Training Center,maxx_center,,,,,42.119006,-71.10365
+Massachusetts,Boston,Gracie Barra Boston,gbbostonbjj,1:00PM,,,,42.338551,-71.018253
+Massachusetts,Methuen,BJJ Boston 24/7/365,bjj__boston,,,,,42.742641,-71.178651
+Maine,Saco,Evolution Athletix,evoathletix,,,,,43.527959,-70.419571
+New Hampshire,Nashua,Gate City MMA,gatecitymma,2:00PM,,,,42.749074,-71.490544
+New Hampshire,Moultonborough,Hook Fight Co,hookfightco,,,,,43.720515,-71.368582
+Massachusetts,Hyannis,Cristyan BJJ,cristyanbjj,1:00PM,,,,41.661478,-70.356951
+Massachusetts,Quincy,Trifecta MMA,trifectamma,,,,,42.261006,-71.008988
+Rhode Island,Exeter,Elevate Dojo,elevatedojo,,,,,41.569431,-71.627921
+Vermont,Rutland,Rutland AJJ,rutland_ajj,10:30AM,,,,43.60967,-72.977788
+Massachusetts,Southbridge,Combate Real School,crjjschool,,,,,42.059737,-72.033908
+Massachusetts,Somerville,Brazilian Martial Arts Center,bmacboston,,11:00AM,,,42.390445,-71.101033
+Massachusetts,Boston,Brazilian Top Team Back Bay,bttbackbay,,10:00AM,,,42.338551,-71.018253
+New Hampshire,Bedford,Aqueous Brazilian Jiu-Jitsu,aqueousbjj,8:00AM,8:00AM,,,42.935584,-71.536871
+Connecticut,Fairfield,FIT CLUB BJJ & Self-Defense,fitclubbjj,,11:00AM,,,41.17594,-73.272046
+Massachusetts,Boston,BU Brazilian Jiu-Jitsu Club,bostonubjj,,,,,42.338551,-71.018253
+Massachusetts,Hyannis,Brazilian Top Team Cape Cod,bttcapecod,,,,,41.661478,-70.356951
+Massachusetts,Taunton,Morselli Jiu Jitsu Academy,morsellijj,10:00AM,,y,,41.903324,-71.094987
+Massachusetts,Charlton,Gracie BJJ and Fitness,hondojjusa,,,,,42.133935,-71.968025
+Connecticut,Trumbull,Essencia Jiu Jitsu,essenciajj,,,,,41.272891,-73.211899
+Massachusetts,North Billerica,ICON Jiu Jitsu USA,iconbjjusa,,,,,42.559674,-71.260948
+Massachusetts,Hanover,PQ Jiu Jitsu,pqjiujitsu,,6:00PM,y,,42.122956,-70.85631
+Vermont,Williston,Vermont BJJ,vermontbjj,12:00PM,,,,44.429166,-73.09631
+Massachusetts,East Bridgewater,IN Jiujitsu,injiujitsu,,10:00AM,,,42.037116,-70.942178
+Massachusetts,Littleton,Unit 232 HQ,unit232.hq,,10:00AM,y,,42.535931,-71.490569
+Connecticut,Willington,Agoge Jiu Jitsu,agogejjmt,,12:30PM,,,41.897267,-72.251848
+Massachusetts,Weymouth,Dedeco Brazilian Jiu-Jitsu,dedecobjj,,9:00AM,n,,42.2073,-70.943687
+Massachusetts,Boston,Brazilian Top Team Boston,bttboston,12:00PM,,,,42.338551,-71.018253
+Massachusetts,Rowley,Brazilian Top Team Rowley,bttrowley,,11:00AM,,,42.721495,-70.886637
+Connecticut,Oakville,CT Combat Training Center,ct_combat,,,,,41.588972,-73.090475
+Massachusetts,Ashland,Selva Brazilian Jiu Jitsu,selva_bjj,,,,,42.257755,-71.473526
+Massachusetts,Revere,Brazilian Top Team Revere,bttrevere,,,,,42.421005,-70.99036
+Connecticut,Hebron,Hebron BJJ,hebronbjj,,,,,41.658584,-72.39342
+Massachusetts,Peabody,Gracie Barra,gbpeabody,12:00PM,,,,42.53431,-70.969443
+Maine,Orrington,Young's MMA,youngs.mma,11:00AM,,,,44.68878,-68.762809
+Massachusetts,Raynham,Lauzon MMA,lauzonmma,,,,,41.93048,-71.046214
+New Hampshire,Somersworth,Nostos MMA,nostosmma,,,,,43.253476,-70.887944
+Massachusetts,West Roxbury,Viver MMA,viver.mma,,,,,42.338551,-71.018253
+Vermont,Burlington,Grind BJJ,grind.bjj,,,,,44.491927,-73.238882
+Massachusetts,Middleboro,REAL BJJ,realbjjma,10:00AM,,,,41.878004,-70.869267
+Vermont,St. Albans,The Club,theclubvt,9:45AM,,,,44.811538,-73.084462
+Connecticut,Wesport,The Dojo,thedojoct,,,,,41.120831,-73.343464
+New Hampshire,Derry,Professional Martial Arts,pmaderry,,,,,42.887613,-71.282047
+Connecticut,Mansfield,Uconn Brazilian Jiu-Jitsu,uconnbjj,,,,,41.789272,-72.228464
+Massachusetts,Lynn,Brazilian Top Team Lynn,btt.lynn,,,,,42.474766,-70.962035
+New Hampshire,Lebanon,UNITA Jiu Jitsu,unitabjj,,,,,43.635428,-72.253837
+Massachusetts,Newton,ATOM Jiu-Jitsu,atom_bjj,11:00AM,,y,,42.331768,-71.2084
+Connecticut,Glastonbury,F.I.T.E. Fit,fitefit1,,,,,41.691883,-72.552173
+Massachusetts,Brockton,Orion BJJ,orionbjj,,7:00PM,y,,42.082543,-71.024638
+Massachusetts,Acton,Mass BJJ,mass_bjj,,12:00PM,,,42.483953,-71.438495
+Massachusetts,Brighton,Submit Your Friend Academy,syfabjj,11:00AM,,,,42.338551,-71.018253
+Massachusetts,Bridgewater,Brazilian Jiu-Jitsu at BSU,bjj_bsu,,,,,41.972376,-70.978773
+Connecticut,Glastonbury,Royce Gracie Academy,rgjjnct,,,,,41.691883,-72.552173
+Massachusetts,Arlington,Mass BJJ Arlington,massbjj,,,,,42.418722,-71.163912
+Rhode Island,North Providence,Folgo Jiu Jitsu,folgojj,,,,,41.861587,-71.456879
+Massachusetts,Boston,All 1 MMA,all1mma,,,,,42.338551,-71.018253
+Connecticut,Windsor,MMA Barn,mmabarn,,,,,41.871037,-72.675082
+Massachusetts,Amherst,NESF MMA,nesfmma,,,,,42.363534,-72.507291
+Vermont,Bennington,Toad BJJ,toadbjj,,,,,42.886154,-73.212685
+Massachusetts,Lowell,River Hawk Brazilian Jiu Jitsu,umlbjj,,,,,42.638995,-71.32102
+Maine,Brunswick,First Class Fitness & MMA,fcfmma,,,,,43.896431,-69.973487
+Connecticut,Milford,Fighting Arts Academy CT,faa_ct,10:00AM,,,,41.225086,-73.06111
+Massachusetts,Somerville,617 Brazilian Jiu Jitsu,617bjj,12:00PM,,,,42.390445,-71.101033
+Connecticut,Plainville,Plainville Martial Arts,pmabjj,,,,,41.673992,-72.854434
+Massachusetts,Milford,Terrinha BJJ,tdtbjj,,,,,42.158692,-71.521419
+New Hampshire,Hooksett,Team Link NH,tjsosd,10:00AM,10:00AM,,,43.081242,-71.446616
+Connecticut,Waterbury,IMB of CT Boxing/MMA,imbct,,,,,41.5585,-73.036685
+Connecticut,Waterbury,PSDTC Warriors,psdtc,,,,,41.5585,-73.036685
+Massachusetts,Bellingham,USMMA,usmma,,,,,42.076682,-71.47449
+Maine,Sanford,Silvestre BJJ,silvestre.bjj,,,,,43.424142,-70.757859
+Massachusetts,Hudson,Grip BJJ,gripbjj.hudson,11:00AM,,,,42.389071,-71.545864
+Connecticut,Fairfield,Gracie Sports,graciesportsfairfield,11:30AM,,,,41.17594,-73.272046
+Massachusetts,Framingham,Holanda BJJ,holanda.bjjacademy,,,,,42.307905,-71.436196
+Connecticut,N. Stonington,York’s Martial Arts,yorkmartialarts,,,,,41.36351,-71.911368
+New Hampshire,Manchester,Full Circle Martial Arts,fullcirclemafc,,,,,42.984941,-71.444131
+Massachusetts,Orange,Roberts Family MMA,robertsfamilymma,,,,,42.605437,-72.292074
+Massachusetts,Attleboro,Morselli Jiu Jitsu Academy,mjjattleboro,,,,,41.931653,-71.294503
+Massachusetts,New Bedford,Hook and Roll Combat,hookandrollfg,,,,,41.661303,-70.937913
+Massachusetts,Tewksbury,Gorilla Crew Fitness,gorillacrewfitness,10:00AM,5:00PM,,,42.612088,-71.227845
+Maine,Standish,Ebb and Flow Jiujitsu,ebb_and_flow_jiujiutsu,10:00AM,,,,43.775497,-70.58199
+Massachusetts,Chelmsford,Resolve Martial Arts,resolve_bjj_ma,12:30PM,11:30AM,,,42.597055,-71.3697
+Rhode Island,Warwick,Braman Jiu Jitsu,bramanjiujitsu,,,,,41.703085,-71.42031
+Massachusetts,Middleborough,Michael DeLuca Brazillian Jiu Jitsu,mikedelucabjj,,,,,41.878004,-70.869267
