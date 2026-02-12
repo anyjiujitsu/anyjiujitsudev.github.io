@@ -2,18 +2,26 @@
 // purpose: app bootstrap + data loading + view wiring + render orchestration
 
 import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260210-911";
-import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery, setIndexDistanceMiles, setIndexDistanceFrom } from "P260212-904";
+import {
+  state,
+  setView,
+  setIndexQuery,
+  setEventsQuery,
+  setIndexEventsQuery,
+  setIndexDistanceMiles,
+  setIndexDistanceFrom,
+} from "./state.js?v=20260212-905";
 import { filterEvents } from "./filters.js?v=20260210-911";
 import { renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260210-911";
 
 import { $ } from "./utils/dom.js?v=20260210-911";
-import { applyDistanceFilter } from "P260212-904";
+import { applyDistanceFilter } from "./utils/geo.js?v=20260212-905";
 import {
   initEventsPills,
   initIndexPills,
   refreshEventsPillDots,
 } from "./ui/pills.js?v=20260210-911";
-import { wireSearch, wireSearchSuggestions } from "P260212-904";
+import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260212-905";
 
 let directoryRows = [];
 let eventRows = [];
