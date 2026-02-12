@@ -24,9 +24,9 @@ export const state = {
     state: new Set(),
     type: new Set(),
     /* section: index distance filter
-       purpose: optional radius + origin (City, ST) for filtering directory rows */
+       purpose: optional radius + origin ZIP (5 digits) for filtering directory rows */
     distMiles: null,      // number | null
-    distFrom: "",         // "City, ST" | ""
+    distFrom: "",         // "#####" | ""
   },
 
   /* section: events state
@@ -61,7 +61,7 @@ export function setIndexEventsQuery(q){
 }
 
 /* section: index distance mutators
-   purpose: used by Index search dropdown (Distance From) */
+   purpose: used by Index search dropdown (Training Near / Enter ZIP) */
 export function setIndexDistanceMiles(miles){
   const n = (miles == null || miles === "") ? null : Number(miles);
   state.indexEvents.distMiles = Number.isFinite(n) ? n : null;
