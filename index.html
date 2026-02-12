@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="assets/css/components.css?v=20260212-902" />
   <link rel="stylesheet" href="assets/css/directory.css?v=20260210-809" />
 <!-- IMPORTANT: repo references main.js (no sequence) -->
-  <script type="module" src="assets/js/main.js?v=20260212-904"></script>
+  <script type="module" src="assets/js/main.js?v=20260212-903"></script>
 </head>
 
 <body>
@@ -99,12 +99,11 @@
                   </div>
                   <div class="menu__divider"></div>
 
-                  <div class="distance__section" aria-label="Enter ZIP for Training Near">
-                    <input id="distanceOriginInput" class="distance__input" type="text"
-                           inputmode="numeric" pattern="\d{5}" maxlength="5"
+                  <div class="distance__section" aria-label="Origin ZIP">
+                    <input id="distanceOriginInput" class="distance__input" type="text" inputmode="numeric"
                            autocomplete="postal-code" autocapitalize="none" spellcheck="false"
-                           placeholder="Enter ZIP"
-                           aria-label="Enter ZIP code" />
+                           placeholder="Enter ZIP" maxlength="5"
+                           aria-label="Enter ZIP" />
                     <div id="distanceHint" class="distance__hint">Shows gyms within 15 miles</div>
                   </div>
                 </div>
