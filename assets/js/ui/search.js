@@ -47,7 +47,7 @@ export function wireSearchSuggestions({
   // sections inside panel
   const quick = $("eventsSearchSuggestQuick");
   const dist  = $("eventsSearchSuggestDistance");
-  const distInput = $("index-zip-input");
+  const distInput = $("distanceOriginInput");
 
   const canSuggest = () => {
     const ev = (typeof isEventsView !== "function") ? true : !!isEventsView();
@@ -108,34 +108,42 @@ export function wireSearchSuggestions({
     input.blur();
   });
 
-  // INDEX mode: Training Near (ZIP)
-  // - digits only
-  // - max length 5
-  // - apply filter when length == 5, clear when shorter
+  // INDEX mode: Training Near (typeahead)
+  function matchesDatalist(val){
+    const list = document.getElementById("distanceOriginList");
+    if(!list) return false;
+    const opts = list.querySelectorAll("option");
+    for(const o of opts){
+      if(o.value === val) return true;
+    }
+    return false;
+  }
+
   distInput?.addEventListener("input", ()=>{
     if(mode() !== "index") return;
-    let v = String(distInput.value || "");
-    v = v.replace(/\D/g, "").slice(0, 5);
-    if(distInput.value !== v) distInput.value = v;
-
-    if(v.length === 5){
-      if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(v);
-    } else {
+    const val = String(distInput.value || "").trim();
+    if(!val){
       if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin("");
+      return;
+    }
+    // Only apply when the user has selected a full suggestion.
+    if(matchesDatalist(val)){
+      if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(val);
     }
   });
 
+  // When user hits Enter, attempt to apply if exact match.
   distInput?.addEventListener("keydown", (e)=>{
     if(mode() !== "index") return;
     if(e.key !== "Enter") return;
-    // prevent "submit" feel; we apply when 5 digits are present
-    if(String(distInput.value || "").replace(/\D/g, "").slice(0,5).length === 5){
+    const val = String(distInput.value || "").trim();
+    if(matchesDatalist(val)){
       e.preventDefault();
+      if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(val);
       close();
       distInput.blur();
     }
   });
-
 
   document.addEventListener("pointerdown", (e)=>{
     if(wrap.contains(e.target)) return;
