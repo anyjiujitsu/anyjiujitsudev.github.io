@@ -9,10 +9,10 @@
   <link rel="stylesheet" href="assets/css/base.css" />
   <link rel="stylesheet" href="assets/css/layout.css" />
   <link rel="stylesheet" href="assets/css/pills.css?v=20260129-302">
-  <link rel="stylesheet" href="assets/css/components.css?v=20260212-901" />
+  <link rel="stylesheet" href="assets/css/components.css?v=20260212-902" />
   <link rel="stylesheet" href="assets/css/directory.css?v=20260210-809" />
 <!-- IMPORTANT: repo references main.js (no sequence) -->
-  <script type="module" src="assets/js/main.js?v=20260212-902"></script>
+  <script type="module" src="assets/js/main.js?v=20260212-903"></script>
 </head>
 
 <body>
@@ -92,31 +92,24 @@
                   <button type="button" class="suggest__item" data-value="NEW EVENTS">NEW EVENTS</button>
                 </div>
 
-                <!-- INDEX mode: Distance From -->
+                <!-- INDEX mode: Training Near -->
                 <div id="eventsSearchSuggestDistance" hidden>
                   <div class="menu__header menu__header--static">
-                    <span class="menu__title">DISTANCE FROM</span>
-                    <button id="distanceClear" class="menu__clear" type="button">Clear</button>
+                    <span class="menu__title">TRAINING NEAR</span>
                   </div>
                   <div class="menu__divider"></div>
 
-                  <div class="distance__section" aria-label="Distance radius">
-                    <div class="distance__label">Miles</div>
-                    <div class="distance__chips" role="group" aria-label="Miles options">
-                      <button type="button" class="distance__chip" data-miles="10">10</button>
-                      <button type="button" class="distance__chip" data-miles="20">20</button>
-                      <button type="button" class="distance__chip" data-miles="30">30</button>
-                    </div>
-                  </div>
-
                   <div class="distance__section" aria-label="Origin city">
                     <div class="distance__label">City</div>
-                    <select id="distanceOrigin" class="distance__select" aria-label="Choose a city">
-                      <option value="">Select city…</option>
-                    </select>
-                    <div id="distanceHint" class="distance__hint">Choose miles + city to filter gyms</div>
+                    <input id="distanceOriginInput" class="distance__input" type="text" inputmode="search"
+                           autocomplete="off" autocapitalize="words" spellcheck="false"
+                           placeholder="Start typing a city…" list="distanceOriginList"
+                           aria-label="Choose a city" />
+                    <datalist id="distanceOriginList"></datalist>
+                    <div id="distanceHint" class="distance__hint">Shows gyms within 15 miles</div>
                   </div>
                 </div>
+
 
               </div>
               </div>
