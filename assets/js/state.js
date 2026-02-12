@@ -68,7 +68,10 @@ export function setIndexDistanceMiles(miles){
 }
 
 export function setIndexDistanceFrom(label){
-  state.indexEvents.distFrom = String(label ?? "").trim();
+  const v = String(label ?? "").trim();
+  state.indexEvents.distFrom = v;
+  // Fixed radius: 15 miles when a valid origin is selected
+  state.indexEvents.distMiles = v ? 15 : null;
 }
 
 /* section: selection checks
@@ -79,7 +82,7 @@ export function hasIndexSelections(){
     state.index.states.size > 0 ||
     state.index.opens.size > 0 ||
     state.index.guests.size > 0 ||
-    (state.indexEvents.distMiles != null && String(state.indexEvents.distFrom || "").trim().length > 0);
+    (String(state.indexEvents.distFrom || "").trim().length > 0);
 }
 
 export function hasEventsSelections(){
