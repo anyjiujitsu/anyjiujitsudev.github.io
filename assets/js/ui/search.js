@@ -31,7 +31,14 @@ export function wireSearch({ $, setIndexQuery, setIndexEventsQuery, setActiveEve
 }
 
 /* section: search suggestions // purpose: quick-pick common search tokens for Events */
-export function wireSearchSuggestions({ $, setActiveEventsQuery, isEventsView, isIndexView, onIndexViewOpen, onIndexDistanceClear, onIndexDistanceSelectMiles, onIndexDistanceSelectOrigin }){
+export function wireSearchSuggestions({
+  $,
+  setActiveEventsQuery,
+  isEventsView,
+  isIndexView,
+  onIndexViewOpen,
+  onIndexDistanceSelectOrigin,
+}){
   const wrap  = $("eventsSearchWrap");
   const input = $("eventsSearchInput");
   const panel = $("eventsSearchSuggest");
@@ -40,8 +47,7 @@ export function wireSearchSuggestions({ $, setActiveEventsQuery, isEventsView, i
   // sections inside panel
   const quick = $("eventsSearchSuggestQuick");
   const dist  = $("eventsSearchSuggestDistance");
-  const distOrigin = $("distanceOrigin");
-  const distClear  = $("distanceClear");
+  const distInput = $("distanceOriginInput");
 
   const canSuggest = () => {
     const ev = (typeof isEventsView !== "function") ? true : !!isEventsView();
@@ -65,6 +71,7 @@ export function wireSearchSuggestions({ $, setActiveEventsQuery, isEventsView, i
     if(panel.hasAttribute("hidden")) panel.removeAttribute("hidden");
     if(mode() === "index" && typeof onIndexViewOpen === "function") onIndexViewOpen();
   };
+
   const close = ()=>{
     if(!panel.hasAttribute("hidden")) panel.setAttribute("hidden", "");
   };
@@ -73,6 +80,7 @@ export function wireSearchSuggestions({ $, setActiveEventsQuery, isEventsView, i
     if(!canSuggest()) return;
     if(!String(input.value || "").trim()) open();
   });
+
   input.addEventListener("click", ()=>{
     if(!canSuggest()) return;
     if(!String(input.value || "").trim()) open();
@@ -100,38 +108,41 @@ export function wireSearchSuggestions({ $, setActiveEventsQuery, isEventsView, i
     input.blur();
   });
 
-  // INDEX mode: Distance From controls
-  dist?.addEventListener("click", (e)=>{
+  // INDEX mode: Training Near (typeahead)
+  function matchesDatalist(val){
+    const list = document.getElementById("distanceOriginList");
+    if(!list) return false;
+    const opts = list.querySelectorAll("option");
+    for(const o of opts){
+      if(o.value === val) return true;
+    }
+    return false;
+  }
+
+  distInput?.addEventListener("input", ()=>{
     if(mode() !== "index") return;
-    const milesBtn = e.target.closest("button[data-miles]");
-    if(milesBtn){
-      e.preventDefault();
-      e.stopPropagation();
-      const miles = Number(milesBtn.getAttribute("data-miles"));
-      if(typeof onIndexDistanceSelectMiles === "function") onIndexDistanceSelectMiles(miles);
-      // aria-pressed styling
-      dist.querySelectorAll("button[data-miles]").forEach(b=>{
-        b.setAttribute("aria-pressed", b === milesBtn ? "true" : "false");
-      });
+    const val = String(distInput.value || "").trim();
+    if(!val){
+      if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin("");
       return;
+    }
+    // Only apply when the user has selected a full suggestion.
+    if(matchesDatalist(val)){
+      if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(val);
     }
   });
 
-  distOrigin?.addEventListener("change", ()=>{
+  // When user hits Enter, attempt to apply if exact match.
+  distInput?.addEventListener("keydown", (e)=>{
     if(mode() !== "index") return;
-    const label = String(distOrigin.value || "");
-    if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(label);
-  });
-
-  distClear?.addEventListener("click", (e)=>{
-    if(mode() !== "index") return;
-    e.preventDefault();
-    e.stopPropagation();
-    if(typeof onIndexDistanceClear === "function") onIndexDistanceClear();
-
-    // reset UI
-    dist.querySelectorAll("button[data-miles]").forEach(b=>b.setAttribute("aria-pressed", "false"));
-    if(distOrigin) distOrigin.value = "";
+    if(e.key !== "Enter") return;
+    const val = String(distInput.value || "").trim();
+    if(matchesDatalist(val)){
+      e.preventDefault();
+      if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(val);
+      close();
+      distInput.blur();
+    }
   });
 
   document.addEventListener("pointerdown", (e)=>{
