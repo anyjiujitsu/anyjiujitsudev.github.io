@@ -1,18 +1,18 @@
 // main.js
 // purpose: app bootstrap + data loading + view wiring + render orchestration
 
-import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260212-001";
-import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery } from "./state.js?v=20260212-001";
-import { filterEvents } from "./filters.js?v=20260212-001";
-import { renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260212-001";
+import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260210-911";
+import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery } from "./state.js?v=20260210-911";
+import { filterEvents } from "./filters.js?v=20260210-911";
+import { renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260210-911";
 
-import { $ } from "./utils/dom.js?v=20260212-001";
+import { $ } from "./utils/dom.js?v=20260210-911";
 import {
   initEventsPills,
   initIndexPills,
   refreshEventsPillDots,
-} from "./ui/pills.js?v=20260212-001";
-import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260212-001";
+} from "./ui/pills.js?v=20260210-911";
+import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260210-911";
 
 let directoryRows = [];
 let eventRows = [];
