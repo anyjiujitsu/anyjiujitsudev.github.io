@@ -2,26 +2,18 @@
 // purpose: app bootstrap + data loading + view wiring + render orchestration
 
 import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260210-911";
-import {
-  state,
-  setView,
-  setIndexQuery,
-  setEventsQuery,
-  setIndexEventsQuery,
-  setIndexDistanceMiles,
-  setIndexDistanceFrom,
-} from "./state.js?v=20260212-905";
+import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery, setIndexDistanceMiles, setIndexDistanceFrom } from "./state.js?v=20260212-902";
 import { filterEvents } from "./filters.js?v=20260210-911";
 import { renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260210-911";
 
 import { $ } from "./utils/dom.js?v=20260210-911";
-import { applyDistanceFilter } from "./utils/geo.js?v=20260212-905";
+import { applyDistanceFilter } from "./utils/geo.js?v=20260212-902";
 import {
   initEventsPills,
   initIndexPills,
   refreshEventsPillDots,
 } from "./ui/pills.js?v=20260210-911";
-import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260212-905";
+import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260212-902";
 
 let directoryRows = [];
 let eventRows = [];
@@ -30,11 +22,36 @@ let didRender = false;
 // View lock removed: enable slider + Index view
 const VIEW_LOCKED = false;
 
-/* ------------------ INDEX DISTANCE UI (Training Near) ------------------ */
+/* ------------------ INDEX DISTANCE UI (Distance From) ------------------ */
+function buildCityStateOptions(rows){
+  const set = new Set();
+  for(const r of rows){
+    const city = String(r.CITY ?? "").trim();
+    const st   = String(r.STATE ?? "").trim().toUpperCase();
+    if(!city || !st) continue;
+    set.add(`${city}, ${st}`);
+  }
+  return Array.from(set).sort((a,b)=>a.localeCompare(b));
+}
+
+function ensureDistanceOriginOptions(){
+  const list = $("distanceOriginList");
+  if(!list) return;
+  // only (re)build if we don't have options yet
+  if(list.children && list.children.length > 0) return;
+
+  const opts = buildCityStateOptions(directoryRows);
+  for(const label of opts){
+    const o = document.createElement("option");
+    o.value = label;
+    list.appendChild(o);
+  }
+}
+
 function syncDistanceUIFromState(){
   const distWrap = $("eventsSearchSuggestDistance");
   if(!distWrap) return;
-  const input = $("index-zip-input");
+  const input = $("distanceOriginInput");
   if(input) input.value = String(state.indexEvents.distFrom || "");
 }
 
@@ -191,7 +208,7 @@ function setViewUI(view){
   // Search suggestion panel: Events uses Quick Searches; Index uses Distance From
   // (panel is opened on focus/click when input is empty)
   if(view === "index"){
-    // no-op: ZIP input does not require option hydration
+    ensureDistanceOriginOptions();
     syncDistanceUIFromState();
   }
 
@@ -430,6 +447,7 @@ async function init(){
     isEventsView: () => state.view === "events",
     isIndexView: () => state.view === "index",
     onIndexViewOpen: () => {
+      ensureDistanceOriginOptions();
       syncDistanceUIFromState();
     },
     onIndexDistanceSelectOrigin: (label) => {
