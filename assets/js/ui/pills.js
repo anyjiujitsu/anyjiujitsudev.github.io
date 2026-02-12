@@ -386,13 +386,56 @@ export function initIndexPills({ $, state, getDirectoryRows, onChange }){
     const panel = $("openMatMenu");
     const clearBtn = $("openMatClear");
     const listEl = $("openMatList") || panel?.querySelector('.menu__list');
-    if(!btn || !panel) return;
+    if(!btn || !panel || !listEl) return;
 
-    const items = ["ALL","SATURDAY","SUNDAY"];
-    buildMenuListIn(listEl, items, state.index.opens, ()=>{
-      setPillHasSelection(btn, state.index.opens.size>0);
-      onChange();
-    });
+    const items = ["SATURDAY","SUNDAY","BOTH"];
+
+    const rebuild = ()=>{
+      listEl.innerHTML = "";
+      items.forEach(val=>{
+        const row = document.createElement('label');
+        row.className = 'menu__item menu__item--check';
+
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.className = 'menu__checkbox';
+        cb.checked = state.index.opens.has(val);
+        cb.value = val;
+
+        const text = document.createElement('span');
+        text.className = 'menu__itemText';
+        text.textContent = val;
+
+        cb.addEventListener('change', (ev)=>{
+          ev.stopPropagation();
+
+          if(cb.checked){
+            // BOTH is mutually exclusive: selecting it clears SATURDAY/SUNDAY
+            if(val === "BOTH"){
+              state.index.opens.clear();
+              state.index.opens.add("BOTH");
+            } else {
+              // selecting SATURDAY/SUNDAY clears BOTH
+              state.index.opens.delete("BOTH");
+              state.index.opens.add(val);
+            }
+          } else {
+            state.index.opens.delete(val);
+          }
+
+          // keep checkboxes in sync with the Set after mutual-exclusion logic
+          rebuild();
+          setPillHasSelection(btn, state.index.opens.size>0);
+          onChange();
+        });
+
+        row.appendChild(cb);
+        row.appendChild(text);
+        listEl.appendChild(row);
+      });
+    };
+
+    rebuild();
     setPillHasSelection(btn, state.index.opens.size>0);
 
     btn.addEventListener('click', (e)=>{
