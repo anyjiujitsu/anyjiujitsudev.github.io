@@ -36,6 +36,12 @@ function normKey(city, state){
   return `${c}|${s}`;
 }
 
+
+function normZipKey(zip){
+  const z = String(zip ?? "").replace(/\D/g, "").slice(0, 5);
+  return `zip|${z}`;
+}
+
 function storageKey(k){
   return `anyjj:geo:${k}`;
 }
@@ -94,6 +100,24 @@ async function fetchNominatim(city, state){
   return { lat, lon };
 }
 
+async function fetchNominatimZip(zip){
+  const z = String(zip ?? "").replace(/\D/g, "").slice(0, 5);
+  if(z.length !== 5) return null;
+  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=us&postalcode=${encodeURIComponent(z)}`;
+  const res = await fetch(url, {
+    method: "GET",
+    headers: { "Accept": "application/json" }
+  });
+  if(!res.ok) return null;
+  const arr = await res.json();
+  const hit = Array.isArray(arr) ? arr[0] : null;
+  if(!hit) return null;
+  const lat = Number(hit.lat);
+  const lon = Number(hit.lon);
+  if(!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  return { lat, lon };
+}
+
 export function getCityStateLatLon(city, state, onUpdate){
   const k = normKey(city, state);
   if(mem.has(k)){
@@ -125,23 +149,69 @@ export function getCityStateLatLon(city, state, onUpdate){
   return p;
 }
 
+export function getZipLatLon(zip, onUpdate){
+  const k = normZipKey(zip);
+  if(mem.has(k)){
+    const v = mem.get(k);
+    return (v && typeof v.then === "function") ? v : Promise.resolve(v);
+  }
+
+  const cached = readCache(k);
+  if(cached){
+    mem.set(k, cached);
+    return Promise.resolve(cached);
+  }
+
+  const p = enqueue(async ()=>{
+    const got = await fetchNominatimZip(zip);
+    if(got){
+      mem.set(k, got);
+      writeCache(k, got);
+    } else {
+      mem.set(k, null);
+    }
+    if(typeof onUpdate === "function") onUpdate();
+    return mem.get(k);
+  });
+
+  mem.set(k, p);
+  return p;
+}
+
 /* ------------------ DISTANCE FILTER ------------------ */
+function memCached(k){
+  const v = mem.get(k);
+  return (v && typeof v.then !== "function") ? v : null;
+}
+
 export function applyDistanceFilter(directoryRows, distMiles, distFromLabel, onUpdate){
   const miles = Number(distMiles);
   const from = String(distFromLabel ?? "").trim();
   if(!Number.isFinite(miles) || miles <= 0 || !from) return { rows: directoryRows, pending: 0, active: false };
 
-  // parse "City, ST"
-  const m = from.match(/^(.*?),\s*([A-Za-z]{2})$/);
-  if(!m) return { rows: directoryRows, pending: 0, active: false };
-  const originCity = m[1].trim();
-  const originState = m[2].trim().toUpperCase();
+  // origin may be either a 5-digit ZIP or "City, ST"
+  const isZip = /^\d{5}$/.test(from);
 
-  // if origin coords missing, request and temporarily return [] (keeps UI honest)
-  const originCached = readCache(normKey(originCity, originState)) || (mem.get(normKey(originCity, originState)) && typeof mem.get(normKey(originCity, originState)).then !== "function" ? mem.get(normKey(originCity, originState)) : null);
-  if(!originCached){
-    getCityStateLatLon(originCity, originState, onUpdate);
-    return { rows: [], pending: 1, active: true };
+  let originCached = null;
+  if(isZip){
+    const k = normZipKey(from);
+    originCached = readCache(k) || memCached(k);
+    if(!originCached){
+      getZipLatLon(from, onUpdate);
+      return { rows: [], pending: 1, active: true };
+    }
+  } else {
+    const m = from.match(/^(.*?),\s*([A-Za-z]{2})$/);
+    if(!m) return { rows: directoryRows, pending: 0, active: false };
+    const originCity = m[1].trim();
+    const originState = m[2].trim().toUpperCase();
+
+    const k = normKey(originCity, originState);
+    originCached = readCache(k) || memCached(k);
+    if(!originCached){
+      getCityStateLatLon(originCity, originState, onUpdate);
+      return { rows: [], pending: 1, active: true };
+    }
   }
 
   let pending = 0;
@@ -153,7 +223,7 @@ export function applyDistanceFilter(directoryRows, distMiles, distFromLabel, onU
     if(!city || !st) continue;
 
     const k = normKey(city, st);
-    const cached = readCache(k) || (mem.get(k) && typeof mem.get(k).then !== "function" ? mem.get(k) : null);
+    const cached = readCache(k) || memCached(k);
     if(!cached){
       pending++;
       getCityStateLatLon(city, st, onUpdate);
