@@ -23,6 +23,10 @@ export const state = {
     year: new Set(),
     state: new Set(),
     type: new Set(),
+    /* section: index distance filter
+       purpose: optional radius + origin (City, ST) for filtering directory rows */
+    distMiles: null,      // number | null
+    distFrom: "",         // "City, ST" | ""
   },
 
   /* section: events state
@@ -56,6 +60,17 @@ export function setIndexEventsQuery(q){
   state.indexEvents.q = String(q ?? "");
 }
 
+/* section: index distance mutators
+   purpose: used by Index search dropdown (Distance From) */
+export function setIndexDistanceMiles(miles){
+  const n = (miles == null || miles === "") ? null : Number(miles);
+  state.indexEvents.distMiles = Number.isFinite(n) ? n : null;
+}
+
+export function setIndexDistanceFrom(label){
+  state.indexEvents.distFrom = String(label ?? "").trim();
+}
+
 /* section: selection checks
    purpose: used for "hasSelection" indicators (dots) */
 
@@ -63,7 +78,8 @@ export function hasIndexSelections(){
   return state.index.q.trim().length > 0 ||
     state.index.states.size > 0 ||
     state.index.opens.size > 0 ||
-    state.index.guests.size > 0;
+    state.index.guests.size > 0 ||
+    (state.indexEvents.distMiles != null && String(state.indexEvents.distFrom || "").trim().length > 0);
 }
 
 export function hasEventsSelections(){
