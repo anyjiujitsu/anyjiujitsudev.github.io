@@ -108,39 +108,42 @@ export function wireSearchSuggestions({
     input.blur();
   });
 
-  // INDEX mode: Training Near (ZIP: 5 digits)
-  function normalizeZip(raw){
+  // INDEX mode: Training Near (ZIP)
+  // - digits only
+  // - max 5
+  // - apply automatically once 5 digits are entered
+  let zipTimer = null;
+
+  function sanitizeZip(raw){
     return String(raw || "").replace(/\D/g, "").slice(0, 5);
+  }
+
+  function maybeApplyZip(zip){
+    if(typeof onIndexDistanceSelectOrigin !== "function") return;
+    if(!zip) { onIndexDistanceSelectOrigin(""); return; }
+    if(zip.length === 5) onIndexDistanceSelectOrigin(zip);
   }
 
   distInput?.addEventListener("input", ()=>{
     if(mode() !== "index") return;
-    const cleaned = normalizeZip(distInput.value);
-    if(distInput.value !== cleaned) distInput.value = cleaned;
+    const clean = sanitizeZip(distInput.value);
+    if(distInput.value !== clean) distInput.value = clean;
 
-    if(!cleaned){
-      if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin("");
-      return;
-    }
-
-    // Apply once 5 digits are present.
-    if(cleaned.length === 5){
-      if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(cleaned);
-    } else {
-      // Incomplete ZIP => clear active distance filter.
-      if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin("");
-    }
+    // debounce a touch so we don't thrash render while typing
+    if(zipTimer) clearTimeout(zipTimer);
+    zipTimer = setTimeout(()=>{
+      maybeApplyZip(clean);
+    }, 160);
   });
 
-  // When user hits Enter, apply if ZIP is complete.
   distInput?.addEventListener("keydown", (e)=>{
     if(mode() !== "index") return;
     if(e.key !== "Enter") return;
-    const cleaned = normalizeZip(distInput.value);
-    if(cleaned.length !== 5) return;
+    const clean = sanitizeZip(distInput.value);
+    distInput.value = clean;
+    if(zipTimer) clearTimeout(zipTimer);
     e.preventDefault();
-    distInput.value = cleaned;
-    if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(cleaned);
+    maybeApplyZip(clean);
     close();
     distInput.blur();
   });
