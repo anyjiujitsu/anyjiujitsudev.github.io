@@ -108,41 +108,41 @@ export function wireSearchSuggestions({
     input.blur();
   });
 
-  // INDEX mode: Training Near (typeahead)
-  function matchesDatalist(val){
-    const list = document.getElementById("distanceOriginList");
-    if(!list) return false;
-    const opts = list.querySelectorAll("option");
-    for(const o of opts){
-      if(o.value === val) return true;
-    }
-    return false;
+  // INDEX mode: Training Near (ZIP: 5 digits)
+  function normalizeZip(raw){
+    return String(raw || "").replace(/\D/g, "").slice(0, 5);
   }
 
   distInput?.addEventListener("input", ()=>{
     if(mode() !== "index") return;
-    const val = String(distInput.value || "").trim();
-    if(!val){
+    const cleaned = normalizeZip(distInput.value);
+    if(distInput.value !== cleaned) distInput.value = cleaned;
+
+    if(!cleaned){
       if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin("");
       return;
     }
-    // Only apply when the user has selected a full suggestion.
-    if(matchesDatalist(val)){
-      if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(val);
+
+    // Apply once 5 digits are present.
+    if(cleaned.length === 5){
+      if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(cleaned);
+    } else {
+      // Incomplete ZIP => clear active distance filter.
+      if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin("");
     }
   });
 
-  // When user hits Enter, attempt to apply if exact match.
+  // When user hits Enter, apply if ZIP is complete.
   distInput?.addEventListener("keydown", (e)=>{
     if(mode() !== "index") return;
     if(e.key !== "Enter") return;
-    const val = String(distInput.value || "").trim();
-    if(matchesDatalist(val)){
-      e.preventDefault();
-      if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(val);
-      close();
-      distInput.blur();
-    }
+    const cleaned = normalizeZip(distInput.value);
+    if(cleaned.length !== 5) return;
+    e.preventDefault();
+    distInput.value = cleaned;
+    if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(cleaned);
+    close();
+    distInput.blur();
   });
 
   document.addEventListener("pointerdown", (e)=>{
