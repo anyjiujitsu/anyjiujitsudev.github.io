@@ -1302,7 +1302,7 @@ nav.filters, .filters__inner, .pillRow{
 
 
 /* =========================================================
-   section: Distance From dropdown (Index view)
+   section: Training Near dropdown (Index view)
    purpose: styled controls inside the shared search suggestion panel
    ========================================================= */
 
@@ -1337,7 +1337,8 @@ nav.filters, .filters__inner, .pillRow{
   background: rgba(0,0,0,0.06);
 }
 
-#eventsSearchSuggestDistance .distance__select{
+#eventsSearchSuggestDistance .distance__select,
+#eventsSearchSuggestDistance .distance__input{
   width: 100%;
   border: 1px solid rgba(0,0,0,0.15);
   background: rgba(255,255,255,0.7);
