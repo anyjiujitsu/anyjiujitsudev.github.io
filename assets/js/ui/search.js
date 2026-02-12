@@ -31,17 +31,39 @@ export function wireSearch({ $, setIndexQuery, setIndexEventsQuery, setActiveEve
 }
 
 /* section: search suggestions // purpose: quick-pick common search tokens for Events */
-export function wireSearchSuggestions({ $, setActiveEventsQuery, isEventsView }){
+export function wireSearchSuggestions({ $, setActiveEventsQuery, isEventsView, isIndexView, onIndexViewOpen, onIndexDistanceClear, onIndexDistanceSelectMiles, onIndexDistanceSelectOrigin }){
   const wrap  = $("eventsSearchWrap");
   const input = $("eventsSearchInput");
   const panel = $("eventsSearchSuggest");
   if(!wrap || !input || !panel) return;
 
-  const canSuggest = () => (typeof isEventsView !== "function") ? true : !!isEventsView();
+  // sections inside panel
+  const quick = $("eventsSearchSuggestQuick");
+  const dist  = $("eventsSearchSuggestDistance");
+  const distOrigin = $("distanceOrigin");
+  const distClear  = $("distanceClear");
+
+  const canSuggest = () => {
+    const ev = (typeof isEventsView !== "function") ? true : !!isEventsView();
+    const idx = (typeof isIndexView !== "function") ? false : !!isIndexView();
+    return ev || idx;
+  };
+
+  function mode(){
+    return (typeof isIndexView === "function" && isIndexView()) ? "index" : "events";
+  }
+
+  function setModeUI(){
+    const m = mode();
+    if(quick) quick.hidden = (m !== "events");
+    if(dist)  dist.hidden  = (m !== "index");
+  }
 
   const open = ()=>{
     if(!canSuggest()) return;
+    setModeUI();
     if(panel.hasAttribute("hidden")) panel.removeAttribute("hidden");
+    if(mode() === "index" && typeof onIndexViewOpen === "function") onIndexViewOpen();
   };
   const close = ()=>{
     if(!panel.hasAttribute("hidden")) panel.setAttribute("hidden", "");
@@ -61,8 +83,10 @@ export function wireSearchSuggestions({ $, setActiveEventsQuery, isEventsView })
     if(String(input.value || "").trim()) close();
   });
 
+  // EVENTS mode: quick-search buttons write into the search box
   panel.addEventListener("click", (e)=>{
     if(!canSuggest()) { close(); return; }
+    if(mode() !== "events") return;
     const btn = e.target.closest("button[data-value]");
     if(!btn) return;
     e.preventDefault();
@@ -74,6 +98,40 @@ export function wireSearchSuggestions({ $, setActiveEventsQuery, isEventsView })
     input.dispatchEvent(new Event("input", { bubbles: true }));
     close();
     input.blur();
+  });
+
+  // INDEX mode: Distance From controls
+  dist?.addEventListener("click", (e)=>{
+    if(mode() !== "index") return;
+    const milesBtn = e.target.closest("button[data-miles]");
+    if(milesBtn){
+      e.preventDefault();
+      e.stopPropagation();
+      const miles = Number(milesBtn.getAttribute("data-miles"));
+      if(typeof onIndexDistanceSelectMiles === "function") onIndexDistanceSelectMiles(miles);
+      // aria-pressed styling
+      dist.querySelectorAll("button[data-miles]").forEach(b=>{
+        b.setAttribute("aria-pressed", b === milesBtn ? "true" : "false");
+      });
+      return;
+    }
+  });
+
+  distOrigin?.addEventListener("change", ()=>{
+    if(mode() !== "index") return;
+    const label = String(distOrigin.value || "");
+    if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(label);
+  });
+
+  distClear?.addEventListener("click", (e)=>{
+    if(mode() !== "index") return;
+    e.preventDefault();
+    e.stopPropagation();
+    if(typeof onIndexDistanceClear === "function") onIndexDistanceClear();
+
+    // reset UI
+    dist.querySelectorAll("button[data-miles]").forEach(b=>b.setAttribute("aria-pressed", "false"));
+    if(distOrigin) distOrigin.value = "";
   });
 
   document.addEventListener("pointerdown", (e)=>{
