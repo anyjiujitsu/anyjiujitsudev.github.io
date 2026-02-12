@@ -1,8 +1,5 @@
 // utils/geo.js
-// purpose: lightweight geocoding + distance helpers for Index "Training Near" filter
-// notes:
-// - origin is a 5-digit ZIP (USA)
-// - gyms are City/State only, so results are estimated (city centroids)
+// purpose: lightweight geocoding + distance helpers for Index "Distance From" filter
 
 /* ------------------ HAVERSINE (miles) ------------------ */
 const EARTH_RADIUS_MI = 3958.7613;
@@ -28,18 +25,15 @@ export function haversineMiles(a, b){
 }
 
 /* ------------------ GEOCODING (Nominatim) ------------------ */
-// Works client-side on a static site.
-// Uses localStorage caching + a small throttle queue.
+// Notes:
+// - Works client-side on a static site.
+// - Uses localStorage caching to minimize requests.
+// - Uses a small throttle queue to avoid hammering the service.
 
-function cityKey(city, state){
+function normKey(city, state){
   const c = String(city ?? "").trim().toLowerCase();
   const s = String(state ?? "").trim().toUpperCase();
-  return `city:${c}|${s}`;
-}
-
-function zipKey(zip){
-  const z = String(zip ?? "").trim();
-  return `zip:${z}`;
+  return `${c}|${s}`;
 }
 
 function storageKey(k){
@@ -73,16 +67,22 @@ const mem = new Map();
 let queue = Promise.resolve();
 function enqueue(fn){
   queue = queue.then(async ()=>{
+    // space requests
     await new Promise(r => setTimeout(r, 1100));
     return fn();
   }).catch(()=>fn());
   return queue;
 }
 
-async function fetchNominatim(url){
+async function fetchNominatim(city, state){
+  const q = encodeURIComponent(`${city}, ${state}, USA`);
+  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${q}`;
   const res = await fetch(url, {
     method: "GET",
-    headers: { "Accept": "application/json" }
+    headers: {
+      // polite header; browsers may ignore custom UA
+      "Accept": "application/json"
+    }
   });
   if(!res.ok) return null;
   const arr = await res.json();
@@ -94,66 +94,23 @@ async function fetchNominatim(url){
   return { lat, lon };
 }
 
-async function fetchCityState(city, state){
-  const q = encodeURIComponent(`${city}, ${state}, USA`);
-  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${q}`;
-  return fetchNominatim(url);
-}
-
-async function fetchZip(zip){
-  // keep it simple and reliable: query the ZIP with a USA hint
-  const q = encodeURIComponent(`${zip} USA`);
-  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${q}`;
-  return fetchNominatim(url);
-}
-
 export function getCityStateLatLon(city, state, onUpdate){
-  const k = cityKey(city, state);
+  const k = normKey(city, state);
   if(mem.has(k)){
     const v = mem.get(k);
     return (v && typeof v.then === "function") ? v : Promise.resolve(v);
   }
 
+  // localStorage cache first
   const cached = readCache(k);
   if(cached){
     mem.set(k, cached);
     return Promise.resolve(cached);
   }
 
+  // enqueue a fetch
   const p = enqueue(async ()=>{
-    const got = await fetchCityState(city, state);
-    if(got){
-      mem.set(k, got);
-      writeCache(k, got);
-    } else {
-      mem.set(k, null);
-    }
-    if(typeof onUpdate === "function") onUpdate();
-    return mem.get(k);
-  });
-
-  mem.set(k, p);
-  return p;
-}
-
-export function getZipLatLon(zip, onUpdate){
-  const z = String(zip ?? "").trim();
-  if(!/^\d{5}$/.test(z)) return Promise.resolve(null);
-
-  const k = zipKey(z);
-  if(mem.has(k)){
-    const v = mem.get(k);
-    return (v && typeof v.then === "function") ? v : Promise.resolve(v);
-  }
-
-  const cached = readCache(k);
-  if(cached){
-    mem.set(k, cached);
-    return Promise.resolve(cached);
-  }
-
-  const p = enqueue(async ()=>{
-    const got = await fetchZip(z);
+    const got = await fetchNominatim(city, state);
     if(got){
       mem.set(k, got);
       writeCache(k, got);
@@ -169,41 +126,22 @@ export function getZipLatLon(zip, onUpdate){
 }
 
 /* ------------------ DISTANCE FILTER ------------------ */
-function getMemCached(k){
-  const v = mem.get(k);
-  if(v && typeof v.then !== "function") return v;
-  return null;
-}
-
 export function applyDistanceFilter(directoryRows, distMiles, distFromLabel, onUpdate){
   const miles = Number(distMiles);
   const from = String(distFromLabel ?? "").trim();
   if(!Number.isFinite(miles) || miles <= 0 || !from) return { rows: directoryRows, pending: 0, active: false };
 
-  // origin: ZIP
-  const isZip = /^\d{5}$/.test(from);
-  let origin = null;
-  let originKey = null;
+  // parse "City, ST"
+  const m = from.match(/^(.*?),\s*([A-Za-z]{2})$/);
+  if(!m) return { rows: directoryRows, pending: 0, active: false };
+  const originCity = m[1].trim();
+  const originState = m[2].trim().toUpperCase();
 
-  if(isZip){
-    originKey = zipKey(from);
-    origin = readCache(originKey) || getMemCached(originKey);
-    if(!origin){
-      getZipLatLon(from, onUpdate);
-      return { rows: [], pending: 1, active: true };
-    }
-  } else {
-    // legacy support: "City, ST"
-    const m = from.match(/^(.*?),\s*([A-Za-z]{2})$/);
-    if(!m) return { rows: directoryRows, pending: 0, active: false };
-    const originCity = m[1].trim();
-    const originState = m[2].trim().toUpperCase();
-    originKey = cityKey(originCity, originState);
-    origin = readCache(originKey) || getMemCached(originKey);
-    if(!origin){
-      getCityStateLatLon(originCity, originState, onUpdate);
-      return { rows: [], pending: 1, active: true };
-    }
+  // if origin coords missing, request and temporarily return [] (keeps UI honest)
+  const originCached = readCache(normKey(originCity, originState)) || (mem.get(normKey(originCity, originState)) && typeof mem.get(normKey(originCity, originState)).then !== "function" ? mem.get(normKey(originCity, originState)) : null);
+  if(!originCached){
+    getCityStateLatLon(originCity, originState, onUpdate);
+    return { rows: [], pending: 1, active: true };
   }
 
   let pending = 0;
@@ -214,15 +152,15 @@ export function applyDistanceFilter(directoryRows, distMiles, distFromLabel, onU
     const st   = String(r.STATE ?? "").trim().toUpperCase();
     if(!city || !st) continue;
 
-    const k = cityKey(city, st);
-    const cached = readCache(k) || getMemCached(k);
+    const k = normKey(city, st);
+    const cached = readCache(k) || (mem.get(k) && typeof mem.get(k).then !== "function" ? mem.get(k) : null);
     if(!cached){
       pending++;
       getCityStateLatLon(city, st, onUpdate);
       continue;
     }
 
-    const d = haversineMiles(origin, cached);
+    const d = haversineMiles(originCached, cached);
     if(Number.isFinite(d) && d <= miles) out.push(r);
   }
 
