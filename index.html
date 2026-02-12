@@ -9,10 +9,10 @@
   <link rel="stylesheet" href="assets/css/base.css" />
   <link rel="stylesheet" href="assets/css/layout.css" />
   <link rel="stylesheet" href="assets/css/pills.css?v=20260129-302">
-  <link rel="stylesheet" href="assets/css/components.css?v=20260212-904" />
+  <link rel="stylesheet" href="assets/css/components.css?v=20260212-902" />
   <link rel="stylesheet" href="assets/css/directory.css?v=20260210-809" />
 <!-- IMPORTANT: repo references main.js (no sequence) -->
-  <script type="module" src="assets/js/main.js?v=20260212-905"></script>
+  <script type="module" src="assets/js/main.js?v=20260212-903"></script>
 </head>
 
 <body>
@@ -99,14 +99,15 @@
                   </div>
                   <div class="menu__divider"></div>
 
-                  <div class="distance__section" aria-label="Enter zip code">
-                    <input id="index-zip-input" class="distance__input" type="text"
-                           inputmode="numeric" pattern="[0-9]*" maxlength="5"
-                           autocomplete="postal-code" autocapitalize="none" spellcheck="false"
-                           placeholder="Enter Zip" aria-label="Enter zip code" />
+                  <div class="distance__section" aria-label="Origin city">
+                    <div class="distance__label">City</div>
+                    <input id="distanceOriginInput" class="distance__input" type="text" inputmode="search"
+                           autocomplete="off" autocapitalize="words" spellcheck="false"
+                           placeholder="Start typing a city…" list="distanceOriginList"
+                           aria-label="Choose a city" />
+                    <datalist id="distanceOriginList"></datalist>
                     <div id="distanceHint" class="distance__hint">Shows gyms within 15 miles</div>
                   </div>
-                </div>
                 </div>
 
 
