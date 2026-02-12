@@ -195,8 +195,8 @@ export function filterDirectory(rows, state){
       // BOTH explicitly means "Sat OR Sun"
       if(wantBoth) return hasSat || hasSun;
 
-      // If user selects both SATURDAY + SUNDAY (shouldn't happen with UI, but safe),
-      // treat it as OR, not AND.
+      // Safety: if SATURDAY + SUNDAY are both selected (even if UI misbehaves),
+      // treat it as OR (never AND).
       if(wantSat && wantSun) return hasSat || hasSun;
 
       // Otherwise, OR across selected days
