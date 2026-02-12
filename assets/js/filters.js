@@ -181,27 +181,26 @@ function monthYearLabel(dateStr){
 export function filterDirectory(rows, state){
   let out = rows;
 
-  // OPENS pill — SATURDAY | SUNDAY | BOTH (BOTH = SAT OR SUN)
+  // OPENS pill — multi-select: ALL | SATURDAY | SUNDAY
   const opensSel = state?.index?.opens;
   if(opensSel && opensSel.size){
-    const wantSat  = opensSel.has("SATURDAY");
-    const wantSun  = opensSel.has("SUNDAY");
-    const wantBoth = opensSel.has("BOTH");
+    const wantAll = opensSel.has("ALL");
+    const wantSat = opensSel.has("SATURDAY");
+    const wantSun = opensSel.has("SUNDAY");
 
-    out = out.filter(r => {
-      const hasSat = !!(r.SAT && String(r.SAT).trim());
-      const hasSun = !!(r.SUN && String(r.SUN).trim());
-
-      // BOTH explicitly means "Sat OR Sun"
-      if(wantBoth) return hasSat || hasSun;
-
-      // Safety: if SATURDAY + SUNDAY are both selected (even if UI misbehaves),
-      // treat it as OR (never AND).
-      if(wantSat && wantSun) return hasSat || hasSun;
-
-      // Otherwise, OR across selected days
-      return (wantSat && hasSat) || (wantSun && hasSun);
-    });
+    // if ALL selected, treat as "Sat OR Sun"
+    if(wantAll){
+      out = out.filter(r =>
+        (r.SAT && String(r.SAT).trim()) || (r.SUN && String(r.SUN).trim())
+      );
+    } else {
+      // otherwise OR across selected days
+      out = out.filter(r => {
+        const hasSat = (r.SAT && String(r.SAT).trim());
+        const hasSun = (r.SUN && String(r.SUN).trim());
+        return (wantSat && hasSat) || (wantSun && hasSun);
+      });
+    }
   }
 
   // GUESTS pill — "GUESTS WELCOME" means OTA === "Y"
