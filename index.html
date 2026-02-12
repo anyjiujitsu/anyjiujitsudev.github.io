@@ -9,10 +9,10 @@
   <link rel="stylesheet" href="assets/css/base.css" />
   <link rel="stylesheet" href="assets/css/layout.css" />
   <link rel="stylesheet" href="assets/css/pills.css?v=20260129-302">
-  <link rel="stylesheet" href="assets/css/components.css" />
+  <link rel="stylesheet" href="assets/css/components.css?v=20260212-901" />
   <link rel="stylesheet" href="assets/css/directory.css?v=20260210-809" />
 <!-- IMPORTANT: repo references main.js (no sequence) -->
-  <script type="module" src="assets/js/main.js?v=20260210-900"></script>
+  <script type="module" src="assets/js/main.js?v=20260212-902"></script>
 </head>
 
 <body>
@@ -80,14 +80,44 @@
                 <button id="eventsSearchClear" class="pill__clear" type="button" aria-label="Clear">×</button>
               </div>
               <div id="eventsSearchSuggest" class="suggest" hidden>
-  <div class="menu__header menu__header--static">
-    <span class="menu__title">Quick Searches</span>
-  </div>
-  <div class="menu__divider"></div>
 
-                <button type="button" class="suggest__item" data-value="THIS WEEKEND">THIS WEEKEND</button>
-                <button type="button" class="suggest__item" data-value="2026, COMP">2026, COMP</button>
-                <button type="button" class="suggest__item" data-value="NEW EVENTS">NEW EVENTS</button>
+                <!-- EVENTS mode: Quick Searches -->
+                <div id="eventsSearchSuggestQuick">
+                  <div class="menu__header menu__header--static">
+                    <span class="menu__title">Quick Searches</span>
+                  </div>
+                  <div class="menu__divider"></div>
+                  <button type="button" class="suggest__item" data-value="THIS WEEKEND">THIS WEEKEND</button>
+                  <button type="button" class="suggest__item" data-value="2026, COMP">2026, COMP</button>
+                  <button type="button" class="suggest__item" data-value="NEW EVENTS">NEW EVENTS</button>
+                </div>
+
+                <!-- INDEX mode: Distance From -->
+                <div id="eventsSearchSuggestDistance" hidden>
+                  <div class="menu__header menu__header--static">
+                    <span class="menu__title">DISTANCE FROM</span>
+                    <button id="distanceClear" class="menu__clear" type="button">Clear</button>
+                  </div>
+                  <div class="menu__divider"></div>
+
+                  <div class="distance__section" aria-label="Distance radius">
+                    <div class="distance__label">Miles</div>
+                    <div class="distance__chips" role="group" aria-label="Miles options">
+                      <button type="button" class="distance__chip" data-miles="10">10</button>
+                      <button type="button" class="distance__chip" data-miles="20">20</button>
+                      <button type="button" class="distance__chip" data-miles="30">30</button>
+                    </div>
+                  </div>
+
+                  <div class="distance__section" aria-label="Origin city">
+                    <div class="distance__label">City</div>
+                    <select id="distanceOrigin" class="distance__select" aria-label="Choose a city">
+                      <option value="">Select city…</option>
+                    </select>
+                    <div id="distanceHint" class="distance__hint">Choose miles + city to filter gyms</div>
+                  </div>
+                </div>
+
               </div>
               </div>
 
