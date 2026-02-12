@@ -2,17 +2,18 @@
 // purpose: app bootstrap + data loading + view wiring + render orchestration
 
 import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260210-911";
-import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery } from "./state.js?v=20260210-911";
+import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery, setIndexDistanceMiles, setIndexDistanceFrom } from "./state.js?v=20260212-901";
 import { filterEvents } from "./filters.js?v=20260210-911";
 import { renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260210-911";
 
 import { $ } from "./utils/dom.js?v=20260210-911";
+import { applyDistanceFilter } from "./utils/geo.js?v=20260212-901";
 import {
   initEventsPills,
   initIndexPills,
   refreshEventsPillDots,
 } from "./ui/pills.js?v=20260210-911";
-import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260210-911";
+import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260212-901";
 
 let directoryRows = [];
 let eventRows = [];
@@ -20,6 +21,47 @@ let eventRows = [];
 let didRender = false;
 // View lock removed: enable slider + Index view
 const VIEW_LOCKED = false;
+
+/* ------------------ INDEX DISTANCE UI (Distance From) ------------------ */
+function buildCityStateOptions(rows){
+  const set = new Set();
+  for(const r of rows){
+    const city = String(r.CITY ?? "").trim();
+    const st   = String(r.STATE ?? "").trim().toUpperCase();
+    if(!city || !st) continue;
+    set.add(`${city}, ${st}`);
+  }
+  return Array.from(set).sort((a,b)=>a.localeCompare(b));
+}
+
+function ensureDistanceOriginOptions(){
+  const sel = $("distanceOrigin");
+  if(!sel) return;
+  // only (re)build if we don't have options yet
+  if(sel.options && sel.options.length > 1) return;
+
+  const opts = buildCityStateOptions(directoryRows);
+  for(const label of opts){
+    const o = document.createElement("option");
+    o.value = label;
+    o.textContent = label;
+    sel.appendChild(o);
+  }
+}
+
+function syncDistanceUIFromState(){
+  const distWrap = $("eventsSearchSuggestDistance");
+  if(!distWrap) return;
+  // miles buttons
+  const miles = state.indexEvents.distMiles;
+  distWrap.querySelectorAll("button[data-miles]").forEach(btn=>{
+    const m = Number(btn.getAttribute("data-miles"));
+    btn.setAttribute("aria-pressed", (miles != null && Number.isFinite(m) && m === miles) ? "true" : "false");
+  });
+  // origin select
+  const sel = $("distanceOrigin");
+  if(sel) sel.value = String(state.indexEvents.distFrom || "");
+}
 
 /* ------------------ INDEX REMAP (directory.csv -> events-style rows) ------------------ */
 function dirToIndexEventRow(r){
@@ -171,9 +213,12 @@ function setViewUI(view){
   const evIn = $("eventsSearchInput");
   if(evIn) evIn.value = String(activeEventsState().q || "");
 
-  // Quick Search suggestions should be disabled on INDEX view
-  const suggestPanel = $("eventsSearchSuggest");
-  if(suggestPanel && view === "index") suggestPanel.setAttribute("hidden", "");
+  // Search suggestion panel: Events uses Quick Searches; Index uses Distance From
+  // (panel is opened on focus/click when input is empty)
+  if(view === "index"){
+    ensureDistanceOriginOptions();
+    syncDistanceUIFromState();
+  }
 
   // Header counts
   const evStatus = $("eventsStatus");
@@ -366,11 +411,31 @@ function render(){
   renderEventsGroups($("eventsRoot"), evFiltered);
   $("eventsStatus").textContent = `${evFiltered.length} events`;
 
-  // Index view (Phase 2): render Directory rows using Events-style cards
-  const idxRows = directoryRows.map(dirToIndexEventRow);
+  // Index view: render Directory rows using Events-style cards
+  // Optional distance filter (Distance From dropdown)
+  const distRes = applyDistanceFilter(
+    directoryRows,
+    state.indexEvents.distMiles,
+    state.indexEvents.distFrom,
+    () => {
+      // re-render as geocoding results arrive
+      if(state.view === "index") render();
+    }
+  );
+
+  const idxRows = distRes.rows.map(dirToIndexEventRow);
   const idxFiltered = filterIndexDirectoryAsEvents(idxRows, state.indexEvents);
   renderIndexEventsGroups($("indexEventsRoot"), idxFiltered);
-  $("status").textContent = `${idxFiltered.length} gyms`;
+
+  // status copy: show pending geocodes if distance filter is active
+  if(distRes.active){
+    const pending = Number(distRes.pending) || 0;
+    $("status").textContent = pending > 0
+      ? `${idxFiltered.length} gyms (locating ${pending}…)`
+      : `${idxFiltered.length} gyms`;
+  } else {
+    $("status").textContent = `${idxFiltered.length} gyms`;
+  }
 }
 
 /* ------------------ INIT ------------------ */
@@ -387,7 +452,25 @@ async function init(){
   wireSearchSuggestions({
     $,
     setActiveEventsQuery,
-    isEventsView: () => state.view === "events"
+    isEventsView: () => state.view === "events",
+    isIndexView: () => state.view === "index",
+    onIndexViewOpen: () => {
+      ensureDistanceOriginOptions();
+      syncDistanceUIFromState();
+    },
+    onIndexDistanceClear: () => {
+      setIndexDistanceMiles(null);
+      setIndexDistanceFrom("");
+      render();
+    },
+    onIndexDistanceSelectMiles: (miles) => {
+      setIndexDistanceMiles(miles);
+      render();
+    },
+    onIndexDistanceSelectOrigin: (label) => {
+      setIndexDistanceFrom(label);
+      render();
+    },
   });
 if(!state.view) state.view = "events";
   setViewUI(state.view);
