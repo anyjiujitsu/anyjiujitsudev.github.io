@@ -1,5 +1,5 @@
 // utils/geo.js
-// purpose: lightweight geocoding + distance helpers for Index "Distance From" filter
+// purpose: fast, client-side distance filtering for Index "Training Near" (ZIP)
 
 /* ------------------ HAVERSINE (miles) ------------------ */
 const EARTH_RADIUS_MI = 3958.7613;
@@ -24,31 +24,17 @@ export function haversineMiles(a, b){
   return EARTH_RADIUS_MI * c;
 }
 
-/* ------------------ GEOCODING (Nominatim) ------------------ */
-// Notes:
-// - Works client-side on a static site.
-// - Uses localStorage caching to minimize requests.
-// - Uses a small throttle queue to avoid hammering the service.
+/* ------------------ ZIP GEOCODING ------------------ */
+// We only ever geocode ONE thing: the user's ZIP.
+// Directory rows already include LAT/LON in directory.csv.
 
-function normKey(city, state){
-  const c = String(city ?? "").trim().toLowerCase();
-  const s = String(state ?? "").trim().toUpperCase();
-  return `${c}|${s}`;
+function zipStorageKey(zip){
+  return `anyjj:zipgeo:${zip}`;
 }
 
-
-function normZipKey(zip){
-  const z = String(zip ?? "").replace(/\D/g, "").slice(0, 5);
-  return `zip|${z}`;
-}
-
-function storageKey(k){
-  return `anyjj:geo:${k}`;
-}
-
-function readCache(k){
+function readZipCache(zip){
   try{
-    const raw = localStorage.getItem(storageKey(k));
+    const raw = localStorage.getItem(zipStorageKey(zip));
     if(!raw) return null;
     const obj = JSON.parse(raw);
     if(!obj || !Number.isFinite(obj.lat) || !Number.isFinite(obj.lon)) return null;
@@ -58,181 +44,107 @@ function readCache(k){
   }
 }
 
-function writeCache(k, val){
+function writeZipCache(zip, val){
   try{
-    localStorage.setItem(storageKey(k), JSON.stringify(val));
+    localStorage.setItem(zipStorageKey(zip), JSON.stringify(val));
   }catch(_){
     // ignore (private mode / quota)
   }
 }
 
-// in-memory cache: key -> {lat,lon} | Promise<{lat,lon}|null>
-const mem = new Map();
+// in-memory cache: zip -> {lat,lon} | Promise<{lat,lon}|null>
+const zipMem = new Map();
 
-// simple queue throttle (1 request ~ every 1100ms)
-let queue = Promise.resolve();
-function enqueue(fn){
-  queue = queue.then(async ()=>{
-    // space requests
-    await new Promise(r => setTimeout(r, 1100));
+let zipQueue = Promise.resolve();
+function enqueueZip(fn){
+  zipQueue = zipQueue.then(async ()=>{
+    // space requests a bit (polite)
+    await new Promise(r => setTimeout(r, 450));
     return fn();
   }).catch(()=>fn());
-  return queue;
+  return zipQueue;
 }
 
-async function fetchNominatim(city, state){
-  const q = encodeURIComponent(`${city}, ${state}, USA`);
-  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${q}`;
-  const res = await fetch(url, {
-    method: "GET",
-    headers: {
-      // polite header; browsers may ignore custom UA
-      "Accept": "application/json"
-    }
-  });
+async function fetchZipLatLon(zip){
+  // zippopotam.us is simple and fast; one call per ZIP.
+  const url = `https://api.zippopotam.us/us/${encodeURIComponent(zip)}`;
+  const res = await fetch(url, { method: "GET" });
   if(!res.ok) return null;
-  const arr = await res.json();
-  const hit = Array.isArray(arr) ? arr[0] : null;
-  if(!hit) return null;
-  const lat = Number(hit.lat);
-  const lon = Number(hit.lon);
+  const data = await res.json();
+  const place = data && Array.isArray(data.places) ? data.places[0] : null;
+  if(!place) return null;
+  const lat = Number(place.latitude);
+  const lon = Number(place.longitude);
   if(!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
   return { lat, lon };
-}
-
-async function fetchNominatimZip(zip){
-  const z = String(zip ?? "").replace(/\D/g, "").slice(0, 5);
-  if(z.length !== 5) return null;
-  const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=us&postalcode=${encodeURIComponent(z)}`;
-  const res = await fetch(url, {
-    method: "GET",
-    headers: { "Accept": "application/json" }
-  });
-  if(!res.ok) return null;
-  const arr = await res.json();
-  const hit = Array.isArray(arr) ? arr[0] : null;
-  if(!hit) return null;
-  const lat = Number(hit.lat);
-  const lon = Number(hit.lon);
-  if(!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
-  return { lat, lon };
-}
-
-export function getCityStateLatLon(city, state, onUpdate){
-  const k = normKey(city, state);
-  if(mem.has(k)){
-    const v = mem.get(k);
-    return (v && typeof v.then === "function") ? v : Promise.resolve(v);
-  }
-
-  // localStorage cache first
-  const cached = readCache(k);
-  if(cached){
-    mem.set(k, cached);
-    return Promise.resolve(cached);
-  }
-
-  // enqueue a fetch
-  const p = enqueue(async ()=>{
-    const got = await fetchNominatim(city, state);
-    if(got){
-      mem.set(k, got);
-      writeCache(k, got);
-    } else {
-      mem.set(k, null);
-    }
-    if(typeof onUpdate === "function") onUpdate();
-    return mem.get(k);
-  });
-
-  mem.set(k, p);
-  return p;
 }
 
 export function getZipLatLon(zip, onUpdate){
-  const k = normZipKey(zip);
-  if(mem.has(k)){
-    const v = mem.get(k);
+  const z = String(zip || "").trim();
+  if(!/^\d{5}$/.test(z)) return Promise.resolve(null);
+
+  if(zipMem.has(z)){
+    const v = zipMem.get(z);
     return (v && typeof v.then === "function") ? v : Promise.resolve(v);
   }
 
-  const cached = readCache(k);
+  const cached = readZipCache(z);
   if(cached){
-    mem.set(k, cached);
+    zipMem.set(z, cached);
     return Promise.resolve(cached);
   }
 
-  const p = enqueue(async ()=>{
-    const got = await fetchNominatimZip(zip);
+  const p = enqueueZip(async ()=>{
+    const got = await fetchZipLatLon(z);
     if(got){
-      mem.set(k, got);
-      writeCache(k, got);
-    } else {
-      mem.set(k, null);
+      zipMem.set(z, got);
+      writeZipCache(z, got);
+    }else{
+      zipMem.set(z, null);
     }
     if(typeof onUpdate === "function") onUpdate();
-    return mem.get(k);
+    return zipMem.get(z);
   });
 
-  mem.set(k, p);
+  zipMem.set(z, p);
   return p;
 }
 
 /* ------------------ DISTANCE FILTER ------------------ */
-function memCached(k){
-  const v = mem.get(k);
-  return (v && typeof v.then !== "function") ? v : null;
-}
-
 export function applyDistanceFilter(directoryRows, distMiles, distFromLabel, onUpdate){
   const miles = Number(distMiles);
   const from = String(distFromLabel ?? "").trim();
   if(!Number.isFinite(miles) || miles <= 0 || !from) return { rows: directoryRows, pending: 0, active: false };
 
-  // origin may be either a 5-digit ZIP or "City, ST"
-  const isZip = /^\d{5}$/.test(from);
+  // ZIP must be 5 digits
+  if(!/^\d{5}$/.test(from)) return { rows: directoryRows, pending: 0, active: false };
 
-  let originCached = null;
-  if(isZip){
-    const k = normZipKey(from);
-    originCached = readCache(k) || memCached(k);
-    if(!originCached){
-      getZipLatLon(from, onUpdate);
-      return { rows: [], pending: 1, active: true };
-    }
-  } else {
-    const m = from.match(/^(.*?),\s*([A-Za-z]{2})$/);
-    if(!m) return { rows: directoryRows, pending: 0, active: false };
-    const originCity = m[1].trim();
-    const originState = m[2].trim().toUpperCase();
-
-    const k = normKey(originCity, originState);
-    originCached = readCache(k) || memCached(k);
-    if(!originCached){
-      getCityStateLatLon(originCity, originState, onUpdate);
-      return { rows: [], pending: 1, active: true };
-    }
+  // origin coords (ZIP) – if missing, request and temporarily return [] (keeps UI honest)
+  const originCached = readZipCache(from) || (zipMem.get(from) && typeof zipMem.get(from).then !== "function" ? zipMem.get(from) : null);
+  if(!originCached){
+    getZipLatLon(from, onUpdate);
+    return { rows: [], pending: 1, active: true };
   }
 
-  let pending = 0;
+  // bounding box prefilter (cheap) before haversine
+  const deltaLat = miles / 69; // ~69 miles per degree latitude
+  const cosLat = Math.cos(toRad(originCached.lat));
+  const deltaLon = miles / (69 * (cosLat || 1));
+  const minLat = originCached.lat - deltaLat;
+  const maxLat = originCached.lat + deltaLat;
+  const minLon = originCached.lon - deltaLon;
+  const maxLon = originCached.lon + deltaLon;
+
   const out = [];
-
   for(const r of directoryRows){
-    const city = String(r.CITY ?? "").trim();
-    const st   = String(r.STATE ?? "").trim().toUpperCase();
-    if(!city || !st) continue;
+    const lat = Number(r.LAT);
+    const lon = Number(r.LON);
+    if(!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+    if(lat < minLat || lat > maxLat || lon < minLon || lon > maxLon) continue;
 
-    const k = normKey(city, st);
-    const cached = readCache(k) || memCached(k);
-    if(!cached){
-      pending++;
-      getCityStateLatLon(city, st, onUpdate);
-      continue;
-    }
-
-    const d = haversineMiles(originCached, cached);
+    const d = haversineMiles(originCached, { lat, lon });
     if(Number.isFinite(d) && d <= miles) out.push(r);
   }
 
-  return { rows: out, pending, active: true };
+  return { rows: out, pending: 0, active: true };
 }
