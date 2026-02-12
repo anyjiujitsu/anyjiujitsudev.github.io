@@ -380,19 +380,16 @@ export function initIndexPills({ $, state, getDirectoryRows, onChange }){
     });
   })();
 
-  const items = ["SATURDAY","SUNDAY","BOTH"];
-    buildMenuListIn(listEl, items, state.index.opens, ()=>{
-      // Enforce mutual exclusivity:
-      // - If BOTH is selected, clear SATURDAY/SUNDAY
-      // - If SATURDAY or SUNDAY is selected, clear BOTH
-      if(state.index.opens.has("BOTH")){
-        state.index.opens.delete("SATURDAY");
-        state.index.opens.delete("SUNDAY");
-        // keep BOTH
-      } else if(state.index.opens.has("SATURDAY") || state.index.opens.has("SUNDAY")){
-        state.index.opens.delete("BOTH");
-      }
+  // OPENS pill
+  (function(){
+    const btn = $("openMatBtn");
+    const panel = $("openMatMenu");
+    const clearBtn = $("openMatClear");
+    const listEl = $("openMatList") || panel?.querySelector('.menu__list');
+    if(!btn || !panel) return;
 
+    const items = ["ALL","SATURDAY","SUNDAY"];
+    buildMenuListIn(listEl, items, state.index.opens, ()=>{
       setPillHasSelection(btn, state.index.opens.size>0);
       onChange();
     });
