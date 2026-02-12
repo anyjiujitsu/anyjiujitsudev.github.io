@@ -2,18 +2,18 @@
 // purpose: app bootstrap + data loading + view wiring + render orchestration
 
 import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260210-911";
-import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery, setIndexDistanceMiles, setIndexDistanceFrom } from "./state.js?v=20260212-901";
+import { state, setView, setIndexQuery, setEventsQuery, setIndexEventsQuery, setIndexDistanceMiles, setIndexDistanceFrom } from "./state.js?v=20260212-902";
 import { filterEvents } from "./filters.js?v=20260210-911";
 import { renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260210-911";
 
 import { $ } from "./utils/dom.js?v=20260210-911";
-import { applyDistanceFilter } from "./utils/geo.js?v=20260212-901";
+import { applyDistanceFilter } from "./utils/geo.js?v=20260212-902";
 import {
   initEventsPills,
   initIndexPills,
   refreshEventsPillDots,
 } from "./ui/pills.js?v=20260210-911";
-import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260212-901";
+import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260212-902";
 
 let directoryRows = [];
 let eventRows = [];
@@ -35,32 +35,24 @@ function buildCityStateOptions(rows){
 }
 
 function ensureDistanceOriginOptions(){
-  const sel = $("distanceOrigin");
-  if(!sel) return;
+  const list = $("distanceOriginList");
+  if(!list) return;
   // only (re)build if we don't have options yet
-  if(sel.options && sel.options.length > 1) return;
+  if(list.children && list.children.length > 0) return;
 
   const opts = buildCityStateOptions(directoryRows);
   for(const label of opts){
     const o = document.createElement("option");
     o.value = label;
-    o.textContent = label;
-    sel.appendChild(o);
+    list.appendChild(o);
   }
 }
 
 function syncDistanceUIFromState(){
   const distWrap = $("eventsSearchSuggestDistance");
   if(!distWrap) return;
-  // miles buttons
-  const miles = state.indexEvents.distMiles;
-  distWrap.querySelectorAll("button[data-miles]").forEach(btn=>{
-    const m = Number(btn.getAttribute("data-miles"));
-    btn.setAttribute("aria-pressed", (miles != null && Number.isFinite(m) && m === miles) ? "true" : "false");
-  });
-  // origin select
-  const sel = $("distanceOrigin");
-  if(sel) sel.value = String(state.indexEvents.distFrom || "");
+  const input = $("distanceOriginInput");
+  if(input) input.value = String(state.indexEvents.distFrom || "");
 }
 
 /* ------------------ INDEX REMAP (directory.csv -> events-style rows) ------------------ */
@@ -457,15 +449,6 @@ async function init(){
     onIndexViewOpen: () => {
       ensureDistanceOriginOptions();
       syncDistanceUIFromState();
-    },
-    onIndexDistanceClear: () => {
-      setIndexDistanceMiles(null);
-      setIndexDistanceFrom("");
-      render();
-    },
-    onIndexDistanceSelectMiles: (miles) => {
-      setIndexDistanceMiles(miles);
-      render();
     },
     onIndexDistanceSelectOrigin: (label) => {
       setIndexDistanceFrom(label);
