@@ -181,27 +181,28 @@ function monthYearLabel(dateStr){
 export function filterDirectory(rows, state){
   let out = rows;
 
-// OPENS pill — SATURDAY | SUNDAY | BOTH
-const opensSel = state?.index?.opens;
-if(opensSel && opensSel.size){
+  // OPENS pill — SATURDAY | SUNDAY | BOTH (BOTH = SAT OR SUN)
+  const opensSel = state?.index?.opens;
+  if(opensSel && opensSel.size){
+    const wantSat  = opensSel.has("SATURDAY");
+    const wantSun  = opensSel.has("SUNDAY");
+    const wantBoth = opensSel.has("BOTH");
 
-  const wantSat  = opensSel.has("SATURDAY");
-  const wantSun  = opensSel.has("SUNDAY");
-  const wantBoth = opensSel.has("BOTH");
+    out = out.filter(r => {
+      const hasSat = !!(r.SAT && String(r.SAT).trim());
+      const hasSun = !!(r.SUN && String(r.SUN).trim());
 
-  out = out.filter(r => {
-    const hasSat = !!(r.SAT && String(r.SAT).trim());
-    const hasSun = !!(r.SUN && String(r.SUN).trim());
+      // BOTH explicitly means "Sat OR Sun"
+      if(wantBoth) return hasSat || hasSun;
 
-    // BOTH = SAT OR SUN (explicitly OR, never AND)
-    if(wantBoth){
-      return hasSat || hasSun;
-    }
+      // If user selects both SATURDAY + SUNDAY (shouldn't happen with UI, but safe),
+      // treat it as OR, not AND.
+      if(wantSat && wantSun) return hasSat || hasSun;
 
-    // Individual selections = OR behavior
-    return (wantSat && hasSat) || (wantSun && hasSun);
-  });
-}
+      // Otherwise, OR across selected days
+      return (wantSat && hasSat) || (wantSun && hasSun);
+    });
+  }
 
   // GUESTS pill — "GUESTS WELCOME" means OTA === "Y"
   const guestsSel = state?.index?.guests;
