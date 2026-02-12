@@ -60,7 +60,7 @@ function filterIndexDirectoryAsEvents(rows, idxState){
       const wantBoth = yearSet.has("BOTH") || (wantSat && wantSun);
 
       if(wantBoth){
-        if(!(hasSat && hasSun)) return false;
+        if(!(hasSat || hasSun)) return false;
       } else {
         // Treat selections as OR when BOTH is not selected
         let ok = false;
