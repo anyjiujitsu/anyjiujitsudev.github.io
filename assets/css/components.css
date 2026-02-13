@@ -1396,9 +1396,8 @@ nav.filters, .filters__inner, .pillRow{
   }
 
   /* Shift the ZIP row + its hint slightly left to reclaim space */
-  #eventsSearchSuggestDistance .distance__row,
-  #eventsSearchSuggestDistance .distance__hint{
-    margin-left: -12px; /* +1 more left shift */
+  #eventsSearchSuggestDistance .distance__row{
+    margin-left: -14px; /* final micro left push */
   }
 
   /* Reduce gap a touch so the apply button stays visible */
