@@ -129,21 +129,27 @@ function __setViewShellW(w){ __viewShellW = Math.max(1, Number(w)||0); }
 function __getViewShellW(){ return (__viewShellW || ($("viewShell")?.clientWidth) || window.innerWidth || 1); }
 
 let __lastViewTitleMode = null; // null | "events" | "index"
+let __currentP = 0;              // source of truth for current progress (avoids getComputedStyle reads)
 
 function applyProgressVars(p){
   const clamped = Math.max(0, Math.min(1, p));
-  // Fast path: only update CSS variables (no per-frame DOM churn).
+  __currentP = clamped;
+
+  // Fast path: only update CSS variables.
   document.body.style.setProperty("--viewProgress", String(clamped));
+
   const w = __getViewShellW();
   const offsetPx = (-w * clamped);
-  document.body.style.setProperty("--viewOffsetPx", `${offsetPx.toFixed(4)}px`);
+
+  // Avoid toFixed() during swipe frames (it allocates + can be expensive on iOS).
+  document.body.style.setProperty("--viewOffsetPx", offsetPx + "px");
   return clamped;
 }
 
 function applyProgress(p){
   const clamped = applyProgressVars(p);
 
-  // Update title only when crossing the mid-point.
+  // Update title only when crossing the mid-point (prevents per-frame DOM churn).
   const mode = (clamped >= 0.5) ? "index" : "events";
   if(mode !== __lastViewTitleMode){
     __lastViewTitleMode = mode;
@@ -328,7 +334,7 @@ function wireViewToggle(){
       }
 
       setTransition(260);
-      const p = Number(getComputedStyle(document.body).getPropertyValue("--viewProgress")) || 0;
+      const p = __currentP || 0;
       setViewUI(p >= 0.5 ? "index" : "events");
     };
 
@@ -347,29 +353,17 @@ function wireViewToggle(){
     let targetP = null;
 
     function startSwipeLoop(){
-  if(rafLoop) return;
+      if(rafLoop) return;
 
-  let p = startP;
-  let v = 0;
-  let last = performance.now();
+      const tick = () => {
+        rafLoop = requestAnimationFrame(tick);
+        if(targetP === null) return;
+        // iOS-like: track finger 1:1; render via rAF for stable 60fps.
+        applyProgressVars(targetP);
+      };
 
-  const tick = () => {
-    rafLoop = requestAnimationFrame(tick);
-
-    if(targetP === null) return;
-
-    const now = performance.now();
-    const dt = Math.max(0.5, Math.min(3, (now - last) / 16.67)); // normalize to ~60fps
-    last = now;
-
-    // iOS-like: track the finger 1:1 during the swipe.
-// We still render via rAF so motion is smooth even if touchmove events arrive unevenly.
-p = targetP;
-applyProgressVars(p);
-  };
-
-  rafLoop = requestAnimationFrame(tick);
-}
+      rafLoop = requestAnimationFrame(tick);
+    }
 
 function stopSwipeLoop(){
 
@@ -382,7 +376,7 @@ function stopSwipeLoop(){
       if(e.touches.length !== 1) return;
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
-      startP = Number(getComputedStyle(document.body).getPropertyValue("--viewProgress")) || 0;
+      startP = __currentP || 0;
       shellW = Math.max(1, viewShell.clientWidth || 1);
       __setViewShellW(shellW);
 
@@ -445,7 +439,7 @@ function stopSwipeLoop(){
         applyProgress(targetP);
       }
 
-      const p = Number(getComputedStyle(document.body).getPropertyValue("--viewProgress")) || 0;
+      const p = __currentP || 0;
 
       // More sensitive commit: shorter swipe distance + quick flick support
       const FLICK_V = 0.45; // px/ms
