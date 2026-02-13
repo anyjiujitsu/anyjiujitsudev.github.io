@@ -67,10 +67,14 @@ export function normalizeDirectoryRow(r){
   const SAT   = (r.SAT || "").trim();
   const SUN   = (r.SUN || "").trim();
   const OTA   = (r.OTA || "").trim().toUpperCase(); // Y / N / blank
-  const LAT   = (r.LAT || r.lat || "").trim();
-  const LON   = (r.LON || r.LONG || r.LONGITUDE || r.lon || "").trim();
 
-  const row = { STATE, CITY, NAME, IG, SAT, SUN, OTA, LAT, LON };
+  // Optional precomputed coordinates (for fast local ZIP distance filtering)
+  const LAT = (r.LAT ?? r.Lat ?? "").toString().trim();
+  const LON = (r.LON ?? r.Lon ?? r.LONG ?? r.Long ?? "").toString().trim();
+  const lat = LAT === "" ? NaN : Number(LAT);
+  const lon = LON === "" ? NaN : Number(LON);
+
+  const row = { STATE, CITY, NAME, IG, SAT, SUN, OTA, LAT: lat, LON: lon };
   return { ...row, searchText: buildSearchText(row) };
 }
 
