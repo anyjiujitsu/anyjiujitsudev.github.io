@@ -1382,3 +1382,34 @@ nav.filters, .filters__inner, .pillRow{
   font-size: 12px;
   opacity: 0.7;
 }
+
+/* =========================================================
+   section: Training Near dropdown (Index view) — mobile sizing
+   purpose: reduce ZIP input + apply button + helper text sizes on mobile only
+   note: does NOT change dropdown container, divider, or title styling
+   ========================================================= */
+
+@media (max-width: 520px){
+  /* Keep the dropdown structure intact; only shrink the interactive ZIP controls */
+  #eventsSearchSuggestDistance .distance__input{
+    flex: 0 0 130px;
+    width: 130px;
+    max-width: 130px;
+    padding: 8px 9px;
+    font-size: 13px;
+  }
+
+  #eventsSearchSuggestDistance .distance__input::placeholder{
+    font-size: 12px;
+  }
+
+  #eventsSearchSuggestDistance .distance__apply{
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+
+  #eventsSearchSuggestDistance .distance__hint{
+    margin-top: 6px;
+    font-size: 11px;
+  }
+}
