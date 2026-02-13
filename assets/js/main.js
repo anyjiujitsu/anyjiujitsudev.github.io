@@ -126,13 +126,17 @@ function setTransition(ms){
 
 function applyProgress(p){
   const clamped = Math.max(0, Math.min(1, p));
+  // Set both the semantic progress and a precomputed offset string to avoid calc() jitter on mobile.
   document.body.style.setProperty("--viewProgress", String(clamped));
+  document.body.style.setProperty("--viewOffsetPct", `${(-50 * clamped).toFixed(4)}%`);
+
   const viewTitle = $("viewTitle");
   if(viewTitle){
     viewTitle.textContent = (clamped >= 0.5) ? "FIND TRAINING (DEV)" : "EVENTS (DEV)";
   }
   return clamped;
 }
+
 
 function setViewUI(view){
   setView(view);
@@ -317,6 +321,7 @@ function wireViewToggle(){
 
   if(viewShell){
     let startX = 0, startY = 0, startP = 0;
+    let shellW = 0;
     let lastX = 0, lastT = 0, vx = 0;
     let lockedAxis = ""; // "", "x", "y"
     let swipeActive = false;
@@ -327,6 +332,7 @@ function wireViewToggle(){
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
       startP = Number(getComputedStyle(document.body).getPropertyValue("--viewProgress")) || 0;
+      shellW = Math.max(1, viewShell.clientWidth || 1);
 
       lastX = startX;
       lastT = performance.now();
@@ -366,7 +372,7 @@ function wireViewToggle(){
       lastX = x;
       lastT = now;
 
-      const denom = Math.max(1, viewShell.clientWidth || window.innerWidth || 1);
+      const denom = shellW || Math.max(1, viewShell.clientWidth || window.innerWidth || 1);
       const delta = -dx / denom;
       const nextP = startP + delta;
       pendingP = nextP;
