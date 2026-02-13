@@ -1395,7 +1395,7 @@ margin-top: 8px;
 
   /* Shift the ZIP row + its hint slightly left to reclaim space */
   #eventsSearchSuggestDistance .distance__row{
-    margin-left: -18px; /* final micro left push */
+    margin-left: -17px; /* final micro left push */
   }
 
   /* Reduce gap a touch so the apply button stays visible */
@@ -1510,6 +1510,7 @@ font-size: 10px;
     transform: translateX(-1px) !important; /* mobile left */
   }
 }
+
 
 
 
