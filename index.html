@@ -99,11 +99,15 @@
                   </div>
                   <div class="menu__divider"></div>
 
-                  <div class="distance__section" aria-label="Origin ZIP">
-                    <input id="distanceOriginInput" class="distance__input" type="text" inputmode="numeric"
-                           autocomplete="postal-code" autocapitalize="none" spellcheck="false"
-                           placeholder="Enter ZIP" maxlength="5"
-                           aria-label="Enter ZIP" />
+                  <div class="distance__section" aria-label="Training near ZIP">
+                    <div class="distance__row">
+                      <input id="distanceOriginInput" class="distance__input" type="text"
+                             inputmode="numeric" autocomplete="off" autocapitalize="none" spellcheck="false"
+                             placeholder="Enter ZIP" maxlength="5" aria-label="Enter ZIP" />
+                      <button id="distanceApplyBtn" class="distance__apply" type="button" aria-label="Apply ZIP">
+                        ➜
+                      </button>
+                    </div>
                     <div id="distanceHint" class="distance__hint">Shows gyms within 15 miles</div>
                   </div>
                 </div>
