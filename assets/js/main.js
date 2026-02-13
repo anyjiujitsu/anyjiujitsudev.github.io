@@ -421,9 +421,9 @@ function render(){
   if(distRes.active){
     const pending = Number(distRes.pending) || 0;
     $("status").textContent = pending > 0
-      ? `${idxFiltered.length} gyms (locating ${pending}…)`
-      : `${idxFiltered.length} gyms`;
-  } else {
+      ? `${idxFiltered.length} gyms (within ${state.indexEvents.distMiles || 15} mi, locating ${pending}…)`
+      : `${idxFiltered.length} gyms (within ${state.indexEvents.distMiles || 15} mi)`;
+} else {
     $("status").textContent = `${idxFiltered.length} gyms`;
   }
 }
