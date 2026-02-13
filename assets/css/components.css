@@ -1448,41 +1448,6 @@ font-size: 10px;
 }
 
 
-/* Index: distance segmented toggle (Training Near) */
-#eventsSearchSuggestDistance .distance__hint{
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  opacity: 1; /* override legacy hint opacity for the toggle row */
-}
-
-#eventsSearchSuggestDistance .distance__hintText{
-  color: #7a7a7a;
-}
-
-#eventsSearchSuggestDistance .distance__segmented{
-  display: inline-flex;
-  border: 1px solid rgba(0,0,0,0.18);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-#eventsSearchSuggestDistance .distance__opt{
-  appearance: none;
-  border: 0;
-  background: transparent;
-  padding: 4px 10px;
-  font-size: 12px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-#eventsSearchSuggestDistance .distance__opt.is-active{
-  background: var(--green);
-  color: #fff;
-}
-
-
 /* Index: iOS-style segmented control for Distance (Training Near) */
 #eventsSearchSuggestDistance .distance__hint--toggle{
   display: flex;
@@ -1502,7 +1467,6 @@ font-size: 10px;
   background: rgba(0,0,0,0.10);
   border-radius: 10px;
   padding: 2px;
-  gap: 0;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
@@ -1521,7 +1485,6 @@ font-size: 10px;
   transition: transform 160ms ease;
 }
 
-/* Slide the thumb when 30 is selected */
 #eventsSearchSuggestDistance .iosSeg[data-selected="30"]::before{
   transform: translateX(100%);
 }
