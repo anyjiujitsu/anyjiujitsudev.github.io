@@ -357,9 +357,10 @@ function wireViewToggle(){
 
       // Tiny blend factor smooths micro-jitter from uneven touchmove cadence on iOS.
       // Closer to 1 = tighter finger tracking; lower = smoother (but more lag).
-      const BLEND_FAR  = 0.92; // follow fast when you're far away
-      const BLEND_NEAR = 0.78; // extra smoothing for micro-jitter when you're close
-      const NEAR_P = 0.018;    // threshold (in progress units) considered "near"
+      const BLEND_FAR  = 0.90; // slightly smoother even when far
+      const BLEND_NEAR = 0.66; // stronger smoothing for micro-jitter when close
+      const NEAR_P = 0.030;    // wider "near" window
+      const SNAP_P = 0.0035;   // snap-to-target deadband to kill last tiny shimmer
 
       let p = __currentP || startP || 0;
 
@@ -368,6 +369,14 @@ function wireViewToggle(){
         if(targetP === null) return;
 
         const d = Math.abs(targetP - p);
+
+        // If we're extremely close, snap to the exact target to avoid sub-pixel shimmer.
+        if(d < SNAP_P){
+          p = targetP;
+          applyProgressVars(p);
+          return;
+        }
+
         const b = (d > NEAR_P) ? BLEND_FAR : BLEND_NEAR;
 
         // Smooth toward the latest target (adaptive: buttery when close, responsive when far).
