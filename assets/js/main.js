@@ -325,8 +325,26 @@ function wireViewToggle(){
     let lastX = 0, lastT = 0, vx = 0;
     let lockedAxis = ""; // "", "x", "y"
     let swipeActive = false;
-    let rafId = 0;
-    let pendingP = null;
+    let rafLoop = 0;
+    let targetP = null;
+
+    function startSwipeLoop(){
+      if(rafLoop) return;
+      const tick = () => {
+        rafLoop = requestAnimationFrame(tick);
+        if(targetP !== null){
+          applyProgress(targetP);
+        }
+      };
+      rafLoop = requestAnimationFrame(tick);
+    }
+
+    function stopSwipeLoop(){
+      if(rafLoop){
+        cancelAnimationFrame(rafLoop);
+        rafLoop = 0;
+      }
+    }
     viewShell.addEventListener("touchstart", (e) => {
       if(e.touches.length !== 1) return;
       startX = e.touches[0].clientX;
@@ -339,6 +357,8 @@ function wireViewToggle(){
       vx = 0;
       lockedAxis = "";
       swipeActive = false;
+      stopSwipeLoop();
+      targetP = null;
     }, { passive: true });
 
     viewShell.addEventListener("touchmove", (e) => {
@@ -360,6 +380,8 @@ function wireViewToggle(){
       if(!swipeActive){
         swipeActive = true;
         setTransition(0);
+        targetP = startP;
+        startSwipeLoop();
       }
 
       // Prevent the page from trying to scroll while we are swiping horizontally
@@ -375,29 +397,18 @@ function wireViewToggle(){
       const denom = shellW || Math.max(1, viewShell.clientWidth || window.innerWidth || 1);
       const delta = -dx / denom;
       const nextP = startP + delta;
-      pendingP = nextP;
-      if(!rafId){
-        rafId = requestAnimationFrame(() => {
-          rafId = 0;
-          if(pendingP !== null){
-            applyProgress(pendingP);
-            pendingP = null;
-          }
-        });
-      }
+
+      // Set the target progress; a dedicated rAF loop will keep frames smooth even if touchmove events arrive unevenly.
+      targetP = nextP;
     }, { passive: false });
 
     viewShell.addEventListener("touchend", () => {
       setTransition(220);
 
-      // Flush any pending rAF progress update before we decide which view to commit
-      if(rafId){
-        cancelAnimationFrame(rafId);
-        rafId = 0;
-      }
-      if(pendingP !== null){
-        applyProgress(pendingP);
-        pendingP = null;
+      // Stop the continuous swipe loop and sync the last target before we decide which view to commit.
+      stopSwipeLoop();
+      if(targetP !== null){
+        applyProgress(targetP);
       }
 
       const p = Number(getComputedStyle(document.body).getPropertyValue("--viewProgress")) || 0;
