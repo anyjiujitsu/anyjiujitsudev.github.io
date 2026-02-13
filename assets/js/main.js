@@ -326,114 +326,119 @@ function wireViewToggle(){
   }
 
   if(viewShell){
-    // Mobile swipe between views (Events <-> Index)
-    // Goal: "native iOS" feel — finger tracks the page 1:1, animation only on release.
     let startX = 0, startY = 0, startP = 0;
     let shellW = 0;
     let lastX = 0, lastT = 0, vx = 0;
     let lockedAxis = ""; // "", "x", "y"
     let swipeActive = false;
+    let rafLoop = 0;
+    let targetP = null;
 
-    // rAF-driven 1:1 tracking (prevents stutter from uneven touchmove delivery)
-    let rafId = 0;
-    let latestDx = 0;
-    let latestDy = 0;
+    function startSwipeLoop(){
+  if(rafLoop) return;
 
-    function scheduleTrack(){
-      if(rafId) return;
-      rafId = requestAnimationFrame(() => {
-        rafId = 0;
-        if(!swipeActive) return;
+  let p = startP;
+  let v = 0;
+  let last = performance.now();
 
-        const denom = shellW || Math.max(1, viewShell.clientWidth || window.innerWidth || 1);
-        const delta = -latestDx / denom;
-        applyProgress(startP + delta);
-      });
-    }
+  const tick = () => {
+    rafLoop = requestAnimationFrame(tick);
 
-    function resetTrack(){
-      if(rafId){
-        cancelAnimationFrame(rafId);
-        rafId = 0;
+    if(targetP === null) return;
+
+    const now = performance.now();
+    const dt = Math.max(0.5, Math.min(3, (now - last) / 16.67)); // normalize to ~60fps
+    last = now;
+
+    // Critically-damped-ish spring toward targetP for "analog" smoothness.
+    const k = 0.18 * dt;          // spring strength
+    const damp = Math.pow(0.72, dt); // damping per frame
+    v = (v * damp) + (targetP - p) * k;
+    p = p + v;
+
+    applyProgress(p);
+  };
+
+  rafLoop = requestAnimationFrame(tick);
+}
+
+function stopSwipeLoop(){
+
+      if(rafLoop){
+        cancelAnimationFrame(rafLoop);
+        rafLoop = 0;
       }
     }
-
     viewShell.addEventListener("touchstart", (e) => {
       if(e.touches.length !== 1) return;
-
-      const t = e.touches[0];
-      startX = t.clientX;
-      startY = t.clientY;
-
-      // Read once per gesture (avoid layout reads during move)
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      startP = Number(getComputedStyle(document.body).getPropertyValue("--viewProgress")) || 0;
       shellW = Math.max(1, viewShell.clientWidth || 1);
       __setViewShellW(shellW);
-
-      startP = Number(getComputedStyle(document.body).getPropertyValue("--viewProgress")) || 0;
 
       lastX = startX;
       lastT = performance.now();
       vx = 0;
-
       lockedAxis = "";
       swipeActive = false;
-
-      latestDx = 0;
-      latestDy = 0;
-      resetTrack();
+      stopSwipeLoop();
+      targetP = null;
     }, { passive: true });
 
     viewShell.addEventListener("touchmove", (e) => {
       if(e.touches.length !== 1) return;
+      const x = e.touches[0].clientX;
+      const y = e.touches[0].clientY;
 
-      const t = e.touches[0];
-      const x = t.clientX;
-      const y = t.clientY;
+      const dx = x - startX;
+      const dy = y - startY;
 
-      latestDx = x - startX;
-      latestDy = y - startY;
-
-      // Deadzone + axis lock
+      // Deadzone + axis lock to avoid jitter from tiny diagonal movement
       if(!lockedAxis){
-        if(Math.abs(latestDx) < 8 && Math.abs(latestDy) < 8) return;
-        lockedAxis = (Math.abs(latestDx) >= Math.abs(latestDy)) ? "x" : "y";
+        if(Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        lockedAxis = (Math.abs(dx) >= Math.abs(dy)) ? "x" : "y";
       }
       if(lockedAxis === "y") return;
 
-      // Commit to horizontal swipe
+      // We're committing to a horizontal swipe; disable transition for buttery tracking.
       if(!swipeActive){
         swipeActive = true;
-        setTransition(0); // direct finger tracking
+        setTransition(0);
+        targetP = startP;
+        startSwipeLoop();
       }
 
-      // Prevent page scroll once we are locked to x (important for iOS feel)
+      // Prevent the page from trying to scroll while we are swiping horizontally
       e.preventDefault();
 
-      // Velocity (px/ms) for quick flick
+      // Velocity (px/ms) for "quick flick" commits
       const now = performance.now();
       const dt = Math.max(1, now - lastT);
       vx = (x - lastX) / dt;
       lastX = x;
       lastT = now;
 
-      scheduleTrack();
+      const denom = shellW || Math.max(1, viewShell.clientWidth || window.innerWidth || 1);
+      const delta = -dx / denom;
+      const nextP = startP + delta;
+
+      // Set the target progress; a dedicated rAF loop will keep frames smooth even if touchmove events arrive unevenly.
+      targetP = nextP;
     }, { passive: false });
 
     viewShell.addEventListener("touchend", () => {
-      // If we never committed to horizontal, do nothing.
-      if(!swipeActive){
-        resetTrack();
-        return;
+      setTransition(220);
+
+      // Stop the continuous swipe loop and sync the last target before we decide which view to commit.
+      stopSwipeLoop();
+      if(targetP !== null){
+        applyProgress(targetP);
       }
 
-      // Finish the last tracked position immediately.
-      resetTrack();
-      const denom = shellW || Math.max(1, viewShell.clientWidth || window.innerWidth || 1);
-      const p = applyProgress(startP + (-latestDx / denom));
+      const p = Number(getComputedStyle(document.body).getPropertyValue("--viewProgress")) || 0;
 
-      // Animate to the chosen view on release.
-      setTransition(260);
-
+      // More sensitive commit: shorter swipe distance + quick flick support
       const FLICK_V = 0.45; // px/ms
       const EDGE_T  = 0.35; // distance from edge to switch
 
@@ -443,23 +448,15 @@ function wireViewToggle(){
         return;
       }
 
-      // Otherwise commit based on how far you pulled from the starting edge
+      // Otherwise: commit based on how far you pulled from the *starting* view edge
       if(startP >= 0.5){
-        // started on index
+        // started on index (p ~ 1) -> switch earlier when p drops below 1-EDGE_T
         setViewUI(p <= (1 - EDGE_T) ? "events" : "index");
       }else{
-        // started on events
+        // started on events (p ~ 0) -> switch earlier when p rises above EDGE_T
         setViewUI(p >= EDGE_T ? "index" : "events");
       }
     }, { passive: true });
-
-    viewShell.addEventListener("touchcancel", () => {
-      resetTrack();
-      setTransition(260);
-      setViewUI(startP >= 0.5 ? "index" : "events");
-    }, { passive: true });
-  }
-
   }
 }
 
