@@ -125,7 +125,7 @@ export function wireSearchSuggestions({
   }
 
   function applyZip(){
-    if(mode() !== "index") return;
+    if(!isIndexView()) return;
     const zip = sanitizeZip();
     if(zip.length !== 5) return;
     // Mirror into the search bar so the user can see the active filter.
@@ -152,32 +152,31 @@ export function wireSearchSuggestions({
   // iOS-style segmented control (Index view only)
   segBtns?.forEach((btn)=>{
     btn.addEventListener("click", (e)=>{
-      if(mode() !== "index") return;
+      if(!isIndexView()) return;
       e.preventDefault();
       e.stopPropagation();
       const miles = Number(btn.dataset.miles);
       if(!Number.isFinite(miles)) return;
       setMilesUI(miles);
       if(typeof setIndexDistanceMiles === "function") setIndexDistanceMiles(miles);
-      if(state && state.indexEvents) state.indexEvents.distMiles = miles;
       render();
     });
   });
 
   distInput?.addEventListener("input", ()=>{
-    if(mode() !== "index") return;
+    if(!isIndexView()) return;
     sanitizeZip();
   });
 
   distInput?.addEventListener("keydown", (e)=>{
-    if(mode() !== "index") return;
+    if(!isIndexView()) return;
     if(e.key !== "Enter") return;
     e.preventDefault();
     applyZip();
   });
 
   distApply?.addEventListener("click", (e)=>{
-    if(mode() !== "index") return;
+    if(!isIndexView()) return;
     e.preventDefault();
     e.stopPropagation();
     applyZip();
