@@ -1391,25 +1391,34 @@ nav.filters, .filters__inner, .pillRow{
 
 @media (max-width: 520px){
   /* Keep the dropdown structure intact; only shrink the interactive ZIP controls */
+
+  /* ZIP field: make it tighter (5 digits) */
   #eventsSearchSuggestDistance .distance__input{
-    flex: 0 0 130px;
-    width: 130px;
-    max-width: 130px;
-    padding: 8px 9px;
-    font-size: 13px;
+    flex: 0 0 108px;
+    width: 108px;
+    max-width: 108px;
+    padding: 6px 8px;
+    /* Prevent iOS Safari "zoom on focus" */
+    font-size: 16px;
+    line-height: 1.2;
   }
 
+  /* Placeholder/helper text can stay smaller */
   #eventsSearchSuggestDistance .distance__input::placeholder{
     font-size: 12px;
   }
 
+  /* Apply/arrow button: slightly smaller so it stays in view */
   #eventsSearchSuggestDistance .distance__apply{
-    padding: 8px 10px;
-    font-size: 14px;
+    padding: 6px 9px;
+    font-size: 13px;
+    line-height: 1;
   }
 
+  /* "within X miles" hint: shrink more */
   #eventsSearchSuggestDistance .distance__hint{
     margin-top: 6px;
-    font-size: 11px;
+    font-size: 10px;
   }
 }
+
