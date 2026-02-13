@@ -1448,7 +1448,7 @@ font-size: 10px;
 #eventsSearchSuggestDistance #distanceHint.distance__hint--toggle{
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   opacity: 1;
   transform: translateX(18px) !important;
 }
@@ -1510,6 +1510,7 @@ font-size: 10px;
     transform: translateX(-1px) !important; /* mobile left */
   }
 }
+
 
 
 
