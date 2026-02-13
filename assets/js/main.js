@@ -33,6 +33,17 @@ function syncDistanceUIFromState(){
   if(!distWrap) return;
   const input = $("distanceOriginInput");
   if(input) input.value = String(state.indexEvents.distFrom || "");
+
+  const opts = distWrap.querySelectorAll(".distance__opt");
+  if(opts && opts.length){
+    const miles = Number(state.indexEvents.distMiles || 15);
+    opts.forEach((b)=>{
+      const m = Number(b.dataset.miles);
+      const on = (m === miles);
+      b.classList.toggle("is-active", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
 }
 
 /* ------------------ INDEX REMAP (directory.csv -> events-style rows) ------------------ */
@@ -420,6 +431,7 @@ async function init(){
   wireViewToggle();
 
   wireSearch({
+    setIndexDistanceMiles,
     $,
     setIndexQuery,
     setIndexEventsQuery,
