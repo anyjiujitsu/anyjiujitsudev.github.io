@@ -1383,42 +1383,30 @@ nav.filters, .filters__inner, .pillRow{
   opacity: 0.7;
 }
 
-/* =========================================================
-   section: Training Near dropdown (Index view) — mobile sizing
-   purpose: reduce ZIP input + apply button + helper text sizes on mobile only
-   note: does NOT change dropdown container, divider, or title styling
-   ========================================================= */
-
+/* Mobile-only: tighten the ZIP row so the input + apply button fit on one line,
+   without resizing the dropdown container, divider, or title text. */
 @media (max-width: 520px){
-  /* Keep the dropdown structure intact; only shrink the interactive ZIP controls */
-
-  /* ZIP field: make it tighter (5 digits) */
-  #eventsSearchSuggestDistance .distance__input{
-    flex: 0 0 108px;
-    width: 108px;
-    max-width: 108px;
-    padding: 6px 8px;
-    /* Prevent iOS Safari "zoom on focus" */
-    font-size: 16px;
-    line-height: 1.2;
-  }
-
-  /* Placeholder/helper text can stay smaller */
-  #eventsSearchSuggestDistance .distance__input::placeholder{
-    font-size: 12px;
-  }
-
-  /* Apply/arrow button: slightly smaller so it stays in view */
-  #eventsSearchSuggestDistance .distance__apply{
-    padding: 6px 9px;
-    font-size: 13px;
-    line-height: 1;
-  }
-
-  /* "within X miles" hint: shrink more */
+  /* Shift the ZIP row + its hint slightly left to reclaim space */
+  #eventsSearchSuggestDistance .distance__row,
   #eventsSearchSuggestDistance .distance__hint{
-    margin-top: 6px;
+    margin-left: -6px;
+  }
+
+  /* Reduce gap a touch so the apply button stays visible */
+  #eventsSearchSuggestDistance .distance__row{
+    gap: 6px;
+  }
+
+  /* ZIP field only needs 5 digits */
+  #eventsSearchSuggestDistance .distance__input{
+    flex: 0 0 104px;
+    width: 104px;
+    max-width: 104px;
+  }
+
+  /* Make the “within X miles” line smaller and avoid wrapping */
+  #eventsSearchSuggestDistance .distance__hint{
     font-size: 10px;
+    white-space: nowrap;
   }
 }
-
