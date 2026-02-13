@@ -357,7 +357,9 @@ function wireViewToggle(){
 
       // Tiny blend factor smooths micro-jitter from uneven touchmove cadence on iOS.
       // Closer to 1 = tighter finger tracking; lower = smoother (but more lag).
-      const SWIPE_BLEND = 0.88;
+      const BLEND_FAR  = 0.92; // follow fast when you're far away
+      const BLEND_NEAR = 0.78; // extra smoothing for micro-jitter when you're close
+      const NEAR_P = 0.018;    // threshold (in progress units) considered "near"
 
       let p = __currentP || startP || 0;
 
@@ -365,8 +367,11 @@ function wireViewToggle(){
         rafLoop = requestAnimationFrame(tick);
         if(targetP === null) return;
 
-        // Smooth toward the latest target.
-        p = p + (targetP - p) * SWIPE_BLEND;
+        const d = Math.abs(targetP - p);
+        const b = (d > NEAR_P) ? BLEND_FAR : BLEND_NEAR;
+
+        // Smooth toward the latest target (adaptive: buttery when close, responsive when far).
+        p = p + (targetP - p) * b;
 
         applyProgressVars(p);
       };
