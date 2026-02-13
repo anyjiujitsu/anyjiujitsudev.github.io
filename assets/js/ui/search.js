@@ -52,8 +52,8 @@ export function wireSearchSuggestions({
   const dist  = $("eventsSearchSuggestDistance");
   const distInput = $("distanceOriginInput");
   const distApply = $("distanceApplyBtn");
-  const distToggle = dist?.querySelector(".distance__segmented");
-  const distOpts   = dist?.querySelectorAll(".distance__opt");
+    const seg = dist?.querySelector(".iosSeg");
+    const segBtns = dist?.querySelectorAll(".iosSeg__btn");
 
 
   const canSuggest = () => {
@@ -133,18 +133,23 @@ export function wireSearchSuggestions({
     setActiveEventsQuery(zip);
     if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(zip);
     close();
-    distInput?.blur();
+    distInput?.blur();input.blur();
+  }
+
   function setMilesUI(miles){
-    if(!distOpts) return;
-    distOpts.forEach((b)=>{
+    if(!seg || !segBtns) return;
+    const mNum = Number(miles);
+    seg.dataset.selected = String(mNum);
+    segBtns.forEach((b)=>{
       const m = Number(b.dataset.miles);
-      const on = (m === Number(miles));
+      const on = (m === mNum);
       b.classList.toggle("is-active", on);
       b.setAttribute("aria-pressed", on ? "true" : "false");
     });
   }
 
-  distOpts?.forEach((btn)=>{
+  // iOS-style segmented distance toggle (Index view only)
+  segBtns?.forEach((btn)=>{
     btn.addEventListener("click", (e)=>{
       if(mode() !== "index") return;
       e.preventDefault();
@@ -152,14 +157,10 @@ export function wireSearchSuggestions({
       const miles = Number(btn.dataset.miles);
       if(!Number.isFinite(miles)) return;
       setMilesUI(miles);
-      if(typeof setIndexDistanceMiles === "function") setIndexDistanceMiles(miles);
-      // Re-render to apply the new distance if a ZIP is already set.
+      setIndexDistanceMiles?.(miles);
       render();
     });
   });
-
-    input.blur();
-  }
 
   distInput?.addEventListener("input", ()=>{
     if(mode() !== "index") return;
