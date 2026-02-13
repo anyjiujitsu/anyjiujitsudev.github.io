@@ -52,8 +52,8 @@ export function wireSearchSuggestions({
   const dist  = $("eventsSearchSuggestDistance");
   const distInput = $("distanceOriginInput");
   const distApply = $("distanceApplyBtn");
-    const seg = dist?.querySelector(".iosSeg");
-    const segBtns = dist?.querySelectorAll(".iosSeg__btn");
+  const seg = dist?.querySelector(".iosSeg");
+  const segBtns = dist?.querySelectorAll(".iosSeg__btn");
 
 
   const canSuggest = () => {
@@ -133,7 +133,8 @@ export function wireSearchSuggestions({
     setActiveEventsQuery(zip);
     if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(zip);
     close();
-    distInput?.blur();input.blur();
+    distInput?.blur();
+    input.blur();
   }
 
   function setMilesUI(miles){
@@ -148,7 +149,7 @@ export function wireSearchSuggestions({
     });
   }
 
-  // iOS-style segmented distance toggle (Index view only)
+  // iOS-style segmented control (Index view only)
   segBtns?.forEach((btn)=>{
     btn.addEventListener("click", (e)=>{
       if(mode() !== "index") return;
@@ -157,7 +158,7 @@ export function wireSearchSuggestions({
       const miles = Number(btn.dataset.miles);
       if(!Number.isFinite(miles)) return;
       setMilesUI(miles);
-      setIndexDistanceMiles?.(miles);
+      if(typeof setIndexDistanceMiles === "function") setIndexDistanceMiles(miles);
       render();
     });
   });
