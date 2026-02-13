@@ -1395,7 +1395,7 @@ nav.filters, .filters__inner, .pillRow{
   /* Shift the ZIP row + its hint slightly left to reclaim space */
   #eventsSearchSuggestDistance .distance__row,
   #eventsSearchSuggestDistance .distance__hint{
-    margin-left: -8px; /* +1 more left shift */
+    margin-left: -10px; /* +1 more left shift */
   }
 
   /* Reduce gap a touch so the apply button stays visible */
@@ -1409,6 +1409,9 @@ nav.filters, .filters__inner, .pillRow{
     flex: 0 0 96px;
     width: 96px;
     max-width: 96px;
+  
+
+    font-size: 16px; /* prevent iOS zoom on focus */
   }
 
   /* Bring the hint closer + smaller + avoid wrapping */
@@ -1430,7 +1433,7 @@ nav.filters, .filters__inner, .pillRow{
     max-width: 104px;
   }
 
-  /* Make the â€œwithin X milesâ€ line smaller and avoid wrapping */
+  /* Make the “within X miles” line smaller and avoid wrapping */
   #eventsSearchSuggestDistance .distance__hint{
     font-size: 10px;
     white-space: nowrap;
