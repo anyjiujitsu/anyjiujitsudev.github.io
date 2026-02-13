@@ -403,10 +403,10 @@ function render(){
 
   // Index view: render Directory rows using Events-style cards
   // Optional distance filter (Distance From dropdown)
-  // distance filter
-  // Derive miles from state, but fall back to the visible iOS toggle if needed
+  // Source of truth for miles: the visible iOS segmented control (prevents state/module mismatch issues)
   const seg = document.querySelector("#eventsSearchSuggestDistance .iosSeg");
-  const miles = Number(state.indexEvents.distMiles) || Number(seg?.dataset?.selected) || 15;
+  const uiMiles = Number(seg?.dataset?.selected);
+  const miles = Number.isFinite(uiMiles) ? uiMiles : (Number(state.indexEvents.distMiles) || 15);
   state.indexEvents.distMiles = miles;
 
   const distRes = applyDistanceFilter(
@@ -418,7 +418,6 @@ function render(){
       if(state.view === "index") render();
     }
   );
-
 const idxRows = distRes.rows.map(dirToIndexEventRow);
   const idxFiltered = filterIndexDirectoryAsEvents(idxRows, state.indexEvents);
   renderIndexEventsGroups($("indexEventsRoot"), idxFiltered);
