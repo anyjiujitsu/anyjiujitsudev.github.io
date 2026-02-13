@@ -1,6 +1,8 @@
 // ui/search.js
 // purpose: wire search inputs + search suggestion UX
 
+import { state as appState, setIndexDistanceMiles } from "../state.js";
+
 export function wireSearch({ $, setIndexQuery, setIndexEventsQuery, setActiveEventsQuery, setIndexDistanceMiles, render, isIndexView, clearIndexDistance }){
   const idxIn = $("searchInput");
   const evIn  = $("eventsSearchInput");
@@ -158,8 +160,8 @@ export function wireSearchSuggestions({
       const miles = Number(btn.dataset.miles);
       if(!Number.isFinite(miles)) return;
       setMilesUI(miles);
-      const fn = (typeof setIndexDistanceMiles === "function") ? setIndexDistanceMiles : setIndexDistanceMilesState;
-      fn?.(miles);
+      setIndexDistanceMiles?.(miles);
+      if(appState && appState.indexEvents) appState.indexEvents.distMiles = miles;
       render();
     });
   });
