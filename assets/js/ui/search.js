@@ -1,7 +1,7 @@
 // ui/search.js
 // purpose: wire search inputs + search suggestion UX
 
-export function wireSearch({ $, setIndexQuery, setIndexEventsQuery, setActiveEventsQuery, render }){
+export function wireSearch({ $, setIndexQuery, setIndexEventsQuery, setActiveEventsQuery, render, isIndexView, clearIndexDistance }){
   const idxIn = $("searchInput");
   const evIn  = $("eventsSearchInput");
 
@@ -26,6 +26,9 @@ export function wireSearch({ $, setIndexQuery, setIndexEventsQuery, setActiveEve
   $("eventsSearchClear")?.addEventListener("click", ()=>{
     setActiveEventsQuery("");
     if(evIn) evIn.value = "";
+    // Index view: X should also clear the ZIP distance filter
+    const idx = (typeof isIndexView === "function") ? !!isIndexView() : false;
+    if(idx && typeof clearIndexDistance === "function") clearIndexDistance();
     render();
   });
 }
@@ -48,6 +51,7 @@ export function wireSearchSuggestions({
   const quick = $("eventsSearchSuggestQuick");
   const dist  = $("eventsSearchSuggestDistance");
   const distInput = $("distanceOriginInput");
+  const distApply = $("distanceApplyBtn");
 
   const canSuggest = () => {
     const ev = (typeof isEventsView !== "function") ? true : !!isEventsView();
@@ -109,43 +113,44 @@ export function wireSearchSuggestions({
   });
 
   // INDEX mode: Training Near (ZIP)
-  // - digits only
-  // - max 5
-  // - apply automatically once 5 digits are entered
-  let zipTimer = null;
-
-  function sanitizeZip(raw){
-    return String(raw || "").replace(/\D/g, "").slice(0, 5);
+  function sanitizeZip(){
+    if(!distInput) return "";
+    const raw = String(distInput.value || "");
+    const digits = raw.replace(/\D/g, "").slice(0, 5);
+    if(digits !== raw) distInput.value = digits;
+    return digits;
   }
 
-  function maybeApplyZip(zip){
-    if(typeof onIndexDistanceSelectOrigin !== "function") return;
-    if(!zip) { onIndexDistanceSelectOrigin(""); return; }
-    if(zip.length === 5) onIndexDistanceSelectOrigin(zip);
+  function applyZip(){
+    if(mode() !== "index") return;
+    const zip = sanitizeZip();
+    if(zip.length !== 5) return;
+    // Mirror into the search bar so the user can see the active filter.
+    input.value = zip;
+    setActiveEventsQuery(zip);
+    if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(zip);
+    close();
+    distInput?.blur();
+    input.blur();
   }
 
   distInput?.addEventListener("input", ()=>{
     if(mode() !== "index") return;
-    const clean = sanitizeZip(distInput.value);
-    if(distInput.value !== clean) distInput.value = clean;
-
-    // debounce a touch so we don't thrash render while typing
-    if(zipTimer) clearTimeout(zipTimer);
-    zipTimer = setTimeout(()=>{
-      maybeApplyZip(clean);
-    }, 160);
+    sanitizeZip();
   });
 
   distInput?.addEventListener("keydown", (e)=>{
     if(mode() !== "index") return;
     if(e.key !== "Enter") return;
-    const clean = sanitizeZip(distInput.value);
-    distInput.value = clean;
-    if(zipTimer) clearTimeout(zipTimer);
     e.preventDefault();
-    maybeApplyZip(clean);
-    close();
-    distInput.blur();
+    applyZip();
+  });
+
+  distApply?.addEventListener("click", (e)=>{
+    if(mode() !== "index") return;
+    e.preventDefault();
+    e.stopPropagation();
+    applyZip();
   });
 
   document.addEventListener("pointerdown", (e)=>{
