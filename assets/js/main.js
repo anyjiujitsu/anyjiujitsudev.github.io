@@ -128,13 +128,29 @@ let __viewShellW = 0;
 function __setViewShellW(w){ __viewShellW = Math.max(1, Number(w)||0); }
 function __getViewShellW(){ return (__viewShellW || ($("viewShell")?.clientWidth) || window.innerWidth || 1); }
 
+let __viewVarTarget = null;
+
+function __getViewVarTarget(){
+  // Scope variable updates to the moving element to reduce style recalculation.
+  if(__viewVarTarget) return __viewVarTarget;
+  const byId = document.getElementById("viewSlider") || document.getElementById("viewTrack");
+  if(byId) { __viewVarTarget = byId; return __viewVarTarget; }
+  const byClass = document.querySelector(".viewSlider") || document.querySelector(".view-track") || document.querySelector(".views");
+  if(byClass) { __viewVarTarget = byClass; return __viewVarTarget; }
+  __viewVarTarget = document.body;
+  return __viewVarTarget;
+}
+
 function applyProgressVars(p){
   const clamped = Math.max(0, Math.min(1, p));
-  document.body.style.setProperty("--viewProgress", String(clamped));
+  const el = __getViewVarTarget();
+  el.style.setProperty("--viewProgress", String(clamped));
+
   const w = __getViewShellW();
   const offsetPx = (-w * clamped);
-  // Use higher precision to reduce perceptible stepping on mobile GPUs.
-  document.body.style.setProperty("--viewOffsetPx", `${offsetPx.toFixed(4)}px`);
+
+  // Higher precision + translate3d reduces quantization on iOS.
+  el.style.setProperty("--viewOffsetPx", `${offsetPx.toFixed(6)}px`);
   return clamped;
 }
 
@@ -338,7 +354,7 @@ function wireViewToggle(){
     let lockedAxis = ""; // "", "x", "y"
     let swipeActive = false;
     let rafLoop = 0;
-    let targetP = null;
+    let targetP = null; __swipeW = 0;
 
     function startSwipeLoop(){
   if(rafLoop) return;
@@ -381,7 +397,7 @@ function stopSwipeLoop(){
       lockedAxis = "";
       swipeActive = false;
       stopSwipeLoop();
-      targetP = null;
+      targetP = null; __swipeW = 0;
     }, { passive: true });
 
     viewShell.addEventListener("touchmove", (e) => {
