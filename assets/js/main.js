@@ -250,26 +250,28 @@ function wireViewToggle(){
   if(viewToggle){
     let dragging = false;
     let pointerId = null;
+    let downX = 0;
+    let moved = false;
 
     viewToggle.addEventListener("pointerdown", (e) => {
+      // Treat pointerdown as a potential "tap". We only enter drag-mode after a small move.
       dragging = true;
+      moved = false;
+      downX = e.clientX;
       pointerId = e.pointerId;
       viewToggle.setPointerCapture(pointerId);
-      setTransition(0);
-
-      const rect = viewToggle.getBoundingClientRect();
-      const padding = 4;
-      const trackW = rect.width - padding * 2;
-      const thumbW = trackW / 2;
-      const travel = trackW - thumbW;
-
-      const x = e.clientX - rect.left - padding;
-      const p = (x - thumbW / 2) / travel;
-      applyProgress(p);
     });
 
     viewToggle.addEventListener("pointermove", (e) => {
       if(!dragging || e.pointerId !== pointerId) return;
+
+      // Only start dragging after a tiny movement threshold.
+      if(!moved){
+        if(Math.abs(e.clientX - downX) < 6) return;
+        moved = true;
+        setTransition(0);
+      }
+
       const rect = viewToggle.getBoundingClientRect();
       const padding = 4;
       const trackW = rect.width - padding * 2;
@@ -284,8 +286,22 @@ function wireViewToggle(){
     const endDrag = (e) => {
       if(!dragging) return;
       if(e && pointerId != null && e.pointerId !== pointerId) return;
+
       dragging = false;
+      const wasMoved = moved;
+      moved = false;
       pointerId = null;
+
+      // If the user didn't drag, treat this as a tap/click and animate the view change.
+      if(!wasMoved){
+        const rect = viewToggle.getBoundingClientRect();
+        const x = e && typeof e.clientX === "number" ? e.clientX : (rect.left + rect.width / 2);
+        const isRightHalf = x >= (rect.left + rect.width / 2);
+        setTransition(260);
+        setViewUI(isRightHalf ? "index" : "events");
+        return;
+      }
+
       setTransition(260);
       const p = Number(getComputedStyle(document.body).getPropertyValue("--viewProgress")) || 0;
       setViewUI(p >= 0.5 ? "index" : "events");
@@ -300,6 +316,7 @@ function wireViewToggle(){
     let startX = 0, startY = 0, startP = 0;
     let lastX = 0, lastT = 0, vx = 0;
     let lockedAxis = ""; // "", "x", "y"
+    let swipeActive = false;
     let rafId = 0;
     let pendingP = null;
     viewShell.addEventListener("touchstart", (e) => {
@@ -312,8 +329,7 @@ function wireViewToggle(){
       lastT = performance.now();
       vx = 0;
       lockedAxis = "";
-
-      setTransition(0);
+      swipeActive = false;
     }, { passive: true });
 
     viewShell.addEventListener("touchmove", (e) => {
@@ -331,6 +347,12 @@ function wireViewToggle(){
       }
       if(lockedAxis === "y") return;
 
+      // We're committing to a horizontal swipe; disable transition for buttery tracking.
+      if(!swipeActive){
+        swipeActive = true;
+        setTransition(0);
+      }
+
       // Prevent the page from trying to scroll while we are swiping horizontally
       e.preventDefault();
 
@@ -341,7 +363,8 @@ function wireViewToggle(){
       lastX = x;
       lastT = now;
 
-      const delta = -dx / window.innerWidth;
+      const denom = Math.max(1, viewShell.clientWidth || window.innerWidth || 1);
+      const delta = -dx / denom;
       const nextP = startP + delta;
       pendingP = nextP;
       if(!rafId){
