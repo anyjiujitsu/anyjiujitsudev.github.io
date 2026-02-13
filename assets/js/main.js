@@ -124,11 +124,17 @@ function setTransition(ms){
   document.body.style.setProperty("--viewTransition", ms + "ms");
 }
 
+let __viewShellW = 0;
+function __setViewShellW(w){ __viewShellW = Math.max(1, Number(w)||0); }
+function __getViewShellW(){ return (__viewShellW || ($("viewShell")?.clientWidth) || window.innerWidth || 1); }
+
 function applyProgress(p){
   const clamped = Math.max(0, Math.min(1, p));
   // Set both the semantic progress and a precomputed offset string to avoid calc() jitter on mobile.
   document.body.style.setProperty("--viewProgress", String(clamped));
-  document.body.style.setProperty("--viewOffsetPct", `${(-50 * clamped).toFixed(4)}%`);
+  const w = __getViewShellW();
+  const offsetPx = (-w * clamped);
+  document.body.style.setProperty("--viewOffsetPx", `${offsetPx.toFixed(2)}px`);
 
   const viewTitle = $("viewTitle");
   if(viewTitle){
@@ -329,17 +335,35 @@ function wireViewToggle(){
     let targetP = null;
 
     function startSwipeLoop(){
-      if(rafLoop) return;
-      const tick = () => {
-        rafLoop = requestAnimationFrame(tick);
-        if(targetP !== null){
-          applyProgress(targetP);
-        }
-      };
-      rafLoop = requestAnimationFrame(tick);
-    }
+  if(rafLoop) return;
 
-    function stopSwipeLoop(){
+  let p = startP;
+  let v = 0;
+  let last = performance.now();
+
+  const tick = () => {
+    rafLoop = requestAnimationFrame(tick);
+
+    if(targetP === null) return;
+
+    const now = performance.now();
+    const dt = Math.max(0.5, Math.min(3, (now - last) / 16.67)); // normalize to ~60fps
+    last = now;
+
+    // Critically-damped-ish spring toward targetP for "analog" smoothness.
+    const k = 0.18 * dt;          // spring strength
+    const damp = Math.pow(0.72, dt); // damping per frame
+    v = (v * damp) + (targetP - p) * k;
+    p = p + v;
+
+    applyProgress(p);
+  };
+
+  rafLoop = requestAnimationFrame(tick);
+}
+
+function stopSwipeLoop(){
+
       if(rafLoop){
         cancelAnimationFrame(rafLoop);
         rafLoop = 0;
@@ -351,6 +375,7 @@ function wireViewToggle(){
       startY = e.touches[0].clientY;
       startP = Number(getComputedStyle(document.body).getPropertyValue("--viewProgress")) || 0;
       shellW = Math.max(1, viewShell.clientWidth || 1);
+      __setViewShellW(shellW);
 
       lastX = startX;
       lastT = performance.now();
