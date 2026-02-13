@@ -129,13 +129,16 @@ function __setViewShellW(w){ __viewShellW = Math.max(1, Number(w)||0); }
 function __getViewShellW(){ return (__viewShellW || ($("viewShell")?.clientWidth) || window.innerWidth || 1); }
 
 let __lastViewTitleMode = null; // null | "events" | "index"
+let __swipeW = 0; // cached width during active swipe
 
 function applyProgressVars(p){
   const clamped = Math.max(0, Math.min(1, p));
-  // Fast path: only update CSS variables (no DOM reads/writes besides style props).
+  // Fast path: only update CSS variables (no per-frame DOM churn).
   document.body.style.setProperty("--viewProgress", String(clamped));
-  const w = __getViewShellW();
+
+  const w = (__swipeW > 0) ? __swipeW : __getViewShellW();
   const offsetPx = (-w * clamped);
+
   // Higher precision reduces perceptible stepping on iOS.
   document.body.style.setProperty("--viewOffsetPx", `${offsetPx.toFixed(4)}px`);
   return clamped;
@@ -144,7 +147,7 @@ function applyProgressVars(p){
 function applyProgress(p){
   const clamped = applyProgressVars(p);
 
-  // Slow path: update title only when crossing the mid-point (prevents per-frame DOM churn).
+  // Slow path: update title only when crossing the mid-point.
   const mode = (clamped >= 0.5) ? "index" : "events";
   if(mode !== __lastViewTitleMode){
     __lastViewTitleMode = mode;
@@ -345,7 +348,7 @@ function wireViewToggle(){
     let lockedAxis = ""; // "", "x", "y"
     let swipeActive = false;
     let rafLoop = 0;
-    let targetP = null;
+    let targetP = null; __swipeW = 0;
 
     function startSwipeLoop(){
   if(rafLoop) return;
@@ -396,7 +399,7 @@ function stopSwipeLoop(){
       lockedAxis = "";
       swipeActive = false;
       stopSwipeLoop();
-      targetP = null;
+      targetP = null; __swipeW = 0;
     }, { passive: true });
 
     viewShell.addEventListener("touchmove", (e) => {
