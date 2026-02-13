@@ -228,6 +228,7 @@ line-height: 1;
   font-weight: 600;
   color: rgba(0,0,0,0.55);
   white-space: nowrap;
+    color: #7a7a7a; /* softer grey */
 }
 
 .pill__caret{ font-size: 10px; opacity: 0.55; margin-left: var(--evIconLeft); }
@@ -449,6 +450,7 @@ input[type="search"]{ font-size:16px; }
     font-size: 8.3px;
     letter-spacing: 0.05em;
     white-space: nowrap;
+    color: #7a7a7a; /* softer grey */
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
@@ -1204,7 +1206,8 @@ nav.filters, .filters__inner, .pillRow{
   letter-spacing: .06em;
   text-transform: uppercase;
   color: #6f6f6f;
-  white-space: nowrap; /* prevent wrapping on small screens */
+  white-space: nowrap;
+    color: #7a7a7a; /* softer grey */ /* prevent wrapping on small screens */
 }
 
 /* Quick Searches dropdown (search suggestions) */
@@ -1395,7 +1398,7 @@ nav.filters, .filters__inner, .pillRow{
   /* Shift the ZIP row + its hint slightly left to reclaim space */
   #eventsSearchSuggestDistance .distance__row,
   #eventsSearchSuggestDistance .distance__hint{
-    margin-left: -10px; /* +1 more left shift */
+    margin-left: -12px; /* +1 more left shift */
   }
 
   /* Reduce gap a touch so the apply button stays visible */
@@ -1419,6 +1422,7 @@ nav.filters, .filters__inner, .pillRow{
     margin-top: 4px;
     font-size: 9.5px;
     white-space: nowrap;
+    color: #7a7a7a; /* softer grey */
   }
 }
 /* Reduce gap a touch so the apply button stays visible */
@@ -1437,5 +1441,6 @@ nav.filters, .filters__inner, .pillRow{
   #eventsSearchSuggestDistance .distance__hint{
     font-size: 10px;
     white-space: nowrap;
+    color: #7a7a7a; /* softer grey */
   }
 }
