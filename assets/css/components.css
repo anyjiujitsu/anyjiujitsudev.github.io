@@ -376,7 +376,7 @@ input[type="search"]{ font-size:16px; }
   .pill__icon{ font-size: 11px; margin-left: var(--evIconLeft); }
   .pill__clear{ font-size: 17px; padding: 0 2px; }
   .pill__caret{ font-size: 8px; }
-  .pill__dot{ margin-left: 3px; }
+  .pill__dot{ margin-left: 1px; }
 
   /* Search input: prevent iOS zoom while visually smaller */
   .pill__input{
@@ -1510,6 +1510,6 @@ font-size: 10px;
 @media (max-width: 520px){
   #eventsSearchSuggestDistance #distanceHint.distance__hint--toggle{
     margin-top: 8px;   /* slightly more padding above this line */
-    margin-left: 3px;  /* subtle visual shift right */
+    margin-left: 1px;  /* subtle visual shift right */
   }
 }
