@@ -355,11 +355,20 @@ function wireViewToggle(){
     function startSwipeLoop(){
       if(rafLoop) return;
 
+      // Tiny blend factor smooths micro-jitter from uneven touchmove cadence on iOS.
+      // Closer to 1 = tighter finger tracking; lower = smoother (but more lag).
+      const SWIPE_BLEND = 0.88;
+
+      let p = __currentP || startP || 0;
+
       const tick = () => {
         rafLoop = requestAnimationFrame(tick);
         if(targetP === null) return;
-        // iOS-like: track finger 1:1; render via rAF for stable 60fps.
-        applyProgressVars(targetP);
+
+        // Smooth toward the latest target.
+        p = p + (targetP - p) * SWIPE_BLEND;
+
+        applyProgressVars(p);
       };
 
       rafLoop = requestAnimationFrame(tick);
