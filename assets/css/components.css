@@ -1449,12 +1449,12 @@ font-size: 10px;
 
 
 /* Index: iOS-style segmented control for Distance (Training Near) */
-#eventsSearchSuggestDistance .distance__hint--toggle{
+#eventsSearchSuggestDistance #distanceHint.distance__hint--toggle{
   display: flex;
   align-items: center;
   gap: 8px;
   opacity: 1;
-  transform: translateX(3px);
+  transform: translateX(3px) !important;
 }
 
 #eventsSearchSuggestDistance .distance__hintText{
@@ -1514,4 +1514,5 @@ font-size: 10px;
     margin-left: 1px;  /* subtle visual shift right */
   }
 }
+
 
