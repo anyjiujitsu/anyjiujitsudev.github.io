@@ -34,10 +34,12 @@ function syncDistanceUIFromState(){
   const input = $("distanceOriginInput");
   if(input) input.value = String(state.indexEvents.distFrom || "");
 
-  const opts = distWrap.querySelectorAll(".distance__opt");
-  if(opts && opts.length){
+  const seg = distWrap.querySelector(".iosSeg");
+  const btns = distWrap.querySelectorAll(".iosSeg__btn");
+  if(seg && btns && btns.length){
     const miles = Number(state.indexEvents.distMiles || 15);
-    opts.forEach((b)=>{
+    seg.dataset.selected = String(miles);
+    btns.forEach((b)=>{
       const m = Number(b.dataset.miles);
       const on = (m === miles);
       b.classList.toggle("is-active", on);
