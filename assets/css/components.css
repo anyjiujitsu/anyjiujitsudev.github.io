@@ -1450,7 +1450,7 @@ font-size: 10px;
   align-items: center;
   gap: 8px;
   opacity: 1;
-  transform: translateX(3px) !important;
+  transform: translateX(6px) !important;
 }
 
 #eventsSearchSuggestDistance .distance__hintText{
@@ -1510,3 +1510,4 @@ font-size: 10px;
     margin-left: 1px;  /* subtle visual shift right */
   }
 }
+
