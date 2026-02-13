@@ -483,10 +483,7 @@ input[type="search"]{ font-size:16px; }
     padding-bottom: 0 !important;
   }
 }
-\n
 
-
-}
 
 /* Ensure header row is a predictable flex layout */
 .header__inner{
@@ -1438,14 +1435,13 @@ margin-top: 4px;
     max-width: 104px;
   }
 
-  /* Make the “within X miles” line smaller and avoid wrapping */
+  /* Make the â€œwithin X milesâ€ line smaller and avoid wrapping */
   #eventsSearchSuggestDistance .distance__hint{
       margin-left: -14px;
 font-size: 10px;
     white-space: nowrap;
     color: #7a7a7a; /* softer grey */
   }
-}
 
 
 /* Index: iOS-style segmented control for Distance (Training Near) */
@@ -1514,5 +1510,3 @@ font-size: 10px;
     margin-left: 1px;  /* subtle visual shift right */
   }
 }
-
-
