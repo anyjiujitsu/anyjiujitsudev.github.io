@@ -22,30 +22,10 @@ let didRender = false;
 // View lock removed: enable slider + Index view
 const VIEW_LOCKED = false;
 
-/* ------------------ INDEX DISTANCE UI (Distance From) ------------------ */
-function buildCityStateOptions(rows){
-  const set = new Set();
-  for(const r of rows){
-    const city = String(r.CITY ?? "").trim();
-    const st   = String(r.STATE ?? "").trim().toUpperCase();
-    if(!city || !st) continue;
-    set.add(`${city}, ${st}`);
-  }
-  return Array.from(set).sort((a,b)=>a.localeCompare(b));
-}
-
+/* ------------------ INDEX DISTANCE UI (Training Near ZIP) ------------------ */
 function ensureDistanceOriginOptions(){
-  const list = $("distanceOriginList");
-  if(!list) return;
-  // only (re)build if we don't have options yet
-  if(list.children && list.children.length > 0) return;
-
-  const opts = buildCityStateOptions(directoryRows);
-  for(const label of opts){
-    const o = document.createElement("option");
-    o.value = label;
-    list.appendChild(o);
-  }
+  // legacy stub (kept to avoid breaking callers)
+  // Index now uses a 5-digit ZIP entry instead of a city datalist.
 }
 
 function syncDistanceUIFromState(){
@@ -71,7 +51,12 @@ function dirToIndexEventRow(r){
 }
 
 function filterIndexDirectoryAsEvents(rows, idxState){
-  const q = String(idxState?.q ?? "").trim().toLowerCase();
+  const qRaw = String(idxState?.q ?? "").trim();
+  // When a ZIP is applied, we mirror it into the search bar for clarity.
+  // Do NOT treat that ZIP as a text-search token.
+  const q = (/^\d{5}$/.test(qRaw) && String(idxState?.distFrom || "").trim() === qRaw)
+    ? ""
+    : qRaw.toLowerCase();
   const stateSet = idxState?.state instanceof Set ? idxState.state : new Set();
   const typeSet  = idxState?.type  instanceof Set ? idxState.type  : new Set();
   const yearSet  = idxState?.year  instanceof Set ? idxState.year  : new Set();
@@ -439,6 +424,12 @@ async function init(){
     setIndexQuery,
     setIndexEventsQuery,
     setActiveEventsQuery,
+    isIndexView: () => state.view === "index",
+    clearIndexDistance: () => {
+      setIndexDistanceFrom("");
+      const inZip = $("distanceOriginInput");
+      if(inZip) inZip.value = "";
+    },
     render,
   });
   wireSearchSuggestions({
