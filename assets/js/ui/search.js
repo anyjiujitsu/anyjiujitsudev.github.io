@@ -158,7 +158,11 @@ export function wireSearchSuggestions({
       const miles = Number(btn.dataset.miles);
       if(!Number.isFinite(miles)) return;
       setMilesUI(miles);
-      if(typeof setIndexDistanceMiles === "function") setIndexDistanceMiles(miles);
+      if(typeof setIndexDistanceMiles === "function") {
+        setIndexDistanceMiles(miles);
+      } else if(window.state && window.state.indexEvents){
+        window.state.indexEvents.distMiles = miles;
+      }
       render();
     });
   });
