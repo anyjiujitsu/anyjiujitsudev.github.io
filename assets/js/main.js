@@ -203,6 +203,9 @@ function setViewUI(view){
   const evIn = $("eventsSearchInput");
   if(evIn) evIn.value = String(activeEventsState().q || "");
 
+  // Per-view helper text for the shared search bar
+  if(evIn) evIn.setAttribute("placeholder", view === "index" ? "Search index" : "Search events");
+
   // Search suggestion panel: Events uses Quick Searches; Index uses Distance From
   // (panel is opened on focus/click when input is empty)
   if(view === "index"){
