@@ -108,7 +108,15 @@
                         ➜
                       </button>
                     </div>
-                    <div id="distanceHint" class="distance__hint">Shows gyms within 20 miles</div>
+                    
+                    <div id="distanceHint" class="distance__hint" aria-label="Distance filter">
+                      <span class="distance__hintText">Show gyms within</span>
+                      <div class="distance__segmented" role="group" aria-label="Distance (miles)">
+                        <button type="button" class="distance__opt is-active" data-miles="15" aria-pressed="true">15</button>
+                        <button type="button" class="distance__opt" data-miles="30" aria-pressed="false">30</button>
+                      </div>
+                      <span class="distance__hintText">miles</span>
+                    </div>
                   </div>
                 </div>
 
