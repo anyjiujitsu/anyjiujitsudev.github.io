@@ -1507,9 +1507,10 @@ font-size: 10px;
 @media (max-width: 520px){
   #eventsSearchSuggestDistance #distanceHint.distance__hint--toggle{
     margin-top: 8px;
-    transform: translateX(-7px) !important; /* mobile left */
+    transform: translateX(-5px) !important; /* mobile left */
   }
 }
+
 
 
 
