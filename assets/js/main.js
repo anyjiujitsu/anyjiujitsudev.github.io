@@ -403,9 +403,15 @@ function render(){
 
   // Index view: render Directory rows using Events-style cards
   // Optional distance filter (Distance From dropdown)
+  // distance filter
+  // Derive miles from state, but fall back to the visible iOS toggle if needed
+  const seg = document.querySelector("#eventsSearchSuggestDistance .iosSeg");
+  const miles = Number(state.indexEvents.distMiles) || Number(seg?.dataset?.selected) || 15;
+  state.indexEvents.distMiles = miles;
+
   const distRes = applyDistanceFilter(
     directoryRows,
-    state.indexEvents.distMiles,
+    miles,
     state.indexEvents.distFrom,
     () => {
       // re-render as geocoding results arrive
@@ -413,7 +419,7 @@ function render(){
     }
   );
 
-  const idxRows = distRes.rows.map(dirToIndexEventRow);
+const idxRows = distRes.rows.map(dirToIndexEventRow);
   const idxFiltered = filterIndexDirectoryAsEvents(idxRows, state.indexEvents);
   renderIndexEventsGroups($("indexEventsRoot"), idxFiltered);
 
