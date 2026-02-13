@@ -128,14 +128,20 @@ let __viewShellW = 0;
 function __setViewShellW(w){ __viewShellW = Math.max(1, Number(w)||0); }
 function __getViewShellW(){ return (__viewShellW || ($("viewShell")?.clientWidth) || window.innerWidth || 1); }
 
-function applyProgress(p){
+function applyProgressVars(p){
   const clamped = Math.max(0, Math.min(1, p));
-  // Set both the semantic progress and a precomputed offset string to avoid calc() jitter on mobile.
   document.body.style.setProperty("--viewProgress", String(clamped));
   const w = __getViewShellW();
   const offsetPx = (-w * clamped);
-  document.body.style.setProperty("--viewOffsetPx", `${offsetPx.toFixed(2)}px`);
+  // Use higher precision to reduce perceptible stepping on mobile GPUs.
+  document.body.style.setProperty("--viewOffsetPx", `${offsetPx.toFixed(4)}px`);
+  return clamped;
+}
 
+function applyProgress(p){
+  const clamped = applyProgressVars(p);
+
+  // Avoid expensive DOM/layout work during swipe frames; keep this for "settled" states.
   const viewTitle = $("viewTitle");
   if(viewTitle){
     viewTitle.textContent = (clamped >= 0.5) ? "FIND TRAINING (DEV)" : "EVENTS (DEV)";
@@ -338,25 +344,17 @@ function wireViewToggle(){
   if(rafLoop) return;
 
   let p = startP;
-  let v = 0;
-  let last = performance.now();
 
   const tick = () => {
     rafLoop = requestAnimationFrame(tick);
-
     if(targetP === null) return;
 
-    const now = performance.now();
-    const dt = Math.max(0.5, Math.min(3, (now - last) / 16.67)); // normalize to ~60fps
-    last = now;
+    // iOS-like feel: during an active swipe, track the finger 1:1.
+    // We still run through rAF so motion stays smooth even if touchmove events are uneven.
+    p = targetP;
 
-    // Critically-damped-ish spring toward targetP for "analog" smoothness.
-    const k = 0.18 * dt;          // spring strength
-    const damp = Math.pow(0.72, dt); // damping per frame
-    v = (v * damp) + (targetP - p) * k;
-    p = p + v;
-
-    applyProgress(p);
+    // During swipe frames, only update CSS variables (fast path).
+    applyProgressVars(p);
   };
 
   rafLoop = requestAnimationFrame(tick);
