@@ -128,39 +128,30 @@ let __viewShellW = 0;
 function __setViewShellW(w){ __viewShellW = Math.max(1, Number(w)||0); }
 function __getViewShellW(){ return (__viewShellW || ($("viewShell")?.clientWidth) || window.innerWidth || 1); }
 
-let __viewVarTarget = null;
-
-function __getViewVarTarget(){
-  // Scope variable updates to the moving element to reduce style recalculation.
-  if(__viewVarTarget) return __viewVarTarget;
-  const byId = document.getElementById("viewSlider") || document.getElementById("viewTrack");
-  if(byId) { __viewVarTarget = byId; return __viewVarTarget; }
-  const byClass = document.querySelector(".viewSlider") || document.querySelector(".view-track") || document.querySelector(".views");
-  if(byClass) { __viewVarTarget = byClass; return __viewVarTarget; }
-  __viewVarTarget = document.body;
-  return __viewVarTarget;
-}
+let __lastViewTitleMode = null; // null | "events" | "index"
 
 function applyProgressVars(p){
   const clamped = Math.max(0, Math.min(1, p));
-  const el = __getViewVarTarget();
-  el.style.setProperty("--viewProgress", String(clamped));
-
+  // Fast path: only update CSS variables (no DOM reads/writes besides style props).
+  document.body.style.setProperty("--viewProgress", String(clamped));
   const w = __getViewShellW();
   const offsetPx = (-w * clamped);
-
-  // Higher precision + translate3d reduces quantization on iOS.
-  el.style.setProperty("--viewOffsetPx", `${offsetPx.toFixed(6)}px`);
+  // Higher precision reduces perceptible stepping on iOS.
+  document.body.style.setProperty("--viewOffsetPx", `${offsetPx.toFixed(4)}px`);
   return clamped;
 }
 
 function applyProgress(p){
   const clamped = applyProgressVars(p);
 
-  // Avoid expensive DOM/layout work during swipe frames; keep this for "settled" states.
-  const viewTitle = $("viewTitle");
-  if(viewTitle){
-    viewTitle.textContent = (clamped >= 0.5) ? "FIND TRAINING (DEV)" : "EVENTS (DEV)";
+  // Slow path: update title only when crossing the mid-point (prevents per-frame DOM churn).
+  const mode = (clamped >= 0.5) ? "index" : "events";
+  if(mode !== __lastViewTitleMode){
+    __lastViewTitleMode = mode;
+    const viewTitle = $("viewTitle");
+    if(viewTitle){
+      viewTitle.textContent = (mode === "index") ? "FIND TRAINING (DEV)" : "EVENTS (DEV)";
+    }
   }
   return clamped;
 }
@@ -315,7 +306,7 @@ function wireViewToggle(){
 
       const x = e.clientX - rect.left - padding;
       const p = (x - thumbW / 2) / travel;
-      applyProgress(p);
+      applyProgressVars(p);
     });
 
     const endDrag = (e) => {
@@ -354,22 +345,30 @@ function wireViewToggle(){
     let lockedAxis = ""; // "", "x", "y"
     let swipeActive = false;
     let rafLoop = 0;
-    let targetP = null; __swipeW = 0;
+    let targetP = null;
 
     function startSwipeLoop(){
   if(rafLoop) return;
 
   let p = startP;
+  let v = 0;
+  let last = performance.now();
 
   const tick = () => {
     rafLoop = requestAnimationFrame(tick);
+
     if(targetP === null) return;
 
-    // iOS-like feel: during an active swipe, track the finger 1:1.
-    // We still run through rAF so motion stays smooth even if touchmove events are uneven.
-    p = targetP;
+    const now = performance.now();
+    const dt = Math.max(0.5, Math.min(3, (now - last) / 16.67)); // normalize to ~60fps
+    last = now;
 
-    // During swipe frames, only update CSS variables (fast path).
+    // Critically-damped-ish spring toward targetP for "analog" smoothness.
+    const k = 0.18 * dt;          // spring strength
+    const damp = Math.pow(0.72, dt); // damping per frame
+    v = (v * damp) + (targetP - p) * k;
+    p = p + v;
+
     applyProgressVars(p);
   };
 
@@ -397,7 +396,7 @@ function stopSwipeLoop(){
       lockedAxis = "";
       swipeActive = false;
       stopSwipeLoop();
-      targetP = null; __swipeW = 0;
+      targetP = null;
     }, { passive: true });
 
     viewShell.addEventListener("touchmove", (e) => {
