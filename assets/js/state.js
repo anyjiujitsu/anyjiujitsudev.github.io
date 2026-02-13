@@ -71,7 +71,7 @@ export function setIndexDistanceFrom(label){
   const v = String(label ?? "").trim();
   state.indexEvents.distFrom = v;
   // Fixed radius: 15 miles when a valid origin is selected
-  state.indexEvents.distMiles = v ? 15 : null;
+  state.indexEvents.distMiles = v ? 20 : null;
 }
 
 /* section: selection checks
