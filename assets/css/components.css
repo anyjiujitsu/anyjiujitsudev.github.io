@@ -1348,6 +1348,35 @@ nav.filters, .filters__inner, .pillRow{
   font-size: 14px;
 }
 
+/* ZIP row: narrower input + apply arrow button */
+#eventsSearchSuggestDistance .distance__row{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#eventsSearchSuggestDistance .distance__input{
+  flex: 0 0 150px;
+  width: 150px;
+  max-width: 150px;
+}
+
+#eventsSearchSuggestDistance .distance__apply{
+  flex: 0 0 auto;
+  border: 1px solid rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.06);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#eventsSearchSuggestDistance .distance__apply:active{
+  transform: translateY(1px);
+}
+
 #eventsSearchSuggestDistance .distance__hint{
   margin-top: 8px;
   font-size: 12px;
