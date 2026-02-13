@@ -1,5 +1,5 @@
 // utils/geo.js
-// purpose: fast, client-side distance filtering for Index "Training Near" (ZIP)
+// purpose: lightweight distance helpers for Index "Training Near" filter (ZIP -> local distance)
 
 /* ------------------ HAVERSINE (miles) ------------------ */
 const EARTH_RADIUS_MI = 3958.7613;
@@ -24,17 +24,18 @@ export function haversineMiles(a, b){
   return EARTH_RADIUS_MI * c;
 }
 
-/* ------------------ ZIP GEOCODING ------------------ */
-// We only ever geocode ONE thing: the user's ZIP.
-// Directory rows already include LAT/LON in directory.csv.
+/* ------------------ ZIP -> LAT/LON (Zippopotam.us) ------------------ */
+// Notes:
+// - We only geocode the ZIP once per search.
+// - All directory rows already have LAT/LON in the CSV, so per-row work is just math.
 
-function zipStorageKey(zip){
-  return `anyjj:zipgeo:${zip}`;
+function zipKey(zip){
+  return `anyjj:zip:${zip}`;
 }
 
 function readZipCache(zip){
   try{
-    const raw = localStorage.getItem(zipStorageKey(zip));
+    const raw = localStorage.getItem(zipKey(zip));
     if(!raw) return null;
     const obj = JSON.parse(raw);
     if(!obj || !Number.isFinite(obj.lat) || !Number.isFinite(obj.lon)) return null;
@@ -46,32 +47,20 @@ function readZipCache(zip){
 
 function writeZipCache(zip, val){
   try{
-    localStorage.setItem(zipStorageKey(zip), JSON.stringify(val));
+    localStorage.setItem(zipKey(zip), JSON.stringify(val));
   }catch(_){
-    // ignore (private mode / quota)
+    // ignore
   }
 }
 
-// in-memory cache: zip -> {lat,lon} | Promise<{lat,lon}|null>
-const zipMem = new Map();
-
-let zipQueue = Promise.resolve();
-function enqueueZip(fn){
-  zipQueue = zipQueue.then(async ()=>{
-    // space requests a bit (polite)
-    await new Promise(r => setTimeout(r, 450));
-    return fn();
-  }).catch(()=>fn());
-  return zipQueue;
-}
+const zipMem = new Map(); // zip -> {lat,lon} | Promise<{lat,lon}|null>
 
 async function fetchZipLatLon(zip){
-  // zippopotam.us is simple and fast; one call per ZIP.
   const url = `https://api.zippopotam.us/us/${encodeURIComponent(zip)}`;
   const res = await fetch(url, { method: "GET" });
   if(!res.ok) return null;
   const data = await res.json();
-  const place = data && Array.isArray(data.places) ? data.places[0] : null;
+  const place = Array.isArray(data?.places) ? data.places[0] : null;
   if(!place) return null;
   const lat = Number(place.latitude);
   const lon = Number(place.longitude);
@@ -79,34 +68,31 @@ async function fetchZipLatLon(zip){
   return { lat, lon };
 }
 
-export function getZipLatLon(zip, onUpdate){
-  const z = String(zip || "").trim();
-  if(!/^\d{5}$/.test(z)) return Promise.resolve(null);
-
-  if(zipMem.has(z)){
-    const v = zipMem.get(z);
+function getZipLatLon(zip, onUpdate){
+  if(zipMem.has(zip)){
+    const v = zipMem.get(zip);
     return (v && typeof v.then === "function") ? v : Promise.resolve(v);
   }
 
-  const cached = readZipCache(z);
+  const cached = readZipCache(zip);
   if(cached){
-    zipMem.set(z, cached);
+    zipMem.set(zip, cached);
     return Promise.resolve(cached);
   }
 
-  const p = enqueueZip(async ()=>{
-    const got = await fetchZipLatLon(z);
+  const p = (async ()=>{
+    const got = await fetchZipLatLon(zip);
     if(got){
-      zipMem.set(z, got);
-      writeZipCache(z, got);
-    }else{
-      zipMem.set(z, null);
+      zipMem.set(zip, got);
+      writeZipCache(zip, got);
+    } else {
+      zipMem.set(zip, null);
     }
     if(typeof onUpdate === "function") onUpdate();
-    return zipMem.get(z);
-  });
+    return zipMem.get(zip);
+  })();
 
-  zipMem.set(z, p);
+  zipMem.set(zip, p);
   return p;
 }
 
@@ -116,24 +102,23 @@ export function applyDistanceFilter(directoryRows, distMiles, distFromLabel, onU
   const from = String(distFromLabel ?? "").trim();
   if(!Number.isFinite(miles) || miles <= 0 || !from) return { rows: directoryRows, pending: 0, active: false };
 
-  // ZIP must be 5 digits
-  if(!/^\d{5}$/.test(from)) return { rows: directoryRows, pending: 0, active: false };
+  // ZIP origin (5 digits)
+  const zip = (from.match(/^\d{5}$/) || [])[0];
+  if(!zip) return { rows: directoryRows, pending: 0, active: false };
 
-  // origin coords (ZIP) – if missing, request and temporarily return [] (keeps UI honest)
-  const originCached = readZipCache(from) || (zipMem.get(from) && typeof zipMem.get(from).then !== "function" ? zipMem.get(from) : null);
-  if(!originCached){
-    getZipLatLon(from, onUpdate);
+  const origin = readZipCache(zip) || (zipMem.get(zip) && typeof zipMem.get(zip).then !== "function" ? zipMem.get(zip) : null);
+  if(!origin){
+    getZipLatLon(zip, onUpdate);
     return { rows: [], pending: 1, active: true };
   }
 
-  // bounding box prefilter (cheap) before haversine
-  const deltaLat = miles / 69; // ~69 miles per degree latitude
-  const cosLat = Math.cos(toRad(originCached.lat));
-  const deltaLon = miles / (69 * (cosLat || 1));
-  const minLat = originCached.lat - deltaLat;
-  const maxLat = originCached.lat + deltaLat;
-  const minLon = originCached.lon - deltaLon;
-  const maxLon = originCached.lon + deltaLon;
+  // cheap bounding-box prefilter before haversine
+  const lat0 = origin.lat;
+  const lon0 = origin.lon;
+  const dLat = miles / 69;
+  const dLon = miles / (69 * Math.max(0.2, Math.cos(toRad(lat0))));
+  const minLat = lat0 - dLat, maxLat = lat0 + dLat;
+  const minLon = lon0 - dLon, maxLon = lon0 + dLon;
 
   const out = [];
   for(const r of directoryRows){
@@ -141,8 +126,7 @@ export function applyDistanceFilter(directoryRows, distMiles, distFromLabel, onU
     const lon = Number(r.LON);
     if(!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
     if(lat < minLat || lat > maxLat || lon < minLon || lon > maxLon) continue;
-
-    const d = haversineMiles(originCached, { lat, lon });
+    const d = haversineMiles(origin, { lat, lon });
     if(Number.isFinite(d) && d <= miles) out.push(r);
   }
 
