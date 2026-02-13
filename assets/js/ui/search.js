@@ -1,7 +1,7 @@
 // ui/search.js
 // purpose: wire search inputs + search suggestion UX
 
-export function wireSearch({ $, setIndexQuery, setIndexEventsQuery, setActiveEventsQuery, render, isIndexView, clearIndexDistance }){
+export function wireSearch({ $, setIndexQuery, setIndexEventsQuery, setActiveEventsQuery, setIndexDistanceMiles, render, isIndexView, clearIndexDistance }){
   const idxIn = $("searchInput");
   const evIn  = $("eventsSearchInput");
 
@@ -52,6 +52,9 @@ export function wireSearchSuggestions({
   const dist  = $("eventsSearchSuggestDistance");
   const distInput = $("distanceOriginInput");
   const distApply = $("distanceApplyBtn");
+  const distToggle = dist?.querySelector(".distance__segmented");
+  const distOpts   = dist?.querySelectorAll(".distance__opt");
+
 
   const canSuggest = () => {
     const ev = (typeof isEventsView !== "function") ? true : !!isEventsView();
@@ -131,6 +134,30 @@ export function wireSearchSuggestions({
     if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(zip);
     close();
     distInput?.blur();
+  function setMilesUI(miles){
+    if(!distOpts) return;
+    distOpts.forEach((b)=>{
+      const m = Number(b.dataset.miles);
+      const on = (m === Number(miles));
+      b.classList.toggle("is-active", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
+  distOpts?.forEach((btn)=>{
+    btn.addEventListener("click", (e)=>{
+      if(mode() !== "index") return;
+      e.preventDefault();
+      e.stopPropagation();
+      const miles = Number(btn.dataset.miles);
+      if(!Number.isFinite(miles)) return;
+      setMilesUI(miles);
+      if(typeof setIndexDistanceMiles === "function") setIndexDistanceMiles(miles);
+      // Re-render to apply the new distance if a ZIP is already set.
+      render();
+    });
+  });
+
     input.blur();
   }
 
