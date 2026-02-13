@@ -25,7 +25,7 @@ export const state = {
     type: new Set(),
     /* section: index distance filter
        purpose: optional radius + origin ZIP (5 digits) for filtering directory rows */
-    distMiles: null,      // number | null
+    distMiles: 15,      // number | null
     distFrom: "",         // "#####" | ""
   },
 
@@ -70,8 +70,6 @@ export function setIndexDistanceMiles(miles){
 export function setIndexDistanceFrom(label){
   const v = String(label ?? "").trim();
   state.indexEvents.distFrom = v;
-  // Fixed radius: 15 miles when a valid origin is selected
-  state.indexEvents.distMiles = v ? 20 : null;
 }
 
 /* section: selection checks
