@@ -148,7 +148,7 @@
       if (!title) return;
       // lightweight "slide" feel via CSS class toggle
       title.classList.add("adminTitle--swap");
-      title.textContent = (which === "index") ? "INDEX" : "EVENTS";
+      title.textContent = (which === "index") ? "ADD LOCATION" : "ADD EVENT";
       window.setTimeout(() => title.classList.remove("adminTitle--swap"), 160);
     };
 
