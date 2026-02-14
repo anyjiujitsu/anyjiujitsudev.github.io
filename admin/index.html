@@ -23,16 +23,14 @@
 
     <!-- Header (matches main site header look, but with admin page title + toggle on the right) -->
     <header class="header adminHeader" id="header">
-      <!-- Use the exact same header container as the main site so left edges align perfectly -->
+      <!-- Match main-site header structure exactly (logo + title + viewToggle as direct children) -->
       <div class="header__inner adminHeader__inner">
-        <div class="adminBrand" aria-label="ANY Admin header">
-          <div class="header__logo" aria-hidden="true">
-            <div class="header__logoCrop">
-              <img class="header__logoImage" src="../assets/img/any-logo.png" alt="ANY" />
-            </div>
+        <div class="header__logo" aria-hidden="true">
+          <div class="header__logoCrop">
+            <img class="header__logoImage" src="../assets/img/any-logo.png" alt="ANY" />
           </div>
-          <h1 class="header__title" id="adminTitle">ADD EVENT</h1>
         </div>
+        <h1 class="header__title" id="adminTitle">ADD EVENT</h1>
 
         <!-- Slider toggle (same sizing/feel as main site viewToggle) -->
         <div class="viewToggle adminPageToggle" id="adminPageToggle" role="tablist" aria-label="Admin page toggle">
