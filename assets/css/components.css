@@ -1066,12 +1066,18 @@ nav.filters, .filters__inner, .pillRow{
     flex: 1 1 auto;
     min-width: 0;
   }
-  .suggestWrap > .pill--search{
+  /* Mobile typing room: reclaim pixels INSIDE the same-sized pill */
+  .suggestWrap > .pill.pill--search{
     flex: 1 1 auto;
     min-width: 0;
-    padding-right: 10px;
+    padding-right: 4px; /* bring text closer to the clear "x" */
+    gap: 6px;          /* slightly tighter spacing between icon/input/x */
+  }
+  .suggestWrap > .pill.pill--search .pill__clear{
+    padding: 0 2px;    /* narrower clear button hit area */
   }
 }
+
 
 #eventsSearchSuggest.suggest{
   color: inherit;
@@ -1511,4 +1517,3 @@ font-size: 10px;
     transform: translateX(-1px) !important; /* mobile left */
   }
 }
-
