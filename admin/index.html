@@ -21,7 +21,7 @@
 <body>
   <div class="app" id="app">
 
-    <!-- Header (same look/structure as main EVENTS header) -->
+    <!-- Header (same look/structure as main site header) -->
     <header class="header" id="header">
       <div aria-label="ANY logo" style="margin:0 0 -10px 0;">
         <div class="header__inner" style="display:flex;justify-content:flex-start;align-items:flex-end;">
@@ -30,35 +30,41 @@
       </div>
 
       <div class="header__inner" style="padding-top:0px;">
-        <h1 class="header__title" id="adminTitle" aria-label="Admin">EVENTS (DEV)</h1>
+        <h1 class="header__title" id="adminTitle" aria-label="Admin">EVENTS</h1>
         <div class="header__countWrap" aria-live="polite">
           <span class="status header__count">ADMIN</span>
-        </div>
-
-        <!-- Slider toggle (reuses the main viewToggle styling) -->
-        <div class="viewToggle" id="adminPageToggle" role="tablist" aria-label="Admin page toggle">
-          <button class="viewToggle__tab" id="tabAdminEvents" role="tab" aria-selected="true" type="button">Events Entry</button>
-          <button class="viewToggle__tab" id="tabAdminIndex" role="tab" aria-selected="false" type="button">Index Entry</button>
-          <div class="viewToggle__thumb" aria-hidden="true"></div>
         </div>
       </div>
     </header>
 
+    <!-- Green bar (matches main site "filters" bar): Token + page toggle, frozen under header -->
+    <section class="filters adminFilters" id="adminFilters" aria-label="Admin controls">
+      <div class="filters__inner adminFilters__inner">
+        <!-- Token row (shared across both pages) -->
+        <div class="adminToken" aria-label="GitHub token">
+          <div class="adminToken__row">
+            <div class="pill pill--search adminToken__pill" title="Paste token here (stored locally when you tap Save)">
+              <span class="pill__icon" aria-hidden="true">🔑</span>
+              <input id="token" class="pill__input" type="password" placeholder="GitHub token" autocomplete="off" />
+              <button id="toggleToken" class="pill__clear" type="button" aria-label="Show/Hide token">👁</button>
+            </div>
+            <button class="adminBtn" id="saveTokenBtn" type="button">Save</button>
+          </div>
+        </div>
+
+        <!-- Slider toggle (reuses the main viewToggle styling) -->
+        <div class="viewToggle" id="adminPageToggle" role="tablist" aria-label="Admin page toggle">
+          <button class="viewToggle__tab" id="tabAdminEvents" role="tab" aria-selected="true" type="button">EVENTS</button>
+          <button class="viewToggle__tab" id="tabAdminIndex" role="tab" aria-selected="false" type="button">INDEX</button>
+          <div class="viewToggle__thumb" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- Admin content -->
     <main class="adminMain" id="adminMain">
 
-      <!-- Token row (shared across both pages) -->
-      <section class="adminToken" aria-label="GitHub token">
-        <div class="adminToken__row">
-          <div class="pill pill--search adminToken__pill" title="Paste token here (stored locally when you tap Save)">
-            <span class="pill__icon" aria-hidden="true">🔑</span>
-            <input id="token" class="pill__input" type="password" placeholder="GitHub token" autocomplete="off" />
-            <button id="toggleToken" class="pill__clear" type="button" aria-label="Show/Hide token">👁</button>
-          </div>
-          <button class="adminBtn" id="saveTokenBtn" type="button">Save</button>
-        </div>
-        <div class="adminHint">Token is stored locally in your browser (LocalStorage) after you tap Save.</div>
-      </section>
+      <div class="adminHint" style="margin-top:10px;">Token is stored locally in your browser (LocalStorage) after you tap Save.</div>
 
       <!-- Swipe/scroll pages -->
       <section class="adminPager" aria-label="Admin pages">
