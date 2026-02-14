@@ -1,4 +1,8 @@
 :root{
+  --adminAnyLeft: 115px;
+  --adminAnyTop: -24px;
+  --adminAnyWidth: 64px;
+
   --admin-bg: var(--bg, #ebebeb);
   --admin-card: #e6e6e6;
   --admin-text: #111;
@@ -37,9 +41,9 @@ body{ background: var(--admin-bg); }
 }
 .adminBrand__logo{
   position:absolute;
-  left: -6px;
-  top: -18px;
-  width: 54px;
+  left: var(--adminAnyLeft);
+  top: var(--adminAnyTop);
+  width: var(--adminAnyWidth);
   height: auto;
   pointer-events:none;
   user-select:none;
@@ -55,7 +59,15 @@ body{ background: var(--admin-bg); }
 .adminPageToggle{ align-self:center; }
 @media (max-width: 640px){
   .adminTitle{ font-size: clamp(34px, 9vw, 56px); }
-  .adminBrand__logo{ width: 46px; top:-16px; }
+  .adminBrand__logo{
+  position:absolute;
+  left: var(--adminAnyLeft);
+  top: var(--adminAnyTop);
+  width: var(--adminAnyWidth);
+  height: auto;
+  pointer-events:none;
+  user-select:none;
+}
 }
 /* ----------------------------------------------------------- */
 
