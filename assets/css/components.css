@@ -1613,7 +1613,7 @@ font-size: 10px;
   /* clear button no longer steals flex width */
   .suggestWrap > .pill.pill--search .pill__clear{
     position: absolute;
-    right: 10px;
+    right: 6px;
     top: 50%;
     transform: translateY(-50%);
     padding: 0;
@@ -1623,6 +1623,6 @@ font-size: 10px;
   /* input can now occupy the reclaimed space */
   .suggestWrap > .pill.pill--search .pill__input{
     width: 100%;
-    padding-right: 20px; /* small reserve so text reaches near Ã— */
+    padding-right: 14px; /* reserve so text doesn't sit under Ã— */
   }
 }
