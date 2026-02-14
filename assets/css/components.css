@@ -371,8 +371,8 @@ input[type="search"]{ font-size:16px; }
   .nav__inner{ gap: 7px; }
 
   /* Pills */
-  .pill{ gap: 4px; border-width: 1px; box-shadow: 0 5px 10px rgba(0,0,0,0.09); }
-  .pill--search{ min-width: 178px; padding-right: 4px !important; }
+  .pill{ gap: 3px; border-width: 1px; box-shadow: 0 5px 10px rgba(0,0,0,0.09); }
+  .pill--search{ min-width: 178px; padding-right: 0px !important; }
   .pill__icon{ font-size: 11px; margin-left: var(--evIconLeft); }
   .pill__clear{ font-size: 17px; padding: 0 0px; }
   .pill__caret{ font-size: 8px; }
@@ -381,9 +381,9 @@ input[type="search"]{ font-size:16px; }
   /* Search input: prevent iOS zoom while visually smaller */
   .pill__input{
     font-size: 16px;
-    transform: scale(0.68); /* smaller text so more characters fit before scroll */
+    transform: scale(0.66); /* smaller text so more characters fit before scroll */
     transform-origin: left center;
-    width: 155%; /* compensate so caret stays aligned while fitting more characters */
+    width: 160%; /* compensate so caret stays aligned while fitting more characters */
   }
 
   /* Counter + groups */
