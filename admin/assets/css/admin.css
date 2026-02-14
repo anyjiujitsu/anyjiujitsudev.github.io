@@ -21,15 +21,14 @@ body{ background: var(--admin-bg); }
   transition: transform 160ms ease, opacity 160ms ease;
 }
 
-/* Header layout: align left edge with cards and place toggle in the white header area */
+/*
+  IMPORTANT: Alignment
+  Use the main site's .header__inner and .filters__inner geometry (max-width + page padding)
+  so the left edge of the logo/title, token row, and cards all line up.
+*/
 .adminHeader .adminHeader__inner{
-  max-width: 980px;
-  margin: 0 auto;
-  padding: 6px 12px 0;
-  display: flex;
-  justify-content: space-between;
+  /* .header__inner already defines max-width + padding; we only add minor admin tweaks */
   align-items: flex-end;
-  gap: 12px;
 }
 
 .adminBrand{
@@ -38,16 +37,17 @@ body{ background: var(--admin-bg); }
   gap: 10px;
 }
 
-/* Tighten logo/title stacking so the left edge matches the form below */
-.adminBrand .header__logoCrop{ margin: 0 0 -10px 0; }
+/* Move the toggle UP to sit higher in the white header area (like your blue box) */
+.adminHeader .adminPageToggle{
+  margin-left: auto;
+  transform: translateY(-18px);
+}
 
-/* Make sure the toggle uses the same sizing rules as the main site (avoid admin overrides) */
-.adminHeader #adminPageToggle{ margin-left: auto; }
-
+/* Content width + padding should match main site content__inner */
 .adminMain{
-  max-width: 980px;
+  max-width: var(--maxW);
   margin: 0 auto;
-  padding: 14px 12px 28px;
+  padding: 12px var(--pagePad) 48px;
 }
 
 /* Token + toggle live in the green "filters" bar now */
@@ -69,8 +69,8 @@ body{ background: var(--admin-bg); }
 
 /* Slightly tighter green bar, like the main site search bar spacing */
 .adminFilters .filters__inner{
-  padding-top: 6px;
-  padding-bottom: 6px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 /* Remove the (now unused) header badge area spacing if any */
