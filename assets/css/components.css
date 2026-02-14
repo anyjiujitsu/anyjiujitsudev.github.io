@@ -1536,7 +1536,7 @@ font-size: 10px;
 @media (max-width: 520px){
   /* Reclaim space to the right of the input (near the clear "x") */
   .pill.pill--search{
-    padding-right: 2px; /* overrides the shared pill horizontal padding on the right only */
+    padding-right: 0px; /* overrides the shared pill horizontal padding on the right only */
     gap: 6px;           /* slightly tighter than the global 8px */
   }
 
@@ -1582,7 +1582,7 @@ font-size: 10px;
 
   /* Tighten the internal spacing inside the pill */
   .pill--search{
-    padding-right: 2px; /* reduce right-side inset so input reaches closer to the edge */
+    padding-right: 0px; /* reduce right-side inset so input reaches closer to the edge */
     gap: 2px;           /* overrides .pill gap on mobile */
   }
 
@@ -1613,7 +1613,7 @@ font-size: 10px;
   /* clear button no longer steals flex width */
   .suggestWrap > .pill.pill--search .pill__clear{
     position: absolute;
-    right: 2px;
+    right: 0px;
     top: 50%;
     transform: translateY(-50%);
     padding: 0;
@@ -1623,6 +1623,6 @@ font-size: 10px;
   /* input can now occupy the reclaimed space */
   .suggestWrap > .pill.pill--search .pill__input{
     width: 100%;
-    padding-right: 6px; /* aggressive: maximize typing width; text may approach Ã— */
+    padding-right: 0px; /* extreme: no reserve space */
   }
 }
