@@ -14,6 +14,8 @@ import {
   refreshEventsPillDots,
 } from "./ui/pills.js?v=20260210-911";
 import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260212-902";
+import { FEATURES } from "./config/features.js";
+import { initFabEntry } from "./ui/fabEntry.js";
 
 let directoryRows = [];
 let eventRows = [];
@@ -579,6 +581,14 @@ if(!state.view) state.view = "events";
   }catch(err){
     console.warn("Index pill wiring skipped:", err);
   }
+
+  // Optional UI modules
+  try{
+    if(FEATURES?.FAB_ENTRY) initFabEntry();
+  }catch(err){
+    console.warn("FAB Entry wiring skipped:", err);
+  }
+
 
   render();
 }
