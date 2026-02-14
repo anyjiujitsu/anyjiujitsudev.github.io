@@ -1069,6 +1069,7 @@ nav.filters, .filters__inner, .pillRow{
   .suggestWrap > .pill--search{
     flex: 1 1 auto;
     min-width: 0;
+    padding-right: 10px;
   }
 }
 
@@ -1435,7 +1436,7 @@ margin-top: 4px;
     max-width: 104px;
   }
 
-  /* Make the â€œwithin X milesâ€ line smaller and avoid wrapping */
+  /* Make the Ã¢â‚¬Å“within X milesÃ¢â‚¬Â line smaller and avoid wrapping */
   #eventsSearchSuggestDistance .distance__hint{
       margin-left: -14px;
 font-size: 10px;
@@ -1510,20 +1511,4 @@ font-size: 10px;
     transform: translateX(-1px) !important; /* mobile left */
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
