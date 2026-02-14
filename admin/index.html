@@ -21,10 +21,11 @@
 <header class="header adminHeader" id="header">
 <!-- Match main-site header structure exactly (logo + title + viewToggle as direct children) -->
 <div class="header__inner adminHeader__inner">
-
-
-<!-- Slider toggle (same sizing/feel as main site viewToggle) -->
-<div aria-hidden="true" class="adminHeader__spacer"></div><div class="adminBrand"><div aria-hidden="true" class="adminBrand__logo"><img alt="ANY" class="header__logoImage" src="../assets/img/any-logo.png"/></div><h1 class="header__title" id="adminTitle">EVENTS - ADD NEW</h1></div><div aria-label="Admin page toggle" class="viewToggle adminPageToggle" id="adminPageToggle" role="tablist">
+  <div class="adminBrand" aria-label="Admin header">
+    <img class="adminBrand__logo" src="../assets/img/any-logo.png" alt="ANY"/>
+    <h1 class="header__title adminTitle" id="adminTitle">EVENTS - ADD NEW</h1>
+  </div>
+<div aria-label="Admin page toggle" class="viewToggle adminPageToggle" id="adminPageToggle" role="tablist">
 <button aria-selected="true" class="viewToggle__tab" id="tabAdminEvents" role="tab" type="button">EVENTS</button>
 <button aria-selected="false" class="viewToggle__tab" id="tabAdminIndex" role="tab" type="button">INDEX</button>
 <div aria-hidden="true" class="viewToggle__thumb"></div>
