@@ -31,23 +31,60 @@ body{ background: var(--admin-bg); }
   align-items: center;
 }
 
-
-/* Place the ANY logo above the title (matching main site header composition) */
-.adminHeader .adminHeader__inner{ position: relative; }
-.adminHeader .header__logo{
-  position: absolute;
-  left: 50%;
-  top: 6px;
-  transform: translateX(-50%);
+/* Header layout: center the title block like the main site, with the (ANY) mark above it */
+.adminHeader .adminHeader__inner{
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
 }
+
+.adminHeader__spacer{
+  flex: 0 0 var(--adminToggleW, 210px);
+}
+
+.adminBrand{
+  flex: 1 1 auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 86px;
+}
+
+.adminBrand__logo{
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  opacity: 1;
+}
+
+.adminBrand__logo img{
+  height: 22px;
+  width: auto;
+  display: block;
+}
+
 .adminHeader .header__title{
   text-align: center;
+  margin: 0;
+  padding-top: 10px; /* creates room for the (ANY) mark */
 }
-/* Admin uses the same header row + viewToggle placement as the main site */
+
+@media (min-width: 900px){
+  .adminHeader__spacer{ flex-basis: var(--adminToggleW, 240px); }
+  .adminBrand{ min-height: 98px; }
+  .adminBrand__logo img{ height: 24px; }
+}
+
+/* Keep toggle pinned to the right like the main site */
 .adminHeader .adminPageToggle{
-  margin-left: auto;
-  transform: none;
+  margin-left: 0;
 }
+
+
 
 /* Content width + padding should match main site content__inner */
 .adminMain{
