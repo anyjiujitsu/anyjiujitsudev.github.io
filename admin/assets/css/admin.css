@@ -42,11 +42,36 @@ body{ background: var(--admin-bg); }
   align-items: center;
 }
 
+/* --- Admin polish to match main site spacing/alignment --- */
+
+/* Slightly tighter green bar, like the main site search bar spacing */
+.adminFilters .filters__inner{
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+/* Bring the view toggle up so it sits "on top" of the green bar */
+#adminPageToggle{
+  position: relative;
+  top: -10px;
+  margin-left: auto;
+}
+
+/* Remove the (now unused) header badge area spacing if any */
+.header__countWrap{ display:none !important; }
+
+/* Nudge header left alignment to match filters edge perfectly */
+.header .header__inner{
+  padding-left: var(--pagePad);
+  padding-right: var(--pagePad);
+}
+
+
 /* Keep token row + toggle from wrapping awkwardly */
 .adminToken__row{ flex-wrap: nowrap; }
 
 /* Let the toggle sit on the right like the main site */
-#adminPageToggle{ margin-left: auto; }
+
 
 .adminToken__row{
   display:flex;
@@ -59,7 +84,7 @@ body{ background: var(--admin-bg); }
 }
 
 .adminBtn{
-  height: 36px;
+  height: 34px;
   border-radius: var(--admin-pill);
   border: 1px solid rgba(0,0,0,.18);
   background: #fff;
