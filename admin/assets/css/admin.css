@@ -11,15 +11,42 @@
 /* Keep admin pages visually aligned with main site */
 body{ background: var(--admin-bg); }
 
+/* subtle title motion when switching pages */
+.adminTitle--swap{
+  transform: translateX(6px);
+  opacity: .88;
+}
+
+.header__title{
+  transition: transform 160ms ease, opacity 160ms ease;
+}
+
 .adminMain{
   max-width: 980px;
   margin: 0 auto;
   padding: 14px 12px 28px;
 }
 
-.adminToken{
-  margin: 8px 0 14px;
+/* Token + toggle live in the green "filters" bar now */
+.adminToken{ margin: 0; }
+
+/* Make the green bar freeze under the sticky header */
+.adminFilters{
+  position: sticky;
+  top: var(--adminFiltersTop, 0px);
+  z-index: 45;
 }
+
+.adminFilters__inner{
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Keep token row + toggle from wrapping awkwardly */
+.adminToken__row{ flex-wrap: nowrap; }
+
+/* Let the toggle sit on the right like the main site */
+#adminPageToggle{ margin-left: auto; }
 
 .adminToken__row{
   display:flex;
@@ -185,8 +212,8 @@ body{ background: var(--admin-bg); }
 .adminPages::-webkit-scrollbar{ height: 0; }
 .adminPages{ scrollbar-width: none; }
 
-/* Prevent iOS Safari zoom on focus */
-input, select, textarea, button{ font-size: 16px !important; }
+/* Prevent iOS Safari zoom on focus (ONLY form fields — do not override viewToggle/button sizing) */
+input, select, textarea{ font-size: 16px; }
 
 @media (max-width: 480px){
   .adminField{ grid-template-columns: 80px 1fr; }
