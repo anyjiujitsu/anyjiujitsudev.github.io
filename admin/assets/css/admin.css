@@ -11,6 +11,55 @@
 /* Keep admin pages visually aligned with main site */
 body{ background: var(--admin-bg); }
 
+/* ---------- Admin header: match main site geometry ---------- */
+:root{
+  --admin-maxW: 1140px;
+  --admin-pad: 26px;
+}
+@media (max-width: 640px){
+  :root{ --admin-pad: 18px; }
+}
+.adminHeader__inner{
+  max-width: var(--admin-maxW);
+  margin: 0 auto;
+  padding: 18px var(--admin-pad) 14px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap: 18px;
+}
+.adminBrand{
+  position: relative;
+  display:flex;
+  align-items:flex-end;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.adminBrand__logo{
+  position:absolute;
+  left: -6px;
+  top: -18px;
+  width: 54px;
+  height: auto;
+  pointer-events:none;
+  user-select:none;
+}
+.adminTitle{
+  white-space: nowrap;
+  line-height: .92;
+  margin: 0;
+  padding: 0;
+  font-size: clamp(40px, 6.2vw, 78px);
+}
+/* keep toggle aligned to header baseline like main site */
+.adminPageToggle{ align-self:center; }
+@media (max-width: 640px){
+  .adminTitle{ font-size: clamp(34px, 9vw, 56px); }
+  .adminBrand__logo{ width: 46px; top:-16px; }
+}
+/* ----------------------------------------------------------- */
+
+
 /* subtle title motion when switching pages */
 .adminTitle--swap{
   transform: translateX(6px);
@@ -26,66 +75,6 @@ body{ background: var(--admin-bg); }
   Use the main site's .header__inner and .filters__inner geometry (max-width + page padding)
   so the left edge of the logo/title, token row, and cards all line up.
 */
-.adminHeader .adminHeader__inner{
-  /* .header__inner already defines max-width + padding; we only add minor admin tweaks */
-  align-items: center;
-}
-
-/* Header layout: center the title block like the main site, with the (ANY) mark above it */
-.adminHeader .adminHeader__inner{
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-}
-
-.adminHeader__spacer{
-  flex: 0 0 var(--adminToggleW, 210px);
-}
-
-.adminBrand{
-  flex: 1 1 auto;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 86px;
-}
-
-.adminBrand__logo{
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  pointer-events: none;
-  opacity: 1;
-}
-
-.adminBrand__logo img{
-  height: 22px;
-  width: auto;
-  display: block;
-}
-
-.adminHeader .header__title{
-  text-align: center;
-  margin: 0;
-  padding-top: 10px; /* creates room for the (ANY) mark */
-}
-
-@media (min-width: 900px){
-  .adminHeader__spacer{ flex-basis: var(--adminToggleW, 240px); }
-  .adminBrand{ min-height: 98px; }
-  .adminBrand__logo img{ height: 24px; }
-}
-
-/* Keep toggle pinned to the right like the main site */
-.adminHeader .adminPageToggle{
-  margin-left: 0;
-}
-
-
-
 /* Content width + padding should match main site content__inner */
 .adminMain{
   max-width: var(--maxW);
