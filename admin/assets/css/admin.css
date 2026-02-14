@@ -1,74 +1,301 @@
-
 :root{
-  --adminAnyLeft: 115px;
-  --adminAnyTop: -24px;
-  --adminAnyWidth: 64px;
+  --admin-bg: var(--bg, #ebebeb);
+  --admin-card: #e6e6e6;
+  --admin-text: #111;
+  --admin-muted: #6b6b6b;
+  --admin-shadow: 0 10px 18px rgba(0,0,0,.12);
+  --admin-radius: 14px;
+  --admin-pill: 999px;
 
+  /* Adjustable header nudges (tweak in DevTools, then commit here) */
   --adminTitleLeft: 0px;
   --adminTitleTop: 0px;
+  --adminAnyLeft: -6px;
+  --adminAnyTop: -18px;
+  --adminAnyWidth: 54px;
 }
 
-.header{
-  background:#f3f3f3;
-  padding:30px 0 20px;
-}
+/* Keep admin pages visually aligned with main site */
+body{ background: var(--admin-bg); }
 
-.header__inner{
-  max-width:1200px;
-  margin:0 auto;
-  padding:0 20px;
+/* ---------- Admin header: match main site geometry ---------- */
+:root{
+  --admin-maxW: 1140px;
+  --admin-pad: 26px;
+}
+@media (max-width: 640px){
+  :root{ --admin-pad: 18px; }
+}
+.adminHeader__inner{
+  max-width: var(--admin-maxW);
+  margin: 0 auto;
+  padding: 18px var(--admin-pad) 14px;
   display:flex;
-  align-items:center;
+  align-items:flex-end;
   justify-content:space-between;
-  position:relative;
+  gap: 18px;
 }
-
-.adminTitleWrap{
-  position:relative;
+.adminBrand{
+  position: relative;
+  display:flex;
+  align-items:flex-end;
+  flex: 1 1 auto;
+  min-width: 0;
 }
-
 .adminBrand__logo{
   position:absolute;
-  left:var(--adminAnyLeft);
-  top:var(--adminAnyTop);
-  width:var(--adminAnyWidth);
+  left: var(--adminAnyLeft);
+  top: var(--adminAnyTop);
+  width: var(--adminAnyWidth);
+  height: auto;
+  pointer-events:none;
+  user-select:none;
 }
-
 .adminTitle{
-  font-size:64px;
-  font-weight:900;
-  color:#234c31;
-  position:relative;
-  left:var(--adminTitleLeft);
-  top:var(--adminTitleTop);
-  white-space:nowrap;
+  white-space: nowrap;
+  line-height: .92;
+  margin: 0;
+  padding: 0;
+  font-size: clamp(40px, 6.2vw, 78px);
+  position: relative;
+  left: var(--adminTitleLeft);
+  top: var(--adminTitleTop);
+}
+/* keep toggle aligned to header baseline like main site */
+.adminPageToggle{ align-self:center; }
+@media (max-width: 640px){
+  .adminTitle{ font-size: clamp(34px, 9vw, 56px); }
+  .adminBrand__logo{ width: 46px; top:-16px; }
+}
+/* ----------------------------------------------------------- */
+
+
+/* subtle title motion when switching pages */
+.adminTitle--swap{
+  transform: translateX(6px);
+  opacity: .88;
 }
 
-.viewToggle button{
-  padding:10px 20px;
-  border:none;
-  border-radius:20px;
-  background:#e0e0e0;
-  margin-left:8px;
+.header__title{
+  transition: transform 160ms ease, opacity 160ms ease;
 }
 
-.viewToggle button.active{
-  background:white;
-  box-shadow:0 2px 6px rgba(0,0,0,.15);
+/*
+  IMPORTANT: Alignment
+  Use the main site's .header__inner and .filters__inner geometry (max-width + page padding)
+  so the left edge of the logo/title, token row, and cards all line up.
+*/
+/* Content width + padding should match main site content__inner */
+.adminMain{
+  max-width: var(--maxW);
+  margin: 0 auto;
+  padding: 12px var(--pagePad) 48px;
 }
 
-.filters{
-  background:#234c31;
-  padding:12px 0;
+/* Token + toggle live in the green "filters" bar now */
+.adminToken{ margin: 0; }
+
+/* Make the green bar freeze under the sticky header */
+.adminFilters{
+  position: sticky;
+  top: var(--adminFiltersTop, 0px);
+  z-index: 45;
 }
 
-.filters__inner{
-  max-width:1200px;
-  margin:0 auto;
-  padding:0 20px;
+.adminFilters__inner{
+  justify-content: flex-start;
+  align-items: center;
 }
 
-.tokenRow{
+/* --- Admin polish to match main site spacing/alignment --- */
+
+/* Slightly tighter green bar, like the main site search bar spacing */
+.adminFilters .filters__inner{
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+/* Remove the (now unused) header badge area spacing if any */
+.header__countWrap{ display:none !important; }
+
+/* (Header alignment handled by .adminHeader__inner above) */
+
+
+/* Keep token row + toggle from wrapping awkwardly */
+.adminToken__row{ flex-wrap: nowrap; }
+
+/* Let the toggle sit on the right like the main site */
+
+
+.adminToken__row{
   display:flex;
   gap:10px;
+  align-items:center;
+}
+
+.adminToken__pill{
+  flex: 1 1 auto;
+}
+
+.adminBtn{
+  height: 34px;
+  border-radius: var(--admin-pill);
+  border: 1px solid rgba(0,0,0,.18);
+  background: #fff;
+  padding: 0 14px;
+  font-size: 13px;
+  cursor: pointer;
+  box-shadow: 0 6px 10px rgba(0,0,0,.10);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  user-select: none;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.adminBtn:active{ transform: translateY(1px); }
+.adminBtn[disabled]{ opacity:.55; cursor:not-allowed; transform:none; }
+.adminBtn--primary{ background: #fff; }
+
+.adminSectionLabel{
+  margin: 10px 6px 8px 6px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #6a6a6a;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.adminCard{
+  background: var(--admin-card);
+  border-radius: var(--admin-radius);
+  box-shadow: var(--admin-shadow);
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,.06);
+}
+
+.adminCard__content{
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.adminField{
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.adminKey{
+  color: var(--admin-muted);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.adminVal{ min-width:0; }
+
+.adminVal input,
+.adminVal select{
+  width: 100%;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,.14);
+  padding: 0 10px;
+  background: rgba(255,255,255,.70);
+  font-size: 13px;
+  outline: none;
+}
+
+.adminVal input[type="date"]{
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  min-width: 0;
+}
+
+.adminVal input:focus,
+.adminVal select:focus{ box-shadow: 0 0 0 3px rgba(31,79,53,.18); }
+
+.adminVal input[readonly]{
+  background: rgba(0,0,0,.08);
+  border-color: rgba(0,0,0,.10);
+  color: rgba(0,0,0,.55);
+  box-shadow: none;
+}
+
+.req:after{ content:" *"; color:#b00020; font-weight:900; letter-spacing:0; }
+
+.adminCard__actions{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px;
+  border-top: 1px solid rgba(0,0,0,.08);
+  background: rgba(255,255,255,.25);
+  justify-content: space-between;
+}
+
+.adminCard__actions .adminBtn{
+  flex: 1 1 auto;
+  min-width: 140px;
+}
+
+.adminHint{
+  margin: 10px 6px 0 6px;
+  font-size: 12px;
+  color: var(--admin-muted);
+}
+
+.adminStatus{
+  margin: 10px 6px 0 6px;
+  font-size: 13px;
+  font-weight: 900;
+  color: #1f4f35;
+}
+
+.adminError{
+  margin: 8px 6px 0 6px;
+  font-size: 13px;
+  font-weight: 900;
+  color: #b00020;
+  white-space: pre-wrap;
+}
+
+/* Pager / slider */
+.adminPager{ margin-top: 8px; }
+
+.adminPages{
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 100%;
+  gap: 14px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding-bottom: 2px;
+}
+
+.adminPage{
+  scroll-snap-align: start;
+  padding-bottom: 8px;
+}
+
+/* Hide scrollbar but keep it scrollable */
+.adminPages::-webkit-scrollbar{ height: 0; }
+.adminPages{ scrollbar-width: none; }
+
+/* Prevent iOS Safari zoom on focus (ONLY form fields — do not override viewToggle/button sizing) */
+input, select, textarea{ font-size: 16px; }
+
+@media (max-width: 480px){
+  .adminField{ grid-template-columns: 80px 1fr; }
+  .adminToken__row{ gap: 8px; }
+  .adminBtn{ padding: 0 12px; }
 }
