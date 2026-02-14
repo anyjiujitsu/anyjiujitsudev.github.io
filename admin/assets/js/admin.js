@@ -139,12 +139,31 @@
     const pages = $("adminPages");
     const tabA = $("tabAdminEvents");
     const tabB = $("tabAdminIndex");
+    const toggle = $("adminPageToggle");
+    const thumb = toggle?.querySelector?.(".viewToggle__thumb") || null;
+    const title = $("adminTitle");
     if (!pages || !tabA || !tabB) return;
+
+    const setTitle = (which) => {
+      if (!title) return;
+      // lightweight "slide" feel via CSS class toggle
+      title.classList.add("adminTitle--swap");
+      title.textContent = (which === "index") ? "INDEX" : "EVENTS";
+      window.setTimeout(() => title.classList.remove("adminTitle--swap"), 160);
+    };
 
     function setActive(which){
       const isA = which === "events";
       tabA.setAttribute("aria-selected", isA ? "true" : "false");
       tabB.setAttribute("aria-selected", isA ? "false" : "true");
+      setTitle(isA ? "events" : "index");
+    }
+
+    function setThumbProgress(p){
+      if (!thumb) return;
+      const clamped = Math.max(0, Math.min(1, p));
+      // thumb is half-width; translate from 0% -> 100%
+      thumb.style.transform = `translateX(${clamped * 100}%)`;
     }
 
     function scrollToIndex(idx){
@@ -152,17 +171,33 @@
       pages.scrollTo({ left: w * idx, behavior: "smooth" });
     }
 
-    tabA.addEventListener("click", () => { setActive("events"); scrollToIndex(0); });
-    tabB.addEventListener("click", () => { setActive("index");  scrollToIndex(1); });
+    tabA.addEventListener("click", () => { setActive("events"); scrollToIndex(0); setThumbProgress(0); });
+    tabB.addEventListener("click", () => { setActive("index");  scrollToIndex(1); setThumbProgress(1); });
 
     let raf = 0;
     pages.addEventListener("scroll", () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
-        const idx = Math.round(pages.scrollLeft / Math.max(1, pages.clientWidth));
+        const w = Math.max(1, pages.clientWidth);
+        const p = pages.scrollLeft / w; // 0..1
+        setThumbProgress(p);
+        const idx = Math.round(p);
         setActive(idx >= 1 ? "index" : "events");
       });
     }, { passive: true });
+
+    // initial
+    setThumbProgress(0);
+    setTitle("events");
+  }
+
+  // Keep the green bar sticky *under* the header
+  function syncStickyOffsets(){
+    const header = $("header");
+    const filters = $("adminFilters");
+    if (!header || !filters) return;
+    const h = header.offsetHeight || 0;
+    document.documentElement.style.setProperty("--adminFiltersTop", h + "px");
   }
 
   // ---------- Events form logic ----------
@@ -431,6 +466,8 @@
   window.addEventListener("error", (e) => setError("Script error: " + (e.message || "Unknown")));
 
   // Boot
+  syncStickyOffsets();
+  window.addEventListener("resize", syncStickyOffsets, { passive: true });
   initPager();
   initToken();
   initEventsForm();
