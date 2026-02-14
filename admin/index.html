@@ -23,16 +23,19 @@
 
     <!-- Header (matches main site header look, but with admin page title + toggle on the right) -->
     <header class="header adminHeader" id="header">
-      <div class="adminHeader__inner">
+      <!-- Use the exact same header container as the main site so left edges align perfectly -->
+      <div class="header__inner adminHeader__inner">
         <div class="adminBrand" aria-label="ANY Admin header">
-          <div class="header__logoCrop" aria-hidden="true">
-            <img class="header__logoImage" src="../assets/img/any-logo.png" alt="ANY" />
+          <div class="header__logo" aria-hidden="true">
+            <div class="header__logoCrop">
+              <img class="header__logoImage" src="../assets/img/any-logo.png" alt="ANY" />
+            </div>
           </div>
           <h1 class="header__title" id="adminTitle">ADD EVENT</h1>
         </div>
 
         <!-- Slider toggle (same sizing/feel as main site viewToggle) -->
-        <div class="viewToggle" id="adminPageToggle" role="tablist" aria-label="Admin page toggle">
+        <div class="viewToggle adminPageToggle" id="adminPageToggle" role="tablist" aria-label="Admin page toggle">
           <button class="viewToggle__tab" id="tabAdminEvents" role="tab" aria-selected="true" type="button">EVENTS</button>
           <button class="viewToggle__tab" id="tabAdminIndex" role="tab" aria-selected="false" type="button">INDEX</button>
           <div class="viewToggle__thumb" aria-hidden="true"></div>
@@ -42,6 +45,7 @@
 
     <!-- Green bar (matches main site "filters" bar): Token only, frozen under header -->
     <section class="filters adminFilters" id="adminFilters" aria-label="Admin controls">
+      <!-- Use the same filters container as the main site so token aligns with the title + form -->
       <div class="filters__inner adminFilters__inner">
         <!-- Token row (shared across both pages) -->
         <div class="adminToken" aria-label="GitHub token">
