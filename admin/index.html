@@ -1,239 +1,200 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <title>ANY N.E. (DEV) — Admin</title>
-
-  <!-- Reuse main-site styling so the Admin header matches EVENTS -->
-  <link rel="stylesheet" href="../assets/css/tokens.css" />
-  <link rel="stylesheet" href="../assets/css/base.css" />
-  <link rel="stylesheet" href="../assets/css/layout.css" />
-  <link rel="stylesheet" href="../assets/css/components.css?v=20260212-902" />
-
-  <!-- Admin-specific styles -->
-  <link rel="stylesheet" href="assets/css/admin.css" />
-
-  <!-- Admin logic (kept separate from main.js) -->
-  <script type="module" src="assets/js/admin.js"></script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" name="viewport"/>
+<title>ANY N.E. (DEV) — Admin</title>
+<!-- Reuse main-site styling so the Admin header matches EVENTS -->
+<link href="../assets/css/tokens.css" rel="stylesheet"/>
+<link href="../assets/css/base.css" rel="stylesheet"/>
+<link href="../assets/css/layout.css" rel="stylesheet"/>
+<link href="../assets/css/components.css?v=20260212-902" rel="stylesheet"/>
+<!-- Admin-specific styles -->
+<link href="assets/css/admin.css" rel="stylesheet"/>
+<!-- Admin logic (kept separate from main.js) -->
+<script src="assets/js/admin.js" type="module"></script>
 </head>
-
 <body>
-  <div class="app" id="app">
+<div class="app" id="app">
+<!-- Header (matches main site header look, but with admin page title + toggle on the right) -->
+<header class="header adminHeader" id="header">
+<!-- Match main-site header structure exactly (logo + title + viewToggle as direct children) -->
+<div class="header__inner adminHeader__inner">
 
-    <!-- Header (matches main site header look, but with admin page title + toggle on the right) -->
-    <header class="header adminHeader" id="header">
-      <!-- Match main-site header structure exactly (logo + title + viewToggle as direct children) -->
-      <div class="header__inner adminHeader__inner">
-        <div class="header__logo" aria-hidden="true">
-          <div class="header__logoCrop">
-            <img class="header__logoImage" src="../assets/img/any-logo.png" alt="ANY" />
-          </div>
-        </div>
-        <h1 class="header__title" id="adminTitle">EVENTS - ADD NEW</h1>
 
-        <!-- Slider toggle (same sizing/feel as main site viewToggle) -->
-        <div class="viewToggle adminPageToggle" id="adminPageToggle" role="tablist" aria-label="Admin page toggle">
-          <button class="viewToggle__tab" id="tabAdminEvents" role="tab" aria-selected="true" type="button">EVENTS</button>
-          <button class="viewToggle__tab" id="tabAdminIndex" role="tab" aria-selected="false" type="button">INDEX</button>
-          <div class="viewToggle__thumb" aria-hidden="true"></div>
-        </div>
-      </div>
-    </header>
-
-    <!-- Green bar (matches main site "filters" bar): Token only, frozen under header -->
-    <section class="filters adminFilters" id="adminFilters" aria-label="Admin controls">
-      <!-- Use the same filters container as the main site so token aligns with the title + form -->
-      <div class="filters__inner adminFilters__inner">
-        <!-- Token row (shared across both pages) -->
-        <div class="adminToken" aria-label="GitHub token">
-          <div class="adminToken__row">
-            <div class="pill pill--search adminToken__pill" title="Paste token here (stored locally when you tap Save)">
-              <span class="pill__icon" aria-hidden="true">🔑</span>
-              <input id="token" class="pill__input" type="password" placeholder="GitHub token" autocomplete="off" />
-              <button id="toggleToken" class="pill__clear" type="button" aria-label="Show/Hide token">👁</button>
-            </div>
-            <button class="adminBtn" id="saveTokenBtn" type="button">Save</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Admin content -->
-    <main class="adminMain" id="adminMain">
-
-      <div class="adminHint" style="margin-top:10px;">Token is stored locally in your browser (LocalStorage) after you tap Save.</div>
-
-      <!-- Swipe/scroll pages -->
-      <section class="adminPager" aria-label="Admin pages">
-        <div class="adminPages" id="adminPages">
-
-          <!-- PAGE 1: EVENTS ENTRY -->
-          <article class="adminPage" id="pageEvents" aria-label="Events entry page">
-            <div class="adminSectionLabel">Add Event</div>
-
-            <div class="adminCard" aria-label="Add Event Form">
-              <div class="adminCard__content">
-                <div class="adminField">
-                  <div class="adminKey req">Event</div>
-                  <div class="adminVal"><input id="f_EVENT" placeholder="Event name" required /></div>
-                </div>
-
-                <div class="adminField">
-                  <div class="adminKey req">For</div>
-                  <div class="adminVal">
-                    <select id="f_FOR" required>
-                      <option value="">Select…</option>
-                      <option>Charity Event</option>
-                      <option>Comp</option>
-                      <option>Comp (Invite)</option>
-                      <option>Grand Opening</option>
-                      <option>Kids Event</option>
-                      <option>Open House</option>
-                      <option>Open Mat</option>
-                      <option>Self Defense</option>
-                      <option>Seminar</option>
-                      <option>Women’s Only</option>
-                      <option>Workshop</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="adminField">
-                  <div class="adminKey">Where</div>
-                  <div class="adminVal"><input id="f_WHERE" placeholder="Gym / Event Center" list="whereList" autocomplete="off" /></div>
-                </div>
-
-                <div class="adminField">
-                  <div class="adminKey req">City</div>
-                  <div class="adminVal"><input id="f_CITY" placeholder="City" required list="cityList" autocomplete="off" /></div>
-                </div>
-
-                <div class="adminField">
-                  <div class="adminKey req">State</div>
-                  <div class="adminVal">
-                    <select id="f_STATE" required>
-                      <option value="">Select…</option>
-                      <option>Rhode Island</option>
-                      <option>Connecticut</option>
-                      <option>Vermont</option>
-                      <option>Massachusetts</option>
-                      <option>Maine</option>
-                      <option>New Hampshire</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="adminField">
-                  <div class="adminKey req">Date</div>
-                  <div class="adminVal"><input id="f_DATE" type="date" required /></div>
-                </div>
-
-                <div class="adminField">
-                  <div class="adminKey">Day</div>
-                  <div class="adminVal"><input id="f_DAY" placeholder="Auto from date" readonly /></div>
-                </div>
-
-                <div class="adminField">
-                  <div class="adminKey">Created</div>
-                  <div class="adminVal"><input id="f_CREATED" readonly /></div>
-                </div>
-
-                <!-- Autocomplete sources (populated from existing events CSV) -->
-                <datalist id="whereList"></datalist>
-                <datalist id="cityList"></datalist>
-              </div>
-
-              <div class="adminCard__actions">
-                <button class="adminBtn adminBtn--primary" id="appendBtn" type="button">Submit</button>
-                <button class="adminBtn" id="clearFormBtn" type="button">Clear</button>
-              </div>
-            </div>
-
-            <div class="adminHint">Required fields: Event, For, City, State, Date.</div>
-            <div id="status" class="adminStatus"></div>
-            <div id="error" class="adminError"></div>
-          </article>
-
-          <!-- PAGE 2: INDEX ENTRY (directory.csv) -->
-          <article class="adminPage" id="pageIndex" aria-label="Index entry page">
-            <div class="adminSectionLabel">Add Index Entry</div>
-
-            <div class="adminCard" aria-label="Add Index Entry Form">
-              <div class="adminCard__content">
-                <div class="adminField">
-                  <div class="adminKey req">Name</div>
-                  <div class="adminVal"><input id="d_NAME" placeholder="Gym name" required /></div>
-                </div>
-
-                <div class="adminField">
-                  <div class="adminKey">IG</div>
-                  <div class="adminVal"><input id="d_IG" placeholder="instagram_handle" autocapitalize="none" spellcheck="false" /></div>
-                </div>
-
-                <div class="adminField">
-                  <div class="adminKey req">City</div>
-                  <div class="adminVal"><input id="d_CITY" placeholder="City" required /></div>
-                </div>
-
-                <div class="adminField">
-                  <div class="adminKey req">State</div>
-                  <div class="adminVal">
-                    <select id="d_STATE" required>
-                      <option value="">Select…</option>
-                      <option>Rhode Island</option>
-                      <option>Connecticut</option>
-                      <option>Vermont</option>
-                      <option>Massachusetts</option>
-                      <option>Maine</option>
-                      <option>New Hampshire</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="adminField">
-                  <div class="adminKey">Sat</div>
-                  <div class="adminVal"><input id="d_SAT" placeholder="e.g., 10:00AM" /></div>
-                </div>
-
-                <div class="adminField">
-                  <div class="adminKey">Sun</div>
-                  <div class="adminVal"><input id="d_SUN" placeholder="e.g., 12:00PM" /></div>
-                </div>
-
-                <div class="adminField">
-                  <div class="adminKey">OTA</div>
-                  <div class="adminVal">
-                    <select id="d_OTA">
-                      <option value="">(blank)</option>
-                      <option value="Y">Y</option>
-                      <option value="N">N</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="adminField">
-                  <div class="adminKey">Created</div>
-                  <div class="adminVal"><input id="d_CREATED" readonly /></div>
-                </div>
-
-                <div class="adminHint" style="margin-top:6px;">LAT/LON are left blank and can be filled later.</div>
-              </div>
-
-              <div class="adminCard__actions">
-                <button class="adminBtn adminBtn--primary" id="appendDirectoryBtn" type="button">Submit</button>
-                <button class="adminBtn" id="clearDirectoryBtn" type="button">Clear</button>
-              </div>
-            </div>
-
-            <div id="statusDirectory" class="adminStatus"></div>
-            <div id="errorDirectory" class="adminError"></div>
-          </article>
-
-        </div>
-      </section>
-
-    </main>
-  </div>
+<!-- Slider toggle (same sizing/feel as main site viewToggle) -->
+<div aria-hidden="true" class="adminHeader__spacer"></div><div class="adminBrand"><div aria-hidden="true" class="adminBrand__logo"><img alt="ANY" class="header__logoImage" src="../assets/img/any-logo.png"/></div><h1 class="header__title" id="adminTitle">EVENTS - ADD NEW</h1></div><div aria-label="Admin page toggle" class="viewToggle adminPageToggle" id="adminPageToggle" role="tablist">
+<button aria-selected="true" class="viewToggle__tab" id="tabAdminEvents" role="tab" type="button">EVENTS</button>
+<button aria-selected="false" class="viewToggle__tab" id="tabAdminIndex" role="tab" type="button">INDEX</button>
+<div aria-hidden="true" class="viewToggle__thumb"></div>
+</div>
+</div>
+</header>
+<!-- Green bar (matches main site "filters" bar): Token only, frozen under header -->
+<section aria-label="Admin controls" class="filters adminFilters" id="adminFilters">
+<!-- Use the same filters container as the main site so token aligns with the title + form -->
+<div class="filters__inner adminFilters__inner">
+<!-- Token row (shared across both pages) -->
+<div aria-label="GitHub token" class="adminToken">
+<div class="adminToken__row">
+<div class="pill pill--search adminToken__pill" title="Paste token here (stored locally when you tap Save)">
+<span aria-hidden="true" class="pill__icon">🔑</span>
+<input autocomplete="off" class="pill__input" id="token" placeholder="GitHub token" type="password"/>
+<button aria-label="Show/Hide token" class="pill__clear" id="toggleToken" type="button">👁</button>
+</div>
+<button class="adminBtn" id="saveTokenBtn" type="button">Save</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Admin content -->
+<main class="adminMain" id="adminMain">
+<div class="adminHint" style="margin-top:10px;">Token is stored locally in your browser (LocalStorage) after you tap Save.</div>
+<!-- Swipe/scroll pages -->
+<section aria-label="Admin pages" class="adminPager">
+<div class="adminPages" id="adminPages">
+<!-- PAGE 1: EVENTS ENTRY -->
+<article aria-label="Events entry page" class="adminPage" id="pageEvents">
+<div class="adminSectionLabel">Add Event</div>
+<div aria-label="Add Event Form" class="adminCard">
+<div class="adminCard__content">
+<div class="adminField">
+<div class="adminKey req">Event</div>
+<div class="adminVal"><input id="f_EVENT" placeholder="Event name" required=""/></div>
+</div>
+<div class="adminField">
+<div class="adminKey req">For</div>
+<div class="adminVal">
+<select id="f_FOR" required="">
+<option value="">Select…</option>
+<option>Charity Event</option>
+<option>Comp</option>
+<option>Comp (Invite)</option>
+<option>Grand Opening</option>
+<option>Kids Event</option>
+<option>Open House</option>
+<option>Open Mat</option>
+<option>Self Defense</option>
+<option>Seminar</option>
+<option>Women’s Only</option>
+<option>Workshop</option>
+</select>
+</div>
+</div>
+<div class="adminField">
+<div class="adminKey">Where</div>
+<div class="adminVal"><input autocomplete="off" id="f_WHERE" list="whereList" placeholder="Gym / Event Center"/></div>
+</div>
+<div class="adminField">
+<div class="adminKey req">City</div>
+<div class="adminVal"><input autocomplete="off" id="f_CITY" list="cityList" placeholder="City" required=""/></div>
+</div>
+<div class="adminField">
+<div class="adminKey req">State</div>
+<div class="adminVal">
+<select id="f_STATE" required="">
+<option value="">Select…</option>
+<option>Rhode Island</option>
+<option>Connecticut</option>
+<option>Vermont</option>
+<option>Massachusetts</option>
+<option>Maine</option>
+<option>New Hampshire</option>
+</select>
+</div>
+</div>
+<div class="adminField">
+<div class="adminKey req">Date</div>
+<div class="adminVal"><input id="f_DATE" required="" type="date"/></div>
+</div>
+<div class="adminField">
+<div class="adminKey">Day</div>
+<div class="adminVal"><input id="f_DAY" placeholder="Auto from date" readonly=""/></div>
+</div>
+<div class="adminField">
+<div class="adminKey">Created</div>
+<div class="adminVal"><input id="f_CREATED" readonly=""/></div>
+</div>
+<!-- Autocomplete sources (populated from existing events CSV) -->
+<datalist id="whereList"></datalist>
+<datalist id="cityList"></datalist>
+</div>
+<div class="adminCard__actions">
+<button class="adminBtn adminBtn--primary" id="appendBtn" type="button">Submit</button>
+<button class="adminBtn" id="clearFormBtn" type="button">Clear</button>
+</div>
+</div>
+<div class="adminHint">Required fields: Event, For, City, State, Date.</div>
+<div class="adminStatus" id="status"></div>
+<div class="adminError" id="error"></div>
+</article>
+<!-- PAGE 2: INDEX ENTRY (directory.csv) -->
+<article aria-label="Index entry page" class="adminPage" id="pageIndex">
+<div class="adminSectionLabel">Add Index Entry</div>
+<div aria-label="Add Index Entry Form" class="adminCard">
+<div class="adminCard__content">
+<div class="adminField">
+<div class="adminKey req">Name</div>
+<div class="adminVal"><input id="d_NAME" placeholder="Gym name" required=""/></div>
+</div>
+<div class="adminField">
+<div class="adminKey">IG</div>
+<div class="adminVal"><input autocapitalize="none" id="d_IG" placeholder="instagram_handle" spellcheck="false"/></div>
+</div>
+<div class="adminField">
+<div class="adminKey req">City</div>
+<div class="adminVal"><input id="d_CITY" placeholder="City" required=""/></div>
+</div>
+<div class="adminField">
+<div class="adminKey req">State</div>
+<div class="adminVal">
+<select id="d_STATE" required="">
+<option value="">Select…</option>
+<option>Rhode Island</option>
+<option>Connecticut</option>
+<option>Vermont</option>
+<option>Massachusetts</option>
+<option>Maine</option>
+<option>New Hampshire</option>
+</select>
+</div>
+</div>
+<div class="adminField">
+<div class="adminKey">Sat</div>
+<div class="adminVal"><input id="d_SAT" placeholder="e.g., 10:00AM"/></div>
+</div>
+<div class="adminField">
+<div class="adminKey">Sun</div>
+<div class="adminVal"><input id="d_SUN" placeholder="e.g., 12:00PM"/></div>
+</div>
+<div class="adminField">
+<div class="adminKey">OTA</div>
+<div class="adminVal">
+<select id="d_OTA">
+<option value="">(blank)</option>
+<option value="Y">Y</option>
+<option value="N">N</option>
+</select>
+</div>
+</div>
+<div class="adminField">
+<div class="adminKey">Created</div>
+<div class="adminVal"><input id="d_CREATED" readonly=""/></div>
+</div>
+<div class="adminHint" style="margin-top:6px;">LAT/LON are left blank and can be filled later.</div>
+</div>
+<div class="adminCard__actions">
+<button class="adminBtn adminBtn--primary" id="appendDirectoryBtn" type="button">Submit</button>
+<button class="adminBtn" id="clearDirectoryBtn" type="button">Clear</button>
+</div>
+</div>
+<div class="adminStatus" id="statusDirectory"></div>
+<div class="adminError" id="errorDirectory"></div>
+</article>
+</div>
+</section>
+</main>
+</div>
 </body>
 </html>
