@@ -109,6 +109,55 @@
   setCreatedDate(eventForm);
   setCreatedDate(indexForm);
 
+// --- INDEX: auto-fill LAT/LON from CITY + STATE (readonly fields) ---
+const idxCity  = indexForm.querySelector('input[name="CITY"]');
+const idxState = indexForm.querySelector('select[name="STATE"]');
+const idxLat   = indexForm.querySelector('input[name="LAT"]');
+const idxLon   = indexForm.querySelector('input[name="LON"]');
+
+function setIdxLatLon(lat, lon){
+  if(idxLat) idxLat.value = lat || '';
+  if(idxLon) idxLon.value = lon || '';
+}
+
+let geoTimer = null;
+let lastGeoQ = '';
+
+async function geocodeCityState(city, state){
+  const q = `${city}, ${state}, USA`.trim();
+  if(!city || !state) { setIdxLatLon('', ''); return; }
+  if(q === lastGeoQ) return;
+  lastGeoQ = q;
+
+  // Nominatim (OpenStreetMap) search
+  const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q);
+
+  try{
+    const res = await fetch(url, { method: 'GET' });
+    if(!res.ok) throw new Error('geocode_http_' + res.status);
+    const data = await res.json();
+    if(Array.isArray(data) && data[0] && data[0].lat && data[0].lon){
+      // Keep as strings (reasonable precision)
+      setIdxLatLon(String(data[0].lat), String(data[0].lon));
+    }else{
+      setIdxLatLon('', '');
+    }
+  }catch(_e){
+    setIdxLatLon('', '');
+  }
+}
+
+function scheduleGeocode(){
+  if(!idxCity || !idxState) return;
+  const city = (idxCity.value || '').trim();
+  const state = (idxState.value || '').trim();
+  if(geoTimer) clearTimeout(geoTimer);
+  geoTimer = setTimeout(() => geocodeCityState(city, state), 450);
+}
+
+if(idxCity)  idxCity.addEventListener('input', scheduleGeocode);
+if(idxState) idxState.addEventListener('change', scheduleGeocode);
+
   // optional: auto day from date on event form
   const dateInput = eventForm.querySelector('input[name="DATE"]');
   const dayInput = eventForm.querySelector('input[name="DAY"]');
@@ -132,6 +181,10 @@
     const form = which === 'index' ? indexForm : eventForm;
     form.reset();
     setCreatedDate(form);
+    if(which === 'index'){
+      lastGeoQ = '';
+      setIdxLatLon('', '');
+    }
     if(which === 'event') dayInput.value = '';
   });
 
@@ -158,6 +211,55 @@
     if(ok){
       indexForm.reset();
       setCreatedDate(indexForm);
+
+// --- INDEX: auto-fill LAT/LON from CITY + STATE (readonly fields) ---
+const idxCity  = indexForm.querySelector('input[name="CITY"]');
+const idxState = indexForm.querySelector('select[name="STATE"]');
+const idxLat   = indexForm.querySelector('input[name="LAT"]');
+const idxLon   = indexForm.querySelector('input[name="LON"]');
+
+function setIdxLatLon(lat, lon){
+  if(idxLat) idxLat.value = lat || '';
+  if(idxLon) idxLon.value = lon || '';
+}
+
+let geoTimer = null;
+let lastGeoQ = '';
+
+async function geocodeCityState(city, state){
+  const q = `${city}, ${state}, USA`.trim();
+  if(!city || !state) { setIdxLatLon('', ''); return; }
+  if(q === lastGeoQ) return;
+  lastGeoQ = q;
+
+  // Nominatim (OpenStreetMap) search
+  const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q);
+
+  try{
+    const res = await fetch(url, { method: 'GET' });
+    if(!res.ok) throw new Error('geocode_http_' + res.status);
+    const data = await res.json();
+    if(Array.isArray(data) && data[0] && data[0].lat && data[0].lon){
+      // Keep as strings (reasonable precision)
+      setIdxLatLon(String(data[0].lat), String(data[0].lon));
+    }else{
+      setIdxLatLon('', '');
+    }
+  }catch(_e){
+    setIdxLatLon('', '');
+  }
+}
+
+function scheduleGeocode(){
+  if(!idxCity || !idxState) return;
+  const city = (idxCity.value || '').trim();
+  const state = (idxState.value || '').trim();
+  if(geoTimer) clearTimeout(geoTimer);
+  geoTimer = setTimeout(() => geocodeCityState(city, state), 450);
+}
+
+if(idxCity)  idxCity.addEventListener('input', scheduleGeocode);
+if(idxState) idxState.addEventListener('change', scheduleGeocode);
     }
   });
 })();
