@@ -24,8 +24,16 @@
 
 /* Make the token bar sticky under header */
 .adminFilters{
+  /*
+    Keep the green token bar “frozen” exactly where it starts (directly under
+    the sticky header), matching the behavior of the header title + view toggle.
+
+    The main-site CSS commonly exposes a header height variable; we use a safe
+    fallback so this remains robust if that variable isn't present.
+  */
   position: sticky;
-  top: 0;
+  top: var(--headerH, 0px);
+  z-index: 900;
 }
 
 /* Token pill */
