@@ -328,3 +328,12 @@
   .adminTokenPill{ padding: 7px 12px; }
   .adminTokenPill input{ width: 200px; }
 }
+
+
+/* Slightly increase green bar height on mobile */
+@media (max-width: 520px){
+  .filters.adminFilters{
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+}
