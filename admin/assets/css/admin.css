@@ -215,13 +215,13 @@
 .adminTimeRow{
   grid-column: 1 / -1; /* span full adminGrid width */
   display: grid;
-  grid-template-columns: 60px 1fr 60px 1fr;
+  grid-template-columns: 92px 1fr 92px 1fr; /* match adminGrid label column */
   gap: 10px 14px;
   align-items: center;
 }
 @media (max-width: 520px){
   .adminTimeRow{
-    grid-template-columns: 50px 1fr 50px 1fr;
+    grid-template-columns: 76px 1fr 76px 1fr; /* match adminGrid mobile label column */
   }
 }
 /* keep native time inputs aligned with existing adminInput styling */
@@ -229,3 +229,15 @@
   padding: 12px 14px;
   font-size: 14px;
 }
+
+/* LOCATION: LAT/LON inline (readonly, auto-filled) */
+.adminLatLonRow{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+  align-items: center;
+}
+.adminLatLonRow .adminInput[readonly]{
+  background: rgba(255,255,255,0.92);
+}
+
