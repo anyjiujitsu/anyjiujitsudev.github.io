@@ -320,3 +320,20 @@
   box-shadow: 0 10px 24px rgba(0,0,0,0.10), 0 22px 42px rgba(0,0,0,0.08);
   border-color: rgba(0,0,0,0.05);
 }
+
+
+/* Git Token: make input height match action button */
+.adminTokenRow{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.adminTokenRow .adminInput{
+  height: 44px;
+}
+.adminTokenRow .adminTokenBtn{
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
