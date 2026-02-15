@@ -110,9 +110,11 @@
   setCreatedDate(indexForm);
 
 
+  
   // --- INDEX: OPENS (SAT/SUN) time picker overlay sync ---
   function setupOpensTimeSync(form){
     if(!form) return;
+
     const satNative = form.querySelector('input.adminTimeNative[name="SAT"]');
     const sunNative = form.querySelector('input.adminTimeNative[name="SUN"]');
     const displays  = Array.from(form.querySelectorAll('input.adminTimeDisplay'));
@@ -121,8 +123,104 @@
     const satDisplay = displays[0];
     const sunDisplay = displays[1];
 
+    function format12(hhmm){
+      const v = (hhmm || '').trim();
+      const m = v.match(/^(\d{2}):(\d{2})$/);
+      if(!m) return '';
+      let hh = Number(m[1]);
+      const mm = m[2];
+      const ampm = hh >= 12 ? 'PM' : 'AM';
+      hh = hh % 12; if(hh === 0) hh = 12;
+      return `${hh}:${mm} ${ampm}`;
+    }
+
     function syncOne(nativeEl, displayEl){
-      displayEl.value = nativeEl.value || '';
+      const raw = nativeEl.value || '';
+      displayEl.value = raw ? format12(raw) : '';
+    }
+
+    function isTimeSupported(el){
+      // Desktop Safari downgrades type=time to text (no picker)
+      return el && el.type === 'time';
+    }
+
+    // Desktop fallback modal
+    function ensureModal(){
+      let modal = document.querySelector('.adminTimeModal');
+      if(modal) return modal;
+
+      modal = document.createElement('div');
+      modal.className = 'adminTimeModal';
+      modal.innerHTML = `
+        <div class="adminTimeSheet" role="dialog" aria-modal="true">
+          <div class="adminTimeSheetTitle">Pick time</div>
+          <div class="adminTimePickRow">
+            <select class="tHour"></select>
+            <select class="tMin"></select>
+            <select class="tAmpm"><option>AM</option><option>PM</option></select>
+          </div>
+          <div class="adminTimePickActions">
+            <button type="button" class="adminTimePickBtn tCancel">Cancel</button>
+            <button type="button" class="adminTimePickBtn tOk">OK</button>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+
+      modal.addEventListener('click', (e) => { if(e.target === modal) modal.classList.remove('is-open'); });
+
+      const h = modal.querySelector('.tHour');
+      const mi = modal.querySelector('.tMin');
+      for(let i=1;i<=12;i++){
+        const o=document.createElement('option');
+        o.textContent=String(i);
+        o.value=String(i);
+        h.appendChild(o);
+      }
+      for(let j=0;j<60;j+=5){
+        const o=document.createElement('option');
+        o.textContent=String(j).padStart(2,'0');
+        o.value=String(j).padStart(2,'0');
+        mi.appendChild(o);
+      }
+      return modal;
+    }
+
+    function openModalFor(nativeEl, displayEl){
+      const modal = ensureModal();
+      const hourSel = modal.querySelector('.tHour');
+      const minSel  = modal.querySelector('.tMin');
+      const ampmSel = modal.querySelector('.tAmpm');
+
+      const seed = (nativeEl.value || '').match(/^(\d{2}):(\d{2})$/);
+      let hh = seed ? Number(seed[1]) : 10;
+      let mm = seed ? seed[2] : '00';
+
+      let ap = hh >= 12 ? 'PM' : 'AM';
+      hh = hh % 12; if(hh === 0) hh = 12;
+
+      hourSel.value = String(hh);
+
+      const mmNum = Number(mm);
+      const snapped = String(Math.round(mmNum/5)*5).padStart(2,'0');
+      minSel.value = snapped;
+
+      ampmSel.value = ap;
+
+      modal.classList.add('is-open');
+      modal.querySelector('.tCancel').onclick = () => modal.classList.remove('is-open');
+      modal.querySelector('.tOk').onclick = () => {
+        const h12 = Number(hourSel.value);
+        const m2  = minSel.value;
+        const ap2 = ampmSel.value;
+
+        let h24 = h12 % 12;
+        if(ap2 === 'PM') h24 += 12;
+
+        const hh24 = String(h24).padStart(2,'0');
+        nativeEl.value = `${hh24}:${m2}`;
+        syncOne(nativeEl, displayEl);
+        modal.classList.remove('is-open');
+      };
     }
 
     satNative.addEventListener('input', () => syncOne(satNative, satDisplay));
@@ -130,16 +228,30 @@
     sunNative.addEventListener('input', () => syncOne(sunNative, sunDisplay));
     sunNative.addEventListener('change', () => syncOne(sunNative, sunDisplay));
 
-    // If user taps display (some browsers ignore clicks on fully transparent inputs)
-    satDisplay.addEventListener('click', () => { satNative.click(); satNative.focus({preventScroll:true}); });
-    sunDisplay.addEventListener('click', () => { sunNative.click(); sunNative.focus({preventScroll:true}); });
+    // Clicking display triggers native picker if supported; otherwise modal
+    satDisplay.addEventListener('click', () => {
+      if(isTimeSupported(satNative)){
+        if(typeof satNative.showPicker === 'function') satNative.showPicker();
+        else { satNative.click(); satNative.focus({preventScroll:true}); }
+      }else{
+        openModalFor(satNative, satDisplay);
+      }
+    });
+    sunDisplay.addEventListener('click', () => {
+      if(isTimeSupported(sunNative)){
+        if(typeof sunNative.showPicker === 'function') sunNative.showPicker();
+        else { sunNative.click(); sunNative.focus({preventScroll:true}); }
+      }else{
+        openModalFor(sunNative, sunDisplay);
+      }
+    });
 
-    // Initialize (in case form is repopulated later)
     syncOne(satNative, satDisplay);
     syncOne(sunNative, sunDisplay);
   }
 
   setupOpensTimeSync(indexForm);
+
 
 // --- INDEX: auto-fill LAT/LON from CITY + STATE (readonly fields) ---
 const idxCity  = indexForm.querySelector('input[name="CITY"]');
