@@ -276,7 +276,7 @@ function wireViewToggle(){
   }
 
   tabEvents?.addEventListener("click", () => setViewUI("events"));
-  tabIndex?.addEventListener("click", () => setViewUI("index"));
+  tabIndex?.addEventListener("click", () => setViewUI("Find Training"));
 
   if(viewToggle){
     let dragging = false;
