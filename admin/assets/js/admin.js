@@ -1,237 +1,247 @@
 
-/* Admin: reuse main-site header + filters; only add layout for pager + forms. */
+/* Admin panel
+   - Uses main-site header + viewToggle styling
+   - Horizontal pager with scroll-snap
+   - Keeps viewToggle thumb synced to scroll
+   - Token save to LocalStorage
+   - Clears forms on successful submit (stubbed commit hook for now)
+*/
+(function(){
+  const pager = document.getElementById('adminPager');
+  const titleEl = document.getElementById('adminViewTitle');
+  const toggle = document.getElementById('adminViewToggle');
+  const tabs = Array.from(toggle.querySelectorAll('.viewToggle__tab'));
 
-:root{
-  /* You can tune these in DevTools then commit */
-  --adminTitleLeft: 0px;
-  --adminTitleTop: 0px;
+  const tokenInput = document.getElementById('ghToken');
+  const saveBtn = document.getElementById('saveToken');
+  const eyeBtn = document.getElementById('toggleToken');
 
-  /* Logo tweak (match main site) */
-  --adminLogoRowMarginBottom: -10px;
-}
+  // --- Token: load/save ---
+  const TOKEN_KEY = 'anyjj_admin_github_token';
+  const saved = localStorage.getItem(TOKEN_KEY);
+  if(saved) tokenInput.value = saved;
 
-/* logo row matches main site inline style */
-.adminLogoRow{ margin: 0 0 var(--adminLogoRowMarginBottom) 0; }
-.adminHeaderInner--logo{ display:flex; justify-content:flex-start; align-items:flex-end; }
+  saveBtn.addEventListener('click', () => {
+    localStorage.setItem(TOKEN_KEY, tokenInput.value || '');
+    saveBtn.textContent = 'Saved';
+    setTimeout(() => (saveBtn.textContent = 'Save'), 900);
+  });
 
-/* allow nudging title without breaking toggle */
-#adminViewTitle{
-  position: relative;
-  left: var(--adminTitleLeft);
-  top: var(--adminTitleTop);
-  white-space: nowrap;
-}
+  eyeBtn.addEventListener('click', () => {
+    const isPw = tokenInput.type === 'password';
+    tokenInput.type = isPw ? 'text' : 'password';
+    eyeBtn.setAttribute('aria-label', isPw ? 'Hide token' : 'Show token');
+  });
 
-/* Make the token bar sticky under header */
-.adminFilters{
-  position: sticky;
-  top: 0;
-}
+  // --- Helpers ---
+  function setActiveView(view){
+    const isIndex = view === 'index';
+    tabs.forEach(btn => btn.setAttribute('aria-selected', String(btn.dataset.view === view)));
+    toggle.style.setProperty('--viewProgress', isIndex ? 1 : 0);
 
-/* Token pill */
-.adminTokenPill{
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255,255,255,0.95);
-  border-radius: 999px;
-  padding: 10px 14px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-  border: 1px solid rgba(0,0,0,0.10);
-  flex: 0 0 auto;
-}
-.adminTokenIcon{ font-size: 14px; opacity: 0.85; }
-.adminTokenPill input{
-  border: 0;
-  outline: none;
-  background: transparent;
-  width: 220px;
-  font-size: 16px; /* prevents iOS zoom */
-}
-.adminTokenEye{
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  opacity: 0.75;
-}
-.adminSaveBtn{
-  border: 0;
-  border-radius: 999px;
-  padding: 10px 16px;
-  background: #fff;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-  cursor: pointer;
-  flex: 0 0 auto;
-}
-.adminTokenHint{
-  margin-left: 6px;
-  color: rgba(255,255,255,0.80);
-  font-size: 13px;
-  white-space: nowrap;
-}
-@media (max-width: 760px){
-  .adminTokenHint{ display:none; }
-}
+    titleEl.textContent = isIndex ? 'INDEX – ADD NEW' : 'EVENTS – ADD NEW';
+  }
 
-/* Pager (horizontal, like your main view toggle behavior) */
-.adminContent{ padding: 22px 0 60px; }
-.adminPager{
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 100%;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.adminPager::-webkit-scrollbar{ display:none; }
-.adminPage{ scroll-snap-align: start; padding: 0 var(--pagePad); }
+  function scrollToView(view){
+    const idx = view === 'index' ? 1 : 0;
+    const x = idx * pager.clientWidth;
+    pager.scrollTo({ left: x, behavior: 'smooth' });
+  }
 
-/* Card + form */
-.adminCard{
-  width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
-  background: var(--row);
-  border-radius: 18px;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.10);
-  border: 1px solid rgba(0,0,0,0.08);
-  overflow: hidden;
-}
-.adminCardHeader{
-  padding: 16px 18px;
-  font-weight: 900;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(0,0,0,0.55);
-  font-size: 12px;
-  background: rgba(255,255,255,0.25);
-}
-.adminForm{ padding: 18px; }
-.adminGrid{
-  display: grid;
-  grid-template-columns: 92px 1fr;
-  gap: 10px 14px;
-  align-items: center;
-}
-.adminLabel{
-  font-weight: 900;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  font-size: 11px;
-  color: rgba(0,0,0,0.55);
-}
-.req{ color: #b01212; margin-left: 2px; }
+  // --- Toggle click ---
+  toggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('.viewToggle__tab');
+    if(!btn) return;
+    scrollToView(btn.dataset.view);
+  });
 
-.adminInput, .adminSelect{
-  width: 100%;
-  border-radius: 12px;
-  border: 1px solid rgba(0,0,0,0.12);
-  background: #fff;
-  padding: 12px 14px;
-  font-size: 14px;
-}
-.adminInput[disabled]{
-  background: rgba(0,0,0,0.05);
-  color: rgba(0,0,0,0.55);
-}
+  // --- Pager scroll sync ---
+  function syncFromScroll(){
+    const w = pager.clientWidth || 1;
+    const progress = Math.max(0, Math.min(1, pager.scrollLeft / w));
+    toggle.style.setProperty('--viewProgress', progress);
 
-.adminActions{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 18px;
-}
-.adminActionBtn{
-  border: 0;
-  border-radius: 999px;
-  padding: 14px 18px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  background: #fff;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.10);
-  cursor: pointer;
-}
-.adminNote{
-  margin-top: 10px;
-  font-size: 12px;
-  color: rgba(0,0,0,0.55);
-}
+    // snap title based on midpoint
+    setActiveView(progress > 0.5 ? 'index' : 'events');
+  }
+  pager.addEventListener('scroll', () => {
+    window.requestAnimationFrame(syncFromScroll);
+  }, { passive: true });
 
-@media (max-width: 520px){
-  .adminGrid{ grid-template-columns: 76px 1fr; }
-}
+  // Initialize
+  setActiveView('events');
+  syncFromScroll();
+
+  // --- Form handling (wire commit later) ---
+  const eventForm = document.getElementById('eventForm');
+  const indexForm = document.getElementById('indexForm');
+
+  function setCreatedDate(form){
+    const el = form.querySelector('input[name="CREATED"]');
+    if(!el) return;
+    const d = new Date();
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    const yy = d.getFullYear();
+    el.value = `${mm}/${dd}/${yy}`;
+  }
+  setCreatedDate(eventForm);
+  setCreatedDate(indexForm);
+
+  // optional: auto day from date on event form
+  const dateInput = eventForm.querySelector('input[name="DATE"]');
+  const dayInput = eventForm.querySelector('input[name="DAY"]');
+  function computeDay(str){
+    // expects mm/dd/yyyy
+    const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if(!m) return '';
+    const dt = new Date(Number(m[3]), Number(m[1])-1, Number(m[2]));
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    return days[dt.getDay()] || '';
+  }
+  dateInput.addEventListener('input', () => {
+    dayInput.value = computeDay(dateInput.value.trim());
+  });
+
+  // Clear buttons
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-clear]');
+    if(!btn) return;
+    const which = btn.getAttribute('data-clear');
+    const form = which === 'index' ? indexForm : eventForm;
+    form.reset();
+    setCreatedDate(form);
+    if(which === 'event') dayInput.value = '';
+  });
+
+  // Submit stubs – keep behavior: clear on success
+  async function fakeCommit(){
+    // This is intentionally a stub; you said we'll wire INDEX creation later.
+    // Return true to simulate success.
+    return true;
+  }
+
+  eventForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const ok = await fakeCommit();
+    if(ok){
+      eventForm.reset();
+      setCreatedDate(eventForm);
+      dayInput.value = '';
+    }
+  });
+
+  indexForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const ok = await fakeCommit();
+    if(ok){
+      indexForm.reset();
+      setCreatedDate(indexForm);
+    }
+  });
+})();
 
 
-/* Admin: freeze token bar under header */
-.adminTokenBar{
-  position: sticky;
-  top: var(--adminHeaderHeight, 0px);
-  z-index: 50;
+// Admin: keep token bar sticky below header
+function setAdminHeaderHeight(){
+  const header = document.querySelector('.adminHeader');
+  const h = header ? Math.round(header.getBoundingClientRect().height) : 0;
+  document.documentElement.style.setProperty('--adminHeaderHeight', h + 'px');
 }
+window.addEventListener('load', setAdminHeaderHeight);
+window.addEventListener('resize', setAdminHeaderHeight);
 
 
+// Admin: token button label + empty-token warning
+function wireTokenButtonLabel(){
+  const tokenInput = document.querySelector('.adminFilters input[type="password"], .adminFilters input[type="text"]');
+  const btn = document.querySelector('.adminFilters button, .adminFilters .tokenSaveBtn');
+  if(!tokenInput || !btn) return;
+
+  function refresh(){
+    const has = !!(tokenInput.value || '').trim();
+    btn.textContent = has ? 'SAVE' : 'CLICK TO ENTER';
+    btn.classList.toggle('tokenBtnWarn', !has);
+  }
+
+  tokenInput.addEventListener('input', refresh);
+  btn.addEventListener('click', (e) => {
+    const has = !!(tokenInput.value || '').trim();
+    if(!has){
+      e.preventDefault();
+      e.stopPropagation();
+      tokenInput.focus();
+      tokenInput.classList.add('tokenInputWarn');
+      setTimeout(()=>tokenInput.classList.remove('tokenInputWarn'), 900);
+      btn.classList.add('tokenBtnPulse');
+      setTimeout(()=>btn.classList.remove('tokenBtnPulse'), 900);
+    }
+  }, true);
+
+  refresh();
+}
+window.addEventListener('load', wireTokenButtonLabel);
 
 
+// Admin: fixed header/token metrics + content span
+function setAdminLayoutMetrics(){
+  const header = document.getElementById('adminHeader');
+  const token  = document.getElementById('adminTokenBar');
+  const title  = header ? header.querySelector('.header__title') : null;
+  const toggle = header ? header.querySelector('.viewToggle') : null;
 
-/* Admin: reduce form/card width to align with header content */
-:root{
-  --adminCardMaxW: 980px;
-}
-.adminMain, .adminPages, .adminPage{
-  max-width: var(--adminCardMaxW);
-  margin-left: auto;
-  margin-right: auto;
-}
-.adminMain .card, .adminMain .cardWrap, .adminMain .panel{
-  max-width: var(--adminCardMaxW);
-  margin-left: auto;
-  margin-right: auto;
-}
+  const headerH = header ? Math.round(header.getBoundingClientRect().height) : 0;
+  const tokenH  = token  ? Math.round(token.getBoundingClientRect().height)  : 0;
 
+  document.documentElement.style.setProperty('--adminHeaderH', headerH + 'px');
+  document.documentElement.style.setProperty('--adminTokenH', tokenH + 'px');
 
-/* Admin: sticky header + token bar */
-.adminHeader{
-  position: sticky;
-  top: 0;
-  z-index: 60;
+  // Span from title left edge to toggle right edge
+  if(title && toggle){
+    const t = title.getBoundingClientRect();
+    const g = toggle.getBoundingClientRect();
+    const left = Math.max(0, Math.round(t.left));
+    const width = Math.max(0, Math.round(g.right - t.left));
+    document.documentElement.style.setProperty('--adminSpanL', left + 'px');
+    document.documentElement.style.setProperty('--adminSpanW', width + 'px');
+  }else{
+    document.documentElement.style.setProperty('--adminSpanL', '0px');
+    document.documentElement.style.setProperty('--adminSpanW', '100%');
+  }
 }
-.adminTokenBar{
-  position: sticky;
-  top: var(--adminHeaderHeight, 0px);
-  z-index: 55;
-}
-
-
-/* Admin: slightly smaller (ANY) logo */
-.adminHeader .header__logoCrop{ 
-  height: 38px;
-}
-.adminHeader .header__logoImage{
-  height: 38px;
-}
-@media (max-width: 640px){
-  .adminHeader .header__logoCrop{ height: 32px; }
-  .adminHeader .header__logoImage{ height: 32px; }
-}
+window.addEventListener('load', setAdminLayoutMetrics);
+window.addEventListener('resize', setAdminLayoutMetrics);
 
 
-/* Admin: token empty affordance */
-.tokenBtnWarn{
-  opacity: 0.95;
+// Admin: arrow token button focus-on-empty
+function wireTokenArrow(){
+  const tokenBar = document.getElementById('adminTokenBar');
+  if(!tokenBar) return;
+  const input = tokenBar.querySelector('input');
+  const btn = tokenBar.querySelector('.tokenArrowBtn');
+  if(!input || !btn) return;
+
+  function refresh(){
+    const has = !!(input.value || '').trim();
+    btn.classList.toggle('tokenBtnWarn', !has);
+  }
+  input.addEventListener('input', refresh);
+
+  btn.addEventListener('click', (e) => {
+    const has = !!(input.value || '').trim();
+    if(!has){
+      e.preventDefault();
+      e.stopPropagation();
+      input.focus();
+      input.classList.add('tokenInputWarn');
+      setTimeout(()=>input.classList.remove('tokenInputWarn'), 900);
+      btn.classList.add('tokenBtnPulse');
+      setTimeout(()=>btn.classList.remove('tokenBtnPulse'), 900);
+    }
+  }, true);
+
+  refresh();
 }
-.tokenBtnPulse{
-  animation: tokenPulse 0.9s ease-in-out;
-}
-.tokenInputWarn{
-  outline: 2px solid rgba(205,100,68,0.9);
-}
-@keyframes tokenPulse{
-  0%{ transform: scale(1); }
-  30%{ transform: scale(1.03); }
-  100%{ transform: scale(1); }
-}
+window.addEventListener('load', wireTokenArrow);
+
+window.addEventListener('load', () => { setTimeout(setAdminLayoutMetrics, 0); });
