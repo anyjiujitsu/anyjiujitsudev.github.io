@@ -193,6 +193,9 @@
 }
     color: rgba(0,0,0,0.75) !important;
   -webkit-text-fill-color: rgba(0,0,0,0.75) !important;
+}
+color: rgba(0,0,0,0.75) !important;
+  -webkit-text-fill-color: rgba(0,0,0,0.75) !important;
   font-size: 14px;
   line-height: 1.1;
 }
@@ -307,4 +310,19 @@ color: rgba(0,0,0,0.75);
   height: 26px;
   pointer-events: none;
   background: linear-gradient(to bottom, rgba(0,0,0,0), var(--bg));
+}
+
+
+/* INDEX card: soften bottom edge like EVENTS */
+.adminPage[data-page="index"] .adminCard{ position: relative; overflow: visible; }
+.adminPage[data-page="index"] .adminCard::after{
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -26px;
+  height: 26px;
+  background: linear-gradient(to bottom, var(--row), var(--bg));
+  pointer-events: none;
+  z-index: -1;
 }
