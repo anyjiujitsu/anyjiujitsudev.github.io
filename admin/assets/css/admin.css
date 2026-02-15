@@ -164,3 +164,40 @@
 @media (max-width: 520px){
   .adminGrid{ grid-template-columns: 76px 1fr; }
 }
+
+
+/* Admin: freeze token bar under header */
+.adminTokenBar{
+  position: sticky;
+  top: var(--adminHeaderHeight, 0px);
+  z-index: 50;
+}
+
+
+/* Admin: slightly smaller (ANY) logo */
+.adminHeader .header__logoCrop{ 
+  height: 44px;
+}
+.adminHeader .header__logoImage{
+  height: 44px;
+}
+@media (max-width: 640px){
+  .adminHeader .header__logoCrop{ height: 38px; }
+  .adminHeader .header__logoImage{ height: 38px; }
+}
+
+
+/* Admin: reduce form/card width to align with header content */
+:root{
+  --adminCardMaxW: 980px;
+}
+.adminMain, .adminPages, .adminPage{
+  max-width: var(--adminCardMaxW);
+  margin-left: auto;
+  margin-right: auto;
+}
+.adminMain .card, .adminMain .cardWrap, .adminMain .panel{
+  max-width: var(--adminCardMaxW);
+  margin-left: auto;
+  margin-right: auto;
+}
