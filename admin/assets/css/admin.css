@@ -212,9 +212,6 @@
 /* =========================
    INDEX: SAT + SUN single row
    ========================= */
-/* =========================
-   INDEX: OPENS (SAT + SUN inline)
-   ========================= */
 .adminTimeRow{
   display: grid;
   grid-template-columns: 1fr 1fr;
