@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="assets/css/admin.css" />
 </head>
 
-<body>
+<body class="adminBody">
   <div class="app" id="app">
 
     <!-- Header (match main-site structure) -->
@@ -44,13 +44,13 @@
     </header>
 
     <!-- Green bar (token only) – sticky under header -->
-    <section class="filters adminFilters adminTokenBar" id="adminFilters" aria-label="Admin controls">
+    <section class="filters adminFilters adminTokenBar" id="adminFilters" aria-label="Admin controls" id="adminTokenBar">
       <div class="filters__inner adminFiltersInner">
         <div class="adminTokenPill" role="group" aria-label="GitHub token">
           <span class="adminTokenIcon" aria-hidden="true">🔑</span>
           <input id="ghToken" type="password" inputmode="text" autocomplete="off" spellcheck="false"
                  placeholder="GitHub token" aria-label="GitHub token" />
-          <button id="toggleToken" class="adminTokenEye" type="button" aria-label="Show token">👁</button>
+          <button id="toggleToken" class="adminTokenEye tokenArrowBtn" type="button" aria-label="Show token">&#8594;</button>
         </div>
 
         <button id="saveToken" class="adminSaveBtn" type="button">Save</button>
@@ -163,7 +163,8 @@
         </section>
 
       </div>
-    </main>
+      </div>
+</main>
 
   </div>
 
