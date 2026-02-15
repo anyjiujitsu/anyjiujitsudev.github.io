@@ -1,68 +1,218 @@
-<!-- INDEX PAGE -->
-<section class="adminPage" data-page="index" aria-label="Add location">
-  <div class="adminCard">
-    <div class="adminCardHeader">ADD INDEX ENTRY</div>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>ANY N.E. - Admin</title>
 
-    <form id="indexForm" class="adminForm" autocomplete="off">
-      <div class="adminGrid">
-        <label class="adminLabel">NAME<span class="req">*</span></label>
-        <input class="adminInput" name="NAME" required placeholder="Gym name" />
+  <!-- Reuse main-site CSS (no cache-busting; you manage cache manually) -->
+  <link rel="stylesheet" href="../assets/css/tokens.css" />
+  <link rel="stylesheet" href="../assets/css/base.css" />
+  <link rel="stylesheet" href="../assets/css/layout.css" />
+  <link rel="stylesheet" href="../assets/css/pills.css" />
+  <link rel="stylesheet" href="../assets/css/components.css" />
+  <link rel="stylesheet" href="../assets/css/directory.css" />
 
-        <label class="adminLabel">IG</label>
-        <input class="adminInput" name="IG" placeholder="instagram_handle" />
+  <!-- Admin-specific layout (light)
+       NOTE: different deployments have placed admin.css in different locations.
+       We include safe fallback paths so styling never drops out. -->
+  <link rel="stylesheet" href="assets/css/admin.css" />
+  <link rel="stylesheet" href="../assets/css/admin.css" />
+  <link rel="stylesheet" href="admin.css" />
 
-        <label class="adminLabel">CITY<span class="req">*</span></label>
-        <input class="adminInput" name="CITY" required placeholder="City" />
+  <!-- Freeze the green token bar where it starts (under the sticky header) -->
+  <style>
+    .adminFilters{
+      position: sticky;
+      top: var(--adminStickyTop, 0px);
+      z-index: 50;
+    }
+  </style>
+</head>
 
-        <label class="adminLabel">STATE<span class="req">*</span></label>
-        <select class="adminSelect" name="STATE" required>
-          <option value="">Select…</option>
-          <option>MA</option><option>NH</option><option>VT</option>
-          <option>ME</option><option>CT</option><option>RI</option>
-        </select>
+<body>
+  <div class="app" id="app">
 
-        <!-- OPENS (SAT + SUN inline like LAT/LON) -->
-        <label class="adminLabel">OPENS</label>
-        <div class="adminTimeRow" aria-label="Open mat times">
-          <input
-            class="adminInput"
-            type="time"
-            name="SAT"
-            placeholder="Sat"
-          />
-          <input
-            class="adminInput"
-            type="time"
-            name="SUN"
-            placeholder="Sun"
-          />
+    <!-- Header (match main-site structure) -->
+    <header class="header" id="header">
+      <!-- Logo Area (above header) -->
+      <div aria-label="ANY logo" class="adminLogoRow">
+        <div class="header__inner adminHeaderInner adminHeaderInner--logo">
+          <div class="header__logoCrop">
+            <img class="header__logoImage" src="../assets/img/any-logo.png" alt="ANY" />
+          </div>
         </div>
-
-        <label class="adminLabel">DROP-IN</label>
-        <select class="adminSelect" name="OTA">
-          <option value="">(blank)</option>
-          <option value="Y">Y</option>
-          <option value="N">N</option>
-        </select>
-
-        <label class="adminLabel">LOCATION</label>
-        <div class="adminLatLonRow" aria-label="Location coordinates">
-          <input class="adminInput" name="LON_display" disabled placeholder="Longitude" />
-          <input class="adminInput" name="LAT_display" disabled placeholder="Latitude" />
-          <input type="hidden" name="LON" />
-          <input type="hidden" name="LAT" />
-        </div>
-
-        <label class="adminLabel">CREATED</label>
-        <input class="adminInput" name="CREATED" disabled />
       </div>
 
-      <div class="adminNote">LAT/LON auto-fill after City + State.</div>
+      <div class="header__inner adminHeaderInner">
+        <h1 class="header__title" id="adminViewTitle" aria-label="Current admin view">EVENTS – ADD NEW</h1>
 
-      <div class="adminActions">
-        <button class="adminActionBtn" type="submit">Submit</button>
-        <button class="adminActionBtn" type="button" data-clear="index">Clear</button>
+        <!-- Page toggle (same pill sizing/placement as main site) -->
+        <div class="viewToggle" id="adminViewToggle" role="tablist" aria-label="Admin page toggle">
+          <div class="viewToggle__thumb" aria-hidden="true"></div>
+          <button class="viewToggle__tab" role="tab" aria-selected="true" data-view="events">EVENTS</button>
+          <button class="viewToggle__tab" role="tab" aria-selected="false" data-view="index">INDEX</button>
+        </div>
       </div>
-    </form>
+    </header>
+
+    <!-- Green bar (token only) – sticky under header -->
+    <section class="filters adminFilters" id="adminFilters" aria-label="Admin controls">
+      <div class="filters__inner adminFiltersInner">
+        <div class="adminTokenPill" role="group" aria-label="GitHub token">
+          <span class="adminTokenIcon" aria-hidden="true">
+            <!-- simple outline key icon (matches site style better than emoji) -->
+            <svg class="adminTokenSvg" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M14.5 10.5a4.5 4.5 0 1 1 2.2 3.9L14 17v2h-2v2H9v-3.1l5.1-5.1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <input id="ghToken" type="password" inputmode="text" autocomplete="off" spellcheck="false"
+                 placeholder="GitHub token" aria-label="GitHub token" />
+          <button id="toggleToken" class="adminTokenEye" type="button" aria-label="Show token" title="Show / hide token">
+            <!-- simple outline eye icon (matches site style better than emoji) -->
+            <svg class="adminTokenSvg" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Use the same "apply" button style as the ZIP distance dropdown on the main site -->
+        <button id="saveToken" class="distance__apply" type="button" aria-label="Save token" title="Save token">➜</button>
+
+        <span class="adminTokenHint" id="tokenHint">Token is stored locally (LocalStorage) after you tap Save.</span>
+      </div>
+    </section>
+
+    <!-- Slider pages -->
+    <main class="content adminContent" id="adminMain">
+      <div class="adminPager" id="adminPager" aria-label="Admin pages">
+        <!-- EVENTS PAGE -->
+        <section class="adminPage" data-page="events" aria-label="Add event">
+          <div class="adminCard">
+            <div class="adminCardHeader">ADD EVENT</div>
+
+            <form id="eventForm" class="adminForm" autocomplete="off">
+              <div class="adminGrid">
+                <label class="adminLabel">EVENT<span class="req">*</span></label>
+                <input class="adminInput" name="EVENT" required placeholder="Event name" />
+
+                <label class="adminLabel">FOR<span class="req">*</span></label>
+                <select class="adminSelect" name="TYPE" required>
+                  <option value="">Select…</option>
+                  <option>Seminar</option>
+                  <option>Open Mat</option>
+                  <option>Women</option>
+                  <option>Tournament</option>
+                  <option>Camp</option>
+                  <option>Other</option>
+                </select>
+
+                <label class="adminLabel">WHERE</label>
+                <input class="adminInput" name="WHERE" placeholder="Gym / Event Center" />
+
+                <label class="adminLabel">CITY<span class="req">*</span></label>
+                <input class="adminInput" name="CITY" required placeholder="City" />
+
+                <label class="adminLabel">STATE<span class="req">*</span></label>
+                <select class="adminSelect" name="STATE" required>
+                  <option value="">Select…</option>
+                  <option>MA</option><option>NH</option><option>VT</option><option>ME</option><option>CT</option><option>RI</option>
+                </select>
+
+                <label class="adminLabel">DATE<span class="req">*</span></label>
+                <input class="adminInput" name="DATE" required placeholder="mm/dd/yyyy" />
+
+                <label class="adminLabel">DAY</label>
+                <input class="adminInput" name="DAY" placeholder="Auto from date" disabled />
+
+                <label class="adminLabel">CREATED</label>
+                <input class="adminInput" name="CREATED" disabled />
+              </div>
+
+              <div class="adminActions">
+                <button class="adminActionBtn" type="submit">Submit</button>
+                <button class="adminActionBtn" type="button" data-clear="event">Clear</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- INDEX PAGE -->
+        <section class="adminPage" data-page="index" aria-label="Add location">
+          <div class="adminCard">
+            <div class="adminCardHeader">ADD INDEX ENTRY</div>
+
+            <form id="indexForm" class="adminForm" autocomplete="off">
+              <div class="adminGrid">
+                <label class="adminLabel">NAME<span class="req">*</span></label>
+                <input class="adminInput" name="NAME" required placeholder="Gym name" />
+
+                <label class="adminLabel">IG</label>
+                <input class="adminInput" name="IG" placeholder="instagram_handle" />
+
+                <label class="adminLabel">CITY<span class="req">*</span></label>
+                <input class="adminInput" name="CITY" required placeholder="City" />
+
+                <label class="adminLabel">STATE<span class="req">*</span></label>
+                <select class="adminSelect" name="STATE" required>
+                  <option value="">Select…</option>
+                  <option>MA</option><option>NH</option><option>VT</option><option>ME</option><option>CT</option><option>RI</option>
+                </select>
+<!-- OPENS: SAT + SUN inline (like LAT/LON) using native time pickers -->
+<label class="adminLabel">OPENS</label>
+<div class="adminTimeRow" aria-label="Open mat times">
+  <input class="adminInput" type="time" name="SAT" placeholder="Sat" aria-label="Sat" />
+  <input class="adminInput" type="time" name="SUN" placeholder="Sun" aria-label="Sun" />
+</div>
+<label class="adminLabel">DROP-IN</label>
+                <select class="adminSelect" name="OTA">
+                  <option value="">(blank)</option>
+                  <option value="Y">Y</option>
+                  <option value="N">N</option>
+                </select>
+<label class="adminLabel">LOCATION</label>
+<div class="adminLatLonRow" aria-label="Location coordinates">
+  <!-- Display-only (greyed out like CREATED); hidden inputs carry values for submit -->
+  <input class="adminInput" name="LON_display" inputmode="decimal" disabled placeholder="Longitude" />
+  <input class="adminInput" name="LAT_display" inputmode="decimal" disabled placeholder="Latitude" />
+  <input type="hidden" name="LON" />
+  <input type="hidden" name="LAT" />
+</div>
+<label class="adminLabel">CREATED</label>
+                <input class="adminInput" name="CREATED" disabled />
+              </div>
+
+              <div class="adminNote">LAT/LON auto-fill after City + State.</div>
+
+              <div class="adminActions">
+                <button class="adminActionBtn" type="submit">Submit</button>
+                <button class="adminActionBtn" type="button" data-clear="index">Clear</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
   </div>
-</section>
+
+  <script src="assets/js/admin.js"></script>
+  <script src="../assets/js/admin.js"></script>
+  <script src="admin.js"></script>
+
+  <script>
+    (function(){
+      function setStickyTop(){
+        var header = document.getElementById("header");
+        if(!header) return;
+        var h = header.getBoundingClientRect().height;
+        document.documentElement.style.setProperty("--adminStickyTop", h + "px");
+      }
+      window.addEventListener("load", setStickyTop);
+      window.addEventListener("resize", setStickyTop);
+    })();
+  </script>
+</body>
+</html>
