@@ -191,7 +191,10 @@
   box-shadow: 0 4px 10px rgba(0,0,0,0.10);
   cursor: pointer;
 }
-  color: rgba(0,0,0,0.75);
+   color: rgba(0,0,0,0.75);
+  -webkit-text-fill-color: rgba(0,0,0,0.75);
+}
+color: rgba(0,0,0,0.75);
 }
 /* Put a subtle arrow inside SUBMIT buttons, in a lighter grey (matches site vibe) */
 .adminActionBtn[type="submit"]::after{
@@ -243,5 +246,22 @@
   background: rgba(255,255,255,0.92);
 }
 
-/* OPENS: layout-perfect inputs that open a native time picker via JS */
-.adminTimeProxy{ cursor: pointer; }
+/* OPENS: use overlay native time inputs so iOS opens picker while layout matches LAT/LON */
+.adminTimeCell{
+  position: relative;
+  width: 100%;
+}
+.adminTimeDisplay{
+  width: 100%;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.adminTimeNative{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
