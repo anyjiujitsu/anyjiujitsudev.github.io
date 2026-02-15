@@ -109,95 +109,6 @@
   setCreatedDate(eventForm);
   setCreatedDate(indexForm);
 
-
-  // --- INDEX: native time picker proxy (keeps iOS-perfect sizing by using text inputs) ---
-  function setupTimePickerProxy(form){
-    if(!form) return;
-    const fields = Array.from(form.querySelectorAll('input.adminTimeProxy[name="SAT"], input.adminTimeProxy[name="SUN"]'));
-    if(!fields.length) return;
-
-    // Create one hidden native time input reused for both fields (mobile-friendly)
-    const picker = document.createElement('input');
-    picker.type = 'time';
-    picker.step = 60; // minute granularity
-    picker.tabIndex = -1;
-    picker.setAttribute('aria-hidden','true');
-    picker.style.position = 'fixed';
-    picker.style.left = '-9999px';
-    picker.style.top = '0';
-    picker.style.width = '1px';
-    picker.style.height = '1px';
-    picker.style.opacity = '0';
-    document.body.appendChild(picker);
-
-    let active = null;
-    let didInteract = false;
-
-    function normalizeHHMM(v){
-      // Accept "HH:MM" or "H:MM" or "HHMM" and return "HH:MM" when possible
-      v = (v || '').trim();
-      if(!v) return '';
-      const m1 = v.match(/^(\d{1,2}):(\d{2})$/);
-      if(m1){
-        const hh = String(Math.min(23, Math.max(0, Number(m1[1])))).padStart(2,'0');
-        const mm = String(Math.min(59, Math.max(0, Number(m1[2])))).padStart(2,'0');
-        return `${hh}:${mm}`;
-      }
-      const m2 = v.match(/^(\d{1,2})(\d{2})$/); // e.g. 930, 0930
-      if(m2){
-        const hh = String(Math.min(23, Math.max(0, Number(m2[1])))).padStart(2,'0');
-        const mm = String(Math.min(59, Math.max(0, Number(m2[2])))).padStart(2,'0');
-        return `${hh}:${mm}`;
-      }
-      return '';
-    }
-
-    function openPickerFor(field){
-      active = field;
-      didInteract = false;
-      // Seed picker with current value if valid
-      const seed = normalizeHHMM(field.value);
-      picker.value = seed || '';
-      // Prefer showPicker() where supported (avoids some iOS quirks)
-      if(typeof picker.showPicker === 'function'){
-        picker.showPicker();
-      }else{
-        picker.click();
-        picker.focus({ preventScroll: true });
-      }
-    }
-
-    // Open on tap/click only (avoid focus-triggered auto fill on iOS)
-    fields.forEach(f => {
-      f.readOnly = true; // keep sizing + prevent keyboard; user uses picker
-      f.addEventListener('click', (e) => {
-        e.preventDefault();
-        openPickerFor(f);
-      });
-    });
-
-    picker.addEventListener('input', () => {
-      // User is actively changing the picker
-      didInteract = true;
-    });
-
-    picker.addEventListener('change', () => {
-      // Only commit after user interaction (prevents auto-filling current time)
-      if(!active) return;
-      if(!didInteract) return;
-      active.value = picker.value || '';
-      active.dispatchEvent(new Event('input', { bubbles: true }));
-    });
-});
-
-    // Allow clearing with backspace via long-press iOS menu isn't reliable; provide double-tap to clear
-    fields.forEach(f => {
-      f.addEventListener('dblclick', () => { f.value = ''; });
-    });
-  }
-
-  setupTimePickerProxy(indexForm);
-
 // --- INDEX: auto-fill LAT/LON from CITY + STATE (readonly fields) ---
 const idxCity  = indexForm.querySelector('input[name="CITY"]');
 const idxState = indexForm.querySelector('select[name="STATE"]');
@@ -251,6 +162,92 @@ function scheduleGeocode(){
 
 if(idxCity)  idxCity.addEventListener('input', scheduleGeocode);
 if(idxState) idxState.addEventListener('change', scheduleGeocode);
+
+
+  // --- INDEX: OPENS time picker proxy (keeps perfect iOS layout) ---
+  function setupTimePickerProxy(form){
+    if(!form) return;
+    const fields = Array.from(form.querySelectorAll('input.adminTimeProxy[name="SAT"], input.adminTimeProxy[name="SUN"]'));
+    if(!fields.length) return;
+
+    // Hidden native time input used to invoke the platform time picker
+    const picker = document.createElement('input');
+    picker.type = 'time';
+    picker.step = 60;
+    picker.tabIndex = -1;
+    picker.setAttribute('aria-hidden','true');
+    picker.style.position = 'fixed';
+    picker.style.left = '-9999px';
+    picker.style.top = '0';
+    picker.style.width = '1px';
+    picker.style.height = '1px';
+    picker.style.opacity = '0';
+    document.body.appendChild(picker);
+
+    let active = null;
+    let didInteract = false;
+
+    function normalizeHHMM(v){
+      v = (v || '').trim();
+      if(!v) return '';
+      const m1 = v.match(/^(\d{1,2}):(\d{2})$/);
+      if(m1){
+        const hh = String(Math.min(23, Math.max(0, Number(m1[1])))).padStart(2,'0');
+        const mm = String(Math.min(59, Math.max(0, Number(m1[2])))).padStart(2,'0');
+        return `${hh}:${mm}`;
+      }
+      const m2 = v.match(/^(\d{1,2})(\d{2})$/); // 930, 0930
+      if(m2){
+        const hh = String(Math.min(23, Math.max(0, Number(m2[1])))).padStart(2,'0');
+        const mm = String(Math.min(59, Math.max(0, Number(m2[2])))).padStart(2,'0');
+        return `${hh}:${mm}`;
+      }
+      return '';
+    }
+
+    function openPickerFor(field){
+      active = field;
+      didInteract = false;
+
+      // Seed picker with current value if valid; otherwise blank
+      const seed = normalizeHHMM(field.value);
+      picker.value = seed || '';
+
+      // Prefer showPicker() when available
+      if(typeof picker.showPicker === 'function'){
+        picker.showPicker();
+      }else{
+        // Some browsers need click+focus
+        picker.click();
+        picker.focus({ preventScroll: true });
+      }
+    }
+
+    fields.forEach(f => {
+      f.readOnly = true; // prevents keyboard; user selects time via picker
+      f.addEventListener('click', (e) => {
+        e.preventDefault();
+        openPickerFor(f);
+      });
+    });
+
+    // Mark interaction on input (prevents iOS "auto-now" change)
+    picker.addEventListener('input', () => { didInteract = true; });
+
+    picker.addEventListener('change', () => {
+      if(!active) return;
+      if(!didInteract) return;
+      active.value = picker.value || '';
+      active.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    // Quick clear: double click / double tap
+    fields.forEach(f => {
+      f.addEventListener('dblclick', () => { f.value = ''; });
+    });
+  }
+
+  setupTimePickerProxy(indexForm);
 
   // optional: auto day from date on event form
   const dateInput = eventForm.querySelector('input[name="DATE"]');
@@ -306,59 +303,92 @@ if(idxState) idxState.addEventListener('change', scheduleGeocode);
       indexForm.reset();
       setCreatedDate(indexForm);
 
-// --- INDEX: auto-fill LAT/LON from CITY + STATE (readonly fields) ---
-const idxCity  = indexForm.querySelector('input[name="CITY"]');
-const idxState = indexForm.querySelector('select[name="STATE"]');
-const idxLat   = indexForm.querySelector('input[name="LAT"]');
-const idxLon   = indexForm.querySelector('input[name="LON"]');
-const idxLatD  = indexForm.querySelector('input[name="LAT_display"]');
-const idxLonD  = indexForm.querySelector('input[name="LON_display"]');
-function setIdxLatLon(lat, lon){
-  const _lat = lat || '';
-  const _lon = lon || '';
-  if(idxLat)  idxLat.value  = _lat;
-  if(idxLon)  idxLon.value  = _lon;
-  if(idxLatD) idxLatD.value = _lat;
-  if(idxLonD) idxLonD.value = _lon;
-}
 
-let geoTimer = null;
-let lastGeoQ = '';
 
-async function geocodeCityState(city, state){
-  const q = `${city}, ${state}, USA`.trim();
-  if(!city || !state) { setIdxLatLon('', ''); return; }
-  if(q === lastGeoQ) return;
-  lastGeoQ = q;
+  // --- INDEX: OPENS time picker proxy (keeps perfect iOS layout) ---
+  function setupTimePickerProxy(form){
+    if(!form) return;
+    const fields = Array.from(form.querySelectorAll('input.adminTimeProxy[name="SAT"], input.adminTimeProxy[name="SUN"]'));
+    if(!fields.length) return;
 
-  // Nominatim (OpenStreetMap) search
-  const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q);
+    // Hidden native time input used to invoke the platform time picker
+    const picker = document.createElement('input');
+    picker.type = 'time';
+    picker.step = 60;
+    picker.tabIndex = -1;
+    picker.setAttribute('aria-hidden','true');
+    picker.style.position = 'fixed';
+    picker.style.left = '-9999px';
+    picker.style.top = '0';
+    picker.style.width = '1px';
+    picker.style.height = '1px';
+    picker.style.opacity = '0';
+    document.body.appendChild(picker);
 
-  try{
-    const res = await fetch(url, { method: 'GET' });
-    if(!res.ok) throw new Error('geocode_http_' + res.status);
-    const data = await res.json();
-    if(Array.isArray(data) && data[0] && data[0].lat && data[0].lon){
-      // Keep as strings (reasonable precision)
-      setIdxLatLon(String(data[0].lat), String(data[0].lon));
-    }else{
-      setIdxLatLon('', '');
+    let active = null;
+    let didInteract = false;
+
+    function normalizeHHMM(v){
+      v = (v || '').trim();
+      if(!v) return '';
+      const m1 = v.match(/^(\d{1,2}):(\d{2})$/);
+      if(m1){
+        const hh = String(Math.min(23, Math.max(0, Number(m1[1])))).padStart(2,'0');
+        const mm = String(Math.min(59, Math.max(0, Number(m1[2])))).padStart(2,'0');
+        return `${hh}:${mm}`;
+      }
+      const m2 = v.match(/^(\d{1,2})(\d{2})$/); // 930, 0930
+      if(m2){
+        const hh = String(Math.min(23, Math.max(0, Number(m2[1])))).padStart(2,'0');
+        const mm = String(Math.min(59, Math.max(0, Number(m2[2])))).padStart(2,'0');
+        return `${hh}:${mm}`;
+      }
+      return '';
     }
-  }catch(_e){
-    setIdxLatLon('', '');
+
+    function openPickerFor(field){
+      active = field;
+      didInteract = false;
+
+      // Seed picker with current value if valid; otherwise blank
+      const seed = normalizeHHMM(field.value);
+      picker.value = seed || '';
+
+      // Prefer showPicker() when available
+      if(typeof picker.showPicker === 'function'){
+        picker.showPicker();
+      }else{
+        // Some browsers need click+focus
+        picker.click();
+        picker.focus({ preventScroll: true });
+      }
+    }
+
+    fields.forEach(f => {
+      f.readOnly = true; // prevents keyboard; user selects time via picker
+      f.addEventListener('click', (e) => {
+        e.preventDefault();
+        openPickerFor(f);
+      });
+    });
+
+    // Mark interaction on input (prevents iOS "auto-now" change)
+    picker.addEventListener('input', () => { didInteract = true; });
+
+    picker.addEventListener('change', () => {
+      if(!active) return;
+      if(!didInteract) return;
+      active.value = picker.value || '';
+      active.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    // Quick clear: double click / double tap
+    fields.forEach(f => {
+      f.addEventListener('dblclick', () => { f.value = ''; });
+    });
   }
-}
 
-function scheduleGeocode(){
-  if(!idxCity || !idxState) return;
-  const city = (idxCity.value || '').trim();
-  const state = (idxState.value || '').trim();
-  if(geoTimer) clearTimeout(geoTimer);
-  geoTimer = setTimeout(() => geocodeCityState(city, state), 450);
-}
-
-if(idxCity)  idxCity.addEventListener('input', scheduleGeocode);
-if(idxState) idxState.addEventListener('change', scheduleGeocode);
+  setupTimePickerProxy(indexForm);
     }
   });
 })();
