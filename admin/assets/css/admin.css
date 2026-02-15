@@ -212,6 +212,9 @@
 /* =========================
    INDEX: SAT + SUN single row
    ========================= */
+/* =========================
+   INDEX: OPENS (SAT + SUN inline)
+   ========================= */
 .adminTimeRow{
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -222,6 +225,7 @@
 .adminInput[type="time"]{
   padding: 12px 14px;
   font-size: 14px;
+  width: 100%;  box-sizing: border-box;
 }
 
 /* LOCATION: LAT/LON inline (readonly, auto-filled) */
