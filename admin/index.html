@@ -13,21 +13,8 @@
   <link rel="stylesheet" href="../assets/css/components.css" />
   <link rel="stylesheet" href="../assets/css/directory.css" />
 
-  <!-- Admin-specific layout (light)
-       NOTE: different deployments have placed admin.css in different locations.
-       We include safe fallback paths so styling never drops out. -->
+  <!-- Admin-specific layout (light) -->
   <link rel="stylesheet" href="assets/css/admin.css" />
-  <link rel="stylesheet" href="../assets/css/admin.css" />
-  <link rel="stylesheet" href="admin.css" />
-
-  <!-- Freeze the green token bar where it starts (under the sticky header) -->
-  <style>
-    .adminFilters{
-      position: sticky;
-      top: var(--adminStickyTop, 0px);
-      z-index: 50;
-    }
-  </style>
 </head>
 
 <body>
@@ -66,7 +53,7 @@
           <button id="toggleToken" class="adminTokenEye" type="button" aria-label="Show token">👁</button>
         </div>
 
-        <button id="saveToken" class="adminSaveBtn" type="button">Save</button>
+        <button id="saveToken" class="distance__apply" type="button" aria-label="Save token" title="Save token">➜</button>
 
         <span class="adminTokenHint" id="tokenHint">Token is stored locally (LocalStorage) after you tap Save.</span>
       </div>
@@ -181,20 +168,5 @@
   </div>
 
   <script src="assets/js/admin.js"></script>
-  <script src="../assets/js/admin.js"></script>
-  <script src="admin.js"></script>
-
-  <script>
-    (function(){
-      function setStickyTop(){
-        var header = document.getElementById("header");
-        if(!header) return;
-        var h = header.getBoundingClientRect().height;
-        document.documentElement.style.setProperty("--adminStickyTop", h + "px");
-      }
-      window.addEventListener("load", setStickyTop);
-      window.addEventListener("resize", setStickyTop);
-    })();
-  </script>
 </body>
 </html>
