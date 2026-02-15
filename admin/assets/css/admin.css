@@ -36,7 +36,7 @@
   gap: 10px;
   background: rgba(255,255,255,0.95);
   border-radius: 999px;
-  padding: 10px 14px;
+  padding: 8px 14px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.12);
   border: 1px solid rgba(0,0,0,0.10);
   flex: 0 0 auto;
@@ -48,8 +48,10 @@
   outline: none;
   background: transparent;
   width: 220px;
-  font-size: 16px; /* prevents iOS zoom */
+  font-size: 16px; /* prevents iOS zoom */  padding: 0;
+  line-height: 1;
 }
+
 .adminTokenEye{
   border: 0;
   background: transparent;
@@ -322,18 +324,6 @@
 }
 
 
-/* Git Token: make input height match action button */
-.adminTokenRow{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.adminTokenRow .adminInput{
-  height: 44px;
-}
-.adminTokenRow .adminTokenBtn{
-  height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+@media (max-width: 520px){
+  .adminTokenPill{ padding: 7px 12px; }
 }
