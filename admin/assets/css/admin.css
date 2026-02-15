@@ -7,7 +7,8 @@
   --adminTitleTop: 0px;
 
   /* Logo tweak (match main site) */
-  --adminLogoRowMarginBottom: -10px;
+  /* Pull the title row up closer to the logo (remove the extra gap you see on desktop) */
+  --adminLogoRowMarginBottom: -28px;
 }
 
 /* logo row matches main site inline style */
@@ -41,6 +42,7 @@
   flex: 0 0 auto;
 }
 .adminTokenIcon{ font-size: 14px; opacity: 0.85; }
+.adminTokenSvg{ display:block; color: rgba(0,0,0,0.55); }
 .adminTokenPill input{
   border: 0;
   outline: none;
@@ -53,6 +55,10 @@
   background: transparent;
   cursor: pointer;
   opacity: 0.75;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .adminSaveBtn{
   border: 0;
@@ -135,7 +141,9 @@
   text-transform: uppercase;
   color: rgba(0,0,0,0.55);
   font-size: 12px;
-  background: rgba(255,255,255,0.25);
+  /* Use the site's beige for the admin card header band */
+  background: var(--beige);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 .adminForm{ padding: 18px; }
 .adminGrid{
@@ -182,6 +190,14 @@
   background: #fff;
   box-shadow: 0 4px 10px rgba(0,0,0,0.10);
   cursor: pointer;
+}
+
+/* Put a subtle arrow inside SUBMIT buttons, in a lighter grey (matches site vibe) */
+.adminActionBtn[type="submit"]::after{
+  content: "➜";
+  display: inline-block;
+  margin-left: 10px;
+  color: rgba(0,0,0,0.35);
 }
 .adminNote{
   margin-top: 10px;
