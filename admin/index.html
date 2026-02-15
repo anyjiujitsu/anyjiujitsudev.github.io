@@ -13,12 +13,15 @@
   <link rel="stylesheet" href="../assets/css/components.css" />
   <link rel="stylesheet" href="../assets/css/directory.css" />
 
-  <!-- Admin-specific layout (light) -->
+  <!-- Admin-specific layout (light)
+       NOTE: different deployments have placed admin.css in different locations.
+       We include safe fallback paths so styling never drops out. -->
   <link rel="stylesheet" href="assets/css/admin.css" />
+  <link rel="stylesheet" href="../assets/css/admin.css" />
+  <link rel="stylesheet" href="admin.css" />
 
-  <!-- Admin: keep the green token bar frozen under the sticky header (no layout changes) -->
+  <!-- Freeze the green token bar where it starts (under the sticky header) -->
   <style>
-    /* Header is already sticky in the shared CSS. Make the admin token bar sticky UNDER it. */
     .adminFilters{
       position: sticky;
       top: var(--adminStickyTop, 0px);
@@ -178,8 +181,9 @@
   </div>
 
   <script src="assets/js/admin.js"></script>
+  <script src="../assets/js/admin.js"></script>
+  <script src="admin.js"></script>
 
-  <!-- Compute the sticky offset so the token bar stays exactly where it starts (below header). -->
   <script>
     (function(){
       function setStickyTop(){
