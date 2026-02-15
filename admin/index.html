@@ -174,12 +174,13 @@
                 </select>
 <label class="adminLabel">LOCATION</label>
 <div class="adminLatLonRow" aria-label="Location coordinates">
-  <input class="adminInput" name="LON" inputmode="decimal" readonly aria-readonly="true" placeholder="Longitude" />
-  <input class="adminInput" name="LAT" inputmode="decimal" readonly aria-readonly="true" placeholder="Latitude" />
+  <!-- Display-only (greyed out like CREATED); hidden inputs carry values for submit -->
+  <input class="adminInput" name="LON_display" inputmode="decimal" disabled placeholder="Longitude" />
+  <input class="adminInput" name="LAT_display" inputmode="decimal" disabled placeholder="Latitude" />
+  <input type="hidden" name="LON" />
+  <input type="hidden" name="LAT" />
 </div>
-
-
-                <label class="adminLabel">CREATED</label>
+<label class="adminLabel">CREATED</label>
                 <input class="adminInput" name="CREATED" disabled />
               </div>
 
