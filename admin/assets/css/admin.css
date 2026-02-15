@@ -194,7 +194,7 @@
 
 /* Put a subtle arrow inside SUBMIT buttons, in a lighter grey (matches site vibe) */
 .adminActionBtn[type="submit"]::after{
-  content: "➜";
+  content: "âžœ";
   display: inline-block;
   margin-left: 10px;
   color: rgba(0,0,0,0.35);
@@ -217,14 +217,20 @@
    ========================= */
 .adminTimeRow{
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px 14px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  column-gap: 14px;
+  row-gap: 10px;
   align-items: center;
   width: 100%;
 }
-.adminTimeRow > *{ min-width: 0; }
+.adminTimeRow > *{
+  min-width: 0;
+  justify-self: stretch;
+}
 .adminTimeRow .adminInput[type="time"]{
+  display: block;
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
   margin: 0;
 }
@@ -245,4 +251,3 @@
 .adminLatLonRow .adminInput[readonly]{
   background: rgba(255,255,255,0.92);
 }
-
