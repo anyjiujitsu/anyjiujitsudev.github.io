@@ -150,3 +150,34 @@ function setAdminHeaderHeight(){
 }
 window.addEventListener('load', setAdminHeaderHeight);
 window.addEventListener('resize', setAdminHeaderHeight);
+
+
+// Admin: token button label + empty-token warning
+function wireTokenButtonLabel(){
+  const tokenInput = document.querySelector('.adminFilters input[type="password"], .adminFilters input[type="text"]');
+  const btn = document.querySelector('.adminFilters button, .adminFilters .tokenSaveBtn');
+  if(!tokenInput || !btn) return;
+
+  function refresh(){
+    const has = !!(tokenInput.value || '').trim();
+    btn.textContent = has ? 'SAVE' : 'CLICK TO ENTER';
+    btn.classList.toggle('tokenBtnWarn', !has);
+  }
+
+  tokenInput.addEventListener('input', refresh);
+  btn.addEventListener('click', (e) => {
+    const has = !!(tokenInput.value || '').trim();
+    if(!has){
+      e.preventDefault();
+      e.stopPropagation();
+      tokenInput.focus();
+      tokenInput.classList.add('tokenInputWarn');
+      setTimeout(()=>tokenInput.classList.remove('tokenInputWarn'), 900);
+      btn.classList.add('tokenBtnPulse');
+      setTimeout(()=>btn.classList.remove('tokenBtnPulse'), 900);
+    }
+  }, true);
+
+  refresh();
+}
+window.addEventListener('load', wireTokenButtonLabel);
