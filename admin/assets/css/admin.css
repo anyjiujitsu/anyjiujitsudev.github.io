@@ -191,7 +191,7 @@
   box-shadow: 0 4px 10px rgba(0,0,0,0.10);
   cursor: pointer;
 }
-  color: rgba(0,0,0,0.70);
+  color: rgba(0,0,0,0.75);
 }
 /* Put a subtle arrow inside SUBMIT buttons, in a lighter grey (matches site vibe) */
 .adminActionBtn[type="submit"]::after{
@@ -213,26 +213,22 @@
 /* =========================
    INDEX: SAT + SUN single row
    ========================= */
-/* =========================
-   INDEX: OPENS (SAT + SUN inline)
-   ========================= */
 .adminTimeRow{
+  grid-column: 1 / -1; /* span full adminGrid width */
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  column-gap: 14px;
-  row-gap: 10px;
+  grid-template-columns: 92px 1fr 92px 1fr; /* match adminGrid label column */
+  gap: 10px 14px;
   align-items: center;
-  width: 100%;
 }
-.adminTimeRow > *{
-  min-width: 0;
-  justify-self: stretch;
+@media (max-width: 520px){
+  .adminTimeRow{
+    grid-template-columns: 76px 1fr 76px 1fr; /* match adminGrid mobile label column */
+  }
 }
 /* keep native time inputs aligned with existing adminInput styling */
 .adminInput[type="time"]{
   padding: 12px 14px;
   font-size: 14px;
-  width: 100%;  box-sizing: border-box;
 }
 
 /* LOCATION: LAT/LON inline (readonly, auto-filled) */
@@ -246,13 +242,6 @@
 .adminLatLonRow .adminInput[readonly]{
   background: rgba(255,255,255,0.92);
 }
-/* OPENS row inputs should behave exactly like LAT/LON inputs */
-.adminOpensRow .adminInput{
-  width: 100%;
-  box-sizing: border-box;
-}
 
-/* OPENS: keep layout-perfect text inputs but open native time picker via JS */
-.adminTimeProxy{
-  cursor: pointer;
-}
+/* OPENS: layout-perfect inputs that open a native time picker via JS */
+.adminTimeProxy{ cursor: pointer; }
