@@ -251,3 +251,8 @@
   width: 100%;
   box-sizing: border-box;
 }
+
+/* OPENS: keep layout-perfect text inputs but open native time picker via JS */
+.adminTimeProxy{
+  cursor: pointer;
+}
