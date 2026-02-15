@@ -1,243 +1,275 @@
 
-/* Admin: reuse main-site header + filters; only add layout for pager + forms. */
+/* Admin panel
+   - Uses main-site header + viewToggle styling
+   - Horizontal pager with scroll-snap
+   - Keeps viewToggle thumb synced to scroll
+   - Token save to LocalStorage
+   - Clears forms on successful submit (stubbed commit hook for now)
+*/
+(function(){
+  const pager = document.getElementById('adminPager');
+  const titleEl = document.getElementById('adminViewTitle');
+  const toggle = document.getElementById('adminViewToggle');
+  const tabs = Array.from(toggle.querySelectorAll('.viewToggle__tab'));
 
-:root{
-  /* You can tune these in DevTools then commit */
-  --adminTitleLeft: 0px;
-  --adminTitleTop: 0px;
+  const tokenInput = document.getElementById('ghToken');
+  const saveBtn = document.getElementById('saveToken');
+  const eyeBtn = document.getElementById('toggleToken');
+  const tokenHint = document.getElementById('tokenHint');
 
-  /* Logo tweak (match main site) */
-  /* Pull the title row up closer to the logo (remove the extra gap you see on desktop) */
-  --adminLogoRowMarginBottom: -28px;
-}
+  // --- Token: load/save ---
+  const TOKEN_KEY = 'anyjj_admin_github_token';
+  const saved = localStorage.getItem(TOKEN_KEY);
+  if(saved) tokenInput.value = saved;
 
-/* logo row matches main site inline style */
-.adminLogoRow{ margin: 0 0 var(--adminLogoRowMarginBottom) 0; }
-.adminHeaderInner--logo{ display:flex; justify-content:flex-start; align-items:flex-end; }
+  function setTokenStatus(ok){
+    if(!tokenHint) return;
+    if(ok){
+      // Reuse your existing on-screen message copy
+      tokenHint.textContent = 'Token is stored locally (LocalStorage) after you tap Save.';
+      tokenHint.setAttribute('data-status', 'ok');
+    }else{
+      tokenHint.textContent = 'Token save failed.';
+      tokenHint.setAttribute('data-status', 'fail');
+    }
+  }
 
-/* allow nudging title without breaking toggle */
-#adminViewTitle{
-  position: relative;
-  left: var(--adminTitleLeft);
-  top: var(--adminTitleTop);
-  white-space: nowrap;
-}
+  saveBtn.addEventListener('click', () => {
+    const t = (tokenInput.value || '').trim();
+    if(!t){
+      setTokenStatus(false);
+      return;
+    }
+    try{
+      localStorage.setItem(TOKEN_KEY, t);
+      setTokenStatus(true);
+    }catch(_e){
+      setTokenStatus(false);
+    }
+  });
 
-/* Make the token bar sticky under header */
-.adminFilters{
-  position: sticky;
-  top: 0;
-}
+  eyeBtn.addEventListener('click', () => {
+    const isPw = tokenInput.type === 'password';
+    tokenInput.type = isPw ? 'text' : 'password';
+    eyeBtn.setAttribute('aria-label', isPw ? 'Hide token' : 'Show token');
+  });
 
-/* Token pill */
-.adminTokenPill{
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(255,255,255,0.95);
-  border-radius: 999px;
-  padding: 10px 14px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-  border: 1px solid rgba(0,0,0,0.10);
-  flex: 0 0 auto;
-}
-.adminTokenIcon{ font-size: 14px; opacity: 0.85; }
-.adminTokenSvg{ display:block; color: rgba(0,0,0,0.55); }
-.adminTokenPill input{
-  border: 0;
-  outline: none;
-  background: transparent;
-  width: 220px;
-  font-size: 16px; /* prevents iOS zoom */
-}
-.adminTokenEye{
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  opacity: 0.75;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.adminSaveBtn{
-  border: 0;
-  border-radius: 999px;
-  padding: 10px 16px;
-  background: #fff;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-  cursor: pointer;
-  flex: 0 0 auto;
-}
+  // --- Helpers ---
+  function setActiveView(view){
+    const isIndex = view === 'index';
+    tabs.forEach(btn => btn.setAttribute('aria-selected', String(btn.dataset.view === view)));
+    toggle.style.setProperty('--viewProgress', isIndex ? 1 : 0);
 
-/* Reuse main-site ZIP apply button styling (distance__apply) */
-.distance__apply{
-  flex: 0 0 auto;
-  border: 1px solid rgba(0,0,0,0.15);
-  background: rgba(0,0,0,0.06);
-  border-radius: 10px;
-  padding: 10px 12px;
-  font: inherit;
-  font-size: 16px;
-  line-height: 1;
-  cursor: pointer;
-}
-.distance__apply:active{
-  transform: translateY(1px);
-}
+    titleEl.textContent = isIndex ? 'INDEX – ADD NEW' : 'EVENTS – ADD NEW';
+  }
 
-/* In the green admin bar, make it visible (white pill like the old Save button) */
-.adminFilters .distance__apply{
-  background: rgba(255,255,255,0.95);
-  border: 1px solid rgba(0,0,0,0.10);
-  border-radius: 999px;
-  padding: 10px 16px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-  color: var(--green);
-  font-weight: 900;
-}
-.adminTokenHint{
-  margin-left: 6px;
-  color: rgba(255,255,255,0.80);
-  font-size: 13px;
-  white-space: nowrap;
-}
-@media (max-width: 760px){
-  .adminTokenHint{ display:none; }
-}
+  function scrollToView(view){
+    const idx = view === 'index' ? 1 : 0;
+    const x = idx * pager.clientWidth;
+    pager.scrollTo({ left: x, behavior: 'smooth' });
+  }
 
-/* Pager (horizontal, like your main view toggle behavior) */
-.adminContent{ padding: 22px 0 60px; }
-.adminPager{
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 100%;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.adminPager::-webkit-scrollbar{ display:none; }
-.adminPage{ scroll-snap-align: start; padding: 0 var(--pagePad); }
+  // --- Toggle click ---
+  toggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('.viewToggle__tab');
+    if(!btn) return;
+    scrollToView(btn.dataset.view);
+  });
 
-/* Card + form */
-.adminCard{
-  width: 100%;
-  max-width: 850px;
-  margin: 0 auto;
-  background: var(--row);
-  border-radius: 18px;
-  box-shadow: 0 10px 24px rgba(0,0,0,0.10);
-  border: 1px solid rgba(0,0,0,0.08);
-  overflow: hidden;
-}
-.adminCardHeader{
-  padding: 16px 18px;
-  font-weight: 900;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(0,0,0,0.55);
-  font-size: 12px;
-  /* Use the site's beige for the admin card header band */
-  background: var(--beige);
-  border-bottom: 1px solid rgba(0,0,0,0.06);
-}
-.adminForm{ padding: 18px; }
-.adminGrid{
-  display: grid;
-  grid-template-columns: 92px 1fr;
-  gap: 10px 14px;
-  align-items: center;
-}
-.adminLabel{
-  font-weight: 900;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  font-size: 11px;
-  color: rgba(0,0,0,0.55);
-}
-.req{ color: #b01212; margin-left: 2px; }
+  // --- Pager scroll sync ---
+  function syncFromScroll(){
+    const w = pager.clientWidth || 1;
+    const progress = Math.max(0, Math.min(1, pager.scrollLeft / w));
+    toggle.style.setProperty('--viewProgress', progress);
 
-.adminInput, .adminSelect{
-  width: 100%;
-  border-radius: 12px;
-  border: 1px solid rgba(0,0,0,0.12);
-  background: #fff;
-  padding: 12px 14px;
-  font-size: 14px;
-}
-.adminInput[disabled]{
-  background: rgba(0,0,0,0.05);
-  color: rgba(0,0,0,0.55);
+    // snap title based on midpoint
+    setActiveView(progress > 0.5 ? 'index' : 'events');
+  }
+  pager.addEventListener('scroll', () => {
+    window.requestAnimationFrame(syncFromScroll);
+  }, { passive: true });
+
+  // Initialize
+  setActiveView('events');
+  syncFromScroll();
+
+  // --- Form handling (wire commit later) ---
+  const eventForm = document.getElementById('eventForm');
+  const indexForm = document.getElementById('indexForm');
+
+  function setCreatedDate(form){
+    const el = form.querySelector('input[name="CREATED"]');
+    if(!el) return;
+    const d = new Date();
+    const mm = String(d.getMonth()+1).padStart(2,'0');
+    const dd = String(d.getDate()).padStart(2,'0');
+    const yy = d.getFullYear();
+    el.value = `${mm}/${dd}/${yy}`;
+  }
+  setCreatedDate(eventForm);
+  setCreatedDate(indexForm);
+
+// --- INDEX: auto-fill LAT/LON from CITY + STATE (readonly fields) ---
+const idxCity  = indexForm.querySelector('input[name="CITY"]');
+const idxState = indexForm.querySelector('select[name="STATE"]');
+const idxLat   = indexForm.querySelector('input[name="LAT"]');
+const idxLon   = indexForm.querySelector('input[name="LON"]');
+const idxLatD  = indexForm.querySelector('input[name="LAT_display"]');
+const idxLonD  = indexForm.querySelector('input[name="LON_display"]');
+function setIdxLatLon(lat, lon){
+  const _lat = lat || '';
+  const _lon = lon || '';
+  if(idxLat)  idxLat.value  = _lat;
+  if(idxLon)  idxLon.value  = _lon;
+  if(idxLatD) idxLatD.value = _lat;
+  if(idxLonD) idxLonD.value = _lon;
 }
 
-.adminActions{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 18px;
-}
-.adminActionBtn{
-  border: 0;
-  border-radius: 999px;
-  padding: 14px 18px;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  background: #fff;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.10);
-  cursor: pointer;
-}
+let geoTimer = null;
+let lastGeoQ = '';
 
-/* Put a subtle arrow inside SUBMIT buttons, in a lighter grey (matches site vibe) */
-.adminActionBtn[type="submit"]::after{
-  content: "➜";
-  display: inline-block;
-  margin-left: 10px;
-  color: rgba(0,0,0,0.35);
-}
-.adminNote{
-  margin-top: 10px;
-  font-size: 12px;
-  color: rgba(0,0,0,0.55);
-}
+async function geocodeCityState(city, state){
+  const q = `${city}, ${state}, USA`.trim();
+  if(!city || !state) { setIdxLatLon('', ''); return; }
+  if(q === lastGeoQ) return;
+  lastGeoQ = q;
 
-@media (max-width: 520px){
-  .adminGrid{ grid-template-columns: 76px 1fr; }
-}
+  // Nominatim (OpenStreetMap) search
+  const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q);
 
-/* =========================
-   INDEX: SAT + SUN single row
-   ========================= */
-.adminTimeRow{
-  grid-column: 1 / -1; /* span full adminGrid width */
-  display: grid;
-  grid-template-columns: 92px 1fr 92px 1fr; /* match adminGrid label column */
-  gap: 10px 14px;
-  align-items: center;
-}
-@media (max-width: 520px){
-  .adminTimeRow{
-    grid-template-columns: 76px 1fr 76px 1fr; /* match adminGrid mobile label column */
+  try{
+    const res = await fetch(url, { method: 'GET' });
+    if(!res.ok) throw new Error('geocode_http_' + res.status);
+    const data = await res.json();
+    if(Array.isArray(data) && data[0] && data[0].lat && data[0].lon){
+      // Keep as strings (reasonable precision)
+      setIdxLatLon(String(data[0].lat), String(data[0].lon));
+    }else{
+      setIdxLatLon('', '');
+    }
+  }catch(_e){
+    setIdxLatLon('', '');
   }
 }
-/* keep native time inputs aligned with existing adminInput styling */
-.adminInput[type="time"]{
-  padding: 12px 14px;
-  font-size: 14px;
+
+function scheduleGeocode(){
+  if(!idxCity || !idxState) return;
+  const city = (idxCity.value || '').trim();
+  const state = (idxState.value || '').trim();
+  if(geoTimer) clearTimeout(geoTimer);
+  geoTimer = setTimeout(() => geocodeCityState(city, state), 450);
 }
 
-/* LOCATION: LAT/LON inline (readonly, auto-filled) */
-.adminLatLonRow{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px 14px;
-  align-items: center;
-}
-.adminLatLonRow .adminInput[readonly]{
-  background: rgba(255,255,255,0.92);
+if(idxCity)  idxCity.addEventListener('input', scheduleGeocode);
+if(idxState) idxState.addEventListener('change', scheduleGeocode);
+
+  // optional: auto day from date on event form
+  const dateInput = eventForm.querySelector('input[name="DATE"]');
+  const dayInput = eventForm.querySelector('input[name="DAY"]');
+  function computeDay(str){
+    // expects mm/dd/yyyy
+    const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if(!m) return '';
+    const dt = new Date(Number(m[3]), Number(m[1])-1, Number(m[2]));
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    return days[dt.getDay()] || '';
+  }
+  dateInput.addEventListener('input', () => {
+    dayInput.value = computeDay(dateInput.value.trim());
+  });
+
+  // Clear buttons
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-clear]');
+    if(!btn) return;
+    const which = btn.getAttribute('data-clear');
+    const form = which === 'index' ? indexForm : eventForm;
+    form.reset();
+    setCreatedDate(form);
+    if(which === 'index'){
+      lastGeoQ = '';
+      setIdxLatLon('', '');
+    }
+    if(which === 'event') dayInput.value = '';
+  });
+
+  // Submit stubs – keep behavior: clear on success
+  async function fakeCommit(){
+    // This is intentionally a stub; you said we'll wire INDEX creation later.
+    // Return true to simulate success.
+    return true;
+  }
+
+  eventForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const ok = await fakeCommit();
+    if(ok){
+      eventForm.reset();
+      setCreatedDate(eventForm);
+      dayInput.value = '';
+    }
+  });
+
+  indexForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const ok = await fakeCommit();
+    if(ok){
+      indexForm.reset();
+      setCreatedDate(indexForm);
+
+// --- INDEX: auto-fill LAT/LON from CITY + STATE (readonly fields) ---
+const idxCity  = indexForm.querySelector('input[name="CITY"]');
+const idxState = indexForm.querySelector('select[name="STATE"]');
+const idxLat   = indexForm.querySelector('input[name="LAT"]');
+const idxLon   = indexForm.querySelector('input[name="LON"]');
+const idxLatD  = indexForm.querySelector('input[name="LAT_display"]');
+const idxLonD  = indexForm.querySelector('input[name="LON_display"]');
+function setIdxLatLon(lat, lon){
+  const _lat = lat || '';
+  const _lon = lon || '';
+  if(idxLat)  idxLat.value  = _lat;
+  if(idxLon)  idxLon.value  = _lon;
+  if(idxLatD) idxLatD.value = _lat;
+  if(idxLonD) idxLonD.value = _lon;
 }
 
+let geoTimer = null;
+let lastGeoQ = '';
+
+async function geocodeCityState(city, state){
+  const q = `${city}, ${state}, USA`.trim();
+  if(!city || !state) { setIdxLatLon('', ''); return; }
+  if(q === lastGeoQ) return;
+  lastGeoQ = q;
+
+  // Nominatim (OpenStreetMap) search
+  const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q);
+
+  try{
+    const res = await fetch(url, { method: 'GET' });
+    if(!res.ok) throw new Error('geocode_http_' + res.status);
+    const data = await res.json();
+    if(Array.isArray(data) && data[0] && data[0].lat && data[0].lon){
+      // Keep as strings (reasonable precision)
+      setIdxLatLon(String(data[0].lat), String(data[0].lon));
+    }else{
+      setIdxLatLon('', '');
+    }
+  }catch(_e){
+    setIdxLatLon('', '');
+  }
+}
+
+function scheduleGeocode(){
+  if(!idxCity || !idxState) return;
+  const city = (idxCity.value || '').trim();
+  const state = (idxState.value || '').trim();
+  if(geoTimer) clearTimeout(geoTimer);
+  geoTimer = setTimeout(() => geocodeCityState(city, state), 450);
+}
+
+if(idxCity)  idxCity.addEventListener('input', scheduleGeocode);
+if(idxState) idxState.addEventListener('change', scheduleGeocode);
+    }
+  });
+})();
