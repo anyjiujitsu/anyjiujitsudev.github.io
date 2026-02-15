@@ -166,18 +166,24 @@
   <label class="adminLabel" for="idxSUN">SUN</label>
   <input class="adminInput" id="idxSUN" type="time" name="SUN" />
 </div>
-<label class="adminLabel">OTA</label>
+<label class="adminLabel">DROP-IN</label>
                 <select class="adminSelect" name="OTA">
                   <option value="">(blank)</option>
                   <option value="Y">Y</option>
                   <option value="N">N</option>
                 </select>
+<label class="adminLabel">LOCATION</label>
+<div class="adminLatLonRow" aria-label="Location coordinates">
+  <input class="adminInput" name="LON" inputmode="decimal" readonly aria-readonly="true" placeholder="Longitude" />
+  <input class="adminInput" name="LAT" inputmode="decimal" readonly aria-readonly="true" placeholder="Latitude" />
+</div>
+
 
                 <label class="adminLabel">CREATED</label>
                 <input class="adminInput" name="CREATED" disabled />
               </div>
 
-              <div class="adminNote">LAT/LON are left blank and can be filled later.</div>
+              <div class="adminNote">LAT/LON auto-fill after City + State.</div>
 
               <div class="adminActions">
                 <button class="adminActionBtn" type="submit">Submit</button>
