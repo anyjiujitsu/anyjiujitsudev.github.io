@@ -92,7 +92,7 @@
 
 /* Card + form */
 .adminCard{
-  max-width: 980px;
+  max-width: 850px;
   margin: 0 auto;
   background: var(--row);
   border-radius: 18px;
