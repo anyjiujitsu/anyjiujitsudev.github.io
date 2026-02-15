@@ -140,3 +140,13 @@
     }
   });
 })();
+
+
+// Admin: keep token bar sticky below header
+function setAdminHeaderHeight(){
+  const header = document.querySelector('.adminHeader');
+  const h = header ? Math.round(header.getBoundingClientRect().height) : 0;
+  document.documentElement.style.setProperty('--adminHeaderHeight', h + 'px');
+}
+window.addEventListener('load', setAdminHeaderHeight);
+window.addEventListener('resize', setAdminHeaderHeight);
