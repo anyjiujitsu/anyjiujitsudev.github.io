@@ -8,7 +8,7 @@
 
   /* Logo tweak (match main site) */
   /* Pull the title row up closer to the logo (remove the extra gap you see on desktop) */
-  --adminLogoRowMarginBottom: -28px;
+  --adminLogoRowMarginBottom: -20px;
 }
 
 /* logo row matches main site inline style */
