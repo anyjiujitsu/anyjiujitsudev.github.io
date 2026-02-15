@@ -191,7 +191,8 @@
   box-shadow: 0 4px 10px rgba(0,0,0,0.10);
   cursor: pointer;
 }
-
+  color: rgba(0,0,0,0.70);
+}
 /* Put a subtle arrow inside SUBMIT buttons, in a lighter grey (matches site vibe) */
 .adminActionBtn[type="submit"]::after{
   content: "➜";
@@ -227,13 +228,6 @@
   min-width: 0;
   justify-self: stretch;
 }
-.adminTimeRow .adminInput[type="time"]{
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  margin: 0;
-}
 /* keep native time inputs aligned with existing adminInput styling */
 .adminInput[type="time"]{
   padding: 12px 14px;
@@ -252,11 +246,8 @@
 .adminLatLonRow .adminInput[readonly]{
   background: rgba(255,255,255,0.92);
 }
-/* OPENS row: reuse LAT/LON row sizing + prevent iOS time input overflow */
-.adminOpensRow .adminInput[type="time"]{
-  display: block;
+/* OPENS row inputs should behave exactly like LAT/LON inputs */
+.adminOpensRow .adminInput{
   width: 100%;
-  max-width: 100%;
   box-sizing: border-box;
-  margin: 0;
 }
