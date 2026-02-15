@@ -15,16 +15,37 @@
   const tokenInput = document.getElementById('ghToken');
   const saveBtn = document.getElementById('saveToken');
   const eyeBtn = document.getElementById('toggleToken');
+  const tokenHint = document.getElementById('tokenHint');
 
   // --- Token: load/save ---
   const TOKEN_KEY = 'anyjj_admin_github_token';
   const saved = localStorage.getItem(TOKEN_KEY);
   if(saved) tokenInput.value = saved;
 
+  function setTokenStatus(ok){
+    if(!tokenHint) return;
+    if(ok){
+      // Reuse your existing on-screen message copy
+      tokenHint.textContent = 'Token is stored locally (LocalStorage) after you tap Save.';
+      tokenHint.setAttribute('data-status', 'ok');
+    }else{
+      tokenHint.textContent = 'Token save failed.';
+      tokenHint.setAttribute('data-status', 'fail');
+    }
+  }
+
   saveBtn.addEventListener('click', () => {
-    localStorage.setItem(TOKEN_KEY, tokenInput.value || '');
-    saveBtn.textContent = 'Saved';
-    setTimeout(() => (saveBtn.textContent = 'Save'), 900);
+    const t = (tokenInput.value || '').trim();
+    if(!t){
+      setTokenStatus(false);
+      return;
+    }
+    try{
+      localStorage.setItem(TOKEN_KEY, t);
+      setTokenStatus(true);
+    }catch(_e){
+      setTokenStatus(false);
+    }
   });
 
   eyeBtn.addEventListener('click', () => {
