@@ -162,8 +162,14 @@
 <!-- OPENS: SAT + SUN inline (matches LOCATION row on mobile) -->
 <label class="adminLabel">OPENS</label>
 <div class="adminLatLonRow adminOpensRow" aria-label="Open mat times">
-  <input class="adminInput adminTimeProxy" type="text" name="SAT" placeholder="Sat" inputmode="numeric" maxlength="8" aria-label="Sat" autocomplete="off" />
-  <input class="adminInput adminTimeProxy" type="text" name="SUN" placeholder="Sun" inputmode="numeric" maxlength="8" aria-label="Sun" autocomplete="off" />
+  <div class="adminTimeCell">
+    <input class="adminInput adminTimeDisplay" type="text" placeholder="Sat" aria-label="Sat (display)" readonly />
+    <input class="adminInput adminTimeNative" type="time" name="SAT" aria-label="Sat" />
+  </div>
+  <div class="adminTimeCell">
+    <input class="adminInput adminTimeDisplay" type="text" placeholder="Sun" aria-label="Sun (display)" readonly />
+    <input class="adminInput adminTimeNative" type="time" name="SUN" aria-label="Sun" />
+  </div>
 </div>
 <label class="adminLabel">DROP-IN</label>
                 <select class="adminSelect" name="OTA">
