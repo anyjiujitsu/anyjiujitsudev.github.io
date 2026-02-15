@@ -326,4 +326,5 @@
 
 @media (max-width: 520px){
   .adminTokenPill{ padding: 7px 12px; }
+  .adminTokenPill input{ width: 200px; }
 }
