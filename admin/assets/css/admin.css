@@ -24,16 +24,8 @@
 
 /* Make the token bar sticky under header */
 .adminFilters{
-  /*
-    Keep the green token bar “frozen” exactly where it starts (directly under
-    the sticky header), matching the behavior of the header title + view toggle.
-
-    The main-site CSS commonly exposes a header height variable; we use a safe
-    fallback so this remains robust if that variable isn't present.
-  */
   position: sticky;
-  top: var(--headerH, 0px);
-  z-index: 900;
+  top: 0;
 }
 
 /* Token pill */
@@ -62,6 +54,22 @@
   cursor: pointer;
   opacity: 0.75;
 }
+/* Reuse the same "apply" button style as the ZIP distance entry button on the main site */
+.distance__apply{
+  flex: 0 0 auto;
+  border: 1px solid rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.06);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+.distance__apply:active{
+  transform: translateY(1px);
+}
+
 .adminSaveBtn{
   border: 0;
   border-radius: 999px;
