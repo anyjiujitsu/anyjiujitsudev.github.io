@@ -109,6 +109,81 @@
   setCreatedDate(eventForm);
   setCreatedDate(indexForm);
 
+
+  // --- INDEX: native time picker proxy (keeps iOS-perfect sizing by using text inputs) ---
+  function setupTimePickerProxy(form){
+    if(!form) return;
+    const fields = Array.from(form.querySelectorAll('input.adminTimeProxy[name="SAT"], input.adminTimeProxy[name="SUN"]'));
+    if(!fields.length) return;
+
+    // Create one hidden native time input reused for both fields (mobile-friendly)
+    const picker = document.createElement('input');
+    picker.type = 'time';
+    picker.step = 60; // minute granularity
+    picker.tabIndex = -1;
+    picker.setAttribute('aria-hidden','true');
+    picker.style.position = 'fixed';
+    picker.style.left = '-9999px';
+    picker.style.top = '0';
+    picker.style.width = '1px';
+    picker.style.height = '1px';
+    picker.style.opacity = '0';
+    document.body.appendChild(picker);
+
+    let active = null;
+
+    function normalizeHHMM(v){
+      // Accept "HH:MM" or "H:MM" or "HHMM" and return "HH:MM" when possible
+      v = (v || '').trim();
+      if(!v) return '';
+      const m1 = v.match(/^(\d{1,2}):(\d{2})$/);
+      if(m1){
+        const hh = String(Math.min(23, Math.max(0, Number(m1[1])))).padStart(2,'0');
+        const mm = String(Math.min(59, Math.max(0, Number(m1[2])))).padStart(2,'0');
+        return `${hh}:${mm}`;
+      }
+      const m2 = v.match(/^(\d{1,2})(\d{2})$/); // e.g. 930, 0930
+      if(m2){
+        const hh = String(Math.min(23, Math.max(0, Number(m2[1])))).padStart(2,'0');
+        const mm = String(Math.min(59, Math.max(0, Number(m2[2])))).padStart(2,'0');
+        return `${hh}:${mm}`;
+      }
+      return '';
+    }
+
+    function openPickerFor(field){
+      active = field;
+      // Seed picker with current value if valid
+      const seed = normalizeHHMM(field.value);
+      picker.value = seed || '';
+      // Mobile Safari: focusing the time input triggers the native picker UI
+      picker.focus({ preventScroll: true });
+      // Some browsers need a click too
+      picker.click();
+    }
+
+    // Open on click / focus (focus so keyboard doesn't pop)
+    fields.forEach(f => {
+      f.readOnly = true; // keep sizing + prevent keyboard; user uses picker
+      f.addEventListener('click', () => openPickerFor(f));
+      f.addEventListener('focus', () => openPickerFor(f));
+    });
+
+    picker.addEventListener('change', () => {
+      if(!active) return;
+      active.value = picker.value || '';
+      // Trigger input event so any future listeners behave consistently
+      active.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    // Allow clearing with backspace via long-press iOS menu isn't reliable; provide double-tap to clear
+    fields.forEach(f => {
+      f.addEventListener('dblclick', () => { f.value = ''; });
+    });
+  }
+
+  setupTimePickerProxy(indexForm);
+
 // --- INDEX: auto-fill LAT/LON from CITY + STATE (readonly fields) ---
 const idxCity  = indexForm.querySelector('input[name="CITY"]');
 const idxState = indexForm.querySelector('select[name="STATE"]');
