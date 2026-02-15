@@ -7,7 +7,8 @@
   --adminTitleTop: 0px;
 
   /* Logo tweak (match main site) */
-  --adminLogoRowMarginBottom: 0px;
+  /* Pull the title row up closer to the logo (remove the extra gap you see on desktop) */
+  --adminLogoRowMarginBottom: -28px;
 }
 
 /* logo row matches main site inline style */
@@ -41,6 +42,7 @@
   flex: 0 0 auto;
 }
 .adminTokenIcon{ font-size: 14px; opacity: 0.85; }
+.adminTokenSvg{ display:block; color: rgba(0,0,0,0.55); }
 .adminTokenPill input{
   border: 0;
   outline: none;
@@ -53,33 +55,11 @@
   background: transparent;
   cursor: pointer;
   opacity: 0.75;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
-/* Reuse the same "apply" button style as the ZIP distance entry button on the main site */
-.distance__apply{
-  flex: 0 0 auto;
-  border: 1px solid rgba(0,0,0,0.15);
-  background: rgba(0,0,0,0.06);
-  border-radius: 10px;
-  padding: 10px 12px;
-  font: inherit;
-  font-size: 16px;
-  line-height: 1;
-  cursor: pointer;
-}
-.adminFilters .distance__apply{
-  /* In admin, this button sits on the dark green bar, so give it the same readable pill styling
-     as the previous SAVE button (white pill with soft shadow). */
-  border: 0;
-  background: #fff;
-  border-radius: 999px;
-  padding: 10px 14px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-  font-weight: 900;
-}
-.distance__apply:active{
-  transform: translateY(1px);
-}
-
 .adminSaveBtn{
   border: 0;
   border-radius: 999px;
@@ -91,6 +71,33 @@
   box-shadow: 0 3px 8px rgba(0,0,0,0.12);
   cursor: pointer;
   flex: 0 0 auto;
+}
+
+/* Reuse main-site ZIP apply button styling (distance__apply) */
+.distance__apply{
+  flex: 0 0 auto;
+  border: 1px solid rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.06);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+.distance__apply:active{
+  transform: translateY(1px);
+}
+
+/* In the green admin bar, make it visible (white pill like the old Save button) */
+.adminFilters .distance__apply{
+  background: rgba(255,255,255,0.95);
+  border: 1px solid rgba(0,0,0,0.10);
+  border-radius: 999px;
+  padding: 10px 16px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  color: var(--green);
+  font-weight: 900;
 }
 .adminTokenHint{
   margin-left: 6px;
@@ -134,7 +141,9 @@
   text-transform: uppercase;
   color: rgba(0,0,0,0.55);
   font-size: 12px;
-  background: rgba(255,255,255,0.25);
+  /* Use the site's beige for the admin card header band */
+  background: var(--beige);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 .adminForm{ padding: 18px; }
 .adminGrid{
@@ -181,6 +190,14 @@
   background: #fff;
   box-shadow: 0 4px 10px rgba(0,0,0,0.10);
   cursor: pointer;
+}
+
+/* Put a subtle arrow inside SUBMIT buttons, in a lighter grey (matches site vibe) */
+.adminActionBtn[type="submit"]::after{
+  content: "➜";
+  display: inline-block;
+  margin-left: 10px;
+  color: rgba(0,0,0,0.35);
 }
 .adminNote{
   margin-top: 10px;
