@@ -66,6 +66,16 @@
   line-height: 1;
   cursor: pointer;
 }
+.adminFilters .distance__apply{
+  /* In admin, this button sits on the dark green bar, so give it the same readable pill styling
+     as the previous SAVE button (white pill with soft shadow). */
+  border: 0;
+  background: #fff;
+  border-radius: 999px;
+  padding: 10px 14px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  font-weight: 900;
+}
 .distance__apply:active{
   transform: translateY(1px);
 }
@@ -109,8 +119,8 @@
 /* Card + form */
 .adminCard{
   width: 100%;
-  max-width: none;
-  margin: 0;
+  max-width: 850px;
+  margin: 0 auto;
   background: var(--row);
   border-radius: 18px;
   box-shadow: 0 10px 24px rgba(0,0,0,0.10);
