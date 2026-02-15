@@ -220,6 +220,13 @@
   grid-template-columns: 1fr 1fr;
   gap: 10px 14px;
   align-items: center;
+  width: 100%;
+}
+.adminTimeRow > *{ min-width: 0; }
+.adminTimeRow .adminInput[type="time"]{
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
 }
 /* keep native time inputs aligned with existing adminInput styling */
 .adminInput[type="time"]{
