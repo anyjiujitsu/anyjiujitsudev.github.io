@@ -230,6 +230,19 @@
 
     // Clicking display triggers native picker if supported; otherwise modal
     satDisplay.addEventListener('click', () => {
+      satDisplay.blur();
+    });
+    satDisplay.addEventListener('focus', () => {
+      // treat focus like click (keyboard users / desktop)
+      if(isTimeSupported(satNative)){
+        if(typeof satNative.showPicker === 'function') satNative.showPicker();
+        else { satNative.click(); satNative.focus({preventScroll:true}); }
+      }else{
+        openModalFor(satNative, satDisplay);
+      }
+    });
+
+    satDisplay.addEventListener('click', () => {
       if(isTimeSupported(satNative)){
         if(typeof satNative.showPicker === 'function') satNative.showPicker();
         else { satNative.click(); satNative.focus({preventScroll:true}); }
@@ -240,7 +253,15 @@
     sunDisplay.addEventListener('click', () => {
       if(isTimeSupported(sunNative)){
         if(typeof sunNative.showPicker === 'function') sunNative.showPicker();
+        else { sunNative.click(); sunNative.focus({preventScroll:true});     sunDisplay.addEventListener('focus', () => {
+      if(isTimeSupported(sunNative)){
+        if(typeof sunNative.showPicker === 'function') sunNative.showPicker();
         else { sunNative.click(); sunNative.focus({preventScroll:true}); }
+      }else{
+        openModalFor(sunNative, sunDisplay);
+      }
+    });
+}
       }else{
         openModalFor(sunNative, sunDisplay);
       }
