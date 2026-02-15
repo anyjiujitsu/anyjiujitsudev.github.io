@@ -109,6 +109,38 @@
   setCreatedDate(eventForm);
   setCreatedDate(indexForm);
 
+
+  // --- INDEX: OPENS (SAT/SUN) time picker overlay sync ---
+  function setupOpensTimeSync(form){
+    if(!form) return;
+    const satNative = form.querySelector('input.adminTimeNative[name="SAT"]');
+    const sunNative = form.querySelector('input.adminTimeNative[name="SUN"]');
+    const displays  = Array.from(form.querySelectorAll('input.adminTimeDisplay'));
+    if(!satNative || !sunNative || displays.length < 2) return;
+
+    const satDisplay = displays[0];
+    const sunDisplay = displays[1];
+
+    function syncOne(nativeEl, displayEl){
+      displayEl.value = nativeEl.value || '';
+    }
+
+    satNative.addEventListener('input', () => syncOne(satNative, satDisplay));
+    satNative.addEventListener('change', () => syncOne(satNative, satDisplay));
+    sunNative.addEventListener('input', () => syncOne(sunNative, sunDisplay));
+    sunNative.addEventListener('change', () => syncOne(sunNative, sunDisplay));
+
+    // If user taps display (some browsers ignore clicks on fully transparent inputs)
+    satDisplay.addEventListener('click', () => { satNative.click(); satNative.focus({preventScroll:true}); });
+    sunDisplay.addEventListener('click', () => { sunNative.click(); sunNative.focus({preventScroll:true}); });
+
+    // Initialize (in case form is repopulated later)
+    syncOne(satNative, satDisplay);
+    syncOne(sunNative, sunDisplay);
+  }
+
+  setupOpensTimeSync(indexForm);
+
 // --- INDEX: auto-fill LAT/LON from CITY + STATE (readonly fields) ---
 const idxCity  = indexForm.querySelector('input[name="CITY"]');
 const idxState = indexForm.querySelector('select[name="STATE"]');
@@ -163,92 +195,6 @@ function scheduleGeocode(){
 if(idxCity)  idxCity.addEventListener('input', scheduleGeocode);
 if(idxState) idxState.addEventListener('change', scheduleGeocode);
 
-
-  // --- INDEX: OPENS time picker proxy (keeps perfect iOS layout) ---
-  function setupTimePickerProxy(form){
-    if(!form) return;
-    const fields = Array.from(form.querySelectorAll('input.adminTimeProxy[name="SAT"], input.adminTimeProxy[name="SUN"]'));
-    if(!fields.length) return;
-
-    // Hidden native time input used to invoke the platform time picker
-    const picker = document.createElement('input');
-    picker.type = 'time';
-    picker.step = 60;
-    picker.tabIndex = -1;
-    picker.setAttribute('aria-hidden','true');
-    picker.style.position = 'fixed';
-    picker.style.left = '-9999px';
-    picker.style.top = '0';
-    picker.style.width = '1px';
-    picker.style.height = '1px';
-    picker.style.opacity = '0';
-    document.body.appendChild(picker);
-
-    let active = null;
-    let didInteract = false;
-
-    function normalizeHHMM(v){
-      v = (v || '').trim();
-      if(!v) return '';
-      const m1 = v.match(/^(\d{1,2}):(\d{2})$/);
-      if(m1){
-        const hh = String(Math.min(23, Math.max(0, Number(m1[1])))).padStart(2,'0');
-        const mm = String(Math.min(59, Math.max(0, Number(m1[2])))).padStart(2,'0');
-        return `${hh}:${mm}`;
-      }
-      const m2 = v.match(/^(\d{1,2})(\d{2})$/); // 930, 0930
-      if(m2){
-        const hh = String(Math.min(23, Math.max(0, Number(m2[1])))).padStart(2,'0');
-        const mm = String(Math.min(59, Math.max(0, Number(m2[2])))).padStart(2,'0');
-        return `${hh}:${mm}`;
-      }
-      return '';
-    }
-
-    function openPickerFor(field){
-      active = field;
-      didInteract = false;
-
-      // Seed picker with current value if valid; otherwise blank
-      const seed = normalizeHHMM(field.value);
-      picker.value = seed || '';
-
-      // Prefer showPicker() when available
-      if(typeof picker.showPicker === 'function'){
-        picker.showPicker();
-      }else{
-        // Some browsers need click+focus
-        picker.click();
-        picker.focus({ preventScroll: true });
-      }
-    }
-
-    fields.forEach(f => {
-      f.readOnly = true; // prevents keyboard; user selects time via picker
-      f.addEventListener('click', (e) => {
-        e.preventDefault();
-        openPickerFor(f);
-      });
-    });
-
-    // Mark interaction on input (prevents iOS "auto-now" change)
-    picker.addEventListener('input', () => { didInteract = true; });
-
-    picker.addEventListener('change', () => {
-      if(!active) return;
-      if(!didInteract) return;
-      active.value = picker.value || '';
-      active.dispatchEvent(new Event('input', { bubbles: true }));
-    });
-
-    // Quick clear: double click / double tap
-    fields.forEach(f => {
-      f.addEventListener('dblclick', () => { f.value = ''; });
-    });
-  }
-
-  setupTimePickerProxy(indexForm);
-
   // optional: auto day from date on event form
   const dateInput = eventForm.querySelector('input[name="DATE"]');
   const dayInput = eventForm.querySelector('input[name="DAY"]');
@@ -276,6 +222,10 @@ if(idxState) idxState.addEventListener('change', scheduleGeocode);
       lastGeoQ = '';
       setIdxLatLon('', '');
     }
+    // clear OPENS display fields after reset
+    const _opensDisplays = Array.from(indexForm.querySelectorAll('input.adminTimeDisplay'));
+    _opensDisplays.forEach(el => el.value = '');
+
     if(which === 'event') dayInput.value = '';
   });
 
@@ -302,93 +252,9 @@ if(idxState) idxState.addEventListener('change', scheduleGeocode);
     if(ok){
       indexForm.reset();
       setCreatedDate(indexForm);
-
-
-
-  // --- INDEX: OPENS time picker proxy (keeps perfect iOS layout) ---
-  function setupTimePickerProxy(form){
-    if(!form) return;
-    const fields = Array.from(form.querySelectorAll('input.adminTimeProxy[name="SAT"], input.adminTimeProxy[name="SUN"]'));
-    if(!fields.length) return;
-
-    // Hidden native time input used to invoke the platform time picker
-    const picker = document.createElement('input');
-    picker.type = 'time';
-    picker.step = 60;
-    picker.tabIndex = -1;
-    picker.setAttribute('aria-hidden','true');
-    picker.style.position = 'fixed';
-    picker.style.left = '-9999px';
-    picker.style.top = '0';
-    picker.style.width = '1px';
-    picker.style.height = '1px';
-    picker.style.opacity = '0';
-    document.body.appendChild(picker);
-
-    let active = null;
-    let didInteract = false;
-
-    function normalizeHHMM(v){
-      v = (v || '').trim();
-      if(!v) return '';
-      const m1 = v.match(/^(\d{1,2}):(\d{2})$/);
-      if(m1){
-        const hh = String(Math.min(23, Math.max(0, Number(m1[1])))).padStart(2,'0');
-        const mm = String(Math.min(59, Math.max(0, Number(m1[2])))).padStart(2,'0');
-        return `${hh}:${mm}`;
-      }
-      const m2 = v.match(/^(\d{1,2})(\d{2})$/); // 930, 0930
-      if(m2){
-        const hh = String(Math.min(23, Math.max(0, Number(m2[1])))).padStart(2,'0');
-        const mm = String(Math.min(59, Math.max(0, Number(m2[2])))).padStart(2,'0');
-        return `${hh}:${mm}`;
-      }
-      return '';
-    }
-
-    function openPickerFor(field){
-      active = field;
-      didInteract = false;
-
-      // Seed picker with current value if valid; otherwise blank
-      const seed = normalizeHHMM(field.value);
-      picker.value = seed || '';
-
-      // Prefer showPicker() when available
-      if(typeof picker.showPicker === 'function'){
-        picker.showPicker();
-      }else{
-        // Some browsers need click+focus
-        picker.click();
-        picker.focus({ preventScroll: true });
-      }
-    }
-
-    fields.forEach(f => {
-      f.readOnly = true; // prevents keyboard; user selects time via picker
-      f.addEventListener('click', (e) => {
-        e.preventDefault();
-        openPickerFor(f);
-      });
-    });
-
-    // Mark interaction on input (prevents iOS "auto-now" change)
-    picker.addEventListener('input', () => { didInteract = true; });
-
-    picker.addEventListener('change', () => {
-      if(!active) return;
-      if(!didInteract) return;
-      active.value = picker.value || '';
-      active.dispatchEvent(new Event('input', { bubbles: true }));
-    });
-
-    // Quick clear: double click / double tap
-    fields.forEach(f => {
-      f.addEventListener('dblclick', () => { f.value = ''; });
-    });
-  }
-
-  setupTimePickerProxy(indexForm);
-    }
+          // clear OPENS display fields after reset
+      const _opensDisplays2 = Array.from(indexForm.querySelectorAll('input.adminTimeDisplay'));
+      _opensDisplays2.forEach(el => el.value = '');
+}
   });
 })();
