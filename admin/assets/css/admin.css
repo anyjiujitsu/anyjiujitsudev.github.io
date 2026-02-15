@@ -92,7 +92,8 @@
 
 /* Card + form */
 .adminCard{
-  max-width: 980px;
+  width: 100%;
+  max-width: 100%;
   margin: 0 auto;
   background: var(--row);
   border-radius: 18px;
@@ -174,17 +175,7 @@
 }
 
 
-/* Admin: slightly smaller (ANY) logo */
-.adminHeader .header__logoCrop{ 
-  height: 44px;
-}
-.adminHeader .header__logoImage{
-  height: 44px;
-}
-@media (max-width: 640px){
-  .adminHeader .header__logoCrop{ height: 38px; }
-  .adminHeader .header__logoImage{ height: 38px; }
-}
+
 
 
 /* Admin: reduce form/card width to align with header content */
@@ -200,4 +191,94 @@
   max-width: var(--adminCardMaxW);
   margin-left: auto;
   margin-right: auto;
+}
+
+
+
+
+
+/* Admin: slightly smaller (ANY) logo */
+.adminHeader .header__logoCrop{ 
+  height: 38px;
+}
+.adminHeader .header__logoImage{
+  height: 38px;
+}
+@media (max-width: 640px){
+  .adminHeader .header__logoCrop{ height: 32px; }
+  .adminHeader .header__logoImage{ height: 32px; }
+}
+
+
+/* Admin: token empty affordance */
+.tokenBtnWarn{
+  opacity: 0.95;
+}
+.tokenBtnPulse{
+  animation: tokenPulse 0.9s ease-in-out;
+}
+.tokenInputWarn{
+  outline: 2px solid rgba(205,100,68,0.9);
+}
+@keyframes tokenPulse{
+  0%{ transform: scale(1); }
+  30%{ transform: scale(1.03); }
+  100%{ transform: scale(1); }
+}
+
+
+/* Admin: header + token bar are fixed (never scroll) */
+.adminBody #adminHeader{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 70;
+}
+.adminBody #adminTokenBar{
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: var(--adminHeaderH, 0px);
+  z-index: 65;
+}
+
+/* Push the scrolling content below the fixed header+token bar */
+.adminBody .adminMain{
+  padding-top: calc(var(--adminHeaderH, 0px) + var(--adminTokenH, 0px) + 18px);
+}
+
+
+/* Admin: token arrow button */
+.tokenArrowBtn{
+  width: 44px;
+  height: 36px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  line-height: 1;
+  padding: 0;
+}
+.tokenArrowBtn.tokenBtnWarn{
+  opacity: 0.9;
+}
+/* Keep token row compact like main site */
+.adminFilters .tokenRow{
+  align-items: center;
+}
+
+
+/* Admin: content span matches title start → toggle end */
+.adminMainInner{
+  width: min(100%, var(--adminSpanW, 100%));
+  margin-left: var(--adminSpanL, 0px);
+  margin-right: auto;
+}
+@media (max-width: 900px){
+  .adminMainInner{
+    width: 100%;
+    margin-left: 0;
+  }
 }
