@@ -131,6 +131,7 @@
     document.body.appendChild(picker);
 
     let active = null;
+    let didInteract = false;
 
     function normalizeHHMM(v){
       // Accept "HH:MM" or "H:MM" or "HHMM" and return "HH:MM" when possible
@@ -153,28 +154,41 @@
 
     function openPickerFor(field){
       active = field;
+      didInteract = false;
       // Seed picker with current value if valid
       const seed = normalizeHHMM(field.value);
       picker.value = seed || '';
-      // Mobile Safari: focusing the time input triggers the native picker UI
-      picker.focus({ preventScroll: true });
-      // Some browsers need a click too
-      picker.click();
+      // Prefer showPicker() where supported (avoids some iOS quirks)
+      if(typeof picker.showPicker === 'function'){
+        picker.showPicker();
+      }else{
+        picker.click();
+        picker.focus({ preventScroll: true });
+      }
     }
 
-    // Open on click / focus (focus so keyboard doesn't pop)
+    // Open on tap/click only (avoid focus-triggered auto fill on iOS)
     fields.forEach(f => {
       f.readOnly = true; // keep sizing + prevent keyboard; user uses picker
-      f.addEventListener('click', () => openPickerFor(f));
-      f.addEventListener('focus', () => openPickerFor(f));
+      f.addEventListener('click', (e) => {
+        e.preventDefault();
+        openPickerFor(f);
+      });
+    });
+
+    picker.addEventListener('input', () => {
+      // User is actively changing the picker
+      didInteract = true;
     });
 
     picker.addEventListener('change', () => {
+      // Only commit after user interaction (prevents auto-filling current time)
       if(!active) return;
+      if(!didInteract) return;
       active.value = picker.value || '';
-      // Trigger input event so any future listeners behave consistently
       active.dispatchEvent(new Event('input', { bubbles: true }));
     });
+});
 
     // Allow clearing with backspace via long-press iOS menu isn't reliable; provide double-tap to clear
     fields.forEach(f => {
