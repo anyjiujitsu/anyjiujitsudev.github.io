@@ -60,10 +60,21 @@
     <section class="filters adminFilters" id="adminFilters" aria-label="Admin controls">
       <div class="filters__inner adminFiltersInner">
         <div class="adminTokenPill" role="group" aria-label="GitHub token">
-          <span class="adminTokenIcon" aria-hidden="true">🔑</span>
+          <span class="adminTokenIcon" aria-hidden="true">
+            <!-- simple outline key icon (matches site style better than emoji) -->
+            <svg class="adminTokenSvg" width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M14.5 10.5a4.5 4.5 0 1 1 2.2 3.9L14 17v2h-2v2H9v-3.1l5.1-5.1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
           <input id="ghToken" type="password" inputmode="text" autocomplete="off" spellcheck="false"
                  placeholder="GitHub token" aria-label="GitHub token" />
-          <button id="toggleToken" class="adminTokenEye" type="button" aria-label="Show token">👁</button>
+          <button id="toggleToken" class="adminTokenEye" type="button" aria-label="Show token" title="Show / hide token">
+            <!-- simple outline eye icon (matches site style better than emoji) -->
+            <svg class="adminTokenSvg" width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
         </div>
 
         <!-- Use the same "apply" button style as the ZIP distance dropdown on the main site -->
