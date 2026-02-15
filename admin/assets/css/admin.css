@@ -212,17 +212,14 @@
 /* =========================
    INDEX: SAT + SUN single row
    ========================= */
+/* =========================
+   INDEX: OPENS (SAT + SUN inline)
+   ========================= */
 .adminTimeRow{
-  grid-column: 1 / -1; /* span full adminGrid width */
   display: grid;
-  grid-template-columns: 92px 1fr 92px 1fr; /* match adminGrid label column */
+  grid-template-columns: 1fr 1fr;
   gap: 10px 14px;
   align-items: center;
-}
-@media (max-width: 520px){
-  .adminTimeRow{
-    grid-template-columns: 76px 1fr 76px 1fr; /* match adminGrid mobile label column */
-  }
 }
 /* keep native time inputs aligned with existing adminInput styling */
 .adminInput[type="time"]{
