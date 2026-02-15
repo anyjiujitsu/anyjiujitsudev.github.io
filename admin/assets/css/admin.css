@@ -333,7 +333,7 @@
 /* Slightly increase green bar height on mobile */
 @media (max-width: 520px){
   .filters.adminFilters{
-    padding-top: 14px;
-    padding-bottom: 14px;
+    padding-top: 12px;
+    padding-bottom: 12px;
   }
 }
