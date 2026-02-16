@@ -84,7 +84,7 @@
     tabs.forEach(btn => btn.setAttribute('aria-selected', String(btn.dataset.view === view)));
     toggle.style.setProperty('--viewProgress', isIndex ? 1 : 0);
 
-    titleEl.textContent = isIndex ? 'INDEX – ADD NEW' : 'EVENTS – ADD NEW';
+    titleEl.textContent = isIndex ? 'INDEX – ADD NEW (DEV)' : 'EVENTS – ADD NEW (DEV)';
   }
 
   function scrollToView(view){
