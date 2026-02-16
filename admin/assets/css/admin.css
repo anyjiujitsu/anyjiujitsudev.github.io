@@ -34,6 +34,7 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  position: relative;
   background: rgba(255,255,255,0.95);
   border-radius: 999px;
   padding: 8px 14px;
@@ -103,12 +104,21 @@
   color: var(--green);
   font-weight: 900;
 }
+/* Token status should feel like helper text inside the token field itself */
 .adminTokenStatus{
-  margin-left: 8px;
+  position: absolute;
+  left: 52px;          /* after key icon */
+  right: 52px;         /* before eye icon */
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
   color: rgba(0,0,0,0.45);
   font-size: 13px;
   white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
 }
+.adminTokenStatus.isVisible{ opacity: 1; }
 
 /* Make the date input match other fields on mobile (some browsers give date inputs a larger min-width) */
 .adminInput[type="date"]{
@@ -188,6 +198,11 @@
   font-size: 14px;
 }
 .adminInput[disabled]{
+  background: rgba(0,0,0,0.05);
+  color: rgba(0,0,0,0.55);
+}
+/* readonly fields should look the same as disabled, but still be included in FormData */
+.adminInput[readonly]{
   background: rgba(0,0,0,0.05);
   color: rgba(0,0,0,0.55);
 }
