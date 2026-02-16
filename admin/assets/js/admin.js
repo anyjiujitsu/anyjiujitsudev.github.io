@@ -117,6 +117,169 @@
   setActiveView('events');
   syncFromScroll();
 
+
+  // --- CSV-powered suggestions (WHERE, CITY) ---
+  // Builds type-ahead suggestions from existing values in /data/events.csv
+  // so entry fields stay consistent with the dataset.
+  const PUBLIC_EVENTS_CSV = '../data/events.csv';
+
+  function parseCSV(text){
+    // RFC4180-ish parser (handles quotes + commas + newlines)
+    const rows = [];
+    let row = [];
+    let cell = '';
+    let inQuotes = false;
+
+    for(let i=0;i<text.length;i++){
+      const ch = text[i];
+
+      if(inQuotes){
+        if(ch === '"'){
+          const next = text[i+1];
+          if(next === '"'){ // escaped quote
+            cell += '"';
+            i++;
+          }else{
+            inQuotes = false;
+          }
+        }else{
+          cell += ch;
+        }
+        continue;
+      }
+
+      if(ch === '"'){
+        inQuotes = true;
+        continue;
+      }
+
+      if(ch === ','){
+        row.push(cell);
+        cell = '';
+        continue;
+      }
+
+      if(ch === '\n'){
+        row.push(cell);
+        rows.push(row);
+        row = [];
+        cell = '';
+        continue;
+      }
+
+      if(ch === '\r'){
+        continue;
+      }
+
+      cell += ch;
+    }
+
+    // last cell/row
+    row.push(cell);
+    rows.push(row);
+
+    // trim any trailing empty rows
+    while(rows.length && rows[rows.length-1].every(v => String(v||'').trim() === '')){
+      rows.pop();
+    }
+    return rows;
+  }
+
+  function uniqueNonEmpty(values){
+    const seen = new Set();
+    const out = [];
+    values.forEach(v => {
+      const s = String(v ?? '').trim();
+      if(!s) return;
+      const k = s.toLowerCase();
+      if(seen.has(k)) return;
+      seen.add(k);
+      out.push(s);
+    });
+    return out;
+  }
+
+  function attachDatalist(input, allValues, listId){
+    if(!input) return;
+    let dl = document.getElementById(listId);
+    if(!dl){
+      dl = document.createElement('datalist');
+      dl.id = listId;
+      document.body.appendChild(dl);
+    }
+    input.setAttribute('list', listId);
+
+    function buildOptions(query){
+      const q = String(query ?? '').trim().toLowerCase();
+      const starts = [];
+      const contains = [];
+      for(const v of allValues){
+        const lv = v.toLowerCase();
+        if(!q){
+          starts.push(v);
+        }else if(lv.startsWith(q)){
+          starts.push(v);
+        }else if(lv.includes(q)){
+          contains.push(v);
+        }
+        if(starts.length >= 20 && contains.length >= 20) break;
+      }
+      const list = q ? starts.concat(contains) : starts;
+      const limited = list.slice(0, 30);
+
+      dl.innerHTML = '';
+      limited.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v;
+        dl.appendChild(opt);
+      });
+    }
+
+    input.addEventListener('input', () => buildOptions(input.value));
+    input.addEventListener('focus', () => buildOptions(input.value));
+  }
+
+  async function loadWhereCitySuggestions(){
+    try{
+      const res = await fetch(PUBLIC_EVENTS_CSV, { cache: 'no-store' });
+      if(!res.ok) return;
+      const text = await res.text();
+      const rows = parseCSV(text);
+      if(!rows || rows.length < 2) return;
+
+      const headers = rows[0].map(h => String(h||'').trim().toUpperCase());
+      const idxWhere = headers.indexOf('WHERE');
+      const idxCity  = headers.indexOf('CITY');
+
+      if(idxWhere === -1 && idxCity === -1) return;
+
+      const whereVals = [];
+      const cityVals = [];
+
+      for(let r=1;r<rows.length;r++){
+        const row = rows[r] || [];
+        if(idxWhere !== -1) whereVals.push(row[idxWhere]);
+        if(idxCity  !== -1) cityVals.push(row[idxCity]);
+      }
+
+      const whereUnique = uniqueNonEmpty(whereVals);
+      const cityUnique  = uniqueNonEmpty(cityVals);
+
+      // Attach to all matching inputs (events + index forms)
+      document.querySelectorAll('input[name="WHERE"]').forEach(inp => {
+        attachDatalist(inp, whereUnique, 'anyjjWhereDatalist');
+      });
+      document.querySelectorAll('input[name="CITY"]').forEach(inp => {
+        attachDatalist(inp, cityUnique, 'anyjjCityDatalist');
+      });
+    }catch(_e){
+      // silent fail — admin still works without suggestions
+    }
+  }
+
+  // Kick off suggestions load (non-blocking)
+  loadWhereCitySuggestions();
+
   // --- Form handling (wire commit later) ---
   const eventForm = document.getElementById('eventForm');
   const indexForm = document.getElementById('indexForm');
