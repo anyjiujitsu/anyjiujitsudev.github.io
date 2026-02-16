@@ -17,9 +17,7 @@
        NOTE: different deployments have placed admin.css in different locations.
        We include safe fallback paths so styling never drops out. -->
   <link rel="stylesheet" href="assets/css/admin.css" />
-  <link rel="stylesheet" href="../assets/css/admin.css" />
-  <link rel="stylesheet" href="admin.css" />
-
+  
   <!-- Freeze the green token bar where it starts (under the sticky header) -->
   <style>
     .adminFilters{
@@ -221,7 +219,7 @@
   <input type="hidden" name="LAT" />
 </div>
 <label class="adminLabel">CREATED</label>
-                <input class="adminInput" name="CREATED" disabled />
+                <input class="adminInput" name="CREATED" readonly />
               </div>
 
               <div class="adminNote">LAT/LON auto-fill after City + State.</div>
@@ -240,8 +238,6 @@
   </div>
 
   <script src="assets/js/admin.js"></script>
-  <script src="../assets/js/admin.js"></script>
-  <script src="admin.js"></script>
 
   <script>
     (function(){
