@@ -22,30 +22,42 @@
   const saved = localStorage.getItem(TOKEN_KEY);
   if(saved) tokenInput.value = saved;
 
-  function setTokenStatus(ok){
+  function setTokenStatus(status){
     if(!tokenHint) return;
-    if(ok){
-      // Reuse your existing on-screen message copy
-      tokenHint.textContent = 'Token is stored locally (LocalStorage) after you tap Save.';
-      tokenHint.setAttribute('data-status', 'ok');
-    }else{
-      tokenHint.textContent = 'Token save failed.';
-      tokenHint.setAttribute('data-status', 'fail');
+    tokenHint.textContent = status;
+    tokenHint.setAttribute('data-status', status);
+  }
+
+  async function validateAndStoreToken(){
+    const t = (tokenInput.value || '').trim();
+    if(!t){
+      setTokenStatus('FAILED');
+      return null;
+    }
+
+    // Validate token against GitHub API. If invalid, do not store.
+    try{
+      const res = await fetch('https://api.github.com/user', {
+        headers: {
+          'Accept': 'application/vnd.github+json',
+          'Authorization': `token ${t}`
+        }
+      });
+      if(!res.ok){
+        setTokenStatus('FAILED');
+        return null;
+      }
+      localStorage.setItem(TOKEN_KEY, t);
+      setTokenStatus('APPROVED');
+      return t;
+    }catch(_e){
+      setTokenStatus('FAILED');
+      return null;
     }
   }
 
-  saveBtn.addEventListener('click', () => {
-    const t = (tokenInput.value || '').trim();
-    if(!t){
-      setTokenStatus(false);
-      return;
-    }
-    try{
-      localStorage.setItem(TOKEN_KEY, t);
-      setTokenStatus(true);
-    }catch(_e){
-      setTokenStatus(false);
-    }
+  saveBtn.addEventListener('click', async () => {
+    await validateAndStoreToken();
   });
 
   eyeBtn.addEventListener('click', () => {
@@ -53,93 +65,6 @@
     tokenInput.type = isPw ? 'text' : 'password';
     eyeBtn.setAttribute('aria-label', isPw ? 'Hide token' : 'Show token');
   });
-
-
-  // --- GitHub CSV append/commit (matches QA admin logic) ---
-  const OWNER  = "anyjiujitsu";
-  const REPO   = "anyjiujitsudev.github.io";
-  const BRANCH = "main";
-
-  // Paths inside the repo (must exist)
-  const EVENT_CSV_PATH = "data/events.csv";
-  const INDEX_CSV_PATH = "data/directory.csv";
-
-  const EVENT_CSV_COLUMNS = ["EVENT","FOR","WHERE","CITY","STATE","DAY","DATE","CREATED"];
-  const INDEX_CSV_COLUMNS = ["NAME","IG","CITY","STATE","SAT","SUN","OTA","LON","LAT","CREATED"];
-
-  function requireToken(){
-    const t = (tokenInput?.value || localStorage.getItem(TOKEN_KEY) || "").trim();
-    if(!t) throw new Error("Missing GitHub token. Paste it above and tap Save.");
-    return t;
-  }
-
-  function csvEscape(v){
-    const s = String(v ?? "");
-    if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
-    return s;
-  }
-
-  function b64EncodeUnicode(str){
-    const bytes = new TextEncoder().encode(str);
-    let bin = "";
-    bytes.forEach(b => bin += String.fromCharCode(b));
-    return btoa(bin);
-  }
-
-  function b64DecodeUnicode(str){
-    str = (str || "").replace(/\n/g,"");
-    const bin = atob(str);
-    const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
-    return new TextDecoder("utf-8").decode(bytes);
-  }
-
-  async function ghRequest(url, { method="GET", token="", body=null } = {}){
-    const headers = {
-      "Accept":"application/vnd.github+json",
-    };
-    if(token) headers["Authorization"] = "token " + token;
-    if(body) headers["Content-Type"] = "application/json";
-    const res = await fetch(url, {
-      method,
-      headers,
-      body: body ? JSON.stringify(body) : null
-    });
-    const text = await res.text();
-    let data = null;
-    try{ data = text ? JSON.parse(text) : null; }catch(_e){}
-    if(!res.ok){
-      const msg = (data && (data.message || data.error)) ? (data.message || data.error) : (text || (res.status + " " + res.statusText));
-      throw new Error(msg);
-    }
-    return data;
-  }
-
-  async function appendCsvRow({ csvPath, columns, rowMap, commitLabel }){
-    const token = requireToken();
-    const newRow = columns.map(k => csvEscape(rowMap[k] ?? "")).join(",");
-
-    const getUrl = "https://api.github.com/repos/" + encodeURIComponent(OWNER) + "/" + encodeURIComponent(REPO) +
-      "/contents/" + csvPath + "?ref=" + encodeURIComponent(BRANCH);
-
-    const data = await ghRequest(getUrl, { token });
-    const csv = b64DecodeUnicode(data.content || "");
-    const sha = data.sha;
-
-    let updated = csv;
-    if(!updated.endsWith("\n")) updated += "\n"; // ensure exactly one newline before append
-    updated += newRow; // QA behavior: don't add trailing newline
-
-    const putUrl = "https://api.github.com/repos/" + encodeURIComponent(OWNER) + "/" + encodeURIComponent(REPO) +
-      "/contents/" + csvPath;
-
-    const body = {
-      message: "Append " + commitLabel + " (" + new Date().toISOString() + ")",
-      content: b64EncodeUnicode(updated),
-      sha,
-      branch: BRANCH
-    };
-    await ghRequest(putUrl, { method:"PUT", token, body });
-  }
 
   // --- Helpers ---
   function setActiveView(view){
@@ -428,101 +353,147 @@ if(idxState) idxState.addEventListener('change', scheduleGeocode);
     if(which === 'event') dayInput.value = '';
   });
 
-  // Submit stubs – keep behavior: clear on success
-  /* fakeCommit removed: real GitHub commit now wired */
+  // --- GitHub CSV append/commit (matches QA admin logic) ---
+  const OWNER  = 'anyjiujitsu';
+  const REPO   = 'anyjiujitsudev.github.io';
+  const BRANCH = 'main';
 
-  
-  function hint(msg, status){
-    if(!tokenHint) return;
-    tokenHint.textContent = msg || "";
-    tokenHint.setAttribute('data-status', status || "");
+  // Paths inside the repo (must exist)
+  const EVENT_CSV_PATH = 'data/events.csv';
+  const INDEX_CSV_PATH = 'data/directory.csv';
+
+  function b64DecodeUnicode(str){
+    str = (str || '').replace(/\n/g,'');
+    const bin = atob(str);
+    const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+    return new TextDecoder('utf-8').decode(bytes);
   }
 
-  function v(form, name){
-    const el = form.querySelector(`[name="${name}"]`);
-    return (el && typeof el.value === "string") ? el.value.trim() : "";
+  function b64EncodeUnicode(str){
+    const bytes = new TextEncoder().encode(str);
+    let bin = '';
+    bytes.forEach(b => bin += String.fromCharCode(b));
+    return btoa(bin);
   }
 
-  function format12Time(hhmm){
-    const v = (hhmm || '').trim();
-    const m = v.match(/^(\d{2}):(\d{2})$/);
-    if(!m) return '';
-    let hh = Number(m[1]);
-    const mm = m[2];
-    const ampm = hh >= 12 ? 'PM' : 'AM';
-    hh = hh % 12; if(hh === 0) hh = 12;
-    return `${hh}:${mm} ${ampm}`;
+  function csvEscape(v){
+    const s = String(v ?? '');
+    if(/[\n\r",]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+    return s;
   }
 
-eventForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  function apiUrlFor(path){
+    return `https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURI(path)}?ref=${encodeURIComponent(BRANCH)}`;
+  }
 
-    // Map to the same CSV shape as QA: EVENT=type, FOR=name
-    const rowMap = {
-      EVENT: v(eventForm, "TYPE"),
-      FOR: v(eventForm, "EVENT"),
-      WHERE: v(eventForm, "WHERE"),
-      CITY: v(eventForm, "CITY"),
-      STATE: v(eventForm, "STATE"),
-      DAY: (eventForm.querySelector('[name="DAY"]')?.value || '').trim(),
-      DATE: v(eventForm, "DATE"),
-      CREATED: (eventForm.querySelector('[name="CREATED"]')?.value || '').trim(),
+  async function ghGetFile(path, token){
+    const res = await fetch(apiUrlFor(path), {
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        'Authorization': `token ${token}`
+      }
+    });
+    if(!res.ok){
+      const t = await res.text().catch(()=> '');
+      throw new Error(`GET failed (${res.status}): ${t}`);
+    }
+    return res.json();
+  }
+
+  async function ghPutFile(path, token, body){
+    const putUrl = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${encodeURI(path)}`;
+    const res = await fetch(putUrl, {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json',
+        'Authorization': `token ${token}`
+      },
+      body: JSON.stringify(body)
+    });
+    if(!res.ok){
+      const t = await res.text().catch(()=> '');
+      throw new Error(`PUT failed (${res.status}): ${t}`);
+    }
+    return res.json();
+  }
+
+  function buildRowFromForm(csvText, form){
+    const lines = (csvText || '').split(/\r?\n/);
+    const headerLine = lines.find(l => l.trim().length) || '';
+    const columns = headerLine.split(',').map(s => s.trim());
+
+    const fd = new FormData(form);
+    const map = {};
+    for(const [k,v] of fd.entries()) map[k] = (v ?? '').toString().trim();
+
+    // If file is empty/no header, fall back to form keys order.
+    const cols = columns.filter(Boolean);
+    const finalCols = cols.length ? cols : Object.keys(map);
+    const row = finalCols.map(c => csvEscape(map[c] ?? '')).join(',');
+
+    return { row, finalCols, hasHeader: cols.length > 0 };
+  }
+
+  async function appendCsvRow({ path, form, commitPrefix }){
+    const token = await validateAndStoreToken();
+    if(!token) throw new Error('Token not approved');
+
+    // read
+    const current = await ghGetFile(path, token);
+    const sha = current.sha;
+    const csvText = b64DecodeUnicode(current.content || '');
+
+    // append
+    const { row, finalCols, hasHeader } = buildRowFromForm(csvText, form);
+    const nowIso = new Date().toISOString();
+    const header = hasHeader ? '' : (finalCols.join(',') + '\n');
+    const base = (csvText || '').trimEnd();
+    const updated = (base ? base + '\n' : header) + row + '\n';
+
+    // write
+    const body = {
+      message: `${commitPrefix} (${nowIso})`,
+      content: b64EncodeUnicode(updated),
+      sha,
+      branch: BRANCH
     };
+    await ghPutFile(path, token, body);
+    return true;
+  }
 
+  eventForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
     try{
-      hint("Appending + committing…", "busy");
       await appendCsvRow({
-        csvPath: EVENT_CSV_PATH,
-        columns: EVENT_CSV_COLUMNS,
-        rowMap,
-        commitLabel: "event row"
+        path: EVENT_CSV_PATH,
+        form: eventForm,
+        commitPrefix: 'Append event row'
       });
-      hint("✅ Commit succeeded.", "ok");
-
       eventForm.reset();
       setCreatedDate(eventForm);
       dayInput.value = '';
-    }catch(err){
-      hint("❌ Commit failed: " + (err?.message || err), "fail");
+    }catch(_e){
+      // Surface failure in the token bar (what you asked for)
+      setTokenStatus('FAILED');
     }
   });
 
   indexForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-
-    const satRaw = (indexForm.querySelector('input.adminTimeNative[name="SAT"]')?.value || '').trim();
-    const sunRaw = (indexForm.querySelector('input.adminTimeNative[name="SUN"]')?.value || '').trim();
-
-    const rowMap = {
-      NAME: v(indexForm, "NAME"),
-      IG: v(indexForm, "IG"),
-      CITY: v(indexForm, "CITY"),
-      STATE: v(indexForm, "STATE"),
-      SAT: satRaw ? format12Time(satRaw) : "",
-      SUN: sunRaw ? format12Time(sunRaw) : "",
-      OTA: v(indexForm, "OTA"),
-      LON: v(indexForm, "LON"),
-      LAT: v(indexForm, "LAT"),
-      CREATED: (indexForm.querySelector('[name="CREATED"]')?.value || '').trim(),
-    };
-
     try{
-      hint("Appending + committing…", "busy");
       await appendCsvRow({
-        csvPath: INDEX_CSV_PATH,
-        columns: INDEX_CSV_COLUMNS,
-        rowMap,
-        commitLabel: "index row"
+        path: INDEX_CSV_PATH,
+        form: indexForm,
+        commitPrefix: 'Append directory row'
       });
-      hint("✅ Commit succeeded.", "ok");
-
       indexForm.reset();
       setCreatedDate(indexForm);
       // clear OPENS display fields after reset
       const _opensDisplays2 = Array.from(indexForm.querySelectorAll('input.adminTimeDisplay'));
       _opensDisplays2.forEach(el => el.value = '');
-    }catch(err){
-      hint("❌ Commit failed: " + (err?.message || err), "fail");
+    }catch(_e){
+      setTokenStatus('FAILED');
     }
   });
 })();
