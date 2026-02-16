@@ -54,6 +54,93 @@
     eyeBtn.setAttribute('aria-label', isPw ? 'Hide token' : 'Show token');
   });
 
+
+  // --- GitHub CSV append/commit (matches QA admin logic) ---
+  const OWNER  = "anyjiujitsu";
+  const REPO   = "anyjiujitsudev.github.io";
+  const BRANCH = "main";
+
+  // Paths inside the repo (must exist)
+  const EVENT_CSV_PATH = "data/events.csv";
+  const INDEX_CSV_PATH = "data/directory.csv";
+
+  const EVENT_CSV_COLUMNS = ["EVENT","FOR","WHERE","CITY","STATE","DAY","DATE","CREATED"];
+  const INDEX_CSV_COLUMNS = ["NAME","IG","CITY","STATE","SAT","SUN","OTA","LON","LAT","CREATED"];
+
+  function requireToken(){
+    const t = (tokenInput?.value || localStorage.getItem(TOKEN_KEY) || "").trim();
+    if(!t) throw new Error("Missing GitHub token. Paste it above and tap Save.");
+    return t;
+  }
+
+  function csvEscape(v){
+    const s = String(v ?? "");
+    if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g,'""') + '"';
+    return s;
+  }
+
+  function b64EncodeUnicode(str){
+    const bytes = new TextEncoder().encode(str);
+    let bin = "";
+    bytes.forEach(b => bin += String.fromCharCode(b));
+    return btoa(bin);
+  }
+
+  function b64DecodeUnicode(str){
+    str = (str || "").replace(/\n/g,"");
+    const bin = atob(str);
+    const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+    return new TextDecoder("utf-8").decode(bytes);
+  }
+
+  async function ghRequest(url, { method="GET", token="", body=null } = {}){
+    const headers = {
+      "Accept":"application/vnd.github+json",
+    };
+    if(token) headers["Authorization"] = "token " + token;
+    if(body) headers["Content-Type"] = "application/json";
+    const res = await fetch(url, {
+      method,
+      headers,
+      body: body ? JSON.stringify(body) : null
+    });
+    const text = await res.text();
+    let data = null;
+    try{ data = text ? JSON.parse(text) : null; }catch(_e){}
+    if(!res.ok){
+      const msg = (data && (data.message || data.error)) ? (data.message || data.error) : (text || (res.status + " " + res.statusText));
+      throw new Error(msg);
+    }
+    return data;
+  }
+
+  async function appendCsvRow({ csvPath, columns, rowMap, commitLabel }){
+    const token = requireToken();
+    const newRow = columns.map(k => csvEscape(rowMap[k] ?? "")).join(",");
+
+    const getUrl = "https://api.github.com/repos/" + encodeURIComponent(OWNER) + "/" + encodeURIComponent(REPO) +
+      "/contents/" + csvPath + "?ref=" + encodeURIComponent(BRANCH);
+
+    const data = await ghRequest(getUrl, { token });
+    const csv = b64DecodeUnicode(data.content || "");
+    const sha = data.sha;
+
+    let updated = csv;
+    if(!updated.endsWith("\n")) updated += "\n"; // ensure exactly one newline before append
+    updated += newRow; // QA behavior: don't add trailing newline
+
+    const putUrl = "https://api.github.com/repos/" + encodeURIComponent(OWNER) + "/" + encodeURIComponent(REPO) +
+      "/contents/" + csvPath;
+
+    const body = {
+      message: "Append " + commitLabel + " (" + new Date().toISOString() + ")",
+      content: b64EncodeUnicode(updated),
+      sha,
+      branch: BRANCH
+    };
+    await ghRequest(putUrl, { method:"PUT", token, body });
+  }
+
   // --- Helpers ---
   function setActiveView(view){
     const isIndex = view === 'index';
@@ -342,31 +429,100 @@ if(idxState) idxState.addEventListener('change', scheduleGeocode);
   });
 
   // Submit stubs – keep behavior: clear on success
-  async function fakeCommit(){
-    // This is intentionally a stub; you said we'll wire INDEX creation later.
-    // Return true to simulate success.
-    return true;
+  /* fakeCommit removed: real GitHub commit now wired */
+
+  
+  function hint(msg, status){
+    if(!tokenHint) return;
+    tokenHint.textContent = msg || "";
+    tokenHint.setAttribute('data-status', status || "");
   }
 
-  eventForm.addEventListener('submit', async (e) => {
+  function v(form, name){
+    const el = form.querySelector(`[name="${name}"]`);
+    return (el && typeof el.value === "string") ? el.value.trim() : "";
+  }
+
+  function format12Time(hhmm){
+    const v = (hhmm || '').trim();
+    const m = v.match(/^(\d{2}):(\d{2})$/);
+    if(!m) return '';
+    let hh = Number(m[1]);
+    const mm = m[2];
+    const ampm = hh >= 12 ? 'PM' : 'AM';
+    hh = hh % 12; if(hh === 0) hh = 12;
+    return `${hh}:${mm} ${ampm}`;
+  }
+
+eventForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const ok = await fakeCommit();
-    if(ok){
+
+    // Map to the same CSV shape as QA: EVENT=type, FOR=name
+    const rowMap = {
+      EVENT: v(eventForm, "TYPE"),
+      FOR: v(eventForm, "EVENT"),
+      WHERE: v(eventForm, "WHERE"),
+      CITY: v(eventForm, "CITY"),
+      STATE: v(eventForm, "STATE"),
+      DAY: (eventForm.querySelector('[name="DAY"]')?.value || '').trim(),
+      DATE: v(eventForm, "DATE"),
+      CREATED: (eventForm.querySelector('[name="CREATED"]')?.value || '').trim(),
+    };
+
+    try{
+      hint("Appending + committing…", "busy");
+      await appendCsvRow({
+        csvPath: EVENT_CSV_PATH,
+        columns: EVENT_CSV_COLUMNS,
+        rowMap,
+        commitLabel: "event row"
+      });
+      hint("✅ Commit succeeded.", "ok");
+
       eventForm.reset();
       setCreatedDate(eventForm);
       dayInput.value = '';
+    }catch(err){
+      hint("❌ Commit failed: " + (err?.message || err), "fail");
     }
   });
 
   indexForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const ok = await fakeCommit();
-    if(ok){
+
+    const satRaw = (indexForm.querySelector('input.adminTimeNative[name="SAT"]')?.value || '').trim();
+    const sunRaw = (indexForm.querySelector('input.adminTimeNative[name="SUN"]')?.value || '').trim();
+
+    const rowMap = {
+      NAME: v(indexForm, "NAME"),
+      IG: v(indexForm, "IG"),
+      CITY: v(indexForm, "CITY"),
+      STATE: v(indexForm, "STATE"),
+      SAT: satRaw ? format12Time(satRaw) : "",
+      SUN: sunRaw ? format12Time(sunRaw) : "",
+      OTA: v(indexForm, "OTA"),
+      LON: v(indexForm, "LON"),
+      LAT: v(indexForm, "LAT"),
+      CREATED: (indexForm.querySelector('[name="CREATED"]')?.value || '').trim(),
+    };
+
+    try{
+      hint("Appending + committing…", "busy");
+      await appendCsvRow({
+        csvPath: INDEX_CSV_PATH,
+        columns: INDEX_CSV_COLUMNS,
+        rowMap,
+        commitLabel: "index row"
+      });
+      hint("✅ Commit succeeded.", "ok");
+
       indexForm.reset();
       setCreatedDate(indexForm);
-          // clear OPENS display fields after reset
+      // clear OPENS display fields after reset
       const _opensDisplays2 = Array.from(indexForm.querySelectorAll('input.adminTimeDisplay'));
       _opensDisplays2.forEach(el => el.value = '');
-}
+    }catch(err){
+      hint("❌ Commit failed: " + (err?.message || err), "fail");
+    }
   });
 })();
