@@ -26,14 +26,14 @@
       z-index: 50;
     }
 
-    /* Token status: break the bullet mask with a clean white pill behind the status text */
+    /* Token status: overlay inside the token pill (background matches the pill so it blends) */
     .adminTokenPill{ position: relative; }
     .adminTokenStatus{
       position: absolute;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      background: #fff;
+      background: rgba(255,255,255,0.95);
       padding: 0 10px;
       border-radius: 999px;
       line-height: 1.8;
@@ -42,6 +42,7 @@
       pointer-events: none;
       white-space: nowrap;
     }
+
 
     /* Force date input to match other field widths (mobile browsers can oversize type=date) */
     .adminGrid .adminInput,
@@ -128,10 +129,10 @@
             <form id="eventForm" class="adminForm" autocomplete="off">
               <div class="adminGrid">
                 <label class="adminLabel">FOR<span class="req">*</span></label>
-                <input class="adminInput" name="EVENT" required placeholder="Event name" />
+                <input class="adminInput" name="FOR" required placeholder="Event name" />
 
                 <label class="adminLabel">EVENT<span class="req">*</span></label>
-                <select class="adminSelect" name="TYPE" required>
+                <select class="adminSelect" name="EVENT" id="eventTypeSelect" required>
                   <option value="">Select…</option>
                   <option>Seminar</option>
                   <option>Open Mat</option>
@@ -249,13 +250,22 @@
     (function(){
       function setStickyTop(){
         var header = document.getElementById("header");
+        var filters = document.getElementById("adminFilters");
         if(!header) return;
+
         var h = header.getBoundingClientRect().height;
         document.documentElement.style.setProperty("--adminStickyTop", h + "px");
+        document.documentElement.style.setProperty("--adminHeaderH", h + "px");
+
+        if(filters){
+          var fh = filters.getBoundingClientRect().height;
+          document.documentElement.style.setProperty("--adminFiltersH", fh + "px");
+        }
       }
       window.addEventListener("load", setStickyTop);
       window.addEventListener("resize", setStickyTop);
     })();
+
   </script>
 </body>
 </html>
