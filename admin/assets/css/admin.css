@@ -122,9 +122,21 @@
 
 /* Make the date input match other fields on mobile (some browsers give date inputs a larger min-width) */
 .adminInput[type="date"]{
+  /* iOS Safari can give date inputs an intrinsic min width that overflows the grid */
+  width: 100%;
   max-width: 100%;
   min-width: 0;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  inline-size: 100%;
+  display: block;
   box-sizing: border-box;
+  overflow: hidden;
+}
+
+@media (max-width: 760px){
+  /* extra guard for iOS: force the date field to obey the same sizing as other inputs */
+  .adminInput[type="date"]{ width: 100% !important; }
 }
 
 
