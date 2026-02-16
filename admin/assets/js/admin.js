@@ -506,6 +506,23 @@ if(idxState) idxState.addEventListener('change', scheduleGeocode);
     return s;
   }
 
+  // Normalize directory open times:
+  // <input type="time"> returns "HH:MM" (24h). Directory CSV expects "h:MMAM/PM" (e.g., 5:13PM).
+  function normalizeDirectoryTime(val){
+    const s = (val || '').trim();
+    if(!s) return '';
+    // Already has AM/PM (any case) -> leave as-is but normalize casing and remove spaces
+    if(/[ap]m\b/i.test(s)) return s.replace(/\s+/g,'').toUpperCase();
+    const m = s.match(/^([0-9]{1,2}):([0-9]{2})$/);
+    if(!m) return s;
+    let hh = parseInt(m[1], 10);
+    const mm = m[2];
+    const ampm = hh >= 12 ? 'PM' : 'AM';
+    hh = hh % 12;
+    if(hh === 0) hh = 12;
+    return `${hh}:${mm}${ampm}`;
+  }
+
   function computeDay(str){
     const s = (str || '').trim();
 
@@ -626,6 +643,13 @@ if(idxState) idxState.addEventListener('change', scheduleGeocode);
     if(form && form.id === 'eventForm' && map.DATE){
       map.DATE = normalizeEventDate(map.DATE);
       if(!map.DAY) map.DAY = computeDay(map.DATE);
+    }
+
+
+    // Normalize directory open times (SAT/SUN) to match existing directory.csv format
+    if(form && form.id === 'indexForm'){
+      if('SAT' in map) map.SAT = normalizeDirectoryTime(map.SAT);
+      if('SUN' in map) map.SUN = normalizeDirectoryTime(map.SUN);
     }
 
     // If file is empty/no header, fall back to form keys order.
