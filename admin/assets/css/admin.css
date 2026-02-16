@@ -472,3 +472,28 @@
   background: #fff !important;
   color: rgba(0,0,0,0.75) !important;
 }
+
+
+/* Autocomplete (custom – replaces <datalist> so suggestions don't cover the field on mobile) */
+.acMenu{
+  position: absolute;
+  z-index: 9999;
+  background: var(--row);
+  border: 1px solid rgba(0,0,0,0.10);
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.18);
+  max-height: 220px;
+  overflow: auto;
+  padding: 6px;
+}
+
+.acItem{
+  padding: 9px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.acItem:hover{
+  background: rgba(0,0,0,0.06);
+}
