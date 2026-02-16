@@ -380,3 +380,29 @@
     padding-bottom: 8px;
   }
 }
+
+/* --- iOS date input width fix ---
+   iOS Safari sometimes renders <input type="date"> wider than its container.
+   Wrap it and clip overflow so it visually matches all other fields. */
+.adminDateWrap{
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: #fff;
+}
+/* Move the border to the wrapper so the native control can't expand the box */
+.adminDateWrap .adminDateInput{
+  border: 0;
+  background: transparent;
+  border-radius: 0;
+
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  display: block;
+}
