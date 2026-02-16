@@ -101,20 +101,21 @@
   color: var(--green);
   font-weight: 900;
 }
-.adminTokenHint{
-  margin-left: 6px;
-  color: rgba(255,255,255,0.80);
+.adminTokenStatus{
+  margin-left: 8px;
+  color: rgba(0,0,0,0.45);
   font-size: 13px;
   white-space: nowrap;
 }
 
-/* Status colors (APPROVED / FAILED) */
-.adminTokenHint[data-status="APPROVED"]{ color: rgba(255,255,255,0.95); }
-.adminTokenHint[data-status="FAILED"]{ color: rgba(255,230,230,0.95); }
+
+/* Status text (APPROVED / FAILED) lives inside the pill; keep helper-grey. */
+.adminTokenStatus[data-status="APPROVED"]{ color: rgba(0,0,0,0.45); }
+.adminTokenStatus[data-status="FAILED"]{ color: rgba(0,0,0,0.45); }
 
 @media (max-width: 760px){
   /* Keep it visible on mobile, but short + non-wrapping */
-  .adminTokenHint{ display:inline; font-size: 12px; max-width: 92px; overflow:hidden; text-overflow: ellipsis; }
+  .adminTokenStatus{ display:inline; font-size: 12px; max-width: 92px; overflow:hidden; text-overflow: ellipsis; }
 }
 
 /* Pager (horizontal, like your main view toggle behavior) */
