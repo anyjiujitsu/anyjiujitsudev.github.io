@@ -24,9 +24,21 @@
 
   function setTokenStatus(status){
     if(!tokenStatus) return;
-    tokenStatus.textContent = status;
-    tokenStatus.setAttribute('data-status', status);
+    tokenStatus.textContent = status || '';
+    if(status){
+      tokenStatus.setAttribute('data-status', status);
+      tokenStatus.classList.add('isVisible');
+    }else{
+      tokenStatus.removeAttribute('data-status');
+      tokenStatus.classList.remove('isVisible');
+    }
   }
+
+  // Hide the status while user is editing the token; show again on blur.
+  tokenInput.addEventListener('focus', () => tokenStatus && tokenStatus.classList.remove('isVisible'));
+  tokenInput.addEventListener('blur', () => {
+    if(tokenStatus && tokenStatus.textContent.trim()) tokenStatus.classList.add('isVisible');
+  });
 
   async function validateAndStoreToken(){
     const t = (tokenInput.value || '').trim();
