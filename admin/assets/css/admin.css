@@ -497,3 +497,35 @@
 .acItem:hover{
   background: rgba(0,0,0,0.06);
 }
+
+/* =========================
+   MOBILE SCALE POLISH
+   - Slightly smaller card + contents on mobile
+   - Buttons scaled down a bit more than the rest
+   ========================= */
+@media (max-width: 520px){
+  /* overall card/content scale (done via spacing + type, not transform) */
+  .adminCardHeader{ padding: 14px 16px; font-size: 11px; }
+  .adminForm{ padding: 14px; }
+  .adminGrid{ gap: 8px 12px; }
+
+  .adminLabel{ font-size: 10px; }
+
+  .adminInput, .adminSelect{
+    padding: 10px 12px;
+    font-size: 13px;
+    border-radius: 12px;
+  }
+
+  /* keep time inputs consistent */
+  .adminInput[type="time"]{ padding: 10px 12px; font-size: 13px; }
+
+  .adminNote{ margin-top: 8px; font-size: 11px; }
+
+  /* buttons: slightly smaller than fields */
+  .adminActions{ gap: 10px; margin-top: 14px; }
+  .adminActionBtn{
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+}
