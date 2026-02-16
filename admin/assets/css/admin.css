@@ -462,3 +462,10 @@
   background-position: center;
   background-size: 14px 14px;
 }
+
+
+/* Ensure SAT/SUN display fields do NOT inherit readonly grey */
+.adminTimeDisplay{
+  background: #fff !important;
+  color: rgba(0,0,0,0.75) !important;
+}
