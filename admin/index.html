@@ -75,13 +75,15 @@
               <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
+
+          <!-- Status INSIDE the token pill (requested): APPROVED / FAILED -->
+          <span class="adminTokenStatus" id="tokenStatus" aria-live="polite"></span>
         </div>
 
         <!-- Use the same "apply" button style as the ZIP distance dropdown on the main site -->
         <button id="saveToken" class="distance__apply" type="button" aria-label="Save token" title="Save token">➜</button>
 
-        <!-- Status lives INSIDE the token bar (requested): APPROVED / FAILED -->
-        <span class="adminTokenStatus" id="tokenStatus" aria-live="polite"></span>
+        <!-- status lives inside .adminTokenPill -->
       </div>
     </section>
 
