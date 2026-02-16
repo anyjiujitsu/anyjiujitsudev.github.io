@@ -199,20 +199,55 @@
     return out;
   }
 
-  function attachDatalist(input, allValues, listId){
+  
+  function attachAutocomplete(input, allValues){
     if(!input) return;
-    let dl = document.getElementById(listId);
-    if(!dl){
-      dl = document.createElement('datalist');
-      dl.id = listId;
-      document.body.appendChild(dl);
-    }
-    input.setAttribute('list', listId);
 
-    function buildOptions(query){
+    // Custom dropdown to avoid native <datalist> (which can cover the field on mobile).
+    let menu = null;
+    let hideTimer = null;
+
+    function ensureMenu(){
+      if(menu) return menu;
+      menu = document.createElement('div');
+      menu.className = 'acMenu';
+      menu.style.display = 'none';
+      document.body.appendChild(menu);
+
+      // Prevent input blur from immediately killing clicks.
+      menu.addEventListener('mousedown', (e) => e.preventDefault());
+      menu.addEventListener('click', (e) => {
+        const item = e.target.closest('[data-ac-value]');
+        if(!item) return;
+        input.value = item.getAttribute('data-ac-value') || '';
+        closeMenu();
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+
+      return menu;
+    }
+
+    function closeMenu(){
+      if(!menu) return;
+      menu.style.display = 'none';
+      menu.innerHTML = '';
+    }
+
+    function positionMenu(){
+      if(!menu || menu.style.display === 'none') return;
+      const r = input.getBoundingClientRect();
+      const top = r.bottom + window.scrollY + 4;
+      const left = r.left + window.scrollX;
+      menu.style.top = top + 'px';
+      menu.style.left = left + 'px';
+      menu.style.width = r.width + 'px';
+    }
+
+    function buildList(query){
       const q = String(query ?? '').trim().toLowerCase();
       const starts = [];
       const contains = [];
+
       for(const v of allValues){
         const lv = v.toLowerCase();
         if(!q){
@@ -224,19 +259,39 @@
         }
         if(starts.length >= 20 && contains.length >= 20) break;
       }
-      const list = q ? starts.concat(contains) : starts;
-      const limited = list.slice(0, 30);
 
+      const list = (q ? starts.concat(contains) : starts).slice(0, 30);
+      const dl = ensureMenu();
       dl.innerHTML = '';
-      limited.forEach(v => {
-        const opt = document.createElement('option');
-        opt.value = v;
-        dl.appendChild(opt);
+
+      if(!list.length){
+        closeMenu();
+        return;
+      }
+
+      list.forEach(v => {
+        const div = document.createElement('div');
+        div.className = 'acItem';
+        div.setAttribute('data-ac-value', v);
+        div.textContent = v;
+        dl.appendChild(div);
       });
+
+      dl.style.display = 'block';
+      positionMenu();
     }
 
-    input.addEventListener('input', () => buildOptions(input.value));
-    input.addEventListener('focus', () => buildOptions(input.value));
+    function scheduleClose(){
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(closeMenu, 120);
+    }
+
+    input.addEventListener('input', () => buildList(input.value));
+    input.addEventListener('focus', () => buildList(input.value));
+    input.addEventListener('blur', scheduleClose);
+
+    window.addEventListener('scroll', positionMenu, true);
+    window.addEventListener('resize', positionMenu);
   }
 
   async function loadWhereCitySuggestions(){
@@ -267,10 +322,10 @@
 
       // Attach to all matching inputs (events + index forms)
       document.querySelectorAll('input[name="WHERE"]').forEach(inp => {
-        attachDatalist(inp, whereUnique, 'anyjjWhereDatalist');
+        attachAutocomplete(inp, whereUnique);
       });
       document.querySelectorAll('input[name="CITY"]').forEach(inp => {
-        attachDatalist(inp, cityUnique, 'anyjjCityDatalist');
+        attachAutocomplete(inp, cityUnique);
       });
     }catch(_e){
       // silent fail — admin still works without suggestions
