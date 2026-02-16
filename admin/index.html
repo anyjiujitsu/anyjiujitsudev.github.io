@@ -154,7 +154,10 @@
                 </select>
 
                 <label class="adminLabel">DATE<span class="req">*</span></label>
-                <input class="adminInput" type="date" name="DATE" required aria-label="Event date" />
+                <!-- iOS Safari can oversize native date inputs; wrap + clip to keep width uniform -->
+                <div class="adminDateWrap" aria-label="Event date">
+                  <input class="adminInput adminDateInput" type="date" name="DATE" required />
+                </div>
 
                 <label class="adminLabel">DAY</label>
                 <input class="adminInput" name="DAY" placeholder="Auto from date" readonly />
