@@ -48,6 +48,8 @@
   outline: none;
   background: transparent;
   width: 220px;
+  flex: 1 1 auto;
+  min-width: 0;
   font-size: 16px; /* prevents iOS zoom */  padding: 0;
   line-height: 1;
 }
@@ -106,6 +108,13 @@
   color: rgba(0,0,0,0.45);
   font-size: 13px;
   white-space: nowrap;
+}
+
+/* Make the date input match other fields on mobile (some browsers give date inputs a larger min-width) */
+.adminInput[type="date"]{
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 
