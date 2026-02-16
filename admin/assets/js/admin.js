@@ -15,7 +15,7 @@
   const tokenInput = document.getElementById('ghToken');
   const saveBtn = document.getElementById('saveToken');
   const eyeBtn = document.getElementById('toggleToken');
-  const tokenHint = document.getElementById('tokenHint');
+  const tokenStatus = document.getElementById('tokenStatus');
 
   // --- Token: load/save ---
   const TOKEN_KEY = 'anyjj_admin_github_token';
@@ -23,9 +23,9 @@
   if(saved) tokenInput.value = saved;
 
   function setTokenStatus(status){
-    if(!tokenHint) return;
-    tokenHint.textContent = status;
-    tokenHint.setAttribute('data-status', status);
+    if(!tokenStatus) return;
+    tokenStatus.textContent = status;
+    tokenStatus.setAttribute('data-status', status);
   }
 
   async function validateAndStoreToken(){
@@ -322,16 +322,36 @@ if(idxState) idxState.addEventListener('change', scheduleGeocode);
   // optional: auto day from date on event form
   const dateInput = eventForm.querySelector('input[name="DATE"]');
   const dayInput = eventForm.querySelector('input[name="DAY"]');
+  function normalizeEventDate(val){
+    const s = (val || '').trim();
+    // yyyy-mm-dd (from <input type="date">) -> mm/dd/yyyy
+    const iso = s.match(/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/);
+    if(iso) return `${Number(iso[2])}/${Number(iso[3])}/${iso[1]}`;
+    // already mm/dd/yyyy (or user-typed)
+    return s;
+  }
+
   function computeDay(str){
-    // expects mm/dd/yyyy
-    const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    if(!m) return '';
-    const dt = new Date(Number(m[3]), Number(m[1])-1, Number(m[2]));
+    const s = (str || '').trim();
+
+    // mm/dd/yyyy
+    let m = s.match(/^([0-9]{1,2})\/([0-9]{1,2})\/([0-9]{4})$/);
+    let dt = null;
+    if(m){
+      dt = new Date(Number(m[3]), Number(m[1]) - 1, Number(m[2]));
+    }else{
+      // yyyy-mm-dd
+      m = s.match(/^([0-9]{4})-([0-9]{2})-([0-9]{2})$/);
+      if(m) dt = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    }
+
+    if(!dt || isNaN(dt.getTime())) return '';
     const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     return days[dt.getDay()] || '';
   }
+
   dateInput.addEventListener('input', () => {
-    dayInput.value = computeDay(dateInput.value.trim());
+    dayInput.value = computeDay(dateInput.value);
   });
 
   // Clear buttons
@@ -426,6 +446,12 @@ if(idxState) idxState.addEventListener('change', scheduleGeocode);
     const fd = new FormData(form);
     const map = {};
     for(const [k,v] of fd.entries()) map[k] = (v ?? '').toString().trim();
+
+    // Normalize event date (native date picker returns yyyy-mm-dd)
+    if(form && form.id === 'eventForm' && map.DATE){
+      map.DATE = normalizeEventDate(map.DATE);
+      if(!map.DAY) map.DAY = computeDay(map.DATE);
+    }
 
     // If file is empty/no header, fall back to form keys order.
     const cols = columns.filter(Boolean);
