@@ -150,7 +150,7 @@
 }
 
 /* Pager (horizontal, like your main view toggle behavior) */
-.adminContent{ padding: 22px 0 80px; }
+.adminContent{ padding: 22px 0 120px; overflow: visible; }
 .adminPager{
   display: grid;
   grid-auto-flow: column;
@@ -239,13 +239,6 @@
   -webkit-text-fill-color: rgba(0,0,0,0.75);
 }
 
-/* Put a subtle arrow inside SUBMIT buttons, in a lighter grey (matches site vibe) */
-.adminActionBtn[type="submit"]::after{
-  content: "âžœ";
-  display: inline-block;
-  margin-left: 10px;
-  color: rgba(0,0,0,0.35);
-}
 .adminNote{
   margin-top: 10px;
   font-size: 12px;
@@ -446,3 +439,25 @@
 
 /* Hide note line under Index tile to tighten spacing */
 .adminNote{ display: none; }
+
+/* ===============================
+   Shadow breathing room / prevent clipping
+   =============================== */
+.adminPager{ overflow-y: visible; }
+.adminPage{ overflow: visible; padding-bottom: 40px; }
+
+/* Submit icon: SVG (prevents unicode arrow glitches) */
+.adminActionBtn[type="submit"]{ position: relative; }
+.adminActionBtn[type="submit"]::after{
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-left: 10px;
+  vertical-align: -2px;
+  opacity: 0.55;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23666' d='M13.5 5l-1.4 1.4 4.6 4.6H4v2h12.7l-4.6 4.6L13.5 19 21 12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 14px 14px;
+}
