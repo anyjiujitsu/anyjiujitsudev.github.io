@@ -80,7 +80,8 @@
         <!-- Use the same "apply" button style as the ZIP distance dropdown on the main site -->
         <button id="saveToken" class="distance__apply" type="button" aria-label="Save token" title="Save token">➜</button>
 
-        <span class="adminTokenHint" id="tokenHint">Token is stored locally (LocalStorage) after you tap Save.</span>
+        <!-- Status lives INSIDE the token bar (requested): APPROVED / FAILED -->
+        <span class="adminTokenStatus" id="tokenStatus" aria-live="polite"></span>
       </div>
     </section>
 
@@ -121,7 +122,7 @@
                 </select>
 
                 <label class="adminLabel">DATE<span class="req">*</span></label>
-                <input class="adminInput" name="DATE" required placeholder="mm/dd/yyyy" />
+                <input class="adminInput" type="date" name="DATE" required aria-label="Event date" />
 
                 <label class="adminLabel">DAY</label>
                 <input class="adminInput" name="DAY" placeholder="Auto from date" disabled />
