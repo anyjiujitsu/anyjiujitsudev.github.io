@@ -76,7 +76,7 @@
             </svg>
           </button>
 
-          <!-- Status INSIDE the token pill (requested): APPROVED / FAILED -->
+          <!-- Status overlay INSIDE the token input area (requested) -->
           <span class="adminTokenStatus" id="tokenStatus" aria-live="polite"></span>
         </div>
 
@@ -127,10 +127,10 @@
                 <input class="adminInput" type="date" name="DATE" required aria-label="Event date" />
 
                 <label class="adminLabel">DAY</label>
-                <input class="adminInput" name="DAY" placeholder="Auto from date" disabled />
+                <input class="adminInput" name="DAY" placeholder="Auto from date" readonly />
 
                 <label class="adminLabel">CREATED</label>
-                <input class="adminInput" name="CREATED" disabled />
+                <input class="adminInput" name="CREATED" readonly />
               </div>
 
               <div class="adminActions">
