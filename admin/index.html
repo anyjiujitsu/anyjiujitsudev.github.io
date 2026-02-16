@@ -157,6 +157,7 @@
                 <!-- iOS Safari can oversize native date inputs; wrap + clip to keep width uniform -->
                 <div class="adminDateWrap" aria-label="Event date">
                   <input class="adminInput adminDateInput" type="date" name="DATE" required />
+                  <span class="adminFieldIcon adminCalIcon" aria-hidden="true"></span>
                 </div>
 
                 <label class="adminLabel">DAY</label>
@@ -200,10 +201,12 @@
 <div class="adminLatLonRow adminOpensRow" aria-label="Open mat times">
   <div class="adminTimeCell">
     <input class="adminInput adminTimeDisplay" type="text" placeholder="Sat" aria-label="Sat (display)" readonly />
+    <span class="adminFieldIcon adminClockIcon" aria-hidden="true"></span>
     <input class="adminInput adminTimeNative" type="time" name="SAT" aria-label="Sat" />
   </div>
   <div class="adminTimeCell">
     <input class="adminInput adminTimeDisplay" type="text" placeholder="Sun" aria-label="Sun (display)" readonly />
+    <span class="adminFieldIcon adminClockIcon" aria-hidden="true"></span>
     <input class="adminInput adminTimeNative" type="time" name="SUN" aria-label="Sun" />
   </div>
 </div>
