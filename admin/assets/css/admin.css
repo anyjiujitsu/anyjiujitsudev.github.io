@@ -107,8 +107,14 @@
   font-size: 13px;
   white-space: nowrap;
 }
+
+/* Status colors (APPROVED / FAILED) */
+.adminTokenHint[data-status="APPROVED"]{ color: rgba(255,255,255,0.95); }
+.adminTokenHint[data-status="FAILED"]{ color: rgba(255,230,230,0.95); }
+
 @media (max-width: 760px){
-  .adminTokenHint{ display:none; }
+  /* Keep it visible on mobile, but short + non-wrapping */
+  .adminTokenHint{ display:inline; font-size: 12px; max-width: 92px; overflow:hidden; text-overflow: ellipsis; }
 }
 
 /* Pager (horizontal, like your main view toggle behavior) */
