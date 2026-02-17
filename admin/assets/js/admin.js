@@ -728,8 +728,13 @@ if(idxState) idxState.addEventListener('change', scheduleGeocode);
     const { row, finalCols, hasHeader } = buildRowFromForm(csvText, form);
     const nowIso = new Date().toISOString();
     const header = hasHeader ? '' : (finalCols.join(',') + '\n');
-    const base = (csvText || '').trimEnd();
-    const updated = (base ? base + '\n' : header) + row + '\n';
+
+    // Normalize line endings and ensure we append exactly ONE new row without creating blank lines.
+    // (Some environments can end up with extra trailing newlines; GitHub then shows a blank row.)
+    const normalized = String(csvText || '').replace(/\r\n?/g, '\n');
+    const base = normalized.replace(/\n+$/g, '');
+    const prefix = base ? (base + '\n') : header;
+    const updated = prefix + row + '\n';
 
     // write
     const body = {
