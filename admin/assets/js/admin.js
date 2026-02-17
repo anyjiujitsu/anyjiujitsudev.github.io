@@ -727,14 +727,29 @@ if(idxState) idxState.addEventListener('change', scheduleGeocode);
     // append
     const { row, finalCols, hasHeader } = buildRowFromForm(csvText, form);
     const nowIso = new Date().toISOString();
-    const header = hasHeader ? '' : (finalCols.join(',') + '\n');
+    const header = hasHeader ? '' : (finalCols.join(',') + '
+');
 
-    // Normalize line endings and ensure we append exactly ONE new row without creating blank lines.
-    // (Some environments can end up with extra trailing newlines; GitHub then shows a blank row.)
-    const normalized = String(csvText || '').replace(/\r\n?/g, '\n');
-    const base = normalized.replace(/\n+$/g, '');
-    const prefix = base ? (base + '\n') : header;
-    const updated = prefix + row + '\n';
+    // Normalize to LF, remove ANY completely blank lines (prevents GitHub editor "empty rows"),
+    // then append exactly one row.
+    const normalized = String(csvText || '').replace(/
+?/g, '
+');
+    const nonBlankLines = normalized
+      .split('
+')
+      .filter(l => l.trim().length); // keep only non-empty lines
+
+    const base = nonBlankLines.join('
+').trimEnd();
+
+    if(!row || !row.trim()){
+      throw new Error('Refusing to append empty CSV row');
+    }
+
+    const updated = (base ? base + '
+' : header) + row + '
+';
 
     // write
     const body = {
