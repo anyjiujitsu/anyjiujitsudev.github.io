@@ -732,7 +732,9 @@ if(idxState) idxState.addEventListener('change', scheduleGeocode);
 
     // Normalize to LF, remove ANY completely blank lines (prevents GitHub editor "empty rows"),
     // then append exactly one row.
-    const normalized = String(csvText || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    const normalized = String(csvText || '').replace(/
+?/g, '
+');
     const nonBlankLines = normalized
       .split('
 ')
