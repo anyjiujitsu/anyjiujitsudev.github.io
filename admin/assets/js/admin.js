@@ -87,17 +87,21 @@ if(!pager || !toggle || !tabs.length){
 
   function clamp01(n){ return Math.max(0, Math.min(1, n)); }
 
-  function pageWidth(){ return pager.clientWidth || 1; }
+  // IMPORTANT: do NOT assume each "page" equals pager.clientWidth.
+  // In this admin layout, the scroll-snap container can include padding/gaps,
+  // so the total scroll range is the reliable 0..1 domain.
+  function maxScroll(){
+    return Math.max(1, (pager.scrollWidth || 0) - (pager.clientWidth || 0));
+  }
 
   function getScrollProgress(){
-    // Two-page pager: progress is 0..1 across one viewport width.
-    const w = pageWidth();
-    return clamp01(pager.scrollLeft / w);
+    // Two-page pager: progress is 0..1 across the full scroll range.
+    return clamp01((pager.scrollLeft || 0) / maxScroll());
   }
 
   function setScrollProgress(p){
-    const w = pageWidth();
-    pager.scrollTo({ left: clamp01(p) * w, behavior: 'auto' });
+    // Direct assignment is smoother for drag scrubbing than scrollTo per move.
+    pager.scrollLeft = clamp01(p) * maxScroll();
   }
 
   function applyProgressVisual(p){
@@ -139,8 +143,8 @@ if(!pager || !toggle || !tabs.length){
 
   // Click tabs -> scroll pager (smooth).
   function scrollToView(view){
-    const idx = view === 'index' ? 1 : 0;
-    pager.scrollTo({ left: idx * pageWidth(), behavior: 'smooth' });
+    const x = (view === 'index') ? maxScroll() : 0;
+    pager.scrollTo({ left: x, behavior: 'smooth' });
   }
   toggle.addEventListener('click', (e) => {
     // Prevent click-after-drag.
@@ -176,8 +180,9 @@ if(!pager || !toggle || !tabs.length){
       th
     };
 
-    toggle.setPointerCapture?.(e.pointerId);
-    e.preventDefault();
+    // Do NOT preventDefault here.
+    // On desktop this suppresses the subsequent click, making tabs unclickable.
+    // We'll only capture/prevent once the user actually drags.
   }
 
   function pointerMove(e){
@@ -190,12 +195,18 @@ if(!pager || !toggle || !tabs.length){
     const p = clamp01(drag.startP + dp);
 
     // Mark as drag once we cross a small threshold.
-    if(Math.abs(dx) > 6) toggle.__didDrag = true;
+    // Only then do we capture/prevent so clicks still work.
+    if(Math.abs(dx) > 6){
+      if(!toggle.__didDrag){
+        toggle.__didDrag = true;
+        toggle.setPointerCapture?.(e.pointerId);
+      }
+      e.preventDefault();
+    }
 
     applyProgressVisual(p);
     setScrollProgress(p);
     updateSelectedAndTitleFromProgress(p);
-    e.preventDefault();
   }
 
   function pointerUp(e){
@@ -204,11 +215,13 @@ if(!pager || !toggle || !tabs.length){
     // Snap to nearest view on release.
     const p = getScrollProgress();
     const snapped = (p >= 0.5) ? 1 : 0;
-    pager.scrollTo({ left: snapped * pageWidth(), behavior: 'smooth' });
+    pager.scrollTo({ left: snapped ? maxScroll() : 0, behavior: 'smooth' });
 
     drag = null;
     try{ toggle.releasePointerCapture?.(e.pointerId); }catch(_e){}
-    e.preventDefault();
+
+    // Only suppress default if we actually dragged; otherwise allow normal click.
+    if(toggle.__didDrag) e.preventDefault();
   }
 
   // Attach drag handlers on the whole toggle (better UX than thumb-only).
