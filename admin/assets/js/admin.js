@@ -78,136 +78,146 @@
     eyeBtn.setAttribute('aria-label', isPw ? 'Hide token' : 'Show token');
   });
 
-  // --- Helpers ---
-  function setActiveView(view){
-    const isIndex = view === 'index';
-    tabs.forEach(btn => btn.setAttribute('aria-selected', String(btn.dataset.view === view)));
+// --- Helpers ---
+const clamp01 = (n) => Math.max(0, Math.min(1, n));
 
-    titleEl.textContent = isIndex ? 'INDEX – ADD NEW (DEV)' : 'EVENTS – ADD NEW (DEV)';
+let currentView = 'events'; // 'events' | 'index'
+function setActiveView(view){
+  if(view !== 'events' && view !== 'index') return;
+  if(view === currentView) return;
+  currentView = view;
+
+  tabs.forEach(btn => btn.setAttribute('aria-selected', String(btn.dataset.view === view)));
+  titleEl.textContent = (view === 'index')
+    ? 'INDEX – ADD NEW (DEV)'
+    : 'EVENTS – ADD NEW (DEV)';
+}
+
+function setViewProgress(progress){
+  toggle.style.setProperty('--viewProgress', String(clamp01(progress)));
+}
+
+function scrollToView(view){
+  const idx = view === 'index' ? 1 : 0;
+  const x = idx * pager.clientWidth;
+  pager.scrollTo({ left: x, behavior: 'smooth' });
+}
+
+// --- Toggle click (tap on tabs) ---
+let suppressNextClick = false;
+toggle.addEventListener('click', (e) => {
+  if(suppressNextClick){
+    suppressNextClick = false;
+    return;
   }
+  const btn = e.target.closest('.viewToggle__tab');
+  if(!btn) return;
+  scrollToView(btn.dataset.view);
+});
 
-  function scrollToView(view){
-    const idx = view === 'index' ? 1 : 0;
-    const x = idx * pager.clientWidth;
-    pager.scrollTo({ left: x, behavior: 'smooth' });
-  }
+// --- Toggle drag (slide thumb) ---
+// Enables dragging anywhere on the toggle to switch views.
+// Keeps it smooth by writing --viewProgress during drag and snapping on release.
+toggle.style.touchAction = 'none';
 
-  // --- Toggle click ---
-  toggle.addEventListener('click', (e) => {
-    const btn = e.target.closest('.viewToggle__tab');
-    if(!btn) return;
-    scrollToView(btn.dataset.view);
-  });
-  // --- Toggle drag (pointer) ---
-  // Allows sliding the toggle thumb to change views, and keeps it in sync with swipes.
-  let drag = { active:false, pointerId:null, startX:0, startProgress:0, rect:null, moved:false };
+const drag = {
+  active: false,
+  pointerId: null,
+  startX: 0,
+  lastX: 0,
+  moved: 0,
+  lastProgress: 0
+};
 
-  function clamp01(n){ return Math.max(0, Math.min(1, n)); }
+function getProgressFromPager(){
+  const w = pager.clientWidth || 1;
+  return clamp01(pager.scrollLeft / w);
+}
 
-  function progressFromClientX(clientX, rect){
-    const r = rect || toggle.getBoundingClientRect();
-    const x = (clientX - r.left) / (r.width || 1);
-    return clamp01(x);
-  }
+function getProgressFromPointer(clientX){
+  const r = toggle.getBoundingClientRect();
+  const x = clientX - r.left;
+  return clamp01(x / (r.width || 1));
+}
 
-  function setProgressAndScroll(progress){
-    const p = clamp01(progress);
-    toggle.style.setProperty('--viewProgress', p);
-    pager.scrollLeft = p * pager.clientWidth;
-  }
+toggle.addEventListener('pointerdown', (e) => {
+  // Only left-click for mouse; touch/pen are fine.
+  if(e.pointerType === 'mouse' && e.button !== 0) return;
 
-  function endDragAndSnap(){
-    if(!drag.active) return;
-    drag.active = false;
-    drag.pointerId = null;
+  drag.active = true;
+  drag.pointerId = e.pointerId;
+  drag.startX = e.clientX;
+  drag.lastX = e.clientX;
+  drag.moved = 0;
+  drag.lastProgress = getProgressFromPager();
 
-    const w = pager.clientWidth || 1;
-    const progress = clamp01(pager.scrollLeft / w);
-    const targetView = progress > 0.5 ? 'index' : 'events';
+  try{ toggle.setPointerCapture(e.pointerId); }catch(_e){}
+  // Start controlling progress immediately
+  drag.lastProgress = getProgressFromPointer(e.clientX);
+  setViewProgress(drag.lastProgress);
 
-    currentView = targetView;
-    setActiveView(targetView);
-    scrollToView(targetView);
-  }
+  // Prevent the browser from treating this as a scroll gesture.
+  e.preventDefault();
+});
 
-  toggle.addEventListener('pointerdown', (e) => {
-    // Ignore non-primary mouse buttons.
-    if(e.pointerType === 'mouse' && e.button !== 0) return;
+toggle.addEventListener('pointermove', (e) => {
+  if(!drag.active || e.pointerId !== drag.pointerId) return;
 
-    drag.active = true;
-    drag.pointerId = e.pointerId;
-    drag.startX = e.clientX;
-    drag.rect = toggle.getBoundingClientRect();
+  drag.lastX = e.clientX;
+  drag.moved = Math.max(drag.moved, Math.abs(drag.lastX - drag.startX));
 
-    const w = pager.clientWidth || 1;
-    drag.startProgress = clamp01(pager.scrollLeft / w);
-    drag.moved = false;
+  drag.lastProgress = getProgressFromPointer(e.clientX);
+  setViewProgress(drag.lastProgress);
 
-    try{ toggle.setPointerCapture(e.pointerId); }catch(_e){}
-  });
+  e.preventDefault();
+});
 
-  toggle.addEventListener('pointermove', (e) => {
-    if(!drag.active) return;
-    if(drag.pointerId !== null && e.pointerId !== drag.pointerId) return;
+function endDrag(e){
+  if(!drag.active || (e && e.pointerId !== drag.pointerId)) return;
 
-    const dx = (e.clientX - drag.startX) / (drag.rect?.width || 1);
-    if(Math.abs(dx) > 0.01) drag.moved = true;
+  // If it was essentially a tap (not a drag), snap based on which half was tapped.
+  const wasTap = drag.moved < 6;
+  const p = wasTap ? getProgressFromPointer(drag.lastX) : drag.lastProgress;
+  const target = (p > 0.5) ? 'index' : 'events';
 
-    const next = drag.startProgress + dx;
-    setProgressAndScroll(next);
+  // Prevent the click that follows pointerup from also firing toggle click logic.
+  suppressNextClick = true;
+  window.setTimeout(() => { suppressNextClick = false; }, 0);
 
-    // Prevent the page from interpreting this as a scroll while dragging the thumb.
-    e.preventDefault();
-  }, { passive: false });
+  drag.active = false;
+  drag.pointerId = null;
 
-  toggle.addEventListener('pointerup', (e) => {
-    if(!drag.active) return;
-    if(drag.pointerId !== null && e.pointerId !== drag.pointerId) return;
+  try{ toggle.releasePointerCapture(e.pointerId); }catch(_e){}
 
-    try{ toggle.releasePointerCapture(e.pointerId); }catch(_e){}
-    endDragAndSnap();
+  scrollToView(target);
+}
 
-    // If the user dragged, swallow the click that would otherwise fire after pointerup.
-    if(drag.moved){
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  });
+toggle.addEventListener('pointerup', endDrag);
+toggle.addEventListener('pointercancel', endDrag);
 
-  toggle.addEventListener('pointercancel', (e) => {
-    if(!drag.active) return;
-    if(drag.pointerId !== null && e.pointerId !== drag.pointerId) return;
-    try{ toggle.releasePointerCapture(e.pointerId); }catch(_e){}
-    endDragAndSnap();
-  });
+// --- Pager scroll sync ---
+// Source of truth: pager scroll position.
+// We update the thumb continuously, and only switch titles/tabs when crossing midpoint.
+let rafPending = false;
+function syncFromScroll(){
+  rafPending = false;
 
+  const progress = getProgressFromPager();
+  setViewProgress(progress);
 
-  // --- Pager scroll sync ---
-  let currentView = 'events';
+  const view = (progress > 0.5) ? 'index' : 'events';
+  setActiveView(view);
+}
 
-  function syncFromScroll(){
-    const w = pager.clientWidth || 1;
-    const progress = Math.max(0, Math.min(1, pager.scrollLeft / w));
+pager.addEventListener('scroll', () => {
+  if(rafPending) return;
+  rafPending = true;
+  window.requestAnimationFrame(syncFromScroll);
+}, { passive: true });
 
-    // Drive the thumb from actual scroll position.
-    toggle.style.setProperty('--viewProgress', progress);
-
-    // Snap the active state + title only when the midpoint changes.
-    const nextView = progress > 0.5 ? 'index' : 'events';
-    if(nextView !== currentView){
-      currentView = nextView;
-      setActiveView(currentView);
-    }
-  }
-
-  pager.addEventListener('scroll', () => {
-    window.requestAnimationFrame(syncFromScroll);
-  }, { passive: true });
-  }, { passive: true });
-
-  // Initialize
-  setActiveView('events');
-  syncFromScroll();
+// Initialize
+setViewProgress(getProgressFromPager());
+syncFromScroll();
 
 
   // --- CSV-powered suggestions (WHERE, CITY) ---
