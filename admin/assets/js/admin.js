@@ -82,7 +82,6 @@
   function setActiveView(view){
     const isIndex = view === 'index';
     tabs.forEach(btn => btn.setAttribute('aria-selected', String(btn.dataset.view === view)));
-    toggle.style.setProperty('--viewProgress', isIndex ? 1 : 0);
 
     titleEl.textContent = isIndex ? 'INDEX – ADD NEW (DEV)' : 'EVENTS – ADD NEW (DEV)';
   }
@@ -99,18 +98,111 @@
     if(!btn) return;
     scrollToView(btn.dataset.view);
   });
+  // --- Toggle drag (pointer) ---
+  // Allows sliding the toggle thumb to change views, and keeps it in sync with swipes.
+  let drag = { active:false, pointerId:null, startX:0, startProgress:0, rect:null, moved:false };
+
+  function clamp01(n){ return Math.max(0, Math.min(1, n)); }
+
+  function progressFromClientX(clientX, rect){
+    const r = rect || toggle.getBoundingClientRect();
+    const x = (clientX - r.left) / (r.width || 1);
+    return clamp01(x);
+  }
+
+  function setProgressAndScroll(progress){
+    const p = clamp01(progress);
+    toggle.style.setProperty('--viewProgress', p);
+    pager.scrollLeft = p * pager.clientWidth;
+  }
+
+  function endDragAndSnap(){
+    if(!drag.active) return;
+    drag.active = false;
+    drag.pointerId = null;
+
+    const w = pager.clientWidth || 1;
+    const progress = clamp01(pager.scrollLeft / w);
+    const targetView = progress > 0.5 ? 'index' : 'events';
+
+    currentView = targetView;
+    setActiveView(targetView);
+    scrollToView(targetView);
+  }
+
+  toggle.addEventListener('pointerdown', (e) => {
+    // Ignore non-primary mouse buttons.
+    if(e.pointerType === 'mouse' && e.button !== 0) return;
+
+    drag.active = true;
+    drag.pointerId = e.pointerId;
+    drag.startX = e.clientX;
+    drag.rect = toggle.getBoundingClientRect();
+
+    const w = pager.clientWidth || 1;
+    drag.startProgress = clamp01(pager.scrollLeft / w);
+    drag.moved = false;
+
+    try{ toggle.setPointerCapture(e.pointerId); }catch(_e){}
+  });
+
+  toggle.addEventListener('pointermove', (e) => {
+    if(!drag.active) return;
+    if(drag.pointerId !== null && e.pointerId !== drag.pointerId) return;
+
+    const dx = (e.clientX - drag.startX) / (drag.rect?.width || 1);
+    if(Math.abs(dx) > 0.01) drag.moved = true;
+
+    const next = drag.startProgress + dx;
+    setProgressAndScroll(next);
+
+    // Prevent the page from interpreting this as a scroll while dragging the thumb.
+    e.preventDefault();
+  }, { passive: false });
+
+  toggle.addEventListener('pointerup', (e) => {
+    if(!drag.active) return;
+    if(drag.pointerId !== null && e.pointerId !== drag.pointerId) return;
+
+    try{ toggle.releasePointerCapture(e.pointerId); }catch(_e){}
+    endDragAndSnap();
+
+    // If the user dragged, swallow the click that would otherwise fire after pointerup.
+    if(drag.moved){
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  });
+
+  toggle.addEventListener('pointercancel', (e) => {
+    if(!drag.active) return;
+    if(drag.pointerId !== null && e.pointerId !== drag.pointerId) return;
+    try{ toggle.releasePointerCapture(e.pointerId); }catch(_e){}
+    endDragAndSnap();
+  });
+
 
   // --- Pager scroll sync ---
+  let currentView = 'events';
+
   function syncFromScroll(){
     const w = pager.clientWidth || 1;
     const progress = Math.max(0, Math.min(1, pager.scrollLeft / w));
+
+    // Drive the thumb from actual scroll position.
     toggle.style.setProperty('--viewProgress', progress);
 
-    // snap title based on midpoint
-    setActiveView(progress > 0.5 ? 'index' : 'events');
+    // Snap the active state + title only when the midpoint changes.
+    const nextView = progress > 0.5 ? 'index' : 'events';
+    if(nextView !== currentView){
+      currentView = nextView;
+      setActiveView(currentView);
+    }
   }
+
   pager.addEventListener('scroll', () => {
     window.requestAnimationFrame(syncFromScroll);
+  }, { passive: true });
   }, { passive: true });
 
   // Initialize
@@ -732,9 +824,7 @@ if(idxState) idxState.addEventListener('change', scheduleGeocode);
 
     // Normalize to LF, remove ANY completely blank lines (prevents GitHub editor "empty rows"),
     // then append exactly one row.
-    const normalized = String(csvText || '').replace(/
-?/g, '
-');
+    const normalized = String(csvText || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     const nonBlankLines = normalized
       .split('
 ')
