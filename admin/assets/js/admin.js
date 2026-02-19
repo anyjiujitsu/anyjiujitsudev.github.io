@@ -83,28 +83,21 @@
 // --- Helpers ---
 const clamp01 = (n) => Math.max(0, Math.min(1, n));
 
-// Pager geometry can include padding/gaps, so the second view is not always exactly
-// `pager.clientWidth` away. We compute the true snap offsets from the direct children.
-let pageEls = [];
-let pageX0 = 0;
-let pageX1 = 0;
-
-function computePagerPages(){
-  if(!pager) return;
-  // Direct children are the snap pages in this layout.
-  pageEls = Array.from(pager.children).filter(el => el && el.nodeType === 1);
-  pageX0 = pageEls[0] ? pageEls[0].offsetLeft : 0;
-  // If the second page exists, use its offset; otherwise fall back.
-  pageX1 = pageEls[1] ? pageEls[1].offsetLeft : (pageX0 + (pager.clientWidth || 1));
-  // Guard against degenerate layouts.
-  if(pageX1 === pageX0) pageX1 = pageX0 + (pager.clientWidth || 1);
-}
-
-function getPageX(idx){
-  return (pageEls[idx] ? pageEls[idx].offsetLeft : (pageX0 + idx * (pager.clientWidth || 1)));
-}
-
 let currentView = 'events'; // 'events' | 'index'
+
+// The pager uses scroll-snap and can include padding/gaps, so the second view is not always
+// exactly `clientWidth` away. With 2 pages, the correct "INDEX" snap point is the max scroll.
+function getMaxScroll(){
+  const max = (pager.scrollWidth || 0) - (pager.clientWidth || 0);
+  // If max is 0 (layout not ready yet), avoid divide-by-zero; caller will clamp anyway.
+  return Math.max(0, max);
+}
+
+// Tabs + thumb geometry: the thumb should travel between the actual tab bounds,
+// not edge-to-edge of the toggle container (which causes overshoot when there's inset padding).
+const tabEvents = tabs.find(b => b.dataset.view === 'events') || tabs[0];
+const tabIndex  = tabs.find(b => b.dataset.view === 'index')  || tabs[1] || tabs[0];
+
 function setActiveView(view){
   if(view !== 'events' && view !== 'index') return;
   if(view === currentView) return;
@@ -116,15 +109,77 @@ function setActiveView(view){
     : 'EVENTS – ADD NEW (DEV)';
 }
 
-function setViewProgress(progress){
+function positionThumb(progress){
+  // Always set the CSS var as a fallback for your existing CSS implementation.
   toggle.style.setProperty('--viewProgress', String(clamp01(progress)));
+
+  if(!thumb || !tabEvents || !tabIndex) return;
+
+  // Interpolate between tab rectangles (relative to the toggle).
+  const leftA  = tabEvents.offsetLeft;
+  const widthA = tabEvents.offsetWidth;
+  const leftB  = tabIndex.offsetLeft;
+  const widthB = tabIndex.offsetWidth;
+
+  const p = clamp01(progress);
+  const left  = leftA  + (leftB  - leftA)  * p;
+  const width = widthA + (widthB - widthA) * p;
+
+  thumb.style.transform = `translateX(${left}px)`;
+  thumb.style.width = `${width}px`;
+}
+
+function setViewProgress(progress){
+  positionThumb(progress);
+}
+
+let isProgrammaticScroll = false;
+function animateScrollTo(targetLeft){
+  const start = pager.scrollLeft;
+  const end = targetLeft;
+  if(Math.abs(end - start) < 1){
+    pager.scrollLeft = end;
+    return;
+  }
+
+  // Temporarily disable snap during programmatic animation to avoid mid-animation snap "stutter".
+  const prevSnap = pager.style.scrollSnapType;
+  pager.style.scrollSnapType = 'none';
+
+  isProgrammaticScroll = true;
+
+  const dur = 260;
+  const t0 = performance.now();
+  const ease = (t) => (t < 0.5)
+    ? 2*t*t
+    : 1 - Math.pow(-2*t + 2, 2)/2;
+
+  function step(now){
+    const t = Math.min(1, (now - t0) / dur);
+    const v = ease(t);
+    pager.scrollLeft = start + (end - start) * v;
+
+    if(t < 1){
+      requestAnimationFrame(step);
+      return;
+    }
+
+    // Land exactly, then restore snap and clear the flag.
+    pager.scrollLeft = end;
+    // Restore snap after the scrollLeft has landed.
+    pager.style.scrollSnapType = prevSnap || '';
+    isProgrammaticScroll = false;
+  }
+
+  requestAnimationFrame(step);
 }
 
 function scrollToView(view){
-  const idx = view === 'index' ? 1 : 0;
-  const x = getPageX(idx);
-  pager.scrollTo({ left: x, behavior: 'smooth' });
+  const max = getMaxScroll();
+  const x = (view === 'index') ? max : 0;
+  animateScrollTo(x);
 }
+
 
 // --- Toggle click (tap on tabs) ---
 let suppressNextClick = false;
@@ -153,9 +208,9 @@ const drag = {
 };
 
 function getProgressFromPager(){
-  // Map scrollLeft onto [0..1] using the true page offsets.
-  const denom = (pageX1 - pageX0) || (pager.clientWidth || 1);
-  return clamp01((pager.scrollLeft - pageX0) / denom);
+  const max = getMaxScroll();
+  if(max <= 0) return 0;
+  return clamp01(pager.scrollLeft / max);
 }
 
 function getProgressFromPointer(clientX){
@@ -240,18 +295,8 @@ pager.addEventListener('scroll', () => {
 }, { passive: true });
 
 // Initialize
-computePagerPages();
 setViewProgress(getProgressFromPager());
 syncFromScroll();
-
-// Keep offsets accurate if layout changes (desktop resize, mobile rotate).
-window.addEventListener('resize', () => {
-  const prevView = currentView;
-  computePagerPages();
-  // Re-snap immediately to avoid scroll-snap "bounce".
-  pager.scrollLeft = getPageX(prevView === 'index' ? 1 : 0);
-  syncFromScroll();
-});
 
 
   // --- CSV-powered suggestions (WHERE, CITY) ---
