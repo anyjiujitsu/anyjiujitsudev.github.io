@@ -83,6 +83,27 @@
 // --- Helpers ---
 const clamp01 = (n) => Math.max(0, Math.min(1, n));
 
+// Pager geometry can include padding/gaps, so the second view is not always exactly
+// `pager.clientWidth` away. We compute the true snap offsets from the direct children.
+let pageEls = [];
+let pageX0 = 0;
+let pageX1 = 0;
+
+function computePagerPages(){
+  if(!pager) return;
+  // Direct children are the snap pages in this layout.
+  pageEls = Array.from(pager.children).filter(el => el && el.nodeType === 1);
+  pageX0 = pageEls[0] ? pageEls[0].offsetLeft : 0;
+  // If the second page exists, use its offset; otherwise fall back.
+  pageX1 = pageEls[1] ? pageEls[1].offsetLeft : (pageX0 + (pager.clientWidth || 1));
+  // Guard against degenerate layouts.
+  if(pageX1 === pageX0) pageX1 = pageX0 + (pager.clientWidth || 1);
+}
+
+function getPageX(idx){
+  return (pageEls[idx] ? pageEls[idx].offsetLeft : (pageX0 + idx * (pager.clientWidth || 1)));
+}
+
 let currentView = 'events'; // 'events' | 'index'
 function setActiveView(view){
   if(view !== 'events' && view !== 'index') return;
@@ -101,7 +122,7 @@ function setViewProgress(progress){
 
 function scrollToView(view){
   const idx = view === 'index' ? 1 : 0;
-  const x = idx * pager.clientWidth;
+  const x = getPageX(idx);
   pager.scrollTo({ left: x, behavior: 'smooth' });
 }
 
@@ -132,8 +153,9 @@ const drag = {
 };
 
 function getProgressFromPager(){
-  const w = pager.clientWidth || 1;
-  return clamp01(pager.scrollLeft / w);
+  // Map scrollLeft onto [0..1] using the true page offsets.
+  const denom = (pageX1 - pageX0) || (pager.clientWidth || 1);
+  return clamp01((pager.scrollLeft - pageX0) / denom);
 }
 
 function getProgressFromPointer(clientX){
@@ -218,8 +240,18 @@ pager.addEventListener('scroll', () => {
 }, { passive: true });
 
 // Initialize
+computePagerPages();
 setViewProgress(getProgressFromPager());
 syncFromScroll();
+
+// Keep offsets accurate if layout changes (desktop resize, mobile rotate).
+window.addEventListener('resize', () => {
+  const prevView = currentView;
+  computePagerPages();
+  // Re-snap immediately to avoid scroll-snap "bounce".
+  pager.scrollLeft = getPageX(prevView === 'index' ? 1 : 0);
+  syncFromScroll();
+});
 
 
   // --- CSV-powered suggestions (WHERE, CITY) ---
