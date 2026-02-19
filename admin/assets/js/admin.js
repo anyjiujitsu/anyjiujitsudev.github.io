@@ -12,27 +12,6 @@
   const toggle = document.getElementById('adminViewToggle');
   const tabs = Array.from(toggle.querySelectorAll('.viewToggle__tab'));
 
-  // Identify the actual horizontal scroller used for swipe navigation.
-  // Some layouts wrap the scrollable element inside #adminPager; this makes the slider sync resilient.
-  function findHorizontalScroller(root){
-    if(!root) return null;
-    const candidates = [root, ...root.querySelectorAll('*')];
-    for(const el of candidates){
-      if(!(el instanceof HTMLElement)) continue;
-      // Must have overflow content horizontally.
-      if((el.scrollWidth || 0) <= (el.clientWidth || 0) + 2) continue;
-      const cs = window.getComputedStyle(el);
-      const ox = cs.overflowX;
-      if(ox === 'auto' || ox === 'scroll' || ox === 'overlay'){
-        return el;
-      }
-    }
-    // Fallback: if root itself scrolls, use it.
-    return root;
-  }
-
-  const scroller = findHorizontalScroller(pager);
-
   const tokenInput = document.getElementById('ghToken');
   const saveBtn = document.getElementById('saveToken');
   const eyeBtn = document.getElementById('toggleToken');
@@ -100,103 +79,132 @@
   });
 
   // --- Helpers ---
-  function updateActiveUI(view){
+  function setActiveView(view){
     const isIndex = view === 'index';
     tabs.forEach(btn => btn.setAttribute('aria-selected', String(btn.dataset.view === view)));
-    if(titleEl){
-      titleEl.textContent = isIndex ? 'INDEX – ADD NEW (DEV)' : 'EVENTS – ADD NEW (DEV)';
-    }
+    titleEl.textContent = isIndex ? 'INDEX – ADD NEW (DEV)' : 'EVENTS – ADD NEW (DEV)';
   }
 
-  function setViewProgress(progress){
-    const p = Math.max(0, Math.min(1, progress));
-    toggle.style.setProperty('--viewProgress', p);
-  }
-
-  function scrollToView(view, behavior='smooth'){
+  function scrollToView(view){
     const idx = view === 'index' ? 1 : 0;
-    const x = idx * scroller.clientWidth;
-    scroller.scrollTo({ left: x, behavior });
+    const x = idx * pager.clientWidth;
+    pager.scrollTo({ left: x, behavior: 'smooth' });
   }
 
-  // --- Toggle click / drag ---
-  // Click (tap) chooses a view; drag (slide) scrubs between views.
-  let isDragging = false;
-  let dragStartX = 0;
-  let dragStartProgress = 0;
-  let didMove = false;
-
-  // Make pointer events behave consistently on touch.
-  try{ toggle.style.touchAction = 'none'; }catch(_e){}
-
+  // --- Toggle click ---
   toggle.addEventListener('click', (e) => {
-    // If user just dragged, suppress the click that follows pointerup.
-    if(didMove){
-      didMove = false;
-      return;
-    }
     const btn = e.target.closest('.viewToggle__tab');
     if(!btn) return;
     scrollToView(btn.dataset.view);
   });
 
+  
+
+  // --- Toggle drag (scrub between views) ---
+  // Allows dragging the thumb area to switch views.
+  // Uses pager scroll position as the source of truth.
+  let isDraggingToggle = false;
+  let dragStartX = 0;
+  let dragStartProgress = 0;
+  let dragMoved = false;
+
+  // Prevent the browser from hijacking horizontal gestures on the toggle
+  // (especially on mobile).
+  try { toggle.style.touchAction = 'none'; } catch(e){}
+
+  function setProgress(p){
+    const progress = Math.max(0, Math.min(1, p));
+    toggle.style.setProperty('--viewProgress', progress);
+  }
+
+  function snapToNearest(){
+    const w = pager.clientWidth || 1;
+    const progress = Math.max(0, Math.min(1, pager.scrollLeft / w));
+    scrollToView(progress > 0.5 ? 'index' : 'events');
+  }
+
   toggle.addEventListener('pointerdown', (e) => {
-    // Only left click / primary touch
-    if(e.button != null && e.button !== 0) return;
-    isDragging = true;
-    didMove = false;
+    // Only left button / primary contact
+    if (e.button !== undefined && e.button !== 0) return;
 
-    const rect = toggle.getBoundingClientRect();
+    const r = toggle.getBoundingClientRect();
+    // If the toggle has no width, do nothing.
+    if (!r.width) return;
+
+    isDraggingToggle = true;
+    dragMoved = false;
     dragStartX = e.clientX;
-    dragStartProgress = rect.width ? ( (scroller.scrollLeft || 0) / (scroller.clientWidth || 1) ) : 0;
 
-    try{ toggle.setPointerCapture(e.pointerId); }catch(_e){}
+    // Start from current pager progress
+    const w = pager.clientWidth || 1;
+    dragStartProgress = Math.max(0, Math.min(1, pager.scrollLeft / w));
+
+    toggle.setPointerCapture?.(e.pointerId);
+  });
+
+  toggle.addEventListener('pointermove', (e) => {
+    if (!isDraggingToggle) return;
+
+    const r = toggle.getBoundingClientRect();
+    if (!r.width) return;
+
+    const dx = e.clientX - dragStartX;
+    if (Math.abs(dx) > 4) dragMoved = true;
+
+    // Convert dx in toggle space to progress delta.
+    const delta = dx / r.width;
+    const p = dragStartProgress + delta;
+
+    // Scrub pager immediately (no smooth) so swipe + slider stay coupled.
+    const w = pager.clientWidth || 1;
+    pager.scrollLeft = Math.max(0, Math.min(w, p * w));
+
+    // Also set progress immediately for visual feedback.
+    setProgress(p);
+
+    // Keep title/aria in sync during drag
+    setActiveView(p > 0.5 ? 'index' : 'events');
     e.preventDefault();
   });
 
-  window.addEventListener('pointermove', (e) => {
-    if(!isDragging) return;
+  function endToggleDrag(e){
+    if (!isDraggingToggle) return;
+    isDraggingToggle = false;
 
-    const rect = toggle.getBoundingClientRect();
-    const dx = e.clientX - dragStartX;
-    const delta = rect.width ? (dx / rect.width) : 0;
-    const p = dragStartProgress + delta;
-
-    // mark as drag after small threshold to avoid killing taps
-    if(Math.abs(dx) > 4) didMove = true;
-
-    setViewProgress(p);
-    scroller.scrollLeft = (Math.max(0, Math.min(1, p))) * (scroller.clientWidth || 1);
-    updateActiveUI((p) > 0.5 ? 'index' : 'events');
-  }, { passive: false });
-
-  function endDrag(){
-    if(!isDragging) return;
-    isDragging = false;
-
-    const w = scroller.clientWidth || 1;
-    const p = Math.max(0, Math.min(1, (scroller.scrollLeft || 0) / w));
-    // Snap to closest view.
-    scrollToView(p > 0.5 ? 'index' : 'events');
+    // If user actually dragged, snap to the nearest view.
+    if (dragMoved){
+      snapToNearest();
+    }
   }
 
-  window.addEventListener('pointerup', endDrag);
-  window.addEventListener('pointercancel', endDrag);
+  toggle.addEventListener('pointerup', endToggleDrag);
+  toggle.addEventListener('pointercancel', endToggleDrag);
 
-  // --- Pager scroll sync ---
+  // If a drag happened, suppress the subsequent click that would otherwise
+  // also fire and cause double navigation.
+  toggle.addEventListener('click', (e) => {
+    if (dragMoved){
+      e.preventDefault();
+      e.stopPropagation();
+      dragMoved = false;
+    }
+  }, true);
+
+// --- Pager scroll sync ---
   function syncFromScroll(){
-    const w = scroller.clientWidth || 1;
-    const progress = Math.max(0, Math.min(1, (scroller.scrollLeft || 0) / w));
-    setViewProgress(progress);
-    updateActiveUI(progress > 0.5 ? 'index' : 'events');
+    const w = pager.clientWidth || 1;
+    const progress = Math.max(0, Math.min(1, pager.scrollLeft / w));
+    toggle.style.setProperty('--viewProgress', progress);
+
+    // snap title based on midpoint
+    setActiveView(progress > 0.5 ? 'index' : 'events');
   }
-  scroller.addEventListener('scroll', () => {
+  pager.addEventListener('scroll', () => {
     window.requestAnimationFrame(syncFromScroll);
   }, { passive: true });
 
-// Initialize
-  updateActiveUI('events');
-  setViewProgress(0);
+  // Initialize
+  setActiveView('events');
   syncFromScroll();
 
 
