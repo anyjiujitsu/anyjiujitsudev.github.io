@@ -282,6 +282,30 @@
   z-index: 1;
 }
 
+/* EVENTS view: NONMEMBER pricing tier marker */
+#viewEvents .row.row--events .cell--event,
+#viewEvents .row.row--events .cell--forwhere{
+  position: relative;
+}
+
+#viewEvents .row.row--events .cell__priceTier{
+  position: absolute;
+  top: 2px;
+  right: 8px;
+  z-index: 3;
+  font-family: 'Fixture', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: var(--green);
+  pointer-events: none;
+}
+
+#viewEvents .row.row--events .cell__priceTier--mobile{
+  display: none;
+}
+
 
 @media (max-width: 520px){
   #viewEvents,
@@ -299,6 +323,16 @@
 #viewIndex .cell--event{ display:none; }
 #viewEvents .cell__eventInlineWrap,
 #viewIndex .cell__eventInlineWrap{ display:flex; }
+
+  #viewEvents .row.row--events .cell__priceTier{
+    display: none;
+  }
+
+  #viewEvents .row.row--events .cell__priceTier--mobile{
+    display: block;
+    top: 2px;
+    right: 8px;
+  }
 #viewEvents .row.row--events .cell--forwhere,
 #viewIndex .row.row--events .cell--forwhere{
   position: relative;
