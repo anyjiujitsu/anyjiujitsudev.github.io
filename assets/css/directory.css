@@ -283,6 +283,47 @@
 }
 
 
+/* EVENTS price marker (NONMEMBER tier) */
+#viewEvents .row.row--events .cell__priceMarker,
+#viewIndex .row.row--events .cell__priceMarker{
+  position: absolute;
+  right: 10px;
+  top: 0;
+  color: #1f6b43;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  z-index: 2;
+  pointer-events: none;
+}
+
+#viewEvents .row.row--events .cell__priceMarker--desktop,
+#viewIndex .row.row--events .cell__priceMarker--desktop{
+  font-size: 1em; /* match desktop EVENT field counterpart */
+}
+
+#viewEvents .row.row--events .cell__priceMarker--mobile,
+#viewIndex .row.row--events .cell__priceMarker--mobile{
+  display: none;
+}
+
+@media (max-width: 520px){
+  #viewEvents .row.row--events .cell__priceMarker--desktop,
+  #viewIndex .row.row--events .cell__priceMarker--desktop{
+    display: none;
+  }
+
+  #viewEvents .row.row--events .cell__priceMarker--mobile,
+  #viewIndex .row.row--events .cell__priceMarker--mobile{
+    display: block;
+    right: 0;
+    top: 0;
+    font-size: 6px; /* match mobile EVENT field counterpart */
+  }
+}
+
+
+
 @media (max-width: 520px){
   #viewEvents,
 #viewIndex{
@@ -1353,25 +1394,5 @@
   /* Ensure values are not shifted independently (prevents crowding) */
   #viewIndex .row.row--events .cell--daydate .dayValue{
     transform: none;
-  }
-}
-
-
-
-/* PRICE TIER INDICATOR */
-.price-tier{
-  position:absolute;
-  right:14px;
-  top:12px;
-  color:#1f6b43;
-  font-weight:700;
-  letter-spacing:1px;
-}
-
-@media (max-width:640px){
-  .price-tier{
-    right:12px;
-    top:10px;
-    font-size:12px; /* match EVENT label size */
   }
 }
