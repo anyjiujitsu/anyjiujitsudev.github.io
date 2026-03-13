@@ -155,7 +155,7 @@ function applyProgress(p){
     __lastViewTitleMode = mode;
     const viewTitle = $("viewTitle");
     if(viewTitle){
-      viewTitle.textContent = (mode === "index") ? "FIND TRAINING" : "EVENTS";
+      viewTitle.textContent = (mode === "index") ? "FIND TRAINING" : "EVENTS (DEV)";
     }
   }
   return clamped;
