@@ -293,10 +293,10 @@
   right: 10px;
   top: 0;
   z-index: 3;
-  border: 0;
+  border: 0 !important;
   padding: 0;
   margin: 0;
-  background: transparent;
+  background: none !important;
   color: var(--green);
   font-weight: 700;
   line-height: 1.05;
@@ -306,6 +306,12 @@
   -webkit-appearance: none;
   appearance: none;
   font-family: inherit;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  min-width: 0;
+  width: auto;
+  height: auto;
+  text-decoration: none;
 }
 
 #viewEvents .row.row--events .cell__priceTrigger:focus-visible,
@@ -372,7 +378,7 @@ body.pricingPopupOpen{
   top: -20px;
   width: 56px;
   height: 56px;
-  border: 0;
+  border: 0 !important;
   border-radius: 999px;
   background: #f1f1f1;
   box-shadow: 0 8px 20px rgba(0,0,0,0.18);
@@ -851,8 +857,8 @@ body.pricingPopupOpen{
   width: 100%;
   display: block;
   text-align: left;
-  border: 0;
-  background: transparent;
+  border: 0 !important;
+  background: none !important;
   padding: 12px 12px;
   border-radius: 12px;
   font: inherit;
@@ -911,8 +917,8 @@ body.pricingPopupOpen{
   width: 100%;
   text-align: left;
   padding: 10px 14px 10px 32px; /* room for bullet */
-  background: transparent;
-  border: 0;
+  background: none !important;
+  border: 0 !important;
   color: inherit;
   font: inherit;
   -webkit-appearance: none;
