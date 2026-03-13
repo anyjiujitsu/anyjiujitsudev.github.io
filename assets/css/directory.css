@@ -283,44 +283,285 @@
 }
 
 
-/* EVENTS price marker (NONMEMBER tier) */
-#viewEvents .row.row--events .cell--event > .cell__priceMarker,
-#viewIndex .row.row--events .cell--event > .cell__priceMarker,
-#viewEvents .row.row--events .cell--forwhere > .cell__priceMarker,
-#viewIndex .row.row--events .cell--forwhere > .cell__priceMarker{
+
+/* EVENTS price trigger (NONMEMBER tier) */
+#viewEvents .row.row--events .cell--event > .cell__priceTrigger,
+#viewEvents .row.row--events .cell--forwhere > .cell__priceTrigger,
+#viewIndex .row.row--events .cell--event > .cell__priceTrigger,
+#viewIndex .row.row--events .cell--forwhere > .cell__priceTrigger{
   position: absolute;
   right: 10px;
   top: 0;
+  z-index: 3;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
   color: var(--green);
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: 0.02em;
-  z-index: 2;
-  pointer-events: none;
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: inherit;
 }
 
-#viewEvents .row.row--events .cell__priceMarker--desktop,
-#viewIndex .row.row--events .cell__priceMarker--desktop{
+#viewEvents .row.row--events .cell__priceTrigger:focus-visible,
+#viewIndex .row.row--events .cell__priceTrigger:focus-visible{
+  outline: 2px solid rgba(35,76,49,0.28);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+#viewEvents .row.row--events .cell__priceTrigger--desktop,
+#viewIndex .row.row--events .cell__priceTrigger--desktop{
   font-size: 1em; /* match desktop EVENT field counterpart */
 }
 
-#viewEvents .row.row--events .cell__priceMarker--mobile,
-#viewIndex .row.row--events .cell__priceMarker--mobile{
+#viewEvents .row.row--events .cell__priceTrigger--mobile,
+#viewIndex .row.row--events .cell__priceTrigger--mobile{
   display: none;
 }
 
 @media (max-width: 520px){
-  #viewEvents .row.row--events .cell__priceMarker--desktop,
-  #viewIndex .row.row--events .cell__priceMarker--desktop{
+  #viewEvents .row.row--events .cell__priceTrigger--desktop,
+  #viewIndex .row.row--events .cell__priceTrigger--desktop{
     display: none;
   }
 
-  #viewEvents .row.row--events .cell--forwhere > .cell__priceMarker--mobile,
-  #viewIndex .row.row--events .cell--forwhere > .cell__priceMarker--mobile{
+  #viewEvents .row.row--events .cell--forwhere > .cell__priceTrigger--mobile,
+  #viewIndex .row.row--events .cell--forwhere > .cell__priceTrigger--mobile{
     display: block;
     right: 6px;
     top: 0;
     font-size: 6px; /* match mobile EVENT field counterpart */
+  }
+}
+
+/* Pricing popup */
+body.pricingPopupOpen{
+  overflow: hidden;
+}
+
+.pricingOverlay{
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(0,0,0,0.03);
+}
+
+.pricingOverlay[hidden]{
+  display: none;
+}
+
+.pricingPopup{
+  position: fixed;
+  width: min(486px, calc(100vw - 20px));
+  background: #f7f7f7;
+  border-radius: 28px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+  color: #111;
+  overflow: visible;
+}
+
+.pricingPopup__close{
+  position: absolute;
+  left: -20px;
+  top: -20px;
+  width: 56px;
+  height: 56px;
+  border: 0;
+  border-radius: 999px;
+  background: #f1f1f1;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+  color: #8f8f8f;
+  font: inherit;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.pricingPopup__title{
+  padding: 20px 26px 10px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #9b9b9b;
+}
+
+.pricingPopup__rule{
+  height: 2px;
+  margin: 0 26px;
+  background: rgba(0,0,0,0.22);
+}
+
+.pricingPopup__label{
+  padding: 8px 26px 0;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.1;
+  font-weight: 800;
+  color: #9b9b9b;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pricingPopup__grid{
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  align-items: stretch;
+  column-gap: 0;
+  padding: 18px 22px 8px;
+}
+
+.pricingPopup__priceBlock{
+  text-align: center;
+  min-width: 0;
+}
+
+.pricingPopup__price{
+  font-size: 34px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.pricingPopup__priceLabel{
+  margin-top: 8px;
+  font-size: 11px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #9b9b9b;
+  text-transform: uppercase;
+}
+
+.pricingPopup__divider{
+  width: 1px;
+  background: rgba(0,0,0,0.12);
+  margin: 4px 0;
+}
+
+.pricingPopup__presaleRow{
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 22px 18px;
+  text-align: center;
+}
+
+.pricingPopup__presaleLabel{
+  font-size: 11px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #9b9b9b;
+  text-transform: uppercase;
+}
+
+.pricingPopup__presaleValue{
+  font-size: 26px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.pricingPopup__payments{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-items: start;
+  justify-items: center;
+  padding: 18px 22px 16px;
+  background: #e7e7e7;
+  min-height: 112px;
+}
+
+.pricingPopup__payments--single{
+  grid-template-columns: 1fr;
+}
+
+.pricingPopup__payments--empty{
+  min-height: 36px;
+}
+
+.pricingPopup__payItem{
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+
+.pricingPopup__payIcon{
+  width: 70px;
+  height: 50px;
+  color: #111;
+}
+
+.pricingPopup__payIcon svg{
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.pricingPopup__payLabel{
+  font-size: 11px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 640px){
+  .pricingOverlay{
+    padding: 12px;
+    background: rgba(0,0,0,0.08);
+  }
+
+  .pricingPopup{
+    position: fixed;
+    left: 12px !important;
+    right: 12px !important;
+    top: 50% !important;
+    width: auto;
+    transform: translateY(-50%);
+    max-height: calc(100vh - 24px);
+    overflow: auto;
+    border-radius: 24px;
+  }
+
+  .pricingPopup__close{
+    left: 12px;
+    top: -18px;
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+
+  .pricingPopup__title{
+    padding-top: 18px;
+    font-size: 17px;
+  }
+
+  .pricingPopup__price{
+    font-size: 30px;
+  }
+
+  .pricingPopup__presaleValue{
+    font-size: 24px;
+  }
+
+  .pricingPopup__payments{
+    min-height: 104px;
+  }
+
+  .pricingPopup__payIcon{
+    width: 64px;
+    height: 46px;
   }
 }
 
