@@ -192,14 +192,30 @@ function closePricingPopup(){
 function wirePricingPopup(){
   ensurePricingPopup();
 
+  let lastTriggerAt = 0;
+
+  const handleTrigger = (e) => {
+    const trigger = e.target && e.target.closest ? e.target.closest(".js-priceTrigger") : null;
+    if(!trigger) return false;
+    e.preventDefault();
+    e.stopPropagation();
+    lastTriggerAt = Date.now();
+    openPricingPopup(trigger);
+    return true;
+  };
+
+  document.addEventListener("pointerup", handleTrigger, true);
   document.addEventListener("click", (e) => {
-    const trigger = e.target.closest(".js-priceTrigger");
-    if(trigger){
-      e.preventDefault();
-      e.stopPropagation();
-      openPricingPopup(trigger);
+    if(Date.now() - lastTriggerAt < 600){
+      const trigger = e.target && e.target.closest ? e.target.closest(".js-priceTrigger") : null;
+      if(trigger){
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
     }
-  });
+    handleTrigger(e);
+  }, true);
 }
 
 
