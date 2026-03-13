@@ -282,33 +282,6 @@
   z-index: 1;
 }
 
-/* EVENTS view: NONMEMBER pricing tier marker */
-#viewEvents .row.row--events .cell--event,
-#viewEvents .row.row--events .cell--forwhere{
-  position: relative;
-}
-
-#viewEvents .row.row--events .cell__priceTier{
-  position: absolute;
-  top: 7px;
-  right: 10px;
-  z-index: 3;
-  display: inline-block;
-  min-width: 18px;
-  text-align: right;
-  font-family: 'Fixture', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-  font-size: 11px;
-  line-height: 1;
-  font-weight: 900;
-  letter-spacing: 0.02em;
-  color: var(--green);
-  pointer-events: none;
-}
-
-#viewEvents .row.row--events .cell__priceTier--mobile{
-  display: none;
-}
-
 
 @media (max-width: 520px){
   #viewEvents,
@@ -326,26 +299,6 @@
 #viewIndex .cell--event{ display:none; }
 #viewEvents .cell__eventInlineWrap,
 #viewIndex .cell__eventInlineWrap{ display:flex; }
-  #viewEvents .cell__eventInlineWrap{
-    align-items: baseline;
-    gap: 4px;
-  }
-
-  #viewEvents .row.row--events .cell__priceTier{
-    display: none;
-  }
-
-  #viewEvents .row.row--events .cell__priceTier--mobile{
-    display: inline-block;
-    position: static;
-    min-width: 0;
-    text-align: left;
-    font-size: inherit;
-    line-height: inherit;
-    letter-spacing: 0.02em;
-    vertical-align: baseline;
-    margin-left: 4px;
-  }
 #viewEvents .row.row--events .cell--forwhere,
 #viewIndex .row.row--events .cell--forwhere{
   position: relative;
@@ -397,7 +350,7 @@
   /* EVENT + NEW inline strip */
   #viewEvents .row.row--events .cell__eventInline,
 #viewIndex .row.row--events .cell__eventInline{
-    font-size: inherit;
+    font-size: 6px;
   }
   #viewEvents .row.row--events .cell__newInline,
 #viewIndex .row.row--events .cell__newInline{
@@ -1400,5 +1353,25 @@
   /* Ensure values are not shifted independently (prevents crowding) */
   #viewIndex .row.row--events .cell--daydate .dayValue{
     transform: none;
+  }
+}
+
+
+
+/* PRICE TIER INDICATOR */
+.price-tier{
+  position:absolute;
+  right:14px;
+  top:12px;
+  color:#1f6b43;
+  font-weight:700;
+  letter-spacing:1px;
+}
+
+@media (max-width:640px){
+  .price-tier{
+    right:12px;
+    top:10px;
+    font-size:12px; /* match EVENT label size */
   }
 }
