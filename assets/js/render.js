@@ -305,18 +305,10 @@ function renderEventRow(r){
     : (rawDate || "—");
 
   const showNew = shouldShowNew(r.CREATED);
-  const priceTier = getPriceTierLabel(r.NONMEMBER);
-  const priceTierMarkup = priceTier
-    ? `<div class="cell__priceTier" aria-label="Non-member pricing tier">${escapeHtml(priceTier)}</div>`
-    : "";
-  const mobilePriceTierMarkup = priceTier
-    ? `<span class="cell__priceTier cell__priceTier--mobile" aria-label="Non-member pricing tier">${escapeHtml(priceTier)}</span>`
-    : "";
 
   const c1 = document.createElement("div");
   c1.className = "cell cell--event";
   c1.innerHTML = `
-    ${priceTierMarkup}
     <div class="cell__top cell__event">${escapeHtml(r.EVENT || r.TYPE || "—")}</div>
     ${showNew ? `<div class="cell__sub cell__new">*NEW</div>` : `<div class="cell__sub cell__new">&nbsp;</div>`}
   `;
@@ -326,7 +318,6 @@ function renderEventRow(r){
   c2.innerHTML = `
     <div class="cell__eventInlineWrap">
       <span class="cell__eventInline">${escapeHtml(r.EVENT || "—")}</span>
-      ${mobilePriceTierMarkup}
       ${showNew ? `<span class="cell__newInline">*NEW</span>` : `<span class="cell__newInline">&nbsp;</span>`}
     </div>
     <div class="cell__top cell__for">${escapeHtml(r.FOR || "—")}</div>
@@ -352,20 +343,6 @@ function renderEventRow(r){
   row.appendChild(c3);
   row.appendChild(c4);
   return row;
-}
-
-
-function getPriceTierLabel(nonMemberRaw){
-  const raw = String(nonMemberRaw ?? "").trim();
-  if(!raw) return "";
-
-  const normalized = raw.replace(/[$,\s]/g, "");
-  const price = Number(normalized);
-  if(!Number.isFinite(price)) return "";
-
-  if(price <= 50) return "$";
-  if(price <= 125) return "$$";
-  return "$$$";
 }
 
 function getWhereText(r){
