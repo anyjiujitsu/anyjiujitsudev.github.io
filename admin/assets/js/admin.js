@@ -12,8 +12,6 @@
   const toggle = document.getElementById('adminViewToggle');
   const tabs = Array.from(toggle.querySelectorAll('.viewToggle__tab'));
 
-  const thumb = toggle ? toggle.querySelector('.viewToggle__thumb') : null;
-
   const tokenInput = document.getElementById('ghToken');
   const saveBtn = document.getElementById('saveToken');
   const eyeBtn = document.getElementById('toggleToken');
@@ -80,223 +78,44 @@
     eyeBtn.setAttribute('aria-label', isPw ? 'Hide token' : 'Show token');
   });
 
-// --- Helpers ---
-const clamp01 = (n) => Math.max(0, Math.min(1, n));
+  // --- Helpers ---
+  function setActiveView(view){
+    const isIndex = view === 'index';
+    tabs.forEach(btn => btn.setAttribute('aria-selected', String(btn.dataset.view === view)));
+    toggle.style.setProperty('--viewProgress', isIndex ? 1 : 0);
 
-let currentView = 'events'; // 'events' | 'index'
-
-// The pager uses scroll-snap and can include padding/gaps, so the second view is not always
-// exactly `clientWidth` away. With 2 pages, the correct "INDEX" snap point is the max scroll.
-function getMaxScroll(){
-  const max = (pager.scrollWidth || 0) - (pager.clientWidth || 0);
-  // If max is 0 (layout not ready yet), avoid divide-by-zero; caller will clamp anyway.
-  return Math.max(0, max);
-}
-
-// Tabs + thumb geometry: the thumb should travel between the actual tab bounds,
-// not edge-to-edge of the toggle container (which causes overshoot when there's inset padding).
-const tabEvents = tabs.find(b => b.dataset.view === 'events') || tabs[0];
-const tabIndex  = tabs.find(b => b.dataset.view === 'index')  || tabs[1] || tabs[0];
-
-function setActiveView(view){
-  if(view !== 'events' && view !== 'index') return;
-  if(view === currentView) return;
-  currentView = view;
-
-  tabs.forEach(btn => btn.setAttribute('aria-selected', String(btn.dataset.view === view)));
-  titleEl.textContent = (view === 'index')
-    ? 'INDEX – ADD NEW (DEV)'
-    : 'EVENTS – ADD NEW (DEV)';
-}
-
-function positionThumb(progress){
-  // Always set the CSS var as a fallback for your existing CSS implementation.
-  toggle.style.setProperty('--viewProgress', String(clamp01(progress)));
-
-  if(!thumb || !tabEvents || !tabIndex) return;
-
-  // Interpolate between tab rectangles (relative to the toggle).
-  const leftA  = tabEvents.offsetLeft;
-  const widthA = tabEvents.offsetWidth;
-  const leftB  = tabIndex.offsetLeft;
-  const widthB = tabIndex.offsetWidth;
-
-  const p = clamp01(progress);
-  const left  = leftA  + (leftB  - leftA)  * p;
-  const width = widthA + (widthB - widthA) * p;
-
-  thumb.style.transform = `translateX(${left}px)`;
-  thumb.style.width = `${width}px`;
-}
-
-function setViewProgress(progress){
-  positionThumb(progress);
-}
-
-let isProgrammaticScroll = false;
-function animateScrollTo(targetLeft){
-  const start = pager.scrollLeft;
-  const end = targetLeft;
-  if(Math.abs(end - start) < 1){
-    pager.scrollLeft = end;
-    return;
+    titleEl.textContent = isIndex ? 'INDEX – ADD NEW' : 'EVENTS – ADD NEW (DEV)';
   }
 
-  // Temporarily disable snap during programmatic animation to avoid mid-animation snap "stutter".
-  const prevSnap = pager.style.scrollSnapType;
-  pager.style.scrollSnapType = 'none';
-
-  isProgrammaticScroll = true;
-
-  const dur = 260;
-  const t0 = performance.now();
-  const ease = (t) => (t < 0.5)
-    ? 2*t*t
-    : 1 - Math.pow(-2*t + 2, 2)/2;
-
-  function step(now){
-    const t = Math.min(1, (now - t0) / dur);
-    const v = ease(t);
-    pager.scrollLeft = start + (end - start) * v;
-
-    if(t < 1){
-      requestAnimationFrame(step);
-      return;
-    }
-
-    // Land exactly, then restore snap and clear the flag.
-    pager.scrollLeft = end;
-    // Restore snap after the scrollLeft has landed.
-    pager.style.scrollSnapType = prevSnap || '';
-    isProgrammaticScroll = false;
+  function scrollToView(view){
+    const idx = view === 'index' ? 1 : 0;
+    const x = idx * pager.clientWidth;
+    pager.scrollTo({ left: x, behavior: 'smooth' });
   }
 
-  requestAnimationFrame(step);
-}
+  // --- Toggle click ---
+  toggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('.viewToggle__tab');
+    if(!btn) return;
+    scrollToView(btn.dataset.view);
+  });
 
-function scrollToView(view){
-  const max = getMaxScroll();
-  const x = (view === 'index') ? max : 0;
-  animateScrollTo(x);
-}
+  // --- Pager scroll sync ---
+  function syncFromScroll(){
+    const w = pager.clientWidth || 1;
+    const progress = Math.max(0, Math.min(1, pager.scrollLeft / w));
+    toggle.style.setProperty('--viewProgress', progress);
 
-
-// --- Toggle click (tap on tabs) ---
-let suppressNextClick = false;
-toggle.addEventListener('click', (e) => {
-  if(suppressNextClick){
-    suppressNextClick = false;
-    return;
+    // snap title based on midpoint
+    setActiveView(progress > 0.5 ? 'index' : 'events');
   }
-  const btn = e.target.closest('.viewToggle__tab');
-  if(!btn) return;
-  scrollToView(btn.dataset.view);
-});
+  pager.addEventListener('scroll', () => {
+    window.requestAnimationFrame(syncFromScroll);
+  }, { passive: true });
 
-// --- Toggle drag (slide thumb) ---
-// Enables dragging anywhere on the toggle to switch views.
-// Keeps it smooth by writing --viewProgress during drag and snapping on release.
-toggle.style.touchAction = 'none';
-
-const drag = {
-  active: false,
-  pointerId: null,
-  startX: 0,
-  lastX: 0,
-  moved: 0,
-  lastProgress: 0
-};
-
-function getProgressFromPager(){
-  const max = getMaxScroll();
-  if(max <= 0) return 0;
-  return clamp01(pager.scrollLeft / max);
-}
-
-function getProgressFromPointer(clientX){
-  const r = toggle.getBoundingClientRect();
-  const x = clientX - r.left;
-  return clamp01(x / (r.width || 1));
-}
-
-toggle.addEventListener('pointerdown', (e) => {
-  // Only left-click for mouse; touch/pen are fine.
-  if(e.pointerType === 'mouse' && e.button !== 0) return;
-
-  drag.active = true;
-  drag.pointerId = e.pointerId;
-  drag.startX = e.clientX;
-  drag.lastX = e.clientX;
-  drag.moved = 0;
-  drag.lastProgress = getProgressFromPager();
-
-  try{ toggle.setPointerCapture(e.pointerId); }catch(_e){}
-  // Start controlling progress immediately
-  drag.lastProgress = getProgressFromPointer(e.clientX);
-  setViewProgress(drag.lastProgress);
-
-  // Prevent the browser from treating this as a scroll gesture.
-  e.preventDefault();
-});
-
-toggle.addEventListener('pointermove', (e) => {
-  if(!drag.active || e.pointerId !== drag.pointerId) return;
-
-  drag.lastX = e.clientX;
-  drag.moved = Math.max(drag.moved, Math.abs(drag.lastX - drag.startX));
-
-  drag.lastProgress = getProgressFromPointer(e.clientX);
-  setViewProgress(drag.lastProgress);
-
-  e.preventDefault();
-});
-
-function endDrag(e){
-  if(!drag.active || (e && e.pointerId !== drag.pointerId)) return;
-
-  // If it was essentially a tap (not a drag), snap based on which half was tapped.
-  const wasTap = drag.moved < 6;
-  const p = wasTap ? getProgressFromPointer(drag.lastX) : drag.lastProgress;
-  const target = (p > 0.5) ? 'index' : 'events';
-
-  // Prevent the click that follows pointerup from also firing toggle click logic.
-  suppressNextClick = true;
-  window.setTimeout(() => { suppressNextClick = false; }, 0);
-
-  drag.active = false;
-  drag.pointerId = null;
-
-  try{ toggle.releasePointerCapture(e.pointerId); }catch(_e){}
-
-  scrollToView(target);
-}
-
-toggle.addEventListener('pointerup', endDrag);
-toggle.addEventListener('pointercancel', endDrag);
-
-// --- Pager scroll sync ---
-// Source of truth: pager scroll position.
-// We update the thumb continuously, and only switch titles/tabs when crossing midpoint.
-let rafPending = false;
-function syncFromScroll(){
-  rafPending = false;
-
-  const progress = getProgressFromPager();
-  setViewProgress(progress);
-
-  const view = (progress > 0.5) ? 'index' : 'events';
-  setActiveView(view);
-}
-
-pager.addEventListener('scroll', () => {
-  if(rafPending) return;
-  rafPending = true;
-  window.requestAnimationFrame(syncFromScroll);
-}, { passive: true });
-
-// Initialize
-setViewProgress(getProgressFromPager());
-syncFromScroll();
+  // Initialize
+  setActiveView('events');
+  syncFromScroll();
 
 
   // --- CSV-powered suggestions (WHERE, CITY) ---
@@ -803,7 +622,7 @@ if(idxState) idxState.addEventListener('change', scheduleGeocode);
 
   // --- GitHub CSV append/commit (matches QA admin logic) ---
   const OWNER  = 'anyjiujitsu';
-  const REPO   = 'anyjiujitsudev.github.io';
+  const REPO   = 'anyjiujitsu.github.io';
   const BRANCH = 'main';
 
   // Paths inside the repo (must exist)
@@ -909,19 +728,7 @@ if(idxState) idxState.addEventListener('change', scheduleGeocode);
     const { row, finalCols, hasHeader } = buildRowFromForm(csvText, form);
     const nowIso = new Date().toISOString();
     const header = hasHeader ? '' : (finalCols.join(',') + '\n');
-// Normalize to LF, remove ANY completely blank lines (prevents GitHub editor "empty rows"),
-    // then append exactly one row.
-    const normalized = String(csvText || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-    const nonBlankLines = normalized
-      .split('\n')
-      .filter(l => l.trim().length); // keep only non-empty lines
-
-    const base = nonBlankLines.join('\n').trimEnd();
-
-    if(!row || !row.trim()){
-      throw new Error('Refusing to append empty CSV row');
-    }
-
+    const base = (csvText || '').trimEnd();
     const updated = (base ? base + '\n' : header) + row + '\n';
 
     // write
