@@ -290,14 +290,17 @@
 
 #viewEvents .row.row--events .cell__priceTier{
   position: absolute;
-  top: 2px;
-  right: 8px;
+  top: 7px;
+  right: 10px;
   z-index: 3;
+  display: inline-block;
+  min-width: 18px;
+  text-align: right;
   font-family: 'Fixture', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-  font-size: 16px;
+  font-size: 11px;
   line-height: 1;
   font-weight: 900;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   color: var(--green);
   pointer-events: none;
 }
@@ -329,9 +332,13 @@
   }
 
   #viewEvents .row.row--events .cell__priceTier--mobile{
-    display: block;
-    top: 2px;
-    right: 8px;
+    display: inline-block;
+    top: 4px;
+    right: 4px;
+    min-width: 16px;
+    text-align: right;
+    font-size: 10px;
+    letter-spacing: 0.01em;
   }
 #viewEvents .row.row--events .cell--forwhere,
 #viewIndex .row.row--events .cell--forwhere{
