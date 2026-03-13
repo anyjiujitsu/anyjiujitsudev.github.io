@@ -324,9 +324,9 @@ function renderEventRow(r){
   const c2 = document.createElement("div");
   c2.className = "cell cell--forwhere";
   c2.innerHTML = `
-    ${mobilePriceTierMarkup}
     <div class="cell__eventInlineWrap">
       <span class="cell__eventInline">${escapeHtml(r.EVENT || "—")}</span>
+      ${mobilePriceTierMarkup}
       ${showNew ? `<span class="cell__newInline">*NEW</span>` : `<span class="cell__newInline">&nbsp;</span>`}
     </div>
     <div class="cell__top cell__for">${escapeHtml(r.FOR || "—")}</div>
