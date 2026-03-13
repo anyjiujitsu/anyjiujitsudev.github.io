@@ -326,6 +326,10 @@
 #viewIndex .cell--event{ display:none; }
 #viewEvents .cell__eventInlineWrap,
 #viewIndex .cell__eventInlineWrap{ display:flex; }
+  #viewEvents .cell__eventInlineWrap{
+    align-items: baseline;
+    gap: 4px;
+  }
 
   #viewEvents .row.row--events .cell__priceTier{
     display: none;
@@ -333,12 +337,14 @@
 
   #viewEvents .row.row--events .cell__priceTier--mobile{
     display: inline-block;
-    top: 4px;
-    right: 4px;
-    min-width: 16px;
-    text-align: right;
-    font-size: 10px;
-    letter-spacing: 0.01em;
+    position: static;
+    min-width: 0;
+    text-align: left;
+    font-size: inherit;
+    line-height: inherit;
+    letter-spacing: 0.02em;
+    vertical-align: baseline;
+    margin-left: 4px;
   }
 #viewEvents .row.row--events .cell--forwhere,
 #viewIndex .row.row--events .cell--forwhere{
@@ -391,7 +397,7 @@
   /* EVENT + NEW inline strip */
   #viewEvents .row.row--events .cell__eventInline,
 #viewIndex .row.row--events .cell__eventInline{
-    font-size: 6px;
+    font-size: inherit;
   }
   #viewEvents .row.row--events .cell__newInline,
 #viewIndex .row.row--events .cell__newInline{
