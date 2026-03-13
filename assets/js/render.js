@@ -305,10 +305,14 @@ function renderEventRow(r){
     : (rawDate || "—");
 
   const showNew = shouldShowNew(r.CREATED);
+  const priceMarker = getPriceMarker(r.NONMEMBER);
+  const priceMarkerDesktop = priceMarker ? `<div class="cell__priceMarker cell__priceMarker--desktop" aria-hidden="true">${escapeHtml(priceMarker)}</div>` : "";
+  const priceMarkerMobile = priceMarker ? `<div class="cell__priceMarker cell__priceMarker--mobile" aria-hidden="true">${escapeHtml(priceMarker)}</div>` : "";
 
   const c1 = document.createElement("div");
   c1.className = "cell cell--event";
   c1.innerHTML = `
+    ${priceMarkerDesktop}
     <div class="cell__top cell__event">${escapeHtml(r.EVENT || r.TYPE || "—")}</div>
     ${showNew ? `<div class="cell__sub cell__new">*NEW</div>` : `<div class="cell__sub cell__new">&nbsp;</div>`}
   `;
@@ -316,6 +320,7 @@ function renderEventRow(r){
   const c2 = document.createElement("div");
   c2.className = "cell cell--forwhere";
   c2.innerHTML = `
+    ${priceMarkerMobile}
     <div class="cell__eventInlineWrap">
       <span class="cell__eventInline">${escapeHtml(r.EVENT || "—")}</span>
       ${showNew ? `<span class="cell__newInline">*NEW</span>` : `<span class="cell__newInline">&nbsp;</span>`}
@@ -343,6 +348,19 @@ function renderEventRow(r){
   row.appendChild(c3);
   row.appendChild(c4);
   return row;
+}
+
+
+function getPriceMarker(nonMemberRaw){
+  const raw = String(nonMemberRaw ?? "").trim();
+  if(!raw) return "";
+
+  const num = Number(raw.replace(/[^\d.]/g, ""));
+  if(!Number.isFinite(num)) return "";
+
+  if(num <= 50) return "$";
+  if(num <= 125) return "$$";
+  return "$$$";
 }
 
 function getWhereText(r){
