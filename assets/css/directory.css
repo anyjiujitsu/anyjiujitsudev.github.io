@@ -284,8 +284,10 @@
 
 
 /* EVENTS price marker (NONMEMBER tier) */
-#viewEvents .row.row--events .cell__priceMarker,
-#viewIndex .row.row--events .cell__priceMarker{
+#viewEvents .row.row--events .cell--event > .cell__priceMarker,
+#viewIndex .row.row--events .cell--event > .cell__priceMarker,
+#viewEvents .row.row--events .cell--forwhere > .cell__priceMarker,
+#viewIndex .row.row--events .cell--forwhere > .cell__priceMarker{
   position: absolute;
   right: 10px;
   top: 0;
@@ -313,10 +315,10 @@
     display: none;
   }
 
-  #viewEvents .row.row--events .cell__priceMarker--mobile,
-  #viewIndex .row.row--events .cell__priceMarker--mobile{
+  #viewEvents .row.row--events .cell--forwhere > .cell__priceMarker--mobile,
+  #viewIndex .row.row--events .cell--forwhere > .cell__priceMarker--mobile{
     display: block;
-    right: 0;
+    right: 10px;
     top: 0;
     font-size: 6px; /* match mobile EVENT field counterpart */
   }
