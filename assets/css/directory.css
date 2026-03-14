@@ -285,6 +285,7 @@
 
 
 
+
 /* EVENTS price trigger (info icon + clickable cell when NONMEMBER exists) */
 #viewEvents .row.row--events .cell--event > .cell__priceHit,
 #viewIndex .row.row--events .cell--event > .cell__priceHit,
@@ -302,54 +303,34 @@
   appearance: none;
 }
 
-
-#viewEvents .row.row--events .cell--event > .cell__infoIcon,
-#viewIndex .row.row--events .cell--event > .cell__infoIcon,
-#viewEvents .row.row--events .cell--forwhere > .cell__infoIcon,
-#viewIndex .row.row--events .cell--forwhere > .cell__infoIcon{
-  position: absolute;
-  right: 10px;
-  top: 0;
-  z-index: 3;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  border: 0.8px solid var(--green);
-  background: transparent;
-  color: var(--green);
-  font-weight: 700;
-  line-height: 8px;
-  text-align: center;
-  letter-spacing: 0;
-  pointer-events: none;
-  font-family: inherit;
-  font-style: normal;
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding-bottom: 0;
-}
-
 #viewEvents .row.row--events .cell__priceHit:focus-visible,
-#viewIndex .row.row--events .cell__priceHit:focus-visible,
-
 #viewIndex .row.row--events .cell__priceHit:focus-visible{
   outline: 2px solid rgba(35,76,49,0.20);
   outline-offset: -2px;
   border-radius: 8px;
 }
 
-#viewEvents .row.row--events .cell__infoIcon--desktop,
-#viewIndex .row.row--events .cell__infoIcon--desktop{
-  font-size: 8px;
+#viewEvents .row.row--events .cell--event > .cell__infoIcon--desktop,
+#viewIndex .row.row--events .cell--event > .cell__infoIcon--desktop{
+  position: absolute;
+  right: 10px;
+  top: -1px;
+  z-index: 3;
+  color: var(--green);
+  font-weight: 700;
+  font-style: normal;
+  font-family: inherit;
+  line-height: 1;
+  letter-spacing: 0;
+  pointer-events: none;
+  font-size: 9px;
 }
 
 #viewEvents .row.row--events .cell__priceHit--mobile,
 #viewEvents .row.row--events .cell__infoIcon--mobile,
 #viewIndex .row.row--events .cell__priceHit--mobile,
 #viewIndex .row.row--events .cell__infoIcon--mobile{
-  display: none;
+  display: none !important;
 }
 
 @media (max-width: 520px){
@@ -357,25 +338,35 @@
   #viewEvents .row.row--events .cell__infoIcon--desktop,
   #viewIndex .row.row--events .cell__priceHit--desktop,
   #viewIndex .row.row--events .cell__infoIcon--desktop{
-    display: none;
+    display: none !important;
   }
 
   #viewEvents .row.row--events .cell--forwhere > .cell__priceHit--mobile,
   #viewIndex .row.row--events .cell--forwhere > .cell__priceHit--mobile{
-    display: block;
+    display: block !important;
     inset: calc(-1 * var(--evRowBleedY)) 0 calc(-1 * var(--evRowBleedY)) calc(-1 * var(--evRowBleedX));
   }
 
   #viewEvents .row.row--events .cell--forwhere > .cell__infoIcon--mobile,
   #viewIndex .row.row--events .cell--forwhere > .cell__infoIcon--mobile{
-    display: block;
+    display: block !important;
+    position: absolute;
     right: 6px;
     top: 0;
+    z-index: 3;
+    color: var(--green);
+    font-weight: 700;
+    font-style: normal;
+    font-family: inherit;
+    line-height: 1;
+    letter-spacing: 0;
+    pointer-events: none;
     font-size: 6px;
   }
 }
 
 /* Pricing popup */
+
 
 body.pricingPopupOpen{
   overflow: hidden;
