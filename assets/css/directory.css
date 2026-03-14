@@ -302,24 +302,33 @@
   appearance: none;
 }
 
+
 #viewEvents .row.row--events .cell--event > .cell__infoIcon,
 #viewIndex .row.row--events .cell--event > .cell__infoIcon,
 #viewEvents .row.row--events .cell--forwhere > .cell__infoIcon,
 #viewIndex .row.row--events .cell--forwhere > .cell__infoIcon{
   position: absolute;
   right: 10px;
-  top: 0;
+  top: -1px;
   z-index: 3;
-  color: var(--green);
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--green);
+  color: #fff;
   font-weight: 700;
-  line-height: 1;
+  line-height: 16px;
+  text-align: center;
   letter-spacing: 0;
   pointer-events: none;
-  font-family: Georgia, "Times New Roman", serif;
-  font-style: italic;
+  font-family: inherit;
+  font-style: normal;
+  box-sizing: border-box;
 }
 
 #viewEvents .row.row--events .cell__priceHit:focus-visible,
+#viewIndex .row.row--events .cell__priceHit:focus-visible,
+
 #viewIndex .row.row--events .cell__priceHit:focus-visible{
   outline: 2px solid rgba(35,76,49,0.20);
   outline-offset: -2px;
@@ -328,7 +337,7 @@
 
 #viewEvents .row.row--events .cell__infoIcon--desktop,
 #viewIndex .row.row--events .cell__infoIcon--desktop{
-  font-size: 1em;
+  font-size: 10px;
 }
 
 #viewEvents .row.row--events .cell__priceHit--mobile,
