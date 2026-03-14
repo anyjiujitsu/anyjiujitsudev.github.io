@@ -430,7 +430,7 @@ body.pricingPopupOpen{
 }
 
 .pricingPopup__price{
-  font-size: 34px;
+  font-size: 30px;
   line-height: 1;
   font-weight: 900;
   letter-spacing: -0.04em;
@@ -471,7 +471,7 @@ body.pricingPopupOpen{
 }
 
 .pricingPopup__presaleValue{
-  font-size: 26px;
+  font-size: 22px;
   line-height: 1;
   font-weight: 900;
   letter-spacing: -0.04em;
