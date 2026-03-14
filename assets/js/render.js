@@ -393,7 +393,7 @@ function buildPriceTrigger({ member, nonMember, presale, cash, venmo, label, mod
 
 function buildPriceInfoIcon(nonMemberRaw, mode = "desktop"){
   if(!hasPriceInfo(nonMemberRaw)) return "";
-  return `<span class="cell__infoIcon cell__infoIcon--${escapeHtml(mode)}" aria-hidden="true">i</span>`;
+  return `<span class="cell__infoIcon cell__infoIcon--${escapeHtml(mode)}" aria-hidden="true">$</span>`;
 }
 
 function getWhereText(r){
