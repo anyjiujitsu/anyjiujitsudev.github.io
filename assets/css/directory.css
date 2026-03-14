@@ -1678,3 +1678,11 @@ body.pricingPopupOpen{
     border-bottom-right-radius: 22px;
   }
 }
+
+/* info icon svg color to match WHERE grey */
+.cell__infoIcon{
+  color:#6f6f6f;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
