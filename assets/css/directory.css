@@ -309,21 +309,26 @@
 #viewIndex .row.row--events .cell--forwhere > .cell__infoIcon{
   position: absolute;
   right: 10px;
-  top: -1px;
+  top: 0;
   z-index: 3;
-  width: 16px;
-  height: 16px;
+  width: 13px;
+  height: 13px;
   border-radius: 999px;
-  background: var(--green);
-  color: #fff;
+  border: 1.5px solid var(--green);
+  background: transparent;
+  color: var(--green);
   font-weight: 700;
-  line-height: 16px;
+  line-height: 10px;
   text-align: center;
   letter-spacing: 0;
   pointer-events: none;
   font-family: inherit;
   font-style: normal;
   box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 0.5px;
 }
 
 #viewEvents .row.row--events .cell__priceHit:focus-visible,
@@ -337,7 +342,7 @@
 
 #viewEvents .row.row--events .cell__infoIcon--desktop,
 #viewIndex .row.row--events .cell__infoIcon--desktop{
-  font-size: 10px;
+  font-size: 8px;
 }
 
 #viewEvents .row.row--events .cell__priceHit--mobile,
