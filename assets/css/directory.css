@@ -1672,3 +1672,15 @@ body.pricingPopupOpen{
     border-bottom-right-radius: 22px;
   }
 }
+
+
+/* Past Events: pricing ear shifts from NEW orange to WHERE grey */
+#viewEvents .group--past .cell__cornerEar--desktop{
+  border-top-color: var(--muted) !important;
+}
+
+@media (max-width: 520px){
+  #viewEvents .group--past .cell__cornerEar--mobile{
+    border-top-color: var(--muted) !important;
+  }
+}
