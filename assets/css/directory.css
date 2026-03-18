@@ -51,7 +51,7 @@
 
 #viewEvents .table .row.row--events,
 #viewIndex .table .row.row--events{
-  border-top: 0 !important;
+  border-top: 0 !important; transform: none;
   position: relative;
   isolation: isolate;
 }
@@ -62,7 +62,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 0 !important;
+  top: 0 !important; transform: none;
   height: 1px;
   background: rgba(0,0,0,0.06);
   z-index: 30;
@@ -314,7 +314,7 @@
 #viewIndex .row.row--events .cell--event > .cell__cornerEar--desktop{
   position: absolute;
   right: 0;
-  top: 0 !important;
+  top: 0 !important; transform: none;
   z-index: 3;
   width: 0;
   height: 0;
@@ -349,7 +349,7 @@
     display: block !important;
     position: absolute;
     right: 0;
-    top: 0 !important;
+    top: 0 !important; transform: none;
     z-index: 3;
     width: 0;
     height: 0;
@@ -1131,7 +1131,7 @@ body.pricingPopupOpen{
 }
 
 #viewIndex .table .row.row--events{
-  border-top: 0 !important;
+  border-top: 0 !important; transform: none;
   position: relative;
   isolation: isolate;
 }
@@ -1141,7 +1141,7 @@ body.pricingPopupOpen{
   position: absolute;
   left: 0;
   right: 0;
-  top: 0 !important;
+  top: 0 !important; transform: none;
   height: 1px;
   background: rgba(0,0,0,0.06);
   z-index: 30;
@@ -1672,3 +1672,5 @@ body.pricingPopupOpen{
     border-bottom-right-radius: 22px;
   }
 }
+/* ensure parent row anchors ear */
+.event-row, .event-card { position: relative; }
