@@ -314,7 +314,7 @@
 #viewIndex .row.row--events .cell--event > .cell__cornerEar--desktop{
   position: absolute;
   right: 0;
-  top: 0 !important;
+  top: -8px;
   z-index: 3;
   width: 0;
   height: 0;
@@ -349,7 +349,7 @@
     display: block !important;
     position: absolute;
     right: 0;
-    top: 0 !important;
+    top: -5px;
     z-index: 3;
     width: 0;
     height: 0;
