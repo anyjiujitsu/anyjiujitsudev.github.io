@@ -311,6 +311,7 @@ function renderEventRow(r){
     presale: r.PRESALE,
     cash: r.CASH,
     venmo: r.VENMO,
+    signup: (r["SIGN UP"] ?? r.SIGNUP ?? r.SIGN_UP ?? ""),
     label: r.FOR || r.GYM || "—",
     mode: "desktop"
   });
@@ -320,6 +321,7 @@ function renderEventRow(r){
     presale: r.PRESALE,
     cash: r.CASH,
     venmo: r.VENMO,
+    signup: (r["SIGN UP"] ?? r.SIGNUP ?? r.SIGN_UP ?? ""),
     label: r.FOR || r.GYM || "—",
     mode: "mobile"
   });
@@ -375,7 +377,7 @@ function hasPriceInfo(nonMemberRaw){
   return !!String(nonMemberRaw ?? "").trim();
 }
 
-function buildPriceTrigger({ member, nonMember, presale, cash, venmo, label, mode = "desktop" }){
+function buildPriceTrigger({ member, nonMember, presale, cash, venmo, signup, label, mode = "desktop" }){
   if(!hasPriceInfo(nonMember)) return "";
 
   return `<button
@@ -387,6 +389,7 @@ function buildPriceTrigger({ member, nonMember, presale, cash, venmo, label, mod
     data-presale="${escapeHtml(presale ?? "")}"
     data-cash="${escapeHtml(cash ?? "")}"
     data-venmo="${escapeHtml(venmo ?? "")}"
+    data-signup="${escapeHtml(signup ?? "")}"
     data-label="${escapeHtml(label ?? "")}"
   ></button>`;
 }
@@ -503,10 +506,4 @@ function renderIndexIgLink(whereVal){
   const label = `@${handle}`;
 
   return `<a class="cell__whereLink" href="${href}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
-}
-
-
-// --- SIGN UP support ---
-function hasSignupFlag(row){
-  return (row["SIGN UP"] || row.SIGNUP || "").toString().toLowerCase() === "y";
 }
