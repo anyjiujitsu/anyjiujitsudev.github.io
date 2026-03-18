@@ -116,6 +116,21 @@ function getVenmoIconMarkup(){
   `;
 }
 
+
+function getSignupIconMarkup(){
+  return `
+    <svg viewBox="0 0 72 72" aria-hidden="true">
+      <g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round">
+        <rect x="12" y="12" width="48" height="48" rx="4"/>
+        <rect x="18" y="18" width="10" height="10"/>
+        <rect x="44" y="18" width="10" height="10"/>
+        <rect x="18" y="44" width="10" height="10"/>
+        <path d="M34 18h4v4h-4zM34 26h10M18 34h20M44 34h10M26 42h12M34 50h10"/>
+      </g>
+    </svg>
+  `;
+}
+
 function buildPaymentOption(label, iconMarkup){
   return `
     <div class="pricingPopup__payItem">
@@ -146,8 +161,10 @@ function openPricingPopup(trigger){
     const items = [];
     if(isAffirmative(ds.cash)) items.push(buildPaymentOption("CASH", getCashIconMarkup()));
     if(isAffirmative(ds.venmo)) items.push(buildPaymentOption("VENMO", getVenmoIconMarkup()));
+    if(isAffirmative(ds.signup)) items.push(buildPaymentOption("SIGN UP", getSignupIconMarkup()));
     paymentsEl.innerHTML = items.join("");
     paymentsEl.classList.toggle("pricingPopup__payments--single", items.length === 1);
+    paymentsEl.classList.toggle("pricingPopup__payments--double", items.length === 2);
     paymentsEl.classList.toggle("pricingPopup__payments--empty", items.length === 0);
   }
 
