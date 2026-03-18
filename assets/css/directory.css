@@ -1674,13 +1674,19 @@ body.pricingPopupOpen{
 }
 
 
-/* Past Events: pricing ear shifts from NEW orange to WHERE grey */
-#viewEvents .group--past .cell__cornerEar--desktop{
-  border-top-color: var(--muted) !important;
+/* SIGN UP icon */
+.priceIcon--signup{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
 }
 
-@media (max-width: 520px){
-  #viewEvents .group--past .cell__cornerEar--mobile{
-    border-top-color: var(--muted) !important;
-  }
+.priceIcon--signup::before{
+  content:"";
+  width:16px;
+  height:16px;
+  border:2px solid currentColor;
+  display:block;
+  margin-bottom:2px;
 }
