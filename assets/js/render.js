@@ -504,3 +504,9 @@ function renderIndexIgLink(whereVal){
 
   return `<a class="cell__whereLink" href="${href}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`;
 }
+
+
+// --- SIGN UP support ---
+function hasSignupFlag(row){
+  return (row["SIGN UP"] || row.SIGNUP || "").toString().toLowerCase() === "y";
+}
