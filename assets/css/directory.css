@@ -51,7 +51,7 @@
 
 #viewEvents .table .row.row--events,
 #viewIndex .table .row.row--events{
-  border-top: 0;
+  border-top: 0 !important;
   position: relative;
   isolation: isolate;
 }
@@ -62,7 +62,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 0;
+  top: 0 !important;
   height: 1px;
   background: rgba(0,0,0,0.06);
   z-index: 30;
@@ -314,12 +314,12 @@
 #viewIndex .row.row--events .cell--event > .cell__cornerEar--desktop{
   position: absolute;
   right: 0;
-  top: 0;
+  top: 0 !important;
   z-index: 3;
   width: 0;
   height: 0;
-  border-top: 13px solid #D16C4E;
-  border-left: 13px solid transparent;
+  border-top: 6px solid #D16C4E;
+  border-left: 6px solid transparent;
   pointer-events: none;
 }
 
@@ -349,12 +349,12 @@
     display: block !important;
     position: absolute;
     right: 0;
-    top: 0;
+    top: 0 !important;
     z-index: 3;
     width: 0;
     height: 0;
-    border-top: 11px solid #D16C4E;
-    border-left: 11px solid transparent;
+    border-top: 5px solid #D16C4E;
+    border-left: 5px solid transparent;
     pointer-events: none;
   }
 }
@@ -1131,7 +1131,7 @@ body.pricingPopupOpen{
 }
 
 #viewIndex .table .row.row--events{
-  border-top: 0;
+  border-top: 0 !important;
   position: relative;
   isolation: isolate;
 }
@@ -1141,7 +1141,7 @@ body.pricingPopupOpen{
   position: absolute;
   left: 0;
   right: 0;
-  top: 0;
+  top: 0 !important;
   height: 1px;
   background: rgba(0,0,0,0.06);
   z-index: 30;
