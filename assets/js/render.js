@@ -1,3 +1,5 @@
+const ENABLE_PRICING_POPUP = false;
+
 /* section: render (Index + Events)
    purpose: build DOM rows + grouped sections for Index and Events views
    notes: exports must match main.js imports (renderDirectoryGroups, renderEventsGroups) */
@@ -378,6 +380,7 @@ function hasPriceInfo(nonMemberRaw){
 }
 
 function buildPriceTrigger({ member, nonMember, presale, cash, venmo, signup, label, mode = "desktop" }){
+  if(!ENABLE_PRICING_POPUP) return "";
   if(!hasPriceInfo(nonMember)) return "";
 
   return `<button
@@ -395,6 +398,7 @@ function buildPriceTrigger({ member, nonMember, presale, cash, venmo, signup, la
 }
 
 function buildPriceInfoIcon(nonMemberRaw, mode = "desktop"){
+  if(!ENABLE_PRICING_POPUP) return "";
   if(!hasPriceInfo(nonMemberRaw)) return "";
   return `<span class="cell__cornerEar cell__cornerEar--${escapeHtml(mode)}" aria-hidden="true"></span>`;
 }
