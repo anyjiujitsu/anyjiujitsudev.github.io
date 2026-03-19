@@ -139,6 +139,38 @@ function isRowThisWeekend(row){
   return sameYMD(d, sat) || sameYMD(d, sun);
 }
 
+
+
+function weekendDatesForNextWeek(){
+  const now = new Date();
+  const mon = startOfWeekMonday(now);
+  const sat = new Date(mon); sat.setDate(mon.getDate() + 12);
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 13);
+  return { sat, sun };
+}
+
+function isRowNextWeekend(row){
+  const d = parseEventDate(row?.DATE);
+  if(!d) return false;
+  const { sat, sun } = weekendDatesForNextWeek();
+  return sameYMD(d, sat) || sameYMD(d, sun);
+}
+
+function extractNextWeekendToken(q){
+  // detect "next weekend" and remove from remaining query
+  const raw = String(q ?? "");
+  const n = norm(raw);
+  const wantsNextWeekend = n.includes("next weekend");
+  if(!wantsNextWeekend) return { wantsNextWeekend: false, remaining: raw };
+
+  const remainingNorm = n
+    .replace(/\bnext\s+weekend\b/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return { wantsNextWeekend: true, remaining: remainingNorm };
+}
+
 function extractThisWeekendToken(q){
   // detect "this weekend" and remove from remaining query
   const raw = String(q ?? "");
@@ -272,16 +304,19 @@ export function filterEvents(rows, state){
   // Search query + special tokens
   const tokenNew = extractNewEventsToken(state?.events?.q);
   const tokenWeekend = extractThisWeekendToken(tokenNew.remaining);
+  const tokenNextWeekend = extractNextWeekendToken(tokenWeekend.remaining);
 
-  const cs = clauses(tokenWeekend.remaining);
+  const cs = clauses(tokenNextWeekend.remaining);
   const wantsNew = tokenNew.wantsNew;
   const wantsWeekend = tokenWeekend.wantsWeekend;
+  const wantsNextWeekend = tokenNextWeekend.wantsNextWeekend;
 
-  if(!cs.length && !wantsNew && !wantsWeekend) return out;
+  if(!cs.length && !wantsNew && !wantsWeekend && !wantsNextWeekend) return out;
 
   return out.filter(r => {
     if(wantsNew && !isRowNew(r)) return false;
     if(wantsWeekend && !isRowThisWeekend(r)) return false;
+    if(wantsNextWeekend && !isRowNextWeekend(r)) return false;
 
     if(!cs.length) return true;
 
