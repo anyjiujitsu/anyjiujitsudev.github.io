@@ -494,7 +494,7 @@ body.pricingPopupOpen{
 
 .pricingPopup__payments{
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   align-items: start;
   justify-items: center;
@@ -507,6 +507,14 @@ body.pricingPopupOpen{
 
 .pricingPopup__payments--single{
   grid-template-columns: 1fr;
+}
+
+.pricingPopup__payments--double{
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pricingPopup__payments:has(.pricingPopup__payItem:nth-child(2):last-child){
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .pricingPopup__payments--empty{
@@ -1670,17 +1678,5 @@ body.pricingPopupOpen{
   .pricingPopup__payments{
     border-bottom-left-radius: 22px;
     border-bottom-right-radius: 22px;
-  }
-}
-
-
-/* Past Events: pricing ear shifts from NEW orange to WHERE grey */
-#viewEvents .group--past .cell__cornerEar--desktop{
-  border-top-color: var(--muted) !important;
-}
-
-@media (max-width: 520px){
-  #viewEvents .group--past .cell__cornerEar--mobile{
-    border-top-color: var(--muted) !important;
   }
 }
