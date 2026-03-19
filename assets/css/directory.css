@@ -1684,13 +1684,3 @@ body.pricingPopupOpen{
     border-top-color: var(--muted) !important;
   }
 }
-
-
-/* Pricing popup spacing adjustments */
-.priceRow{
-  margin-top: 10px;
-}
-
-.priceRow--presale{
-  margin-top: 14px;
-}
