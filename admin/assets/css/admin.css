@@ -529,3 +529,61 @@
     font-size: 12px;
   }
 }
+
+
+
+/* EVENTS: PRICE triple row */
+.adminPriceRow{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px 14px;
+  align-items:center;
+}
+.adminPriceRow .adminInput{
+  text-transform: uppercase;
+}
+
+/* EVENTS: PAYMENT checkbox row */
+.adminPaymentRow{
+  display:flex;
+  flex-wrap: wrap;
+  gap: 10px 12px;
+  align-items:center;
+  min-height: 44px;
+}
+.adminCheck{
+  display:inline-flex;
+  align-items:center;
+  gap: 7px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 11px;
+  color: rgba(0,0,0,0.60);
+  user-select: none;
+}
+.adminCheck input{
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: rgba(0,0,0,0.65);
+}
+
+@media (max-width: 520px){
+  .adminPriceRow{
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+  .adminPriceRow .adminInput{
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 12px;
+  }
+  .adminPaymentRow{
+    gap: 8px 10px;
+  }
+  .adminCheck{
+    font-size: 10px;
+    letter-spacing: 0.05em;
+  }
+}
