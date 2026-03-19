@@ -622,7 +622,7 @@ if(idxState) idxState.addEventListener('change', scheduleGeocode);
 
   // --- GitHub CSV append/commit (matches QA admin logic) ---
   const OWNER  = 'anyjiujitsu';
-  const REPO   = 'anyjiujitsu.github.io/anyjiujitsudev.github.io';
+  const REPO   = 'anyjiujitsudev.github.io';
   const BRANCH = 'main';
 
   // Paths inside the repo (must exist)
