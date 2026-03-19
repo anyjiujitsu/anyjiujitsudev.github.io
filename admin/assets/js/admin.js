@@ -694,6 +694,13 @@ if(idxState) idxState.addEventListener('change', scheduleGeocode);
     const map = {};
     for(const [k,v] of fd.entries()) map[k] = (v ?? '').toString().trim();
 
+    if(form && form.id === 'eventForm'){
+      ['CASH','VENMO','SIGN UP'].forEach((name) => {
+        const el = form.querySelector(`[name="${name}"]`);
+        map[name] = (el && el.checked) ? 'Y' : '';
+      });
+    }
+
     // Normalize event date (native date picker returns yyyy-mm-dd)
     if(form && form.id === 'eventForm' && map.DATE){
       map.DATE = normalizeEventDate(map.DATE);
