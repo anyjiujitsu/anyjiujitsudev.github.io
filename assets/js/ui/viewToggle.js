@@ -39,7 +39,7 @@ function applyProgress($, p){
   if(mode !== lastViewTitleMode){
     lastViewTitleMode = mode;
     const viewTitle = $("viewTitle");
-    if(viewTitle) viewTitle.textContent = (mode === "index") ? "FIND TRAINING" : "EVENTS (DEV)";
+    if(viewTitle) viewTitle.textContent = (mode === "index") ? "FIND TRAINING" : "EVENTS";
   }
   return clamped;
 }
