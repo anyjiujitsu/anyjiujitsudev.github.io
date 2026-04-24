@@ -2,6 +2,52 @@
 // purpose: all pill dropdown wiring + menu positioning + hasSelection indicator
 
 /* ------------------ Utilities ------------------ */
+const eventsOptionCache = new WeakMap();
+const directoryOptionCache = new WeakMap();
+
+function getEventsOptions(rows){
+  const key = Array.isArray(rows) ? rows : [];
+  const cached = eventsOptionCache.get(key);
+  if(cached) return cached;
+
+  const years = new Set();
+  const states = new Set();
+  const types = new Set();
+
+  for(const r of key){
+    const y = r._eventYear || parseYearFromEventRow(r);
+    const s = String(r.STATE ?? "").trim();
+    const t = String(r.TYPE ?? "").trim();
+    if(y) years.add(y);
+    if(s) states.add(s);
+    if(t) types.add(t);
+  }
+
+  const options = {
+    years: Array.from(years).sort((a,b)=>Number(b)-Number(a)),
+    states: Array.from(states).sort((a,b)=>a.localeCompare(b)),
+    types: Array.from(types).sort((a,b)=>a.localeCompare(b)),
+  };
+  eventsOptionCache.set(key, options);
+  return options;
+}
+
+function getDirectoryOptions(rows){
+  const key = Array.isArray(rows) ? rows : [];
+  const cached = directoryOptionCache.get(key);
+  if(cached) return cached;
+
+  const states = new Set();
+  for(const r of key){
+    const s = String(r.STATE ?? "").trim();
+    if(s) states.add(s);
+  }
+
+  const options = { states: Array.from(states).sort((a,b)=>a.localeCompare(b)) };
+  directoryOptionCache.set(key, options);
+  return options;
+}
+
 function parseYearFromEventRow(r){
   const y = String(r?.YEAR ?? "").trim();
   if(y) return y;
@@ -14,39 +60,19 @@ function parseYearFromEventRow(r){
 }
 
 function uniqYearsFromEvents(rows){
-  const set = new Set();
-  rows.forEach(r=>{
-    const y = parseYearFromEventRow(r);
-    if(y) set.add(y);
-  });
-  return Array.from(set).sort((a,b)=>Number(b)-Number(a));
+  return getEventsOptions(rows).years;
 }
 
 function uniqStatesFromEvents(rows){
-  const set = new Set();
-  rows.forEach(r=>{
-    const s = String(r.STATE ?? "").trim();
-    if(s) set.add(s);
-  });
-  return Array.from(set).sort((a,b)=>a.localeCompare(b));
+  return getEventsOptions(rows).states;
 }
 
 function uniqTypesFromEvents(rows){
-  const set = new Set();
-  rows.forEach(r=>{
-    const t = String(r.TYPE ?? "").trim();
-    if(t) set.add(t);
-  });
-  return Array.from(set).sort((a,b)=>a.localeCompare(b));
+  return getEventsOptions(rows).types;
 }
 
 function uniqStatesFromDirectory(rows){
-  const set = new Set();
-  rows.forEach(r=>{
-    const s = String(r.STATE ?? "").trim();
-    if(s) set.add(s);
-  });
-  return Array.from(set).sort((a,b)=>a.localeCompare(b));
+  return getDirectoryOptions(rows).states;
 }
 
 function buildMenuList(panelEl, items, selectedSet, onToggle){
