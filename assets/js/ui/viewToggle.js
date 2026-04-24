@@ -1,6 +1,7 @@
 // ui/viewToggle.js
 // purpose: view state, slider UI, tab clicks, and swipe gestures
 
+import { CUSTOMIZATION } from "../../../customization.js";
 import { state, setView } from "../state.js?v=20260212-902";
 import { refreshEventsPillDots } from "./pills.js?v=20260210-911";
 
@@ -112,7 +113,7 @@ export function setViewUI(view, { $, onIndexViewOpen } = {}){
   if(evStatus) evStatus.hidden = (view !== "events");
   if(idxStatus) idxStatus.hidden = (view !== "index");
 
-  document.title = "ANY N.E. GRAPPLING (DEV)";
+  document.title = CUSTOMIZATION.siteHeaderName || "ANY N.E. GRAPPLING (DEV)";
 
   setTransition(260);
   refreshEventsPillDots({ $, activeEventsState });
