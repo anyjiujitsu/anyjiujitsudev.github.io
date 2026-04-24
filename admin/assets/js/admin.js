@@ -1,3 +1,5 @@
+import { parseCSVRows } from "../../../assets/js/utils/csv.js";
+
 
 /* Admin panel
    - Uses main-site header + viewToggle styling
@@ -123,68 +125,6 @@
   // so entry fields stay consistent with the dataset.
   const PUBLIC_EVENTS_CSV = '../data/events.csv';
 
-  function parseCSV(text){
-    // RFC4180-ish parser (handles quotes + commas + newlines)
-    const rows = [];
-    let row = [];
-    let cell = '';
-    let inQuotes = false;
-
-    for(let i=0;i<text.length;i++){
-      const ch = text[i];
-
-      if(inQuotes){
-        if(ch === '"'){
-          const next = text[i+1];
-          if(next === '"'){ // escaped quote
-            cell += '"';
-            i++;
-          }else{
-            inQuotes = false;
-          }
-        }else{
-          cell += ch;
-        }
-        continue;
-      }
-
-      if(ch === '"'){
-        inQuotes = true;
-        continue;
-      }
-
-      if(ch === ','){
-        row.push(cell);
-        cell = '';
-        continue;
-      }
-
-      if(ch === '\n'){
-        row.push(cell);
-        rows.push(row);
-        row = [];
-        cell = '';
-        continue;
-      }
-
-      if(ch === '\r'){
-        continue;
-      }
-
-      cell += ch;
-    }
-
-    // last cell/row
-    row.push(cell);
-    rows.push(row);
-
-    // trim any trailing empty rows
-    while(rows.length && rows[rows.length-1].every(v => String(v||'').trim() === '')){
-      rows.pop();
-    }
-    return rows;
-  }
-
   function uniqueNonEmpty(values){
     const seen = new Set();
     const out = [];
@@ -299,7 +239,7 @@
       const res = await fetch(PUBLIC_EVENTS_CSV, { cache: 'no-store' });
       if(!res.ok) return;
       const text = await res.text();
-      const rows = parseCSV(text);
+      const rows = parseCSVRows(text);
       if(!rows || rows.length < 2) return;
 
       const headers = rows[0].map(h => String(h||'').trim().toUpperCase());
