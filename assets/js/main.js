@@ -1,7 +1,6 @@
 // main.js
 // purpose: app bootstrap + data loading + render orchestration
 
-import { applyCustomization } from "../../customization.js";
 import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260210-911";
 import { state, setIndexQuery, setEventsQuery, setIndexEventsQuery, setIndexDistanceMiles, setIndexDistanceFrom } from "./state.js?v=20260212-902";
 import { filterEvents } from "./filters.js?v=20260210-911";
@@ -66,6 +65,7 @@ function render(){
 }
 
 async function init(){
+  const { applyCustomization } = await import(`../../customization.js?v=${Date.now()}`);
   applyCustomization();
 
   wireViewToggle({ $, onIndexViewOpen: syncIndexDistanceUI });
