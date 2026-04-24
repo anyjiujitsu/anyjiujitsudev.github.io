@@ -2,7 +2,7 @@
 // purpose: Index view directory remap + filters used by the Events-style card renderer
 
 export function dirToIndexEventRow(r){
-  return {
+  const row = {
     EVENT: "Drop Ins:",
     FOR: r.NAME || "",
     WHERE: r.IG || "",
@@ -13,6 +13,11 @@ export function dirToIndexEventRow(r){
     OTA: (r.OTA || "").toUpperCase(),
     CREATED: ""
   };
+
+  row.hasSat = !!String(row.DAY || "").trim();
+  row.hasSun = !!String(row.DATE || "").trim();
+  row.searchText = [row.EVENT, row.FOR, row.WHERE, row.CITY, row.STATE, row.DAY, row.DATE, row.OTA].join(" ").toLowerCase();
+  return row;
 }
 
 export function filterIndexDirectoryAsEvents(rows, idxState){
@@ -28,7 +33,7 @@ export function filterIndexDirectoryAsEvents(rows, idxState){
 
   return rows.filter(r=>{
     if(q){
-      const hay = `${r.EVENT} ${r.FOR} ${r.WHERE} ${r.CITY} ${r.STATE} ${r.DAY} ${r.DATE} ${r.OTA}`.toLowerCase();
+      const hay = r.searchText || `${r.EVENT} ${r.FOR} ${r.WHERE} ${r.CITY} ${r.STATE} ${r.DAY} ${r.DATE} ${r.OTA}`.toLowerCase();
       if(!hay.includes(q)) return false;
     }
     if(stateSet.size){
@@ -37,8 +42,8 @@ export function filterIndexDirectoryAsEvents(rows, idxState){
     }
     // OPENS pill (Index view repurposed from YEAR): filter by SAT/SUN availability.
     if(yearSet.size){
-      const hasSat = String(r.DAY || "").trim() !== "";
-      const hasSun = String(r.DATE || "").trim() !== "";
+      const hasSat = r.hasSat ?? (String(r.DAY || "").trim() !== "");
+      const hasSun = r.hasSun ?? (String(r.DATE || "").trim() !== "");
       const wantSat  = yearSet.has("SATURDAY");
       const wantSun  = yearSet.has("SUNDAY");
       const wantBoth = yearSet.has("BOTH") || (wantSat && wantSun);
