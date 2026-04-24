@@ -629,3 +629,36 @@
   min-width: 0 !important;
   box-sizing: border-box;
 }
+
+/* section: fixed admin field colors | purpose: keep fillable admin controls non-customizable */
+.adminInput,
+.adminSelect,
+.adminTimePickRow select,
+.adminTimeDisplay,
+.acMenu{
+  background: #fff;
+  color: rgba(0,0,0,0.75);
+  -webkit-text-fill-color: rgba(0,0,0,0.75);
+}
+
+.adminDateWrap{
+  background: #fff;
+}
+
+.adminDateWrap .adminDateInput{
+  background: transparent;
+}
+
+.adminInput[disabled],
+.adminInput[readonly],
+.adminLatLonRow .adminInput[readonly]{
+  background: rgba(0,0,0,0.05);
+  color: rgba(0,0,0,0.55);
+  -webkit-text-fill-color: rgba(0,0,0,0.55);
+}
+
+.adminTimeDisplay{
+  background: #fff !important;
+  color: rgba(0,0,0,0.75) !important;
+  -webkit-text-fill-color: rgba(0,0,0,0.75) !important;
+}
