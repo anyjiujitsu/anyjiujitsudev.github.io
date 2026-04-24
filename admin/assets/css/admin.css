@@ -712,3 +712,22 @@
 #saveToken:hover{
   background: #ffffff !important;
 }
+
+/* section: fixed form action buttons | purpose: keep admin Clear + Submit buttons non-customizable */
+.adminActionBtn,
+.adminActions .adminActionBtn,
+.adminActions .adminActionBtn[type="button"],
+.adminActions .adminActionBtn[type="submit"]{
+  background: #ffffff !important;
+  color: rgba(0,0,0,0.75) !important;
+  -webkit-text-fill-color: rgba(0,0,0,0.75) !important;
+  border: 0 !important;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.10) !important;
+}
+
+.adminActionBtn:hover,
+.adminActions .adminActionBtn:hover,
+.adminActions .adminActionBtn[type="button"]:hover,
+.adminActions .adminActionBtn[type="submit"]:hover{
+  background: #ffffff !important;
+}
