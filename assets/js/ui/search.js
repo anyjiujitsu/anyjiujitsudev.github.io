@@ -37,6 +37,7 @@ export function wireSearch({ $, state, setIndexQuery, setIndexEventsQuery, setAc
 export function wireSearchSuggestions({
   $,
   setActiveEventsQuery,
+  setIndexDistanceMiles,
   isEventsView,
   isIndexView,
   onIndexViewOpen,
