@@ -662,3 +662,53 @@
   color: rgba(0,0,0,0.75) !important;
   -webkit-text-fill-color: rgba(0,0,0,0.75) !important;
 }
+
+/* section: fixed token controls | purpose: keep admin token entry + submit button non-customizable */
+.adminTokenPill{
+  background: rgba(255,255,255,0.95) !important;
+  border: 1px solid rgba(0,0,0,0.10) !important;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12) !important;
+}
+
+.adminTokenPill input,
+#ghToken{
+  background: transparent !important;
+  color: rgba(0,0,0,0.75) !important;
+  -webkit-text-fill-color: rgba(0,0,0,0.75) !important;
+  caret-color: rgba(0,0,0,0.75) !important;
+}
+
+.adminTokenPill input::placeholder,
+#ghToken::placeholder{
+  color: rgba(0,0,0,0.45) !important;
+  -webkit-text-fill-color: rgba(0,0,0,0.45) !important;
+}
+
+.adminTokenSvg,
+.adminTokenIcon,
+.adminTokenEye{
+  color: rgba(0,0,0,0.55) !important;
+}
+
+.adminTokenEye{
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.adminTokenStatus{
+  background: #e2e4e4 !important;
+  color: rgba(0,0,0,0.45) !important;
+}
+
+.adminFilters .distance__apply,
+#saveToken{
+  background: rgba(255,255,255,0.95) !important;
+  border: 1px solid rgba(0,0,0,0.10) !important;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.12) !important;
+  color: #234c31 !important;
+}
+
+.adminFilters .distance__apply:hover,
+#saveToken:hover{
+  background: #ffffff !important;
+}
