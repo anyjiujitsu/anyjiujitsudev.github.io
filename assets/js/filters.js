@@ -22,13 +22,13 @@ function clauses(q){
 function includesAllWords(hay, needle){
   const words = norm(needle).split(" ").filter(Boolean);
   if(!words.length) return true;
-  const h = norm(hay);
+  const h = String(hay ?? "");
   return words.every(w => h.includes(w));
 }
 
 /* section: events created | purpose: parse CREATED field */
 function createdDateFromRow(row){
-  return parseCreatedDate(row?.CREATED);
+  return row?._createdDate || parseCreatedDate(row?.CREATED);
 }
 
 /* section: events tokens | purpose: "new events" matches CREATED within last 4 days */
@@ -69,7 +69,7 @@ function weekendDatesForCurrentWeek(){
 }
 
 function isRowThisWeekend(row){
-  const d = parseEventDate(row?.DATE);
+  const d = row?._date || parseEventDate(row?.DATE);
   if(!d) return false;
   const { sat, sun } = weekendDatesForCurrentWeek();
   return sameYMD(d, sat) || sameYMD(d, sun);
@@ -86,7 +86,7 @@ function weekendDatesForNextWeek(){
 }
 
 function isRowNextWeekend(row){
-  const d = parseEventDate(row?.DATE);
+  const d = row?._date || parseEventDate(row?.DATE);
   if(!d) return false;
   const { sat, sun } = weekendDatesForNextWeek();
   return sameYMD(d, sat) || sameYMD(d, sun);
@@ -135,15 +135,11 @@ export function filterDirectory(rows, state){
 
     // if ALL selected, treat as "Sat OR Sun"
     if(wantAll){
-      out = out.filter(r =>
-        (r.SAT && String(r.SAT).trim()) || (r.SUN && String(r.SUN).trim())
-      );
+      out = out.filter(r => r.hasSat || r.hasSun);
     } else {
       // otherwise OR across selected days
       out = out.filter(r => {
-        const hasSat = (r.SAT && String(r.SAT).trim());
-        const hasSun = (r.SUN && String(r.SUN).trim());
-        return (wantSat && hasSat) || (wantSun && hasSun);
+        return (wantSat && r.hasSat) || (wantSun && r.hasSun);
       });
     }
   }
@@ -167,9 +163,9 @@ export function filterDirectory(rows, state){
   return out.filter(r => {
     return cs.every(c => {
       // special tokens
-      if(c === "sat" || c === "saturday") return !!(r.SAT && String(r.SAT).trim());
-      if(c === "sun" || c === "sunday") return !!(r.SUN && String(r.SUN).trim());
-      if(c === "open mat") return !!((r.SAT && String(r.SAT).trim()) || (r.SUN && String(r.SUN).trim()));
+      if(c === "sat" || c === "saturday") return !!r.hasSat;
+      if(c === "sun" || c === "sunday") return !!r.hasSun;
+      if(c === "open mat") return !!(r.hasSat || r.hasSun);
 
       const hay = r.searchText ?? `${r.STATE} ${r.CITY} ${r.NAME} ${r.IG} ${r.SAT} ${r.SUN} ${r.OTA}`;
       return includesAllWords(hay, c);
@@ -184,7 +180,7 @@ export function filterEvents(rows, state){
   // YEAR pill (multi-select)
   const years = state?.events?.year;
   if(years && years.size){
-    out = out.filter(r => years.has(eventYear(r)));
+    out = out.filter(r => years.has(r._eventYear || eventYear(r)));
   }
 
   // STATE pill
@@ -218,7 +214,7 @@ export function filterEvents(rows, state){
 
     if(!cs.length) return true;
 
-    const group = monthYearLabel(r.DATE);
+    const group = r._monthYearLabel || monthYearLabel(r.DATE);
     const base = r.searchText ?? `${r.YEAR} ${r.STATE} ${r.CITY} ${r.GYM} ${r.TYPE} ${r.DATE}`;
     const hay = `${base} ${group}`;
 
