@@ -14,9 +14,6 @@ export const CUSTOMIZATION = Object.freeze({
   // INSTAGRAM LINK: instagram icon destination
   instagramLink: "https://www.instagram.com/any.jiujitsu/",
 
-  // GITHUB LINK: GitHub icon destination
-  githubLink: "https://github.com/anyjiujitsu/anyjiujitsu.github.io",
-
   // PAGE HEADER COLOR: title/filter/header accent color
   pageHeaderColor: "#234c31",
 
