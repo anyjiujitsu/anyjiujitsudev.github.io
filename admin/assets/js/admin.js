@@ -8,12 +8,40 @@ import { initWhereCitySuggestions } from './modules/suggestions.js';
 import { setupOpensTimeSync } from './modules/time.js';
 import { initTokenControls } from './modules/token.js';
 
-const { setTokenStatus, validateAndStoreToken } = initTokenControls();
-initAdminPager();
-initWhereCitySuggestions();
+async function loadAdminCustomization(){
+  try{
+    const mod = await import(`../../../customization.js?v=${Date.now()}`);
+    const customization = mod.CUSTOMIZATION || {};
 
-const indexForm = document.getElementById('indexForm');
-setupOpensTimeSync(indexForm);
+    if(typeof mod.applyCustomization === "function"){
+      mod.applyCustomization(customization);
+    }
 
-const geoController = setupIndexGeocode(indexForm);
-initAdminForms({ validateAndStoreToken, setTokenStatus, geoController });
+    const siteName = typeof customization.siteHeaderName === "string"
+      ? customization.siteHeaderName.trim()
+      : "";
+
+    if(siteName){
+      document.title = `${siteName} - Admin`;
+    }
+  } catch(err){
+    console.warn("Admin customization failed to load", err);
+  }
+}
+
+
+async function initAdmin(){
+  await loadAdminCustomization();
+
+  const { setTokenStatus, validateAndStoreToken } = initTokenControls();
+  initAdminPager();
+  initWhereCitySuggestions();
+
+  const indexForm = document.getElementById('indexForm');
+  setupOpensTimeSync(indexForm);
+
+  const geoController = setupIndexGeocode(indexForm);
+  initAdminForms({ validateAndStoreToken, setTokenStatus, geoController });
+}
+
+initAdmin();
