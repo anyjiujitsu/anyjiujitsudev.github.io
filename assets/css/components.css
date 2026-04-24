@@ -120,7 +120,7 @@
   font-synthesis: none;
 }
 
-.viewToggle__tab[aria-selected="true"]{ color: #111; }
+.viewToggle__tab[aria-selected="true"]{ color: var(--text); }
 
 .viewToggle__thumb{
   position: absolute;
@@ -226,7 +226,7 @@ line-height: 1;
   font-variation-settings: 'wdth' 100, 'wght' 500;
   font-size: var(--pillFont);
   font-weight: 600;
-  color: rgba(0,0,0,0.55);
+  color: var(--muted);
   white-space: nowrap;
     color: #7a7a7a; /* softer grey */
 }
@@ -306,13 +306,13 @@ line-height: 1;
 .row:first-child{ border-top: 0; }
 
 .cell__name{ font-weight: 800; }
-.cell__ig{ font-size: calc(var(--rowFont) - 2px); color: rgba(0,0,0,0.55); margin-top: 2px; }
+.cell__ig{ font-size: calc(var(--rowFont) - 2px); color: var(--muted); margin-top: 2px; }
 
 .cell__city{ font-weight: 800; }
-.cell__state{ font-size: calc(var(--rowFont) - 2px); color: rgba(0,0,0,0.55); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em; }
+.cell__state{ font-size: calc(var(--rowFont) - 2px); color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.06em; }
 
 .cell__days{ font-weight: 800; text-align: right; }
-.cell__ota{ font-size: calc(var(--rowFont) - 2px); color: rgba(0,0,0,0.55); margin-top: 2px; text-align: right; }
+.cell__ota{ font-size: calc(var(--rowFont) - 2px); color: var(--muted); margin-top: 2px; text-align: right; }
 
 /* MOBILE: tighter spacing + ensure header fits */
 @media (max-width: 430px){
@@ -823,7 +823,7 @@ nav.filters, .filters__inner, .pillRow{
   right: 0;
   top: calc(-1 * var(--evRowBleedY));
   bottom: calc(-1 * var(--evRowBleedY));
-  background: rgba(232, 221, 198, 0.85);
+  background: var(--beige);
   border-radius: 0 0 0 0;
   z-index: 0;
   pointer-events: none;
@@ -856,7 +856,7 @@ nav.filters, .filters__inner, .pillRow{
   right: 0;
   top: calc(-1 * var(--evRowBleedY));
   bottom: calc(-1 * var(--evRowBleedY));
-  background: rgba(232, 221, 198, 0.85);
+  background: var(--beige);
   border-radius: 0 0 0 0;
   z-index: 0;
   pointer-events: none;
@@ -1000,7 +1000,7 @@ nav.filters, .filters__inner, .pillRow{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--green);
+  color: var(--icon);
   opacity: 1;
   text-decoration: none;
   transition: opacity 0.15s ease;
