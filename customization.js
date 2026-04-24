@@ -21,7 +21,7 @@ export const CUSTOMIZATION = Object.freeze({
   iconsColor: "#234c31",
 
   // PAGE BACKGROUND COLOR
-  pageBackgroundColor: "#ebebeb",
+  pageBackgroundColor: "#000000",
 
   // TABLE HEADER COLUMN COLOR: highlighted first/event column color
   tableHeaderColumnColor: "rgba(232, 221, 198, 0.85)",
