@@ -1,3 +1,5 @@
+import { formatMonthYear, formatShortDate, localMidnight, localMidnightDaysAgo, parseCreatedDate, parseEventDate } from "./utils/dates.js";
+
 const ENABLE_PRICING_POPUP = false;
 
 /* section: render (Index + Events)
@@ -34,7 +36,7 @@ export function renderDirectoryGroups(root, rows){
 
   for(const [labelText, list] of grouped){
     const group = document.createElement("section");
-    group.className = "group" + (isPast ? " group--past" : "");
+    group.className = "group";
 
     const label = document.createElement("div");
     label.className = "group__label";
@@ -302,9 +304,7 @@ function renderEventRow(r){
 
   const rawDate = String(r.DATE ?? "").trim();
   const parsed = rawDate ? parseEventDate(rawDate) : null;
-  const dateText = parsed
-    ? `${String(parsed.getMonth()+1).padStart(2,"0")}/${String(parsed.getDate()).padStart(2,"0")}/${String(parsed.getFullYear()).slice(-2)}`
-    : (rawDate || "—");
+  const dateText = parsed ? formatShortDate(parsed) : (rawDate || "—");
 
   const showNew = shouldShowNew(r.CREATED);
   const priceTriggerDesktop = buildPriceTrigger({
@@ -416,23 +416,6 @@ function shouldShowNew(createdRaw){
   return d >= localMidnightDaysAgo(4);
 }
 
-function parseCreatedDate(str){
-  const ms = Date.parse(str);
-  if(!Number.isNaN(ms)) return new Date(ms);
-  return parseEventDate(str);
-}
-
-function localMidnightDaysAgo(days){
-  const m = localMidnight();
-  m.setDate(m.getDate() - days);
-  return m;
-}
-
-function localMidnight(){
-  const n = new Date();
-  return new Date(n.getFullYear(), n.getMonth(), n.getDate());
-}
-
 function groupEventsByMonth(rows, dir){
   const m = new Map();
   for(const r of rows){
@@ -461,22 +444,6 @@ function minDateIn(list){
     if(d && (!best || d < best)) best = d;
   }
   return best;
-}
-
-function parseEventDate(s){
-  const str = String(s ?? "").trim();
-  if(!str) return null;
-  const m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if(m){
-    const d = new Date(Number(m[3]), Number(m[1]) - 1, Number(m[2]));
-    return isNaN(d) ? null : d;
-  }
-  const d = new Date(str);
-  return isNaN(d) ? null : d;
-}
-
-function formatMonthYear(d){
-  return d.toLocaleString("en-US", { month: "long", year: "numeric" });
 }
 
 function groupByKey(rows, keyFn){
