@@ -127,7 +127,7 @@ export function renderEventsGroups(root, rows){
   const unknown = [];
 
   for(const r of rows){
-    const d = parseEventDate(r.DATE);
+    const d = r._date || parseEventDate(r.DATE);
     if(!d){
       unknown.push(r);
     } else if(d < todayMidnight){
@@ -284,8 +284,8 @@ function renderEventGroup(root, groupTuple, dir, isPast=false){
   table.className = "table";
 
   const sorted = [...list].sort((a,b)=>{
-    const da = parseEventDate(a.DATE)?.getTime() ?? (dir === "asc" ? Infinity : -Infinity);
-    const db = parseEventDate(b.DATE)?.getTime() ?? (dir === "asc" ? Infinity : -Infinity);
+    const da = a._dateTime ?? (parseEventDate(a.DATE)?.getTime() ?? (dir === "asc" ? Infinity : -Infinity));
+    const db = b._dateTime ?? (parseEventDate(b.DATE)?.getTime() ?? (dir === "asc" ? Infinity : -Infinity));
     return dir === "asc" ? da - db : db - da;
   });
 
@@ -303,10 +303,10 @@ function renderEventRow(r){
   row.className = "row row--events";
 
   const rawDate = String(r.DATE ?? "").trim();
-  const parsed = rawDate ? parseEventDate(rawDate) : null;
+  const parsed = r._date || (rawDate ? parseEventDate(rawDate) : null);
   const dateText = parsed ? formatShortDate(parsed) : (rawDate || "—");
 
-  const showNew = shouldShowNew(r.CREATED);
+  const showNew = shouldShowNew(r.CREATED, r);
   const priceTriggerDesktop = buildPriceTrigger({
     member: r.MEMBER,
     nonMember: r.NONMEMBER,
@@ -408,10 +408,10 @@ function getWhereText(r){
   return t || "HOSTED LOCATION";
 }
 
-function shouldShowNew(createdRaw){
+function shouldShowNew(createdRaw, row){
   const raw = String(createdRaw ?? "").trim();
   if(!raw) return false;
-  const d = parseCreatedDate(raw);
+  const d = row?._createdDate || parseCreatedDate(raw);
   if(!d) return false;
   return d >= localMidnightDaysAgo(4);
 }
@@ -419,8 +419,8 @@ function shouldShowNew(createdRaw){
 function groupEventsByMonth(rows, dir){
   const m = new Map();
   for(const r of rows){
-    const d = parseEventDate(r.DATE);
-    const key = d ? formatMonthYear(d) : "Unknown Date";
+    const d = r._date || parseEventDate(r.DATE);
+    const key = r._monthYearLabel || (d ? formatMonthYear(d) : "Unknown Date");
     if(!m.has(key)) m.set(key, []);
     m.get(key).push(r);
   }
@@ -440,7 +440,7 @@ function groupEventsByMonth(rows, dir){
 function minDateIn(list){
   let best = null;
   for(const r of list){
-    const d = parseEventDate(r.DATE);
+    const d = r._date || parseEventDate(r.DATE);
     if(d && (!best || d < best)) best = d;
   }
   return best;
