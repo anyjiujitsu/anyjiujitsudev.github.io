@@ -14,6 +14,9 @@ export const CUSTOMIZATION = Object.freeze({
   // INSTAGRAM LINK: instagram icon destination
   instagramLink: "https://www.instagram.com/any.jiujitsu/",
 
+  // GITHUB LINK: GitHub icon destination
+  githubLink: "https://github.com/anyjiujitsu/anyjiujitsu.github.io",
+
   // PAGE HEADER COLOR: title/filter/header accent color
   pageHeaderColor: "#234c31",
 
@@ -63,6 +66,11 @@ export function applyCustomization(customization = CUSTOMIZATION){
   const instagramLink = document.querySelector('[data-customization-link="instagram"]');
   if(instagramLink && typeof customization.instagramLink === "string" && customization.instagramLink.trim()){
     instagramLink.href = customization.instagramLink.trim();
+  }
+
+  const githubLink = document.querySelector('[data-customization-link="github"]');
+  if(githubLink && typeof customization.githubLink === "string" && customization.githubLink.trim()){
+    githubLink.href = customization.githubLink.trim();
   }
 
   const contactLink = document.querySelector('[data-customization-link="contact"]');
