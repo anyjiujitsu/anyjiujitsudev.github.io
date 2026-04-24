@@ -1,15 +1,25 @@
 /* section: tokens | purpose: global design variables */
 :root{
   /* section: theme | purpose: core colors */
-  --bg: #ebebeb;
-  --green: #234c31;
-  --row: #e2e4e4;
-  --beige: #ebdeca;
+  --page-background-color: #ebebeb;
+  --page-header-color: #234c31;
+  --icons-color: #234c31;
+  --table-header-column-color: rgba(232, 221, 198, 0.85);
+  --table-field-column-color: #e2e4e4;
+  --table-text-line-1-color: #111111;
+  --table-text-line-2-color: rgba(0,0,0,0.55);
+
+  /* section: theme aliases | purpose: preserve existing internal token names */
+  --bg: var(--page-background-color);
+  --green: var(--page-header-color);
+  --icon: var(--icons-color);
+  --row: var(--table-field-column-color);
+  --beige: var(--table-header-column-color);
   --shadow: rgba(0,0,0,0.18);
 
   /* section: text | purpose: base + muted text */
-  --text: #111;
-  --muted: rgba(0,0,0,0.55);
+  --text: var(--table-text-line-1-color);
+  --muted: var(--table-text-line-2-color);
 
   /* section: layout | purpose: radius + spacing */
   --radius: 14px;
