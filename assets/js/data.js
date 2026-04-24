@@ -1,57 +1,15 @@
 /* section: data loading | purpose: fetch CSV with cache disabled */
+import { parseCSVObjects } from "./utils/csv.js";
+
 export async function loadCSV(url){
   const res = await fetch(url, { cache: "no-store" });
   if(!res.ok) throw new Error(`Failed to load CSV: ${res.status}`);
   const text = await res.text();
-  return parseCSV(text);
+  return parseCSVObjects(text);
 }
 
-/* section: csv parsing | purpose: convert CSV text to row objects */
-export function parseCSV(text){
-  const lines = text
-    .split(/\r?\n/)
-    .filter(l => l.trim().length > 0);
-
-  if(!lines.length) return [];
-
-  const headers = splitLine(lines[0]).map(h => h.trim());
-  const rows = [];
-
-  for(let i = 1; i < lines.length; i++){
-    const cols = splitLine(lines[i]);
-    const r = {};
-    headers.forEach((h, idx) => {
-      r[h] = (cols[idx] ?? "").trim();
-    });
-    rows.push(r);
-  }
-
-  return rows;
-}
-
-/* section: csv parsing | purpose: split line respecting quoted commas */
-function splitLine(line){
-  const out = [];
-  let cur = "";
-  let inQ = false;
-
-  for(let i = 0; i < line.length; i++){
-    const ch = line[i];
-    if(ch === '"'){
-      inQ = !inQ;
-      continue;
-    }
-    if(ch === "," && !inQ){
-      out.push(cur);
-      cur = "";
-      continue;
-    }
-    cur += ch;
-  }
-
-  out.push(cur);
-  return out;
-}
+/* section: csv parsing | purpose: shared parser alias for existing imports/tests */
+export const parseCSV = parseCSVObjects;
 
 /* section: search indexing | purpose: build lowercase search text */
 function buildSearchText(obj){
