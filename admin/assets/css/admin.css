@@ -35,7 +35,7 @@
   align-items: center;
   gap: 10px;
   position: relative;
-  background: rgba(255,255,255,0.95);
+  background: var(--table-field-column-color);
   border-radius: 999px;
   padding: 8px 14px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.12);
@@ -43,7 +43,7 @@
   flex: 0 0 auto;
 }
 .adminTokenIcon{ font-size: 14px; opacity: 0.85; }
-.adminTokenSvg{ display:block; color: rgba(0,0,0,0.55); }
+.adminTokenSvg{ display:block; color: var(--icons-color); }
 .adminTokenPill input{
   border: 0;
   outline: none;
@@ -69,7 +69,7 @@
   border: 0;
   border-radius: 999px;
   padding: 10px 16px;
-  background: #fff;
+  background: var(--table-field-column-color);
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -96,12 +96,12 @@
 
 /* In the green admin bar, make it visible (white pill like the old Save button) */
 .adminFilters .distance__apply{
-  background: rgba(255,255,255,0.95);
+  background: var(--table-field-column-color);
   border: 1px solid rgba(0,0,0,0.10);
   border-radius: 999px;
   padding: 10px 16px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.12);
-  color: var(--green);
+  color: var(--icons-color);
   font-weight: 900;
 }
 /* Token status should feel like helper text inside the token field itself */
@@ -112,11 +112,11 @@
   top: 50%;
   transform: translateY(-50%);
   text-align: center;
-  color: rgba(0,0,0,0.45);
+  color: var(--table-text-line-2-color);
   font-size: 13px;
   white-space: nowrap;
   pointer-events: none;
-  background: var(--row);
+  background: var(--table-field-column-color);
   padding: 0 10px;
   border-radius: 999px;
   opacity: 0;
@@ -144,8 +144,8 @@
 
 
 /* Status text (APPROVED / FAILED) lives inside the pill; keep helper-grey. */
-.adminTokenStatus[data-status="APPROVED"]{ color: rgba(0,0,0,0.45); }
-.adminTokenStatus[data-status="FAILED"]{ color: rgba(0,0,0,0.45); }
+.adminTokenStatus[data-status="APPROVED"]{ color: var(--table-text-line-2-color); }
+.adminTokenStatus[data-status="FAILED"]{ color: var(--table-text-line-2-color); }
 
 @media (max-width: 760px){
   /* Keep it visible on mobile, but short + non-wrapping */
@@ -171,7 +171,7 @@
   width: 100%;
   max-width: 850px;
   margin: 0 auto;
-  background: var(--row);
+  background: var(--table-field-column-color);
   border-radius: 18px;
   box-shadow: 0 8px 18px rgba(0,0,0,0.09);
   border: 1px solid rgba(0,0,0,0.08);
@@ -182,10 +182,10 @@
   font-weight: 900;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(0,0,0,0.55);
+  color: var(--table-text-line-2-color);
   font-size: 12px;
   /* Use the site's beige for the admin card header band */
-  background: var(--beige);
+  background: var(--table-header-column-color);
   border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 .adminForm{ padding: 18px; }
@@ -200,7 +200,7 @@
   letter-spacing: 0.2em;
   text-transform: uppercase;
   font-size: 11px;
-  color: rgba(0,0,0,0.55);
+  color: var(--table-text-line-2-color);
 }
 .req{ color: #b01212; margin-left: 2px; }
 
@@ -208,18 +208,18 @@
   width: 100%;
   border-radius: 12px;
   border: 1px solid rgba(0,0,0,0.12);
-  background: #fff;
+  background: var(--table-field-column-color);
   padding: 12px 14px;
   font-size: 14px;
 }
 .adminInput[disabled]{
-  background: rgba(0,0,0,0.05);
-  color: rgba(0,0,0,0.55);
+  background: color-mix(in srgb, var(--table-field-column-color) 88%, var(--table-text-line-1-color));
+  color: var(--table-text-line-2-color);
 }
 /* readonly fields should look the same as disabled, but still be included in FormData */
 .adminInput[readonly]{
-  background: rgba(0,0,0,0.05);
-  color: rgba(0,0,0,0.55);
+  background: color-mix(in srgb, var(--table-field-column-color) 88%, var(--table-text-line-1-color));
+  color: var(--table-text-line-2-color);
 }
 
 .adminActions{
@@ -235,17 +235,17 @@
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  background: #fff;
+  background: var(--table-field-column-color);
   box-shadow: 0 4px 10px rgba(0,0,0,0.10);
   cursor: pointer;
-  color: rgba(0,0,0,0.75);
-  -webkit-text-fill-color: rgba(0,0,0,0.75);
+  color: var(--table-text-line-1-color);
+  -webkit-text-fill-color: var(--table-text-line-1-color);
 }
 
 .adminNote{
   margin-top: 10px;
   font-size: 12px;
-  color: rgba(0,0,0,0.55);
+  color: var(--table-text-line-2-color);
 }
 
 @media (max-width: 520px){
@@ -281,8 +281,8 @@
   align-items: center;
 }
 .adminLatLonRow .adminInput[readonly]{
-  background: rgba(0,0,0,0.05);
-  color: rgba(0,0,0,0.55);
+  background: color-mix(in srgb, var(--table-field-column-color) 88%, var(--table-text-line-1-color));
+  color: var(--table-text-line-2-color);
 }
 
 
@@ -320,7 +320,7 @@
 .adminTimeModal.is-open{ display:flex; }
 .adminTimeSheet{
   width: min(520px, 100%);
-  background: #fff;
+  background: var(--table-field-column-color);
   border-radius: 18px 18px 0 0;
   padding: 14px;
   box-shadow: 0 -10px 24px rgba(0,0,0,0.18);
@@ -330,7 +330,7 @@
   letter-spacing: 0.18em;
   text-transform: uppercase;
   font-size: 12px;
-  color: rgba(0,0,0,0.55);
+  color: var(--table-text-line-2-color);
   margin: 2px 4px 12px;
 }
 .adminTimePickRow{ display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
@@ -338,7 +338,7 @@
   width: 100%;
   border-radius: 12px;
   border: 1px solid rgba(0,0,0,0.12);
-  background: #fff;
+  background: var(--table-field-column-color);
   padding: 12px 14px;
   font-size: 14px;
 }
@@ -352,8 +352,8 @@
   text-transform: uppercase;
   background: rgba(0,0,0,0.06);
   cursor: pointer;
-  color: rgba(0,0,0,0.75);
-  -webkit-text-fill-color: rgba(0,0,0,0.75);
+  color: var(--table-text-line-1-color);
+  -webkit-text-fill-color: var(--table-text-line-1-color);
 }
 
 
@@ -389,7 +389,7 @@
   overflow: hidden;
   border-radius: 12px;
   border: 1px solid rgba(0,0,0,0.12);
-  background: #fff;
+  background: var(--table-field-column-color);
 }
 /* Move the border to the wrapper so the native control can't expand the box */
 .adminDateWrap .adminDateInput{
@@ -469,8 +469,8 @@
 
 /* Ensure SAT/SUN display fields do NOT inherit readonly grey */
 .adminTimeDisplay{
-  background: #fff !important;
-  color: rgba(0,0,0,0.75) !important;
+  background: var(--table-field-column-color) !important;
+  color: var(--table-text-line-1-color) !important;
 }
 
 
@@ -478,7 +478,7 @@
 .acMenu{
   position: absolute;
   z-index: 9999;
-  background: var(--row);
+  background: var(--table-field-column-color);
   border: 1px solid rgba(0,0,0,0.10);
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.18);
@@ -559,14 +559,14 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   font-size: 11px;
-  color: rgba(0,0,0,0.60);
+  color: var(--table-text-line-2-color);
   user-select: none;
 }
 .adminCheck input{
   width: 16px;
   height: 16px;
   margin: 0;
-  accent-color: rgba(0,0,0,0.65);
+  accent-color: var(--icons-color);
 }
 
 @media (max-width: 520px){
@@ -604,12 +604,12 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  background: var(--row);
+  background: var(--table-field-column-color);
   padding: 0 10px;
   border-radius: 999px;
   line-height: 1.8;
   font-size: 12px;
-  color: rgba(0,0,0,0.45);
+  color: var(--table-text-line-2-color);
   pointer-events: none;
   white-space: nowrap;
 }
