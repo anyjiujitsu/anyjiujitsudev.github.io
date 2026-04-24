@@ -271,7 +271,7 @@
   right: 0;
   top: calc(-1 * var(--evRowBleedY));
   bottom: calc(-1 * var(--evRowBleedY));
-  background: rgba(232, 221, 198, 0.85);
+  background: var(--beige);
   border-radius: 0 0 0 0;
   z-index: 0;
   pointer-events: none;
@@ -383,7 +383,7 @@ body.pricingPopupOpen{
   background: #f7f7f7;
   border-radius: 20px;
   box-shadow: 0 16px 40px rgba(0,0,0,0.18);
-  color: #111;
+  color: var(--text);
   overflow: visible;
 }
 
@@ -532,7 +532,7 @@ body.pricingPopupOpen{
 .pricingPopup__payIcon{
   width: 52px;
   height: 36px;
-  color: #111;
+  color: var(--text);
 }
 
 .pricingPopup__payIcon svg{
@@ -628,7 +628,7 @@ body.pricingPopupOpen{
   right: 0;
   top: calc(-1 * var(--evRowBleedY));
   bottom: calc(-1 * var(--evRowBleedY));
-  background: rgba(232, 221, 198, 0.85);
+  background: var(--beige);
   border-radius: 0 0 0 0;
   z-index: 0;
   pointer-events: none;
@@ -795,7 +795,7 @@ body.pricingPopupOpen{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--green);
+  color: var(--icon);
   opacity: 1;
   text-decoration: none;
   transition: opacity 0.15s ease;
@@ -1298,7 +1298,7 @@ body.pricingPopupOpen{
   right: 0;
   top: calc(-1 * var(--evRowBleedY));
   bottom: calc(-1 * var(--evRowBleedY));
-  background: rgba(232, 221, 198, 0.85);
+  background: var(--beige);
   border-radius: 0 0 0 0;
   z-index: 0;
   pointer-events: none;
@@ -1331,7 +1331,7 @@ body.pricingPopupOpen{
   right: 0;
   top: calc(-1 * var(--evRowBleedY));
   bottom: calc(-1 * var(--evRowBleedY));
-  background: rgba(232, 221, 198, 0.85);
+  background: var(--beige);
   border-radius: 0 0 0 0;
   z-index: 0;
   pointer-events: none;
@@ -1475,7 +1475,7 @@ body.pricingPopupOpen{
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--green);
+  color: var(--icon);
   opacity: 1;
   text-decoration: none;
   transition: opacity 0.15s ease;
