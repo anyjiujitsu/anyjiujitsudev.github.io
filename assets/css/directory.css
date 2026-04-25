@@ -1821,13 +1821,13 @@ body.pricingPopupOpen{
   }
 }
 
-/* Events Near: add breathing room above section title */
-#eventsSearchSuggestEventsDistance .menu__header--static{
-  padding-top: 16px;
+/* Events Near: add actual breathing room between Quick Searches and Events Near */
+#eventsSearchSuggestEventsDistance{
+  margin-top: 14px;
 }
 
 @media (max-width: 520px){
-  #eventsSearchSuggestEventsDistance .menu__header--static{
-    padding-top: 18px;
+  #eventsSearchSuggestEventsDistance{
+    margin-top: 18px;
   }
 }
