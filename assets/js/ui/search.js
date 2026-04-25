@@ -184,29 +184,16 @@ export function wireSearchSuggestions({
 
     function handleZipValueRefresh(){
       if(!isActiveMode()) return;
-      const zip = sanitizeZip();
-
-      // Mobile Safari/iOS postal-code suggestions can commit the value without
-      // the same key event sequence as manual typing. When the field contains
-      // a complete ZIP, apply it from the field itself so Events Near and
-      // Training Near behave the same.
-      if(zip.length === 5){
-        window.setTimeout(()=>{
-          if(isActiveMode()) applyZip();
-        }, 0);
-      }
+      sanitizeZip();
     }
 
     distInput?.addEventListener("input", handleZipValueRefresh);
     distInput?.addEventListener("change", handleZipValueRefresh);
     distInput?.addEventListener("blur", handleZipValueRefresh);
-    distInput?.addEventListener("focusout", handleZipValueRefresh);
-    distInput?.addEventListener("keyup", handleZipValueRefresh);
-    distInput?.addEventListener("compositionend", handleZipValueRefresh);
 
     distInput?.addEventListener("keydown", (e)=>{
       if(!isActiveMode()) return;
-      if(e.key !== "Enter" && e.key !== "Go") return;
+      if(e.key !== "Enter") return;
       e.preventDefault();
       applyZip();
     });
