@@ -196,7 +196,13 @@ export function filterEvents(rows, state){
   }
 
   // Search query + special tokens
-  const tokenNew = extractNewEventsToken(state?.events?.q);
+  // When a ZIP distance filter is active, the ZIP may be mirrored into the search bar
+  // for visibility; do not also treat that ZIP as a text-search token.
+  const qRaw = String(state?.events?.q ?? "").trim();
+  const qForSearch = (/^\d{5}$/.test(qRaw) && String(state?.events?.distFrom || "").trim() === qRaw)
+    ? ""
+    : qRaw;
+  const tokenNew = extractNewEventsToken(qForSearch);
   const tokenWeekend = extractThisWeekendToken(tokenNew.remaining);
   const tokenNextWeekend = extractNextWeekendToken(tokenWeekend.remaining);
 
