@@ -120,155 +120,131 @@ export function wireSearchSuggestions({
     input.blur();
   });
 
-  // INDEX mode: Training Near (ZIP)
-  // This block intentionally preserves the original INDEX behavior.
-  const indexDistInput = $("distanceOriginInput");
-  const indexDistApply = $("distanceApplyBtn");
-  const indexSeg = indexDist?.querySelector(".iosSeg");
-  const indexSegBtns = indexDist?.querySelectorAll(".iosSeg__btn");
+  function wireDistanceSection({
+    section,
+    inputId,
+    applyId,
+    activeMode,
+    setMiles,
+    onSelectOrigin,
+  }){
+    if(!section) return;
+    const distInput = $(inputId);
+    const distApply = $(applyId);
+    const seg = section.querySelector(".iosSeg");
+    const segBtns = section.querySelectorAll(".iosSeg__btn");
 
-  function sanitizeIndexZip(){
-    if(!indexDistInput) return "";
-    const raw = String(indexDistInput.value || "");
-    const digits = raw.replace(/\D/g, "").slice(0, 5);
-    if(digits !== raw) indexDistInput.value = digits;
-    return digits;
-  }
+    const isActiveMode = () => mode() === activeMode;
 
-  function applyIndexZip(){
-    if(mode() !== "index") return;
-    const zip = sanitizeIndexZip();
-    if(zip.length !== 5) return;
-    input.value = zip;
-    setActiveEventsQuery(zip);
-    if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(zip);
-    close();
-    indexDistInput?.blur();
-    input.blur();
-  }
+    function sanitizeZip(){
+      if(!distInput) return "";
+      const raw = String(distInput.value || "");
+      const digits = raw.replace(/\D/g, "").slice(0, 5);
+      if(digits !== raw) distInput.value = digits;
+      return digits;
+    }
 
-  function setIndexMilesUI(miles){
-    if(!indexSeg || !indexSegBtns) return;
-    const mNum = Number(miles);
-    indexSeg.dataset.selected = String(mNum);
-    indexSegBtns.forEach((b)=>{
-      const m = Number(b.dataset.miles);
-      const on = (m === mNum);
-      b.classList.toggle("is-active", on);
-      b.setAttribute("aria-pressed", on ? "true" : "false");
+    function applyZip(){
+      if(!isActiveMode()) return;
+      const zip = sanitizeZip();
+      if(zip.length !== 5) return;
+
+      // Match the working INDEX behavior: the ZIP becomes the visible search
+      // value, then the distance origin is applied.
+      input.value = zip;
+      setActiveEventsQuery(zip);
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+
+      if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
+      close();
+      distInput?.blur();
+      input.blur();
+    }
+
+    function scheduleApplyZip(){
+      // iOS Safari can commit suggested/autofilled text at the same moment the
+      // arrow is tapped. For the Events ZIP only, defer one tick so the value
+      // visible in the field is available before applying.
+      if(activeMode === "events") setTimeout(applyZip, 0);
+      else applyZip();
+    }
+
+    function setMilesUI(miles){
+      if(!seg || !segBtns) return;
+      const mNum = Number(miles);
+      seg.dataset.selected = String(mNum);
+      segBtns.forEach((b)=>{
+        const m = Number(b.dataset.miles);
+        const on = (m === mNum);
+        b.classList.toggle("is-active", on);
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+    }
+
+    segBtns?.forEach((btn)=>{
+      btn.addEventListener("click", (e)=>{
+        if(!isActiveMode()) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const miles = Number(btn.dataset.miles);
+        if(!Number.isFinite(miles)) return;
+        setMilesUI(miles);
+        if(typeof setMiles === "function") setMiles(miles);
+        if(typeof onSelectOrigin === "function" && sanitizeZip().length === 5) onSelectOrigin(sanitizeZip());
+      });
     });
-  }
 
-  indexSegBtns?.forEach((btn)=>{
-    btn.addEventListener("click", (e)=>{
-      if(mode() !== "index") return;
+    function refreshZipValue(){
+      if(!isActiveMode()) return;
+      sanitizeZip();
+    }
+
+    distInput?.addEventListener("input", refreshZipValue);
+    distInput?.addEventListener("change", refreshZipValue);
+    distInput?.addEventListener("blur", refreshZipValue);
+
+    distInput?.addEventListener("keydown", (e)=>{
+      if(!isActiveMode()) return;
+      if(e.key !== "Enter") return;
+      e.preventDefault();
+      applyZip();
+    });
+
+    let lastApplyAt = 0;
+    function handleApplyEvent(e){
+      if(!isActiveMode()) return;
       e.preventDefault();
       e.stopPropagation();
-      const miles = Number(btn.dataset.miles);
-      if(!Number.isFinite(miles)) return;
-      setIndexMilesUI(miles);
-      if(typeof setIndexDistanceMiles === "function") setIndexDistanceMiles(miles);
-      if(typeof onIndexDistanceSelectOrigin === "function" && sanitizeIndexZip().length === 5){
-        onIndexDistanceSelectOrigin(sanitizeIndexZip());
-      }
-    });
-  });
 
-  indexDistInput?.addEventListener("input", ()=>{
-    if(mode() !== "index") return;
-    sanitizeIndexZip();
-  });
+      // Avoid double-running on mobile where touch/pointer can be followed by click.
+      const now = Date.now();
+      if(now - lastApplyAt < 250) return;
+      lastApplyAt = now;
 
-  indexDistInput?.addEventListener("keydown", (e)=>{
-    if(mode() !== "index") return;
-    if(e.key !== "Enter") return;
-    e.preventDefault();
-    applyIndexZip();
-  });
+      scheduleApplyZip();
+    }
 
-  indexDistApply?.addEventListener("click", (e)=>{
-    if(mode() !== "index") return;
-    e.preventDefault();
-    e.stopPropagation();
-    applyIndexZip();
-  });
-
-  // EVENTS mode: Events Near (ZIP)
-  // Mirrors the INDEX apply pattern, but is scoped only to EVENTS so INDEX stays untouched.
-  const eventsDistInput = $("eventsDistanceOriginInput");
-  const eventsDistApply = $("eventsDistanceApplyBtn");
-  const eventsSeg = eventsDist?.querySelector(".iosSeg");
-  const eventsSegBtns = eventsDist?.querySelectorAll(".iosSeg__btn");
-
-  function sanitizeEventsZip(){
-    if(!eventsDistInput) return "";
-    const raw = String(eventsDistInput.value || "");
-    const digits = raw.replace(/\D/g, "").slice(0, 5);
-    if(digits !== raw) eventsDistInput.value = digits;
-    return digits;
+    distApply?.addEventListener("click", handleApplyEvent);
+    distApply?.addEventListener("pointerup", handleApplyEvent);
+    distApply?.addEventListener("touchend", handleApplyEvent, { passive: false });
   }
 
-  function applyEventsZip(){
-    if(mode() !== "events") return;
-    const zip = sanitizeEventsZip();
-    if(zip.length !== 5) return;
-    input.value = zip;
-    setActiveEventsQuery(zip);
-    if(typeof onEventsDistanceSelectOrigin === "function") onEventsDistanceSelectOrigin(zip);
-    close();
-    eventsDistInput?.blur();
-    input.blur();
-  }
-
-  function setEventsMilesUI(miles){
-    if(!eventsSeg || !eventsSegBtns) return;
-    const mNum = Number(miles);
-    eventsSeg.dataset.selected = String(mNum);
-    eventsSegBtns.forEach((b)=>{
-      const m = Number(b.dataset.miles);
-      const on = (m === mNum);
-      b.classList.toggle("is-active", on);
-      b.setAttribute("aria-pressed", on ? "true" : "false");
-    });
-  }
-
-  eventsSegBtns?.forEach((btn)=>{
-    btn.addEventListener("click", (e)=>{
-      if(mode() !== "events") return;
-      e.preventDefault();
-      e.stopPropagation();
-      const miles = Number(btn.dataset.miles);
-      if(!Number.isFinite(miles)) return;
-      setEventsMilesUI(miles);
-      if(typeof setEventsDistanceMiles === "function") setEventsDistanceMiles(miles);
-      if(typeof onEventsDistanceSelectOrigin === "function" && sanitizeEventsZip().length === 5){
-        onEventsDistanceSelectOrigin(sanitizeEventsZip());
-      }
-    });
+  wireDistanceSection({
+    section: indexDist,
+    inputId: "distanceOriginInput",
+    applyId: "distanceApplyBtn",
+    activeMode: "index",
+    setMiles: setIndexDistanceMiles,
+    onSelectOrigin: onIndexDistanceSelectOrigin,
   });
 
-  eventsDistInput?.addEventListener("input", ()=>{
-    if(mode() !== "events") return;
-    sanitizeEventsZip();
-  });
-
-  eventsDistInput?.addEventListener("change", ()=>{
-    if(mode() !== "events") return;
-    sanitizeEventsZip();
-  });
-
-  eventsDistInput?.addEventListener("keydown", (e)=>{
-    if(mode() !== "events") return;
-    if(e.key !== "Enter") return;
-    e.preventDefault();
-    applyEventsZip();
-  });
-
-  eventsDistApply?.addEventListener("click", (e)=>{
-    if(mode() !== "events") return;
-    e.preventDefault();
-    e.stopPropagation();
-    applyEventsZip();
+  wireDistanceSection({
+    section: eventsDist,
+    inputId: "eventsDistanceOriginInput",
+    applyId: "eventsDistanceApplyBtn",
+    activeMode: "events",
+    setMiles: setEventsDistanceMiles,
+    onSelectOrigin: onEventsDistanceSelectOrigin,
   });
 
   document.addEventListener("pointerdown", (e)=>{
