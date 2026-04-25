@@ -120,117 +120,155 @@ export function wireSearchSuggestions({
     input.blur();
   });
 
-  function wireDistanceSection({
-    section,
-    inputId,
-    applyId,
-    activeMode,
-    setMiles,
-    onSelectOrigin,
-  }){
-    if(!section) return;
-    const distInput = $(inputId);
-    const distApply = $(applyId);
-    const seg = section.querySelector(".iosSeg");
-    const segBtns = section.querySelectorAll(".iosSeg__btn");
+  // INDEX mode: Training Near (ZIP)
+  // This block intentionally preserves the original INDEX behavior.
+  const indexDistInput = $("distanceOriginInput");
+  const indexDistApply = $("distanceApplyBtn");
+  const indexSeg = indexDist?.querySelector(".iosSeg");
+  const indexSegBtns = indexDist?.querySelectorAll(".iosSeg__btn");
 
-    const isActiveMode = () => mode() === activeMode;
+  function sanitizeIndexZip(){
+    if(!indexDistInput) return "";
+    const raw = String(indexDistInput.value || "");
+    const digits = raw.replace(/\D/g, "").slice(0, 5);
+    if(digits !== raw) indexDistInput.value = digits;
+    return digits;
+  }
 
-    function sanitizeZip(){
-      if(!distInput) return "";
-      const raw = String(distInput.value || "");
-      const digits = raw.replace(/\D/g, "").slice(0, 5);
-      if(digits !== raw) distInput.value = digits;
-      return digits;
-    }
+  function applyIndexZip(){
+    if(mode() !== "index") return;
+    const zip = sanitizeIndexZip();
+    if(zip.length !== 5) return;
+    input.value = zip;
+    setActiveEventsQuery(zip);
+    if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(zip);
+    close();
+    indexDistInput?.blur();
+    input.blur();
+  }
 
-    function applyZip(){
-      if(!isActiveMode()) return;
-      const zip = sanitizeZip();
-      if(zip.length !== 5) return;
-
-      // Match INDEX behavior: the ZIP stays in the local ZIP field until the arrow
-      // is clicked; then the ZIP is mirrored into the main search pill and the
-      // distance origin is applied. This is intentionally not triggered by input/change.
-      input.value = zip;
-      if(typeof setActiveEventsQuery === "function") setActiveEventsQuery(zip);
-      if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
-
-      // Some mobile browsers do not repaint the pill immediately after programmatic
-      // value assignment unless the input event path is also notified. Dispatching
-      // this after the explicit setter keeps the visible field and state in sync.
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-
-      close();
-      distInput?.blur();
-      input.blur();
-    }
-
-    function setMilesUI(miles){
-      if(!seg || !segBtns) return;
-      const mNum = Number(miles);
-      seg.dataset.selected = String(mNum);
-      segBtns.forEach((b)=>{
-        const m = Number(b.dataset.miles);
-        const on = (m === mNum);
-        b.classList.toggle("is-active", on);
-        b.setAttribute("aria-pressed", on ? "true" : "false");
-      });
-    }
-
-    segBtns?.forEach((btn)=>{
-      btn.addEventListener("click", (e)=>{
-        if(!isActiveMode()) return;
-        e.preventDefault();
-        e.stopPropagation();
-        const miles = Number(btn.dataset.miles);
-        if(!Number.isFinite(miles)) return;
-        setMilesUI(miles);
-        if(typeof setMiles === "function") setMiles(miles);
-        if(typeof onSelectOrigin === "function" && sanitizeZip().length === 5) onSelectOrigin(sanitizeZip());
-      });
-    });
-
-    function handleZipValueRefresh(){
-      if(!isActiveMode()) return;
-      sanitizeZip();
-    }
-
-    distInput?.addEventListener("input", handleZipValueRefresh);
-    distInput?.addEventListener("change", handleZipValueRefresh);
-    distInput?.addEventListener("blur", handleZipValueRefresh);
-
-    distInput?.addEventListener("keydown", (e)=>{
-      if(!isActiveMode()) return;
-      if(e.key !== "Enter") return;
-      e.preventDefault();
-      applyZip();
-    });
-
-    distApply?.addEventListener("click", (e)=>{
-      if(!isActiveMode()) return;
-      e.preventDefault();
-      e.stopPropagation();
-      applyZip();
+  function setIndexMilesUI(miles){
+    if(!indexSeg || !indexSegBtns) return;
+    const mNum = Number(miles);
+    indexSeg.dataset.selected = String(mNum);
+    indexSegBtns.forEach((b)=>{
+      const m = Number(b.dataset.miles);
+      const on = (m === mNum);
+      b.classList.toggle("is-active", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
     });
   }
 
-  wireDistanceSection({
-    section: indexDist,
-    inputId: "distanceOriginInput",
-    applyId: "distanceApplyBtn",
-    activeMode: "index",
-    setMiles: setIndexDistanceMiles,
-    onSelectOrigin: onIndexDistanceSelectOrigin,
+  indexSegBtns?.forEach((btn)=>{
+    btn.addEventListener("click", (e)=>{
+      if(mode() !== "index") return;
+      e.preventDefault();
+      e.stopPropagation();
+      const miles = Number(btn.dataset.miles);
+      if(!Number.isFinite(miles)) return;
+      setIndexMilesUI(miles);
+      if(typeof setIndexDistanceMiles === "function") setIndexDistanceMiles(miles);
+      if(typeof onIndexDistanceSelectOrigin === "function" && sanitizeIndexZip().length === 5){
+        onIndexDistanceSelectOrigin(sanitizeIndexZip());
+      }
+    });
   });
 
-  wireDistanceSection({
-    section: eventsDist,
-    inputId: "eventsDistanceOriginInput",
-    applyId: "eventsDistanceApplyBtn",
-    activeMode: "events",
-    setMiles: setEventsDistanceMiles,
-    onSelectOrigin: onEventsDistanceSelectOrigin,
+  indexDistInput?.addEventListener("input", ()=>{
+    if(mode() !== "index") return;
+    sanitizeIndexZip();
+  });
+
+  indexDistInput?.addEventListener("keydown", (e)=>{
+    if(mode() !== "index") return;
+    if(e.key !== "Enter") return;
+    e.preventDefault();
+    applyIndexZip();
+  });
+
+  indexDistApply?.addEventListener("click", (e)=>{
+    if(mode() !== "index") return;
+    e.preventDefault();
+    e.stopPropagation();
+    applyIndexZip();
+  });
+
+  // EVENTS mode: Events Near (ZIP)
+  // Mirrors the INDEX apply pattern, but is scoped only to EVENTS so INDEX stays untouched.
+  const eventsDistInput = $("eventsDistanceOriginInput");
+  const eventsDistApply = $("eventsDistanceApplyBtn");
+  const eventsSeg = eventsDist?.querySelector(".iosSeg");
+  const eventsSegBtns = eventsDist?.querySelectorAll(".iosSeg__btn");
+
+  function sanitizeEventsZip(){
+    if(!eventsDistInput) return "";
+    const raw = String(eventsDistInput.value || "");
+    const digits = raw.replace(/\D/g, "").slice(0, 5);
+    if(digits !== raw) eventsDistInput.value = digits;
+    return digits;
+  }
+
+  function applyEventsZip(){
+    if(mode() !== "events") return;
+    const zip = sanitizeEventsZip();
+    if(zip.length !== 5) return;
+    input.value = zip;
+    setActiveEventsQuery(zip);
+    if(typeof onEventsDistanceSelectOrigin === "function") onEventsDistanceSelectOrigin(zip);
+    close();
+    eventsDistInput?.blur();
+    input.blur();
+  }
+
+  function setEventsMilesUI(miles){
+    if(!eventsSeg || !eventsSegBtns) return;
+    const mNum = Number(miles);
+    eventsSeg.dataset.selected = String(mNum);
+    eventsSegBtns.forEach((b)=>{
+      const m = Number(b.dataset.miles);
+      const on = (m === mNum);
+      b.classList.toggle("is-active", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
+  eventsSegBtns?.forEach((btn)=>{
+    btn.addEventListener("click", (e)=>{
+      if(mode() !== "events") return;
+      e.preventDefault();
+      e.stopPropagation();
+      const miles = Number(btn.dataset.miles);
+      if(!Number.isFinite(miles)) return;
+      setEventsMilesUI(miles);
+      if(typeof setEventsDistanceMiles === "function") setEventsDistanceMiles(miles);
+      if(typeof onEventsDistanceSelectOrigin === "function" && sanitizeEventsZip().length === 5){
+        onEventsDistanceSelectOrigin(sanitizeEventsZip());
+      }
+    });
+  });
+
+  eventsDistInput?.addEventListener("input", ()=>{
+    if(mode() !== "events") return;
+    sanitizeEventsZip();
+  });
+
+  eventsDistInput?.addEventListener("change", ()=>{
+    if(mode() !== "events") return;
+    sanitizeEventsZip();
+  });
+
+  eventsDistInput?.addEventListener("keydown", (e)=>{
+    if(mode() !== "events") return;
+    if(e.key !== "Enter") return;
+    e.preventDefault();
+    applyEventsZip();
+  });
+
+  eventsDistApply?.addEventListener("click", (e)=>{
+    if(mode() !== "events") return;
+    e.preventDefault();
+    e.stopPropagation();
+    applyEventsZip();
   });
 
   document.addEventListener("pointerdown", (e)=>{
