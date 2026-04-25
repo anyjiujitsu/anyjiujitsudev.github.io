@@ -182,10 +182,14 @@ export function wireSearchSuggestions({
       });
     });
 
-    distInput?.addEventListener("input", ()=>{
+    function handleZipValueRefresh(){
       if(!isActiveMode()) return;
       sanitizeZip();
-    });
+    }
+
+    distInput?.addEventListener("input", handleZipValueRefresh);
+    distInput?.addEventListener("change", handleZipValueRefresh);
+    distInput?.addEventListener("blur", handleZipValueRefresh);
 
     distInput?.addEventListener("keydown", (e)=>{
       if(!isActiveMode()) return;
