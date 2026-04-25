@@ -48,14 +48,12 @@ export function wireSearchSuggestions({
   onEventsViewOpen,
   onIndexDistanceSelectOrigin,
   onEventsDistanceSelectOrigin,
-  onEventsZipApply,
 }){
   const wrap  = $("eventsSearchWrap");
   const input = $("eventsSearchInput");
   const panel = $("eventsSearchSuggest");
   if(!wrap || !input || !panel) return;
 
-  // sections inside panel
   const quick = $("eventsSearchSuggestQuick");
   const indexDist  = $("eventsSearchSuggestDistance");
   const eventsDist = $("eventsSearchSuggestEventsDistance");
@@ -104,7 +102,6 @@ export function wireSearchSuggestions({
     if(String(input.value || "").trim()) close();
   });
 
-  // EVENTS mode: quick-search buttons write into the search box
   panel.addEventListener("click", (e)=>{
     if(!canSuggest()) { close(); return; }
     if(mode() !== "events") return;
@@ -121,6 +118,30 @@ export function wireSearchSuggestions({
     input.blur();
   });
 
+  function sanitizeZip(distInput){
+    if(!distInput) return "";
+    const raw = String(distInput.value || "");
+    const digits = raw.replace(/\D/g, "").slice(0, 5);
+    if(digits !== raw) distInput.value = digits;
+    return digits;
+  }
+
+  function applyZip({ distInput, onSelectOrigin }){
+    const zip = sanitizeZip(distInput);
+    if(zip.length !== 5) return;
+
+    // Same visible behavior as the working Index ZIP search:
+    // ZIP appears in the top search field, then the radius origin is applied.
+    input.value = zip;
+    setActiveEventsQuery(zip);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+
+    if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
+    close();
+    distInput?.blur();
+    input.blur();
+  }
+
   function wireDistanceSection({
     section,
     inputId,
@@ -136,50 +157,6 @@ export function wireSearchSuggestions({
     const segBtns = section.querySelectorAll(".iosSeg__btn");
 
     const isActiveMode = () => mode() === activeMode;
-
-    function sanitizeZip(){
-      if(!distInput) return "";
-      const raw = String(distInput.value || "");
-      const digits = raw.replace(/\D/g, "").slice(0, 5);
-      if(digits !== raw) distInput.value = digits;
-      return digits;
-    }
-
-    function applyZip(){
-      const zip = sanitizeZip();
-      if(zip.length !== 5) return;
-
-      // EVENTS: write directly to Events state + main Events search input.
-      // This avoids depending on active-view routing, which is what can leave
-      // the visible Events ZIP field disconnected from the Events search bar.
-      if(activeMode === "events" && typeof onEventsZipApply === "function"){
-        onEventsZipApply(zip);
-        close();
-        distInput?.blur();
-        input.blur();
-        return;
-      }
-
-      if(!isActiveMode()) return;
-
-      // INDEX: keep the existing working behavior.
-      input.value = zip;
-      setActiveEventsQuery(zip);
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-
-      if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
-      close();
-      distInput?.blur();
-      input.blur();
-    }
-
-    function scheduleApplyZip(){
-      // iOS Safari can commit suggested/autofilled text at the same moment the
-      // arrow is tapped. For the Events ZIP only, defer one tick so the value
-      // visible in the field is available before applying.
-      if(activeMode === "events") setTimeout(applyZip, 0);
-      else applyZip();
-    }
 
     function setMilesUI(miles){
       if(!seg || !segBtns) return;
@@ -202,43 +179,33 @@ export function wireSearchSuggestions({
         if(!Number.isFinite(miles)) return;
         setMilesUI(miles);
         if(typeof setMiles === "function") setMiles(miles);
-        if(typeof onSelectOrigin === "function" && sanitizeZip().length === 5) onSelectOrigin(sanitizeZip());
+        const zip = sanitizeZip(distInput);
+        if(typeof onSelectOrigin === "function" && zip.length === 5) onSelectOrigin(zip);
       });
     });
 
-    function refreshZipValue(){
+    function handleZipValueRefresh(){
       if(!isActiveMode()) return;
-      sanitizeZip();
+      sanitizeZip(distInput);
     }
 
-    distInput?.addEventListener("input", refreshZipValue);
-    distInput?.addEventListener("change", refreshZipValue);
-    distInput?.addEventListener("blur", refreshZipValue);
+    distInput?.addEventListener("input", handleZipValueRefresh);
+    distInput?.addEventListener("change", handleZipValueRefresh);
+    distInput?.addEventListener("blur", handleZipValueRefresh);
 
     distInput?.addEventListener("keydown", (e)=>{
       if(!isActiveMode()) return;
       if(e.key !== "Enter") return;
       e.preventDefault();
-      applyZip();
+      applyZip({ distInput, onSelectOrigin });
     });
 
-    let lastApplyAt = 0;
-    function handleApplyEvent(e){
+    distApply?.addEventListener("click", (e)=>{
       if(!isActiveMode()) return;
       e.preventDefault();
       e.stopPropagation();
-
-      // Avoid double-running on mobile where touch/pointer can be followed by click.
-      const now = Date.now();
-      if(now - lastApplyAt < 250) return;
-      lastApplyAt = now;
-
-      scheduleApplyZip();
-    }
-
-    distApply?.addEventListener("click", handleApplyEvent);
-    distApply?.addEventListener("pointerup", handleApplyEvent);
-    distApply?.addEventListener("touchend", handleApplyEvent, { passive: false });
+      applyZip({ distInput, onSelectOrigin });
+    });
   }
 
   wireDistanceSection({
@@ -258,6 +225,31 @@ export function wireSearchSuggestions({
     setMiles: setEventsDistanceMiles,
     onSelectOrigin: onEventsDistanceSelectOrigin,
   });
+
+  // Mobile Safari can occasionally swallow a normal button click when the ZIP
+  // field was populated from the keyboard suggestion bar. This capture listener
+  // only targets the Events arrow and forces the same apply path as above.
+  let lastEventsApply = 0;
+  function handleEventsApplyCapture(e){
+    const btn = e.target?.closest?.("#eventsDistanceApplyBtn");
+    if(!btn) return;
+    if(mode() !== "events") return;
+
+    const now = Date.now();
+    if(now - lastEventsApply < 250) return;
+    lastEventsApply = now;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const distInput = $("eventsDistanceOriginInput");
+    setTimeout(()=>{
+      applyZip({ distInput, onSelectOrigin: onEventsDistanceSelectOrigin });
+    }, 0);
+  }
+
+  document.addEventListener("pointerdown", handleEventsApplyCapture, true);
+  document.addEventListener("touchend", handleEventsApplyCapture, { capture: true, passive: false });
 
   document.addEventListener("pointerdown", (e)=>{
     if(wrap.contains(e.target)) return;
