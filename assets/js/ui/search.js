@@ -48,6 +48,7 @@ export function wireSearchSuggestions({
   onEventsViewOpen,
   onIndexDistanceSelectOrigin,
   onEventsDistanceSelectOrigin,
+  onEventsZipApply,
 }){
   const wrap  = $("eventsSearchWrap");
   const input = $("eventsSearchInput");
@@ -145,12 +146,23 @@ export function wireSearchSuggestions({
     }
 
     function applyZip(){
-      if(!isActiveMode()) return;
       const zip = sanitizeZip();
       if(zip.length !== 5) return;
 
-      // Match the working INDEX behavior: the ZIP becomes the visible search
-      // value, then the distance origin is applied.
+      // EVENTS: write directly to Events state + main Events search input.
+      // This avoids depending on active-view routing, which is what can leave
+      // the visible Events ZIP field disconnected from the Events search bar.
+      if(activeMode === "events" && typeof onEventsZipApply === "function"){
+        onEventsZipApply(zip);
+        close();
+        distInput?.blur();
+        input.blur();
+        return;
+      }
+
+      if(!isActiveMode()) return;
+
+      // INDEX: keep the existing working behavior.
       input.value = zip;
       setActiveEventsQuery(zip);
       input.dispatchEvent(new Event("input", { bubbles: true }));
