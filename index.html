@@ -111,7 +111,8 @@
                   <div class="distance__section" aria-label="Events near ZIP">
                     <div class="distance__row">
                       <input id="eventsDistanceOriginInput" class="distance__input" type="text"
-                             inputmode="numeric" autocomplete="off" autocapitalize="none" spellcheck="false"
+                             inputmode="numeric" autocomplete="postal-code" name="postal-code" pattern="[0-9]*" enterkeyhint="go"
+                             autocapitalize="none" spellcheck="false"
                              placeholder="Enter ZIP" maxlength="5" aria-label="Enter ZIP" />
                       <button id="eventsDistanceApplyBtn" class="distance__apply" type="button" aria-label="Apply event ZIP">
                         ➜
