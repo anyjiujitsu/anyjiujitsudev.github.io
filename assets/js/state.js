@@ -36,6 +36,10 @@ export const state = {
     year: new Set(),
     state: new Set(),
     type: new Set(),
+    /* section: events distance filter
+       purpose: optional radius + origin ZIP for filtering event rows by LAT/LON */
+    distMiles: 15,
+    distFrom: "",
   },
 };
 
@@ -72,6 +76,18 @@ export function setIndexDistanceFrom(label){
   state.indexEvents.distFrom = v;
 }
 
+/* section: events distance mutators
+   purpose: used by Events search dropdown (Events Near / Enter ZIP) */
+export function setEventsDistanceMiles(miles){
+  const n = (miles == null || miles === "") ? null : Number(miles);
+  state.events.distMiles = Number.isFinite(n) ? n : null;
+}
+
+export function setEventsDistanceFrom(label){
+  const v = String(label ?? "").trim();
+  state.events.distFrom = v;
+}
+
 /* section: selection checks
    purpose: used for "hasSelection" indicators (dots) */
 
@@ -87,5 +103,6 @@ export function hasEventsSelections(){
   return state.events.q.trim().length > 0 ||
     state.events.year.size > 0 ||
     state.events.state.size > 0 ||
-    state.events.type.size > 0;
+    state.events.type.size > 0 ||
+    (String(state.events.distFrom || "").trim().length > 0);
 }
