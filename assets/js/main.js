@@ -2,7 +2,7 @@
 // purpose: app bootstrap + data loading + render orchestration
 
 import { loadCSV, normalizeDirectoryRow, normalizeEventRow } from "./data.js?v=20260210-911";
-import { state, setIndexQuery, setEventsQuery, setIndexEventsQuery, setIndexDistanceMiles, setIndexDistanceFrom } from "./state.js?v=20260212-902";
+import { state, setIndexQuery, setEventsQuery, setIndexEventsQuery, setIndexDistanceMiles, setIndexDistanceFrom, setEventsDistanceMiles, setEventsDistanceFrom } from "./state.js?v=20260212-902";
 import { filterEvents } from "./filters.js?v=20260210-911";
 import { renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260210-911";
 
@@ -23,14 +23,51 @@ function syncIndexDistanceUI(){
   syncDistanceUIFromState($, state);
 }
 
+function syncEventsDistanceUI(){
+  const distWrap = $("eventsSearchSuggestEventsDistance");
+  if(!distWrap) return;
+  const input = $("eventsDistanceOriginInput");
+  if(input) input.value = String(state.events.distFrom || "");
+
+  const seg = distWrap.querySelector(".iosSeg");
+  const btns = distWrap.querySelectorAll(".iosSeg__btn");
+  if(seg && btns && btns.length){
+    const miles = Number(state.events.distMiles || 15);
+    seg.dataset.selected = String(miles);
+    btns.forEach((b)=>{
+      const m = Number(b.dataset.miles);
+      const on = (m === miles);
+      b.classList.toggle("is-active", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+}
+
 function setSearchQueryForActiveView(val){
   setActiveEventsQuery(val, { setIndexEventsQuery, setEventsQuery });
 }
 
 function renderEventsView(){
-  const evFiltered = filterEvents(eventRows, state);
+  const distRes = applyDistanceFilter(
+    eventRows,
+    Number(state.events.distMiles) || 15,
+    state.events.distFrom,
+    () => {
+      if(state.view === "events") render();
+    }
+  );
+
+  const evFiltered = filterEvents(distRes.rows, state);
   renderEventsGroups($("eventsRoot"), evFiltered);
-  $("eventsStatus").textContent = `${evFiltered.length} events`;
+
+  if(distRes.active){
+    const pending = Number(distRes.pending) || 0;
+    $("eventsStatus").textContent = pending > 0
+      ? `${evFiltered.length} events (locating ${pending}…)`
+      : `${evFiltered.length} events`;
+  } else {
+    $("eventsStatus").textContent = `${evFiltered.length} events`;
+  }
 }
 
 function renderIndexView(){
@@ -78,9 +115,15 @@ async function init(){
     setActiveEventsQuery: setSearchQueryForActiveView,
     setIndexDistanceMiles,
     isIndexView: () => state.view === "index",
+    isEventsView: () => state.view === "events",
     clearIndexDistance: () => {
       setIndexDistanceFrom("");
       const inZip = $("distanceOriginInput");
+      if(inZip) inZip.value = "";
+    },
+    clearEventsDistance: () => {
+      setEventsDistanceFrom("");
+      const inZip = $("eventsDistanceOriginInput");
       if(inZip) inZip.value = "";
     },
     render,
@@ -90,11 +133,17 @@ async function init(){
     $,
     setActiveEventsQuery: setSearchQueryForActiveView,
     setIndexDistanceMiles,
+    setEventsDistanceMiles,
     isEventsView: () => state.view === "events",
     isIndexView: () => state.view === "index",
     onIndexViewOpen: syncIndexDistanceUI,
+    onEventsViewOpen: syncEventsDistanceUI,
     onIndexDistanceSelectOrigin: (label) => {
       setIndexDistanceFrom(label);
+      render();
+    },
+    onEventsDistanceSelectOrigin: (label) => {
+      setEventsDistanceFrom(label);
       render();
     },
   });
