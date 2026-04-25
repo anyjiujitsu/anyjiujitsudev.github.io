@@ -60,8 +60,12 @@ export function normalizeEventRow(r){
   const TYPE    = (r.TYPE || r.Event || r.EVENT || "").trim();
   const DATE    = (r.DATE || r.Date || "").trim();
   const CREATED = (r.CREATED || r.Created || "").trim();
+  const LAT = (r.LAT ?? r.Lat ?? "").toString().trim();
+  const LON = (r.LON ?? r.Lon ?? r.LONG ?? r.Long ?? "").toString().trim();
+  const lat = LAT === "" ? NaN : Number(LAT);
+  const lon = LON === "" ? NaN : Number(LON);
 
-  const row = { YEAR, STATE, CITY, GYM, TYPE, DATE, CREATED };
+  const row = { YEAR, STATE, CITY, GYM, TYPE, DATE, CREATED, LAT: lat, LON: lon };
   const parsedDate = parseEventDate(DATE);
   const parsedCreated = parseCreatedDate(CREATED);
 
