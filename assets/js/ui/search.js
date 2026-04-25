@@ -148,10 +148,19 @@ export function wireSearchSuggestions({
       if(!isActiveMode()) return;
       const zip = sanitizeZip();
       if(zip.length !== 5) return;
-      // Mirror into the search bar so the user can see the active distance filter.
+
+      // Match INDEX behavior: the ZIP stays in the local ZIP field until the arrow
+      // is clicked; then the ZIP is mirrored into the main search pill and the
+      // distance origin is applied. This is intentionally not triggered by input/change.
       input.value = zip;
-      setActiveEventsQuery(zip);
+      if(typeof setActiveEventsQuery === "function") setActiveEventsQuery(zip);
       if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
+
+      // Some mobile browsers do not repaint the pill immediately after programmatic
+      // value assignment unless the input event path is also notified. Dispatching
+      // this after the explicit setter keeps the visible field and state in sync.
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+
       close();
       distInput?.blur();
       input.blur();
