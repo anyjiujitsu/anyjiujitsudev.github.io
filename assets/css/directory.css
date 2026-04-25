@@ -1820,3 +1820,14 @@ body.pricingPopupOpen{
     transform: translateX(-1px) !important;
   }
 }
+
+/* Events Near: add breathing room above section title */
+#eventsSearchSuggestEventsDistance .menu__header--static{
+  padding-top: 16px;
+}
+
+@media (max-width: 520px){
+  #eventsSearchSuggestEventsDistance .menu__header--static{
+    padding-top: 18px;
+  }
+}
