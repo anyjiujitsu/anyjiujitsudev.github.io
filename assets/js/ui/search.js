@@ -203,8 +203,9 @@ export function wireSearchSuggestions({
     });
 
     let lastApplyTap = 0;
-    function scheduleApplyZip(e, delayOverride){
-      if(!isActiveMode()) return;
+    function scheduleApplyZip(e, opts = {}){
+      const forceEventsApply = !!opts.forceEventsApply && activeMode === "events";
+      if(!forceEventsApply && !isActiveMode()) return;
       if(e){
         e.preventDefault();
         e.stopPropagation();
@@ -212,20 +213,29 @@ export function wireSearchSuggestions({
       const now = Date.now();
       if(now - lastApplyTap < 180) return;
       lastApplyTap = now;
-      // Mobile Safari may consume the normal click while dismissing the keyboard.
-      // For EVENTS, capture the press at touchstart/pointerdown, then read after
-      // the current tap/autofill cycle has committed the value.
-      const delay = Number.isFinite(delayOverride) ? delayOverride : (activeMode === "events" ? 90 : 0);
-      window.setTimeout(() => {
-        distInput?.blur();
-        applyZip();
-      }, delay);
+
+      // iOS Safari can treat the first tap after selecting an autofill/suggestion
+      // as a keyboard-dismiss tap instead of a normal button click. INDEX already
+      // receives its click reliably; EVENTS needs an earlier captured touch/pointer
+      // path so the arrow button cannot be swallowed on mobile.
+      distInput?.blur();
+
+      if(forceEventsApply){
+        window.requestAnimationFrame(() => {
+          window.setTimeout(applyZip, 120);
+        });
+        return;
+      }
+
+      window.setTimeout(applyZip, activeMode === "events" ? 90 : 0);
     }
 
-    if(activeMode === "events"){
-      distApply?.addEventListener("touchstart", (e)=>scheduleApplyZip(e, 120), { passive: false, capture: true });
-      distApply?.addEventListener("pointerdown", (e)=>scheduleApplyZip(e, 120), true);
+    if(activeMode === "events" && distApply){
+      const captureEventsApply = (e) => scheduleApplyZip(e, { forceEventsApply: true });
+      distApply.addEventListener("touchstart", captureEventsApply, { passive: false, capture: true });
+      distApply.addEventListener("pointerdown", captureEventsApply, { capture: true });
     }
+
     distApply?.addEventListener("touchend", scheduleApplyZip, { passive: false });
     distApply?.addEventListener("pointerup", scheduleApplyZip);
     distApply?.addEventListener("click", scheduleApplyZip);
