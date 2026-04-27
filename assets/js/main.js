@@ -9,7 +9,7 @@ import { renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260
 import { $ } from "./utils/dom.js?v=20260210-911";
 import { applyDistanceFilter } from "./utils/geo.js?v=20260212-902";
 import { initEventsPills, initIndexPills } from "./ui/pills.js?v=20260210-911";
-import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260427-eventszip-ioscommit1";
+import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260427-reuse-index-distance";
 import { closePricingPopup, wirePricingPopup } from "./ui/pricing.js";
 import { activeEventsState, setActiveEventsQuery, setViewUI, wireViewToggle } from "./ui/viewToggle.js";
 import { dirToIndexEventRow, ensureDistanceOriginOptions, filterIndexDirectoryAsEvents, syncDistanceUIFromState } from "./indexDirectory.js";
@@ -24,10 +24,10 @@ function syncIndexDistanceUI(){
 }
 
 function syncEventsDistanceUI(){
-  const distWrap = $("eventsSearchSuggestEventsDistance");
+  const distWrap = $("eventsSearchSuggestDistance");
   if(!distWrap) return;
-  const input = $("eventsDistanceOriginInput");
-  if(input) input.value = String(state.events.distFrom || "");
+  const input = $("distanceOriginInput");
+  if(input && state.view === "events") input.value = String(state.events.distFrom || "");
 
   const seg = distWrap.querySelector(".iosSeg");
   const btns = distWrap.querySelectorAll(".iosSeg__btn");
@@ -123,14 +123,15 @@ async function init(){
     },
     clearEventsDistance: () => {
       setEventsDistanceFrom("");
-      const inZip = $("eventsDistanceOriginInput");
-      if(inZip) inZip.value = "";
+      const inZip = $("distanceOriginInput");
+      if(inZip && state.view === "events") inZip.value = "";
     },
     render,
   });
 
   wireSearchSuggestions({
     $,
+    state,
     setActiveEventsQuery: setSearchQueryForActiveView,
     setIndexDistanceMiles,
     setEventsDistanceMiles,
