@@ -139,25 +139,37 @@ export function wireSearchSuggestions({
     const isSectionVisible = () => !section.hasAttribute("hidden") && !section.hidden;
     const isActiveMode = () => mode() === activeMode || (activeMode === "events" && isSectionVisible());
 
-    function sanitizeZip(){
-      if(!distInput) return "";
-      const raw = String(distInput.value || "");
-      const digits = raw.replace(/\D/g, "").slice(0, 5);
-      if(digits !== raw) distInput.value = digits;
+    // iOS Safari can display a suggested value in an input before the normal
+    // .value read is reliable. Keep the last ZIP-like value that appears
+    // through any input-style event, then use that as a fallback on submit.
+    let lastCommittedZip = "";
+
+    function zipDigits(value){
+      return String(value || "").replace(/\D/g, "").slice(0, 5);
+    }
+
+    function rememberZip(value){
+      const digits = zipDigits(value);
+      if(digits) lastCommittedZip = digits;
       return digits;
     }
 
-    function readZipValue(){
-      if(!distInput) return "";
+    function sanitizeZip({ allowFallback = false } = {}){
+      if(!distInput) return allowFallback ? lastCommittedZip : "";
       const raw = String(distInput.value || "");
-      const digits = raw.replace(/\D/g, "").slice(0, 5);
-      if(digits && digits !== raw) distInput.value = digits;
+      let digits = rememberZip(raw);
+
+      // Some iOS suggested/autofill commits expose the chosen text through
+      // beforeinput/input before it is reflected in input.value at submit time.
+      if(!digits && allowFallback) digits = lastCommittedZip;
+
+      if(digits && distInput.value !== digits) distInput.value = digits;
       return digits;
     }
 
     function applyZip(){
       if(!isActiveMode()) return;
-      const zip = readZipValue();
+      const zip = sanitizeZip({ allowFallback: true });
       if(zip.length !== 5) return;
       // Mirror into the search bar so the user can see the active distance filter.
       input.value = zip;
@@ -194,13 +206,19 @@ export function wireSearchSuggestions({
       });
     });
 
-    function handleZipValueRefresh(){
+    function handleZipValueRefresh(e){
       if(!isActiveMode()) return;
-      sanitizeZip();
+      if(e && typeof e.data === "string") rememberZip(e.data);
+      sanitizeZip({ allowFallback: true });
     }
 
+    distInput?.addEventListener("beforeinput", (e)=>{
+      if(!isActiveMode()) return;
+      if(e && typeof e.data === "string") rememberZip(e.data);
+    });
     distInput?.addEventListener("input", handleZipValueRefresh);
     distInput?.addEventListener("change", handleZipValueRefresh);
+    distInput?.addEventListener("keyup", handleZipValueRefresh);
     distInput?.addEventListener("blur", handleZipValueRefresh);
 
     distInput?.addEventListener("keydown", (e)=>{
@@ -220,20 +238,13 @@ export function wireSearchSuggestions({
       const now = Date.now();
       if(now - lastApplyTap < 180) return;
       lastApplyTap = now;
-
-      // iOS can show a suggested/autofilled ZIP before the input value has fully committed.
-      // Force the field to commit, then read it on the next frame. INDEX remains unchanged;
-      // EVENTS uses the slightly longer defer because that is the only failing mobile path.
+      // Mobile Safari can commit suggested/autofilled values after the tap cycle.
+      // Blur first, then read after a short delay so the value is real, not just visual.
       distInput?.blur();
-      const delay = activeMode === "events" ? 120 : 0;
-      window.requestAnimationFrame(() => {
-        window.setTimeout(applyZip, delay);
-      });
+      window.setTimeout(applyZip, activeMode === "events" ? 90 : 0);
     }
 
-    distApply?.addEventListener("touchstart", scheduleApplyZip, { passive: false });
     distApply?.addEventListener("touchend", scheduleApplyZip, { passive: false });
-    distApply?.addEventListener("pointerdown", scheduleApplyZip);
     distApply?.addEventListener("pointerup", scheduleApplyZip);
     distApply?.addEventListener("click", scheduleApplyZip);
   }
