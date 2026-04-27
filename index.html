@@ -12,20 +12,10 @@
   <link rel="stylesheet" href="assets/css/components.css?v=20260212-902" />
   <link rel="stylesheet" href="assets/css/directory.css?v=20260210-809" />
 <!-- IMPORTANT: repo references main.js (no sequence) -->
-  <script type="module" src="assets/js/main.js?v=20260427-events-zip-cachecheck-001"></script>
+  <script type="module" src="assets/js/main.js?v=20260427-eventszip-directapply"></script>
 </head>
 
-<body data-anyjj-build="20260427-events-zip-cachecheck-001">
-  <script>
-    window.ANYJJ_BUILD = "20260427-events-zip-cachecheck-001";
-    console.info("ANYJJ_BUILD", window.ANYJJ_BUILD);
-    if (new URLSearchParams(window.location.search).has("debugBuild")) {
-      const badge = document.createElement("div");
-      badge.textContent = "BUILD 20260427-events-zip-cachecheck-001";
-      badge.style.cssText = "position:fixed;left:8px;bottom:8px;z-index:999999;padding:6px 8px;border-radius:8px;background:#111;color:#fff;font:12px/1.2 monospace;opacity:.85;pointer-events:none;";
-      window.addEventListener("DOMContentLoaded", () => document.body.appendChild(badge));
-    }
-  </script>
+<body>
   <div class="app" id="app">
 
     <!-- Header Area -->
