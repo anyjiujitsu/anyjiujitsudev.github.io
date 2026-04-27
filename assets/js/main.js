@@ -9,7 +9,7 @@ import { renderEventsGroups, renderIndexEventsGroups } from "./render.js?v=20260
 import { $ } from "./utils/dom.js?v=20260210-911";
 import { applyDistanceFilter } from "./utils/geo.js?v=20260212-902";
 import { initEventsPills, initIndexPills } from "./ui/pills.js?v=20260210-911";
-import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260212-902";
+import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260427-eventszip-directapply";
 import { closePricingPopup, wirePricingPopup } from "./ui/pricing.js";
 import { activeEventsState, setActiveEventsQuery, setViewUI, wireViewToggle } from "./ui/viewToggle.js";
 import { dirToIndexEventRow, ensureDistanceOriginOptions, filterIndexDirectoryAsEvents, syncDistanceUIFromState } from "./indexDirectory.js";
@@ -144,6 +144,15 @@ async function init(){
     },
     onEventsDistanceSelectOrigin: (label) => {
       setEventsDistanceFrom(label);
+      render();
+    },
+    onEventsDistanceApply: (zip) => {
+      const v = String(zip ?? "").trim();
+      if(!/^\d{5}$/.test(v)) return;
+      setEventsQuery(v);
+      setEventsDistanceFrom(v);
+      const evIn = $("eventsSearchInput");
+      if(evIn) evIn.value = v;
       render();
     },
   });
