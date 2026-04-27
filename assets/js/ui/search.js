@@ -48,6 +48,7 @@ export function wireSearchSuggestions({
   onEventsViewOpen,
   onIndexDistanceSelectOrigin,
   onEventsDistanceSelectOrigin,
+  onEventsDistanceApply,
 }){
   const wrap  = $("eventsSearchWrap");
   const input = $("eventsSearchInput");
@@ -127,6 +128,7 @@ export function wireSearchSuggestions({
     activeMode,
     setMiles,
     onSelectOrigin,
+    onApplyZip,
   }){
     if(!section) return;
     const distInput = $(inputId);
@@ -134,7 +136,8 @@ export function wireSearchSuggestions({
     const seg = section.querySelector(".iosSeg");
     const segBtns = section.querySelectorAll(".iosSeg__btn");
 
-    const isActiveMode = () => mode() === activeMode;
+    const isSectionVisible = () => !section.hasAttribute("hidden") && !section.hidden;
+    const isActiveMode = () => mode() === activeMode || (activeMode === "events" && isSectionVisible());
 
     function sanitizeZip(){
       if(!distInput) return "";
@@ -151,7 +154,8 @@ export function wireSearchSuggestions({
       // Mirror into the search bar so the user can see the active distance filter.
       input.value = zip;
       setActiveEventsQuery(zip);
-      if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
+      if(typeof onApplyZip === "function") onApplyZip(zip);
+      else if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
       close();
       distInput?.blur();
       input.blur();
@@ -198,12 +202,25 @@ export function wireSearchSuggestions({
       applyZip();
     });
 
-    distApply?.addEventListener("click", (e)=>{
+    let lastApplyTap = 0;
+    function scheduleApplyZip(e){
       if(!isActiveMode()) return;
-      e.preventDefault();
-      e.stopPropagation();
-      applyZip();
-    });
+      if(e){
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      const now = Date.now();
+      if(now - lastApplyTap < 180) return;
+      lastApplyTap = now;
+      // Mobile Safari can commit suggested/autofilled values after the tap cycle.
+      // Blur first, then read after a short delay so the value is real, not just visual.
+      distInput?.blur();
+      window.setTimeout(applyZip, activeMode === "events" ? 90 : 0);
+    }
+
+    distApply?.addEventListener("touchend", scheduleApplyZip, { passive: false });
+    distApply?.addEventListener("pointerup", scheduleApplyZip);
+    distApply?.addEventListener("click", scheduleApplyZip);
   }
 
   wireDistanceSection({
@@ -222,6 +239,7 @@ export function wireSearchSuggestions({
     activeMode: "events",
     setMiles: setEventsDistanceMiles,
     onSelectOrigin: onEventsDistanceSelectOrigin,
+    onApplyZip: onEventsDistanceApply,
   });
 
   document.addEventListener("pointerdown", (e)=>{
