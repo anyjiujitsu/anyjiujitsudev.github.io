@@ -147,9 +147,17 @@ export function wireSearchSuggestions({
       return digits;
     }
 
+    function readZipValue(){
+      if(!distInput) return "";
+      const raw = String(distInput.value || "");
+      const digits = raw.replace(/\D/g, "").slice(0, 5);
+      if(digits && digits !== raw) distInput.value = digits;
+      return digits;
+    }
+
     function applyZip(){
       if(!isActiveMode()) return;
-      const zip = sanitizeZip();
+      const zip = readZipValue();
       if(zip.length !== 5) return;
       // Mirror into the search bar so the user can see the active distance filter.
       input.value = zip;
@@ -203,51 +211,29 @@ export function wireSearchSuggestions({
     });
 
     let lastApplyTap = 0;
-
-    function applyZipAfterMobileCommit(){
-      // iOS can show a suggested ZIP before committing it to input.value.
-      // Blur and poll briefly, then run the same apply path used everywhere else.
-      const start = Date.now();
-      const tick = () => {
-        if(!isActiveMode()) return;
-        const zip = sanitizeZip();
-        if(zip.length === 5){
-          applyZip();
-          return;
-        }
-        if(Date.now() - start < 900){
-          window.setTimeout(tick, 60);
-        }
-      };
-      distInput?.blur();
-      window.setTimeout(tick, 80);
-    }
-
     function scheduleApplyZip(e){
       if(!isActiveMode()) return;
-      const now = Date.now();
-      if(now - lastApplyTap < 220) return;
-      lastApplyTap = now;
-
-      if(activeMode === "events"){
-        // Leave the native tap alone for iOS so the suggested ZIP commits.
-        applyZipAfterMobileCommit();
-        return;
-      }
-
       if(e){
         e.preventDefault();
         e.stopPropagation();
       }
+      const now = Date.now();
+      if(now - lastApplyTap < 180) return;
+      lastApplyTap = now;
+
+      // iOS can show a suggested/autofilled ZIP before the input value has fully committed.
+      // Force the field to commit, then read it on the next frame. INDEX remains unchanged;
+      // EVENTS uses the slightly longer defer because that is the only failing mobile path.
       distInput?.blur();
-      applyZip();
+      const delay = activeMode === "events" ? 120 : 0;
+      window.requestAnimationFrame(() => {
+        window.setTimeout(applyZip, delay);
+      });
     }
 
-    if(activeMode === "events"){
-      distApply?.addEventListener("touchstart", scheduleApplyZip, { passive: true });
-      distApply?.addEventListener("pointerdown", scheduleApplyZip);
-    }
-    distApply?.addEventListener("touchend", scheduleApplyZip, { passive: activeMode === "events" });
+    distApply?.addEventListener("touchstart", scheduleApplyZip, { passive: false });
+    distApply?.addEventListener("touchend", scheduleApplyZip, { passive: false });
+    distApply?.addEventListener("pointerdown", scheduleApplyZip);
     distApply?.addEventListener("pointerup", scheduleApplyZip);
     distApply?.addEventListener("click", scheduleApplyZip);
   }
