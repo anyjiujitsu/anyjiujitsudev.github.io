@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="assets/css/components.css?v=20260212-902" />
   <link rel="stylesheet" href="assets/css/directory.css?v=20260210-809" />
 <!-- IMPORTANT: repo references main.js (no sequence) -->
-  <script type="module" src="assets/js/main.js?v=20260427-eventszip-directapply"></script>
+  <script type="module" src="assets/js/main.js?v=20260427-reuse-index-distance"></script>
 </head>
 
 <body>
@@ -101,38 +101,10 @@
                   <button type="button" class="suggest__item" data-value="NEW EVENTS">NEW EVENTS</button>
                 </div>
 
-                <!-- EVENTS mode: Events Near -->
-                <div id="eventsSearchSuggestEventsDistance">
-                  <div class="menu__header menu__header--static">
-                    <span class="menu__title">EVENTS NEAR</span>
-                  </div>
-                  <div class="menu__divider"></div>
-
-                  <div class="distance__section" aria-label="Events near ZIP">
-                    <div class="distance__row">
-                      <input id="eventsDistanceOriginInput" class="distance__input" type="text"
-                             inputmode="numeric" autocomplete="off" autocapitalize="none" spellcheck="false"
-                             placeholder="Enter ZIP" maxlength="5" aria-label="Enter ZIP" />
-                      <button id="eventsDistanceApplyBtn" class="distance__apply" type="button" aria-label="Apply event ZIP">
-                        ➜
-                      </button>
-                    </div>
-
-                    <div id="eventsDistanceHint" class="distance__hint distance__hint--toggle" aria-label="Event distance filter">
-                      <span class="distance__hintText">Distance(mi.)</span>
-                      <div class="iosSeg" data-selected="15" role="group" aria-label="Event distance (miles)">
-                        <button type="button" class="iosSeg__btn is-active" data-miles="15" aria-pressed="true">15</button>
-                        <button type="button" class="iosSeg__btn" data-miles="30" aria-pressed="false">30</button>
-                      </div>
-                      <span class="distance__hintText"></span>
-                    </div>
-                  </div>
-                </div>
-
                 <!-- INDEX mode: Training Near -->
                 <div id="eventsSearchSuggestDistance" hidden>
                   <div class="menu__header menu__header--static">
-                    <span class="menu__title">TRAINING NEAR</span>
+                    <span id="distanceSectionTitle" class="menu__title">TRAINING NEAR</span>
                   </div>
                   <div class="menu__divider"></div>
 
