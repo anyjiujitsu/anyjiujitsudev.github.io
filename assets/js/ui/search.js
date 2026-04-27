@@ -36,10 +36,9 @@ export function wireSearch({ $, state, setIndexQuery, setIndexEventsQuery, setAc
   });
 }
 
-/* section: search suggestions // purpose: quick-pick common search tokens + one shared ZIP distance control */
+/* section: search suggestions // purpose: quick-pick common search tokens + ZIP distance filters */
 export function wireSearchSuggestions({
   $,
-  state,
   setActiveEventsQuery,
   setIndexDistanceMiles,
   setEventsDistanceMiles,
@@ -48,6 +47,7 @@ export function wireSearchSuggestions({
   onIndexViewOpen,
   onEventsViewOpen,
   onIndexDistanceSelectOrigin,
+  onEventsDistanceSelectOrigin,
   onEventsDistanceApply,
 }){
   const wrap  = $("eventsSearchWrap");
@@ -55,13 +55,10 @@ export function wireSearchSuggestions({
   const panel = $("eventsSearchSuggest");
   if(!wrap || !input || !panel) return;
 
+  // sections inside panel
   const quick = $("eventsSearchSuggestQuick");
-  const distanceSection = $("eventsSearchSuggestDistance");
-  const distanceTitle = $("distanceSectionTitle") || distanceSection?.querySelector(".menu__title");
-  const distInput = $("distanceOriginInput");
-  const distApply = $("distanceApplyBtn");
-  const seg = distanceSection?.querySelector(".iosSeg");
-  const segBtns = distanceSection ? Array.from(distanceSection.querySelectorAll(".iosSeg__btn")) : [];
+  const indexDist  = $("eventsSearchSuggestDistance");
+  const eventsDist = $("eventsSearchSuggestEventsDistance");
 
   const canSuggest = () => {
     const ev = (typeof isEventsView !== "function") ? true : !!isEventsView();
@@ -73,38 +70,11 @@ export function wireSearchSuggestions({
     return (typeof isIndexView === "function" && isIndexView()) ? "index" : "events";
   }
 
-  function activeDistanceState(){
-    return mode() === "index" ? state?.indexEvents : state?.events;
-  }
-
-  function setMilesUI(miles){
-    if(!seg || !segBtns.length) return;
-    const mNum = Number(miles) || 15;
-    seg.dataset.selected = String(mNum);
-    segBtns.forEach((b)=>{
-      const m = Number(b.dataset.miles);
-      const on = (m === mNum);
-      b.classList.toggle("is-active", on);
-      b.setAttribute("aria-pressed", on ? "true" : "false");
-    });
-  }
-
-  function syncDistanceSection(){
-    const m = mode();
-    const distState = activeDistanceState();
-    if(distanceTitle) distanceTitle.textContent = (m === "index") ? "TRAINING NEAR" : "EVENTS NEAR";
-    if(distanceSection){
-      distanceSection.setAttribute("aria-label", m === "index" ? "Training near ZIP" : "Events near ZIP");
-      distanceSection.hidden = false;
-    }
-    if(distInput) distInput.value = String(distState?.distFrom || "");
-    setMilesUI(distState?.distMiles || 15);
-  }
-
   function setModeUI(){
     const m = mode();
     if(quick) quick.hidden = (m !== "events");
-    syncDistanceSection();
+    if(eventsDist) eventsDist.hidden = (m !== "events");
+    if(indexDist) indexDist.hidden = (m !== "index");
   }
 
   const open = ()=>{
@@ -113,7 +83,6 @@ export function wireSearchSuggestions({
     if(panel.hasAttribute("hidden")) panel.removeAttribute("hidden");
     if(mode() === "index" && typeof onIndexViewOpen === "function") onIndexViewOpen();
     if(mode() === "events" && typeof onEventsViewOpen === "function") onEventsViewOpen();
-    syncDistanceSection();
   };
 
   const close = ()=>{
@@ -135,6 +104,7 @@ export function wireSearchSuggestions({
     if(String(input.value || "").trim()) close();
   });
 
+  // EVENTS mode: quick-search buttons write into the search box
   panel.addEventListener("click", (e)=>{
     if(!canSuggest()) { close(); return; }
     if(mode() !== "events") return;
@@ -146,70 +116,130 @@ export function wireSearchSuggestions({
     const val = btn.getAttribute("data-value") || "";
     input.value = val;
     setActiveEventsQuery(val);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
     close();
     input.blur();
   });
 
-  function sanitizeZip(){
-    if(!distInput) return "";
-    const raw = String(distInput.value || "");
-    const digits = raw.replace(/\D/g, "").slice(0, 5);
-    if(digits !== raw) distInput.value = digits;
-    return digits;
-  }
+  function wireDistanceSection({
+    section,
+    inputId,
+    applyId,
+    activeMode,
+    setMiles,
+    onSelectOrigin,
+    onApplyZip,
+  }){
+    if(!section) return;
+    const distInput = $(inputId);
+    const distApply = $(applyId);
+    const seg = section.querySelector(".iosSeg");
+    const segBtns = section.querySelectorAll(".iosSeg__btn");
 
-  function applyDistanceZip(){
-    if(!canSuggest()) return;
-    const zip = sanitizeZip();
-    if(zip.length !== 5) return;
+    const isSectionVisible = () => !section.hasAttribute("hidden") && !section.hidden;
+    const isActiveMode = () => mode() === activeMode || (activeMode === "events" && isSectionVisible());
 
-    input.value = zip;
-    setActiveEventsQuery(zip);
-
-    if(mode() === "index"){
-      if(typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(zip);
-    }else if(typeof onEventsDistanceApply === "function"){
-      onEventsDistanceApply(zip);
+    function sanitizeZip(){
+      if(!distInput) return "";
+      const raw = String(distInput.value || "");
+      const digits = raw.replace(/\D/g, "").slice(0, 5);
+      if(digits !== raw) distInput.value = digits;
+      return digits;
     }
 
-    close();
-    distInput?.blur();
-    input.blur();
+    function applyZip(){
+      if(!isActiveMode()) return;
+      const zip = sanitizeZip();
+      if(zip.length !== 5) return;
+      // Mirror into the search bar so the user can see the active distance filter.
+      input.value = zip;
+      setActiveEventsQuery(zip);
+      if(typeof onApplyZip === "function") onApplyZip(zip);
+      else if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
+      close();
+      distInput?.blur();
+      input.blur();
+    }
+
+    function setMilesUI(miles){
+      if(!seg || !segBtns) return;
+      const mNum = Number(miles);
+      seg.dataset.selected = String(mNum);
+      segBtns.forEach((b)=>{
+        const m = Number(b.dataset.miles);
+        const on = (m === mNum);
+        b.classList.toggle("is-active", on);
+        b.setAttribute("aria-pressed", on ? "true" : "false");
+      });
+    }
+
+    segBtns?.forEach((btn)=>{
+      btn.addEventListener("click", (e)=>{
+        if(!isActiveMode()) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const miles = Number(btn.dataset.miles);
+        if(!Number.isFinite(miles)) return;
+        setMilesUI(miles);
+        if(typeof setMiles === "function") setMiles(miles);
+        if(typeof onSelectOrigin === "function" && sanitizeZip().length === 5) onSelectOrigin(sanitizeZip());
+      });
+    });
+
+    function handleZipValueRefresh(){
+      if(!isActiveMode()) return;
+      sanitizeZip();
+    }
+
+    distInput?.addEventListener("input", handleZipValueRefresh);
+    distInput?.addEventListener("change", handleZipValueRefresh);
+    distInput?.addEventListener("blur", handleZipValueRefresh);
+
+    distInput?.addEventListener("keydown", (e)=>{
+      if(!isActiveMode()) return;
+      if(e.key !== "Enter") return;
+      e.preventDefault();
+      applyZip();
+    });
+
+    let lastApplyTap = 0;
+    function scheduleApplyZip(e){
+      if(!isActiveMode()) return;
+      if(e){
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      const now = Date.now();
+      if(now - lastApplyTap < 180) return;
+      lastApplyTap = now;
+      // Mobile Safari can commit suggested/autofilled values after the tap cycle.
+      // Blur first, then read after a short delay so the value is real, not just visual.
+      distInput?.blur();
+      window.setTimeout(applyZip, activeMode === "events" ? 90 : 0);
+    }
+
+    distApply?.addEventListener("touchend", scheduleApplyZip, { passive: false });
+    distApply?.addEventListener("pointerup", scheduleApplyZip);
+    distApply?.addEventListener("click", scheduleApplyZip);
   }
 
-  segBtns.forEach((btn)=>{
-    btn.addEventListener("click", (e)=>{
-      if(!canSuggest()) return;
-      e.preventDefault();
-      e.stopPropagation();
-      const miles = Number(btn.dataset.miles);
-      if(!Number.isFinite(miles)) return;
-      setMilesUI(miles);
-      const zip = sanitizeZip();
-      if(mode() === "index"){
-        if(typeof setIndexDistanceMiles === "function") setIndexDistanceMiles(miles);
-        if(zip.length === 5 && typeof onIndexDistanceSelectOrigin === "function") onIndexDistanceSelectOrigin(zip);
-      }else{
-        if(typeof setEventsDistanceMiles === "function") setEventsDistanceMiles(miles);
-        if(zip.length === 5 && typeof onEventsDistanceApply === "function") onEventsDistanceApply(zip);
-      }
-    });
+  wireDistanceSection({
+    section: indexDist,
+    inputId: "distanceOriginInput",
+    applyId: "distanceApplyBtn",
+    activeMode: "index",
+    setMiles: setIndexDistanceMiles,
+    onSelectOrigin: onIndexDistanceSelectOrigin,
   });
 
-  distInput?.addEventListener("input", sanitizeZip);
-  distInput?.addEventListener("change", sanitizeZip);
-  distInput?.addEventListener("blur", sanitizeZip);
-
-  distInput?.addEventListener("keydown", (e)=>{
-    if(e.key !== "Enter") return;
-    e.preventDefault();
-    applyDistanceZip();
-  });
-
-  distApply?.addEventListener("click", (e)=>{
-    e.preventDefault();
-    e.stopPropagation();
-    applyDistanceZip();
+  wireDistanceSection({
+    section: eventsDist,
+    inputId: "eventsDistanceOriginInput",
+    applyId: "eventsDistanceApplyBtn",
+    activeMode: "events",
+    setMiles: setEventsDistanceMiles,
+    onSelectOrigin: onEventsDistanceSelectOrigin,
+    onApplyZip: onEventsDistanceApply,
   });
 
   document.addEventListener("pointerdown", (e)=>{
