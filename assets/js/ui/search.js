@@ -203,40 +203,51 @@ export function wireSearchSuggestions({
     });
 
     let lastApplyTap = 0;
-    function scheduleApplyZip(e, opts = {}){
-      const forceEventsApply = !!opts.forceEventsApply && activeMode === "events";
-      if(!forceEventsApply && !isActiveMode()) return;
+
+    function applyZipAfterMobileCommit(){
+      // iOS can show a suggested ZIP before committing it to input.value.
+      // Blur and poll briefly, then run the same apply path used everywhere else.
+      const start = Date.now();
+      const tick = () => {
+        if(!isActiveMode()) return;
+        const zip = sanitizeZip();
+        if(zip.length === 5){
+          applyZip();
+          return;
+        }
+        if(Date.now() - start < 900){
+          window.setTimeout(tick, 60);
+        }
+      };
+      distInput?.blur();
+      window.setTimeout(tick, 80);
+    }
+
+    function scheduleApplyZip(e){
+      if(!isActiveMode()) return;
+      const now = Date.now();
+      if(now - lastApplyTap < 220) return;
+      lastApplyTap = now;
+
+      if(activeMode === "events"){
+        // Leave the native tap alone for iOS so the suggested ZIP commits.
+        applyZipAfterMobileCommit();
+        return;
+      }
+
       if(e){
         e.preventDefault();
         e.stopPropagation();
       }
-      const now = Date.now();
-      if(now - lastApplyTap < 180) return;
-      lastApplyTap = now;
-
-      // iOS Safari can treat the first tap after selecting an autofill/suggestion
-      // as a keyboard-dismiss tap instead of a normal button click. INDEX already
-      // receives its click reliably; EVENTS needs an earlier captured touch/pointer
-      // path so the arrow button cannot be swallowed on mobile.
       distInput?.blur();
-
-      if(forceEventsApply){
-        window.requestAnimationFrame(() => {
-          window.setTimeout(applyZip, 120);
-        });
-        return;
-      }
-
-      window.setTimeout(applyZip, activeMode === "events" ? 90 : 0);
+      applyZip();
     }
 
-    if(activeMode === "events" && distApply){
-      const captureEventsApply = (e) => scheduleApplyZip(e, { forceEventsApply: true });
-      distApply.addEventListener("touchstart", captureEventsApply, { passive: false, capture: true });
-      distApply.addEventListener("pointerdown", captureEventsApply, { capture: true });
+    if(activeMode === "events"){
+      distApply?.addEventListener("touchstart", scheduleApplyZip, { passive: true });
+      distApply?.addEventListener("pointerdown", scheduleApplyZip);
     }
-
-    distApply?.addEventListener("touchend", scheduleApplyZip, { passive: false });
+    distApply?.addEventListener("touchend", scheduleApplyZip, { passive: activeMode === "events" });
     distApply?.addEventListener("pointerup", scheduleApplyZip);
     distApply?.addEventListener("click", scheduleApplyZip);
   }
