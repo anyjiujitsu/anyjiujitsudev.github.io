@@ -203,7 +203,7 @@ export function wireSearchSuggestions({
     });
 
     let lastApplyTap = 0;
-    function scheduleApplyZip(e){
+    function scheduleApplyZip(e, delayOverride){
       if(!isActiveMode()) return;
       if(e){
         e.preventDefault();
@@ -212,12 +212,20 @@ export function wireSearchSuggestions({
       const now = Date.now();
       if(now - lastApplyTap < 180) return;
       lastApplyTap = now;
-      // Mobile Safari can commit suggested/autofilled values after the tap cycle.
-      // Blur first, then read after a short delay so the value is real, not just visual.
-      distInput?.blur();
-      window.setTimeout(applyZip, activeMode === "events" ? 90 : 0);
+      // Mobile Safari may consume the normal click while dismissing the keyboard.
+      // For EVENTS, capture the press at touchstart/pointerdown, then read after
+      // the current tap/autofill cycle has committed the value.
+      const delay = Number.isFinite(delayOverride) ? delayOverride : (activeMode === "events" ? 90 : 0);
+      window.setTimeout(() => {
+        distInput?.blur();
+        applyZip();
+      }, delay);
     }
 
+    if(activeMode === "events"){
+      distApply?.addEventListener("touchstart", (e)=>scheduleApplyZip(e, 120), { passive: false, capture: true });
+      distApply?.addEventListener("pointerdown", (e)=>scheduleApplyZip(e, 120), true);
+    }
     distApply?.addEventListener("touchend", scheduleApplyZip, { passive: false });
     distApply?.addEventListener("pointerup", scheduleApplyZip);
     distApply?.addEventListener("click", scheduleApplyZip);
