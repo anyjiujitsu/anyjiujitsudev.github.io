@@ -146,15 +146,6 @@ async function init(){
       setEventsDistanceFrom(label);
       render();
     },
-    onEventsDistanceApply: (zip) => {
-      const v = String(zip ?? "").trim();
-      if(!/^\d{5}$/.test(v)) return;
-      setEventsQuery(v);
-      setEventsDistanceFrom(v);
-      const evIn = $("eventsSearchInput");
-      if(evIn) evIn.value = v;
-      render();
-    },
   });
 
   if(!state.view) state.view = "events";
