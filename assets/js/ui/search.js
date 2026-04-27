@@ -48,7 +48,6 @@ export function wireSearchSuggestions({
   onEventsViewOpen,
   onIndexDistanceSelectOrigin,
   onEventsDistanceSelectOrigin,
-  onEventsDistanceApply,
 }){
   const wrap  = $("eventsSearchWrap");
   const input = $("eventsSearchInput");
@@ -128,7 +127,6 @@ export function wireSearchSuggestions({
     activeMode,
     setMiles,
     onSelectOrigin,
-    onApplyZip,
   }){
     if(!section) return;
     const distInput = $(inputId);
@@ -139,45 +137,25 @@ export function wireSearchSuggestions({
     const isSectionVisible = () => !section.hasAttribute("hidden") && !section.hidden;
     const isActiveMode = () => mode() === activeMode || (activeMode === "events" && isSectionVisible());
 
-    let lastGoodZip = "";
-
     function sanitizeZip(){
       if(!distInput) return "";
       const raw = String(distInput.value || "");
       const digits = raw.replace(/\D/g, "").slice(0, 5);
       if(digits !== raw) distInput.value = digits;
-      if(digits.length === 5) lastGoodZip = digits;
       return digits;
     }
 
-    function readZipForApply(){
-      // Mobile browser ZIP suggestions/autofill can display a selected value before
-      // the input.value property is fully committed. Keep the last committed 5-digit
-      // ZIP as a fallback and retry briefly after blur/tap below.
-      const zip = sanitizeZip();
-      return zip.length === 5 ? zip : lastGoodZip;
-    }
-
     function applyZip(){
-      if(!isActiveMode()) return false;
-      const zip = readZipForApply();
-      if(zip.length !== 5) return false;
-
-      if(distInput && distInput.value !== zip) distInput.value = zip;
-
-      // Mirror into the shared search bar so the user can see the active distance
-      // filter, and push the same value into the active view's state.
+      if(!isActiveMode()) return;
+      const zip = sanitizeZip();
+      if(zip.length !== 5) return;
+      // Mirror into the search bar so the user can see the active distance filter.
       input.value = zip;
       setActiveEventsQuery(zip);
-      input.dispatchEvent(new Event("input", { bubbles: true }));
-
-      if(typeof onApplyZip === "function") onApplyZip(zip);
-      else if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
-
+      if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
       close();
       distInput?.blur();
       input.blur();
-      return true;
     }
 
     function setMilesUI(miles){
@@ -212,7 +190,6 @@ export function wireSearchSuggestions({
 
     distInput?.addEventListener("input", handleZipValueRefresh);
     distInput?.addEventListener("change", handleZipValueRefresh);
-    distInput?.addEventListener("keyup", handleZipValueRefresh);
     distInput?.addEventListener("blur", handleZipValueRefresh);
 
     distInput?.addEventListener("keydown", (e)=>{
@@ -232,26 +209,10 @@ export function wireSearchSuggestions({
       const now = Date.now();
       if(now - lastApplyTap < 180) return;
       lastApplyTap = now;
-
-      // Mobile Safari/Chrome can commit postal-code suggestions after the tap/blur
-      // cycle. Try immediately, then retry a few times before giving up. This keeps
-      // desktop behavior instant while making mobile suggested ZIP selection reliable.
       distInput?.blur();
-      const delays = activeMode === "events" ? [0, 80, 180, 320] : [0];
-      let applied = false;
-      delays.forEach((delay)=>{
-        window.setTimeout(()=>{
-          if(applied) return;
-          applied = applyZip();
-        }, delay);
-      });
+      window.setTimeout(applyZip, 0);
     }
 
-    distApply?.addEventListener("pointerdown", ()=>{
-      if(!isActiveMode()) return;
-      sanitizeZip();
-      distInput?.blur();
-    });
     distApply?.addEventListener("touchend", scheduleApplyZip, { passive: false });
     distApply?.addEventListener("pointerup", scheduleApplyZip);
     distApply?.addEventListener("click", scheduleApplyZip);
@@ -273,7 +234,6 @@ export function wireSearchSuggestions({
     activeMode: "events",
     setMiles: setEventsDistanceMiles,
     onSelectOrigin: onEventsDistanceSelectOrigin,
-    onApplyZip: onEventsDistanceApply,
   });
 
   document.addEventListener("pointerdown", (e)=>{
