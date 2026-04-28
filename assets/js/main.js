@@ -26,9 +26,6 @@ function syncIndexDistanceUI(){
 function syncEventsDistanceUI(){
   const distWrap = $("eventsSearchSuggestEventsDistance");
   if(!distWrap) return;
-  const input = $("eventsDistanceOriginInput");
-  if(input) input.value = String(state.events.distFrom || "");
-
   const seg = distWrap.querySelector(".iosSeg");
   const btns = distWrap.querySelectorAll(".iosSeg__btn");
   if(seg && btns && btns.length){
