@@ -205,13 +205,13 @@ export function wireSearchSuggestions({
     let applyRetryToken = 0;
 
     function runApplyRetries(startDelay = 0){
-      // The arrow/submit button is the only thing that promotes the ZIP
-      // into the main search bar. On mobile, pressing the button can first
-      // commit a selected ZIP suggestion, so blur then retry briefly.
+      // Only the arrow/submit action promotes the ZIP into the main search bar.
+      // On mobile, a selected suggestion may commit on blur/release, so blur
+      // first and then re-read the ZIP several times before giving up.
       distInput?.blur();
       const token = ++applyRetryToken;
       const base = Math.max(0, Number(startDelay) || 0);
-      const delays = [0, 40, 100, 180, 300, 500, 800, 1200].map((d)=>d + base);
+      const delays = [0, 60, 140, 260, 420, 700, 1050, 1500].map((d)=>d + base);
       delays.forEach((delay)=>{
         window.setTimeout(()=>{
           if(token !== applyRetryToken) return;
@@ -226,27 +226,19 @@ export function wireSearchSuggestions({
         e.preventDefault();
         e.stopPropagation();
       }
+
+      // De-dupe the synthetic mouse/click events that follow touch/pointer
+      // release, but do not arm this on press-start. Press-start blur was the
+      // mobile failure mode: it could interrupt suggestion commit before the
+      // real submit action happened.
       const now = Date.now();
-      if(now - lastApplyTap < 180) return;
+      if(now - lastApplyTap < 90) return;
       lastApplyTap = now;
-      runApplyRetries(0);
+      runApplyRetries(30);
     }
 
-    function armApplyZip(e){
-      if(!isActiveMode()) return;
-      // Do not prevent default here. Mobile Safari/Chrome may need the native
-      // press/blur sequence to finish committing a selected suggestion.
-      const now = Date.now();
-      if(now - lastApplyTap < 180) return;
-      lastApplyTap = now;
-      runApplyRetries(70);
-    }
-
-    // Arm on press-start without blocking native behavior, then also handle
-    // release/click for desktop and browsers that do not need the early arm.
-    distApply?.addEventListener("touchstart", armApplyZip, { passive: true });
-    distApply?.addEventListener("pointerdown", armApplyZip);
-    distApply?.addEventListener("mousedown", armApplyZip);
+    // Submit only on release/click. Selecting a suggestion should populate the
+    // ZIP field only; pressing this arrow is what mirrors it to the search bar.
     distApply?.addEventListener("touchend", scheduleApplyZip, { passive: false });
     distApply?.addEventListener("pointerup", scheduleApplyZip);
     distApply?.addEventListener("click", scheduleApplyZip);
