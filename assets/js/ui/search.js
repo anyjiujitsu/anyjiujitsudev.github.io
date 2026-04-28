@@ -184,18 +184,33 @@ export function wireSearchSuggestions({
       });
     });
 
+    function handleZipValueRefresh(){
+      if(!isActiveMode()) return;
+      sanitizeZip();
+    }
+
+    distInput?.addEventListener("input", handleZipValueRefresh);
+    distInput?.addEventListener("change", handleZipValueRefresh);
+    distInput?.addEventListener("blur", handleZipValueRefresh);
+
+
+    distInput?.addEventListener("keydown", (e)=>{
+      if(!isActiveMode()) return;
+      if(e.key !== "Enter") return;
+      e.preventDefault();
+      applyZip();
+    });
+
     let lastApplyTap = 0;
     let applyRetryToken = 0;
-    let pendingArrowApplyUntil = 0;
 
-    function runApplyRetries(startDelay = 0){
-      // Only an arrow/submit action promotes the ZIP into the main search bar.
-      // A mobile tap on the arrow can first commit/blur a selected suggestion
-      // without producing a normal click, so retry reads briefly after blur.
+    function runApplyRetries(){
+      // The arrow/submit button is the only thing that promotes the ZIP
+      // into the main search bar. Mobile suggestions can commit slightly
+      // after release, so retry briefly after the submit event only.
       distInput?.blur();
       const token = ++applyRetryToken;
-      const base = Math.max(0, Number(startDelay) || 0);
-      const delays = [0, 60, 140, 260, 420, 700, 1050, 1500].map((d)=>d + base);
+      const delays = [0, 40, 100, 180, 300, 500, 800, 1200];
       delays.forEach((delay)=>{
         window.setTimeout(()=>{
           if(token !== applyRetryToken) return;
@@ -204,54 +219,24 @@ export function wireSearchSuggestions({
       });
     }
 
-    function scheduleApplyZip(e, startDelay = 30){
+    function scheduleApplyZip(e){
       if(!isActiveMode()) return;
       if(e){
         e.preventDefault();
         e.stopPropagation();
       }
       const now = Date.now();
-      if(now - lastApplyTap < 90) return;
+      if(now - lastApplyTap < 180) return;
       lastApplyTap = now;
-      pendingArrowApplyUntil = 0;
-      runApplyRetries(startDelay);
+      runApplyRetries();
     }
 
-    function markArrowPress(){
-      if(!isActiveMode()) return;
-      // Do not submit and do not prevent default on press-start. This only marks
-      // that an upcoming ZIP-input blur was caused by the arrow, so if mobile
-      // swallows the eventual click while committing an autofill/suggestion, the
-      // blur can still finish the intended submit. Selecting a suggestion alone
-      // will not set this flag, so it will not auto-submit.
-      pendingArrowApplyUntil = Date.now() + 1200;
-    }
-
-    function handleZipValueRefresh(){
-      if(!isActiveMode()) return;
-      sanitizeZip();
-    }
-
-    distInput?.addEventListener("input", handleZipValueRefresh);
-    distInput?.addEventListener("change", handleZipValueRefresh);
-    distInput?.addEventListener("blur", ()=>{
-      handleZipValueRefresh();
-      if(Date.now() <= pendingArrowApplyUntil) scheduleApplyZip(null, 80);
-    });
-
-    distInput?.addEventListener("keydown", (e)=>{
-      if(!isActiveMode()) return;
-      if(e.key !== "Enter") return;
-      e.preventDefault();
-      scheduleApplyZip(null, 0);
-    });
-
-    distApply?.addEventListener("touchstart", markArrowPress, { passive: true });
-    distApply?.addEventListener("pointerdown", markArrowPress);
-    distApply?.addEventListener("mousedown", markArrowPress);
-    distApply?.addEventListener("touchend", (e)=>scheduleApplyZip(e, 30), { passive: false });
-    distApply?.addEventListener("pointerup", (e)=>scheduleApplyZip(e, 30));
-    distApply?.addEventListener("click", (e)=>scheduleApplyZip(e, 30));
+    // Submit only from release/click/keyboard events. Do not submit from
+    // touchstart/pointerdown: on mobile that can run before the selected
+    // ZIP suggestion has become the input value.
+    distApply?.addEventListener("touchend", scheduleApplyZip, { passive: false });
+    distApply?.addEventListener("pointerup", scheduleApplyZip);
+    distApply?.addEventListener("click", scheduleApplyZip);
   }
 
   wireDistanceSection({
@@ -271,6 +256,65 @@ export function wireSearchSuggestions({
     setMiles: setEventsDistanceMiles,
     onSelectOrigin: onEventsDistanceSelectOrigin,
   });
+
+  // Capture-phase submit fallback for the distance arrow buttons.
+  // This is intentionally tied only to the arrow buttons: selecting a mobile
+  // ZIP suggestion still fills only the ZIP box. The fallback catches mobile
+  // cases where the button normal click path is swallowed by focus/blur.
+  let delegatedApplyStamp = 0;
+
+  function submitDistanceFromButton(btn){
+    const isIndexBtn = btn && btn.id === "distanceApplyBtn";
+    const isEventsBtn = btn && btn.id === "eventsDistanceApplyBtn";
+    if(!isIndexBtn && !isEventsBtn) return false;
+
+    const active = mode();
+    if(isIndexBtn && active !== "index") return false;
+    if(isEventsBtn && active !== "events") return false;
+
+    const distInput = $(isIndexBtn ? "distanceOriginInput" : "eventsDistanceOriginInput");
+    const searchInput = $("eventsSearchInput");
+    if(!distInput || !searchInput) return false;
+
+    const applyOrigin = isIndexBtn ? onIndexDistanceSelectOrigin : onEventsDistanceSelectOrigin;
+    const token = ++delegatedApplyStamp;
+
+    distInput.blur();
+
+    const tryApply = ()=>{
+      if(token !== delegatedApplyStamp) return true;
+      const raw = String(distInput.value || "");
+      const zip = raw.replace(/\D/g, "").slice(0, 5);
+      if(zip !== raw) distInput.value = zip;
+      if(zip.length !== 5) return false;
+
+      searchInput.value = zip;
+      setActiveEventsQuery(zip);
+      if(typeof applyOrigin === "function") applyOrigin(zip);
+      close();
+      searchInput.blur();
+      delegatedApplyStamp += 1;
+      return true;
+    };
+
+    [0, 40, 100, 180, 300, 500, 800, 1200].forEach((delay)=>{
+      window.setTimeout(tryApply, delay);
+    });
+
+    return true;
+  }
+
+  function handleDelegatedDistanceSubmit(e){
+    const btn = e.target?.closest?.("#distanceApplyBtn, #eventsDistanceApplyBtn");
+    if(!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    submitDistanceFromButton(btn);
+  }
+
+  panel.addEventListener("touchend", handleDelegatedDistanceSubmit, { capture: true, passive: false });
+  panel.addEventListener("pointerup", handleDelegatedDistanceSubmit, true);
+  panel.addEventListener("click", handleDelegatedDistanceSubmit, true);
 
   document.addEventListener("pointerdown", (e)=>{
     if(wrap.contains(e.target)) return;
