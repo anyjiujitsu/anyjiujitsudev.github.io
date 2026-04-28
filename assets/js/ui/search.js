@@ -193,23 +193,6 @@ export function wireSearchSuggestions({
     distInput?.addEventListener("change", handleZipValueRefresh);
     distInput?.addEventListener("blur", handleZipValueRefresh);
 
-    function applyEventsZipAfterBlur(){
-      if(activeMode !== "events") return;
-      if(!isActiveMode()) return;
-      // On mobile, the first tap on the arrow after selecting a suggested ZIP
-      // can be used by the browser to commit/blur the input instead of fully
-      // firing the button event. If a valid EVENTS ZIP is present after blur,
-      // complete the same apply path so the first tap still moves it upward.
-      const token = ++applyRetryToken;
-      [0, 35, 90, 180].forEach((delay)=>{
-        window.setTimeout(()=>{
-          if(token !== applyRetryToken) return;
-          if(applyZip()) applyRetryToken += 1;
-        }, delay);
-      });
-    }
-
-    distInput?.addEventListener("blur", applyEventsZipAfterBlur);
 
     distInput?.addEventListener("keydown", (e)=>{
       if(!isActiveMode()) return;
@@ -233,7 +216,10 @@ export function wireSearchSuggestions({
       delays.forEach((delay)=>{
         window.setTimeout(()=>{
           if(token !== applyRetryToken) return;
-          if(applyZip()) applyRetryToken += 1;
+          if(applyZip()){
+            applyPressStarted = false;
+            applyRetryToken += 1;
+          }
         }, delay);
       });
     }
