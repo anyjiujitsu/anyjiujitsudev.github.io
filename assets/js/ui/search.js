@@ -184,30 +184,14 @@ export function wireSearchSuggestions({
       });
     });
 
-    function handleZipValueRefresh(){
-      if(!isActiveMode()) return;
-      sanitizeZip();
-    }
-
-    distInput?.addEventListener("input", handleZipValueRefresh);
-    distInput?.addEventListener("change", handleZipValueRefresh);
-    distInput?.addEventListener("blur", handleZipValueRefresh);
-
-
-    distInput?.addEventListener("keydown", (e)=>{
-      if(!isActiveMode()) return;
-      if(e.key !== "Enter") return;
-      e.preventDefault();
-      applyZip();
-    });
-
     let lastApplyTap = 0;
     let applyRetryToken = 0;
+    let pendingArrowApplyUntil = 0;
 
     function runApplyRetries(startDelay = 0){
-      // Only the arrow/submit action promotes the ZIP into the main search bar.
-      // On mobile, a selected suggestion may commit on blur/release, so blur
-      // first and then re-read the ZIP several times before giving up.
+      // Only an arrow/submit action promotes the ZIP into the main search bar.
+      // A mobile tap on the arrow can first commit/blur a selected suggestion
+      // without producing a normal click, so retry reads briefly after blur.
       distInput?.blur();
       const token = ++applyRetryToken;
       const base = Math.max(0, Number(startDelay) || 0);
@@ -220,28 +204,54 @@ export function wireSearchSuggestions({
       });
     }
 
-    function scheduleApplyZip(e){
+    function scheduleApplyZip(e, startDelay = 30){
       if(!isActiveMode()) return;
       if(e){
         e.preventDefault();
         e.stopPropagation();
       }
-
-      // De-dupe the synthetic mouse/click events that follow touch/pointer
-      // release, but do not arm this on press-start. Press-start blur was the
-      // mobile failure mode: it could interrupt suggestion commit before the
-      // real submit action happened.
       const now = Date.now();
       if(now - lastApplyTap < 90) return;
       lastApplyTap = now;
-      runApplyRetries(30);
+      pendingArrowApplyUntil = 0;
+      runApplyRetries(startDelay);
     }
 
-    // Submit only on release/click. Selecting a suggestion should populate the
-    // ZIP field only; pressing this arrow is what mirrors it to the search bar.
-    distApply?.addEventListener("touchend", scheduleApplyZip, { passive: false });
-    distApply?.addEventListener("pointerup", scheduleApplyZip);
-    distApply?.addEventListener("click", scheduleApplyZip);
+    function markArrowPress(){
+      if(!isActiveMode()) return;
+      // Do not submit and do not prevent default on press-start. This only marks
+      // that an upcoming ZIP-input blur was caused by the arrow, so if mobile
+      // swallows the eventual click while committing an autofill/suggestion, the
+      // blur can still finish the intended submit. Selecting a suggestion alone
+      // will not set this flag, so it will not auto-submit.
+      pendingArrowApplyUntil = Date.now() + 1200;
+    }
+
+    function handleZipValueRefresh(){
+      if(!isActiveMode()) return;
+      sanitizeZip();
+    }
+
+    distInput?.addEventListener("input", handleZipValueRefresh);
+    distInput?.addEventListener("change", handleZipValueRefresh);
+    distInput?.addEventListener("blur", ()=>{
+      handleZipValueRefresh();
+      if(Date.now() <= pendingArrowApplyUntil) scheduleApplyZip(null, 80);
+    });
+
+    distInput?.addEventListener("keydown", (e)=>{
+      if(!isActiveMode()) return;
+      if(e.key !== "Enter") return;
+      e.preventDefault();
+      scheduleApplyZip(null, 0);
+    });
+
+    distApply?.addEventListener("touchstart", markArrowPress, { passive: true });
+    distApply?.addEventListener("pointerdown", markArrowPress);
+    distApply?.addEventListener("mousedown", markArrowPress);
+    distApply?.addEventListener("touchend", (e)=>scheduleApplyZip(e, 30), { passive: false });
+    distApply?.addEventListener("pointerup", (e)=>scheduleApplyZip(e, 30));
+    distApply?.addEventListener("click", (e)=>scheduleApplyZip(e, 30));
   }
 
   wireDistanceSection({
