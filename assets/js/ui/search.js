@@ -146,9 +146,9 @@ export function wireSearchSuggestions({
     }
 
     function applyZip(){
-      if(!isActiveMode()) return;
+      if(!isActiveMode()) return false;
       const zip = sanitizeZip();
-      if(zip.length !== 5) return;
+      if(zip.length !== 5) return false;
       // Mirror into the search bar so the user can see the active distance filter.
       input.value = zip;
       setActiveEventsQuery(zip);
@@ -156,6 +156,7 @@ export function wireSearchSuggestions({
       close();
       distInput?.blur();
       input.blur();
+      return true;
     }
 
     function setMilesUI(miles){
@@ -200,6 +201,7 @@ export function wireSearchSuggestions({
     });
 
     let lastApplyTap = 0;
+    let applyRetryToken = 0;
     function scheduleApplyZip(e){
       if(!isActiveMode()) return;
       if(e){
@@ -209,8 +211,20 @@ export function wireSearchSuggestions({
       const now = Date.now();
       if(now - lastApplyTap < 180) return;
       lastApplyTap = now;
+
+      // Mobile autofill/suggestion picks can appear in the field before the
+      // JavaScript-readable value is fully committed. Blurring the ZIP input
+      // commits the value, then these short retries let the first arrow tap
+      // apply as soon as the committed value is available.
       distInput?.blur();
-      window.setTimeout(applyZip, 0);
+      const token = ++applyRetryToken;
+      const delays = [0, 35, 90, 180, 320];
+      delays.forEach((delay)=>{
+        window.setTimeout(()=>{
+          if(token !== applyRetryToken) return;
+          if(applyZip()) applyRetryToken += 1;
+        }, delay);
+      });
     }
 
     distApply?.addEventListener("touchend", scheduleApplyZip, { passive: false });
