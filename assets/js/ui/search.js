@@ -203,23 +203,19 @@ export function wireSearchSuggestions({
 
     let lastApplyTap = 0;
     let applyRetryToken = 0;
-    let applyPressStarted = false;
 
-    function runApplyRetries(){
-      // Mobile autofill/suggestion picks can appear in the field before the
-      // JavaScript-readable value is fully committed. Blurring the ZIP input
-      // commits the value, then these retries let the first arrow press apply
-      // as soon as the committed value is available.
+    function runApplyRetries(startDelay = 0){
+      // The arrow/submit button is the only thing that promotes the ZIP
+      // into the main search bar. On mobile, pressing the button can first
+      // commit a selected ZIP suggestion, so blur then retry briefly.
       distInput?.blur();
       const token = ++applyRetryToken;
-      const delays = [0, 35, 90, 180, 320, 520, 800];
+      const base = Math.max(0, Number(startDelay) || 0);
+      const delays = [0, 40, 100, 180, 300, 500, 800, 1200].map((d)=>d + base);
       delays.forEach((delay)=>{
         window.setTimeout(()=>{
           if(token !== applyRetryToken) return;
-          if(applyZip()){
-            applyPressStarted = false;
-            applyRetryToken += 1;
-          }
+          if(applyZip()) applyRetryToken += 1;
         }, delay);
       });
     }
@@ -230,30 +226,30 @@ export function wireSearchSuggestions({
         e.preventDefault();
         e.stopPropagation();
       }
-
       const now = Date.now();
       if(now - lastApplyTap < 180) return;
       lastApplyTap = now;
-      applyPressStarted = true;
-      runApplyRetries();
+      runApplyRetries(0);
     }
 
-    function finishPendingApplyOnBlur(){
+    function armApplyZip(e){
       if(!isActiveMode()) return;
-      if(!applyPressStarted) return;
-      runApplyRetries();
+      // Do not prevent default here. Mobile Safari/Chrome may need the native
+      // press/blur sequence to finish committing a selected suggestion.
+      const now = Date.now();
+      if(now - lastApplyTap < 180) return;
+      lastApplyTap = now;
+      runApplyRetries(70);
     }
 
-    // Use press-start, not only release/click. On mobile, the first tap after
-    // selecting an autofill/suggestion value can be consumed by the browser
-    // before touchend/pointerup/click reliably reach the button.
-    distApply?.addEventListener("touchstart", scheduleApplyZip, { passive: false });
-    distApply?.addEventListener("pointerdown", scheduleApplyZip);
-    distApply?.addEventListener("mousedown", scheduleApplyZip);
+    // Arm on press-start without blocking native behavior, then also handle
+    // release/click for desktop and browsers that do not need the early arm.
+    distApply?.addEventListener("touchstart", armApplyZip, { passive: true });
+    distApply?.addEventListener("pointerdown", armApplyZip);
+    distApply?.addEventListener("mousedown", armApplyZip);
     distApply?.addEventListener("touchend", scheduleApplyZip, { passive: false });
     distApply?.addEventListener("pointerup", scheduleApplyZip);
     distApply?.addEventListener("click", scheduleApplyZip);
-    distInput?.addEventListener("blur", finishPendingApplyOnBlur);
   }
 
   wireDistanceSection({
