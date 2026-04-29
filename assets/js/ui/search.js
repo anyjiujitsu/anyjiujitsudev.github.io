@@ -48,6 +48,8 @@ export function wireSearchSuggestions({
   onEventsViewOpen,
   onIndexDistanceSelectOrigin,
   onEventsDistanceSelectOrigin,
+  setIndexEventsQuery,
+  setEventsQuery,
 }){
   const wrap  = $("eventsSearchWrap");
   const input = $("eventsSearchInput");
@@ -136,6 +138,14 @@ export function wireSearchSuggestions({
 
     const isSectionVisible = () => !section.hasAttribute("hidden") && !section.hidden;
     const isActiveMode = () => mode() === activeMode || (activeMode === "events" && isSectionVisible());
+    const setSectionQuery = activeMode === "index" ? setIndexEventsQuery : setEventsQuery;
+
+    function writeZipToPrimarySearch(zip){
+      input.value = zip;
+      if(typeof setSectionQuery === "function") setSectionQuery(zip);
+      else if(typeof setActiveEventsQuery === "function") setActiveEventsQuery(zip);
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    }
 
     function sanitizeZip(){
       if(!distInput) return "";
@@ -145,13 +155,16 @@ export function wireSearchSuggestions({
       return digits;
     }
 
-    function applyZip(){
-      if(!isActiveMode()) return false;
+    function applyZip({ force = false } = {}){
+      // Button/Enter actions come from this exact ZIP section, so do not let
+      // the shared view-mode check block the submit. The check remains for
+      // passive refreshes and distance-segment changes.
+      if(!force && !isActiveMode()) return false;
       const zip = sanitizeZip();
       if(zip.length !== 5) return false;
-      // Mirror into the search bar so the user can see the active distance filter.
-      input.value = zip;
-      setActiveEventsQuery(zip);
+      // Mirror into the visible primary search bar and update the matching
+      // state branch directly: INDEX => indexEvents.q, EVENTS => events.q.
+      writeZipToPrimarySearch(zip);
       if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
       close();
       distInput?.blur();
@@ -198,7 +211,7 @@ export function wireSearchSuggestions({
       if(!isActiveMode()) return;
       if(e.key !== "Enter") return;
       e.preventDefault();
-      applyZip();
+      applyZip({ force: true });
     });
 
     let lastApplyTap = 0;
@@ -214,13 +227,13 @@ export function wireSearchSuggestions({
       delays.forEach((delay)=>{
         window.setTimeout(()=>{
           if(token !== applyRetryToken) return;
-          if(applyZip()) applyRetryToken += 1;
+          if(applyZip({ force: true })) applyRetryToken += 1;
         }, delay);
       });
     }
 
     function scheduleApplyZip(e){
-      if(!isActiveMode()) return;
+      if(!distInput) return;
       if(e){
         e.preventDefault();
         e.stopPropagation();
@@ -256,65 +269,6 @@ export function wireSearchSuggestions({
     setMiles: setEventsDistanceMiles,
     onSelectOrigin: onEventsDistanceSelectOrigin,
   });
-
-  // Capture-phase submit fallback for the distance arrow buttons.
-  // This is intentionally tied only to the arrow buttons: selecting a mobile
-  // ZIP suggestion still fills only the ZIP box. The fallback catches mobile
-  // cases where the button normal click path is swallowed by focus/blur.
-  let delegatedApplyStamp = 0;
-
-  function submitDistanceFromButton(btn){
-    const isIndexBtn = btn && btn.id === "distanceApplyBtn";
-    const isEventsBtn = btn && btn.id === "eventsDistanceApplyBtn";
-    if(!isIndexBtn && !isEventsBtn) return false;
-
-    const active = mode();
-    if(isIndexBtn && active !== "index") return false;
-    if(isEventsBtn && active !== "events") return false;
-
-    const distInput = $(isIndexBtn ? "distanceOriginInput" : "eventsDistanceOriginInput");
-    const searchInput = $("eventsSearchInput");
-    if(!distInput || !searchInput) return false;
-
-    const applyOrigin = isIndexBtn ? onIndexDistanceSelectOrigin : onEventsDistanceSelectOrigin;
-    const token = ++delegatedApplyStamp;
-
-    distInput.blur();
-
-    const tryApply = ()=>{
-      if(token !== delegatedApplyStamp) return true;
-      const raw = String(distInput.value || "");
-      const zip = raw.replace(/\D/g, "").slice(0, 5);
-      if(zip !== raw) distInput.value = zip;
-      if(zip.length !== 5) return false;
-
-      searchInput.value = zip;
-      setActiveEventsQuery(zip);
-      if(typeof applyOrigin === "function") applyOrigin(zip);
-      close();
-      searchInput.blur();
-      delegatedApplyStamp += 1;
-      return true;
-    };
-
-    [0, 40, 100, 180, 300, 500, 800, 1200].forEach((delay)=>{
-      window.setTimeout(tryApply, delay);
-    });
-
-    return true;
-  }
-
-  function handleDelegatedDistanceSubmit(e){
-    const btn = e.target?.closest?.("#distanceApplyBtn, #eventsDistanceApplyBtn");
-    if(!btn) return;
-    e.preventDefault();
-    e.stopPropagation();
-    submitDistanceFromButton(btn);
-  }
-
-  panel.addEventListener("touchend", handleDelegatedDistanceSubmit, { capture: true, passive: false });
-  panel.addEventListener("pointerup", handleDelegatedDistanceSubmit, true);
-  panel.addEventListener("click", handleDelegatedDistanceSubmit, true);
 
   document.addEventListener("pointerdown", (e)=>{
     if(wrap.contains(e.target)) return;
