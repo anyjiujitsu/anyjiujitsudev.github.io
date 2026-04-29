@@ -247,23 +247,31 @@ export function wireSearchSuggestions({
       applyZip({ force: true });
     }
 
-    function pointIsOnApplyButton(e){
-      if(!distApply || !e) return false;
-      const target = e.target instanceof Element ? e.target : e.target?.parentElement;
-
-      // The coordinate-capture fallback exists only for the mobile case where the
-      // first arrow tap is routed to the page underneath after ZIP autocomplete
-      // commits. If the browser reports that the tap began on a real distance
-      // control, let that control handle it normally. This prevents the 15/30
-      // segmented toggle from being mistaken for the nearby arrow button.
-      if(target?.closest?.(".iosSeg, .iosSeg__btn, .distance__hint, .distance__input")) return false;
-
+    function pointIsInsideElement(e, el, slop = 0){
+      if(!el || !e) return false;
       const x = Number(e.clientX);
       const y = Number(e.clientY);
       if(!Number.isFinite(x) || !Number.isFinite(y)) return false;
-      const r = distApply.getBoundingClientRect();
-      const slop = 10;
-      return x >= r.left - slop && x <= r.right + slop && y >= r.top - slop && y <= r.bottom + slop;
+      const r = el.getBoundingClientRect();
+      return x >= r.left - slop &&
+             x <= r.right + slop &&
+             y >= r.top - slop &&
+             y <= r.bottom + slop;
+    }
+
+    function pointIsOnApplyButton(e){
+      if(!distApply || !e) return false;
+
+      // The mobile coordinate-capture fallback exists because the browser can
+      // report an unreliable DOM target after ZIP autocomplete commits. Use
+      // physical rectangles instead of target.closest(). If the tap lands on
+      // the visible distance controls, never treat it as an arrow submit.
+      const hint = section.querySelector(".distance__hint");
+      if(pointIsInsideElement(e, seg, 14)) return false;
+      if(pointIsInsideElement(e, hint, 8)) return false;
+      if(pointIsInsideElement(e, distInput, 6)) return false;
+
+      return pointIsInsideElement(e, distApply, 10);
     }
 
     // Normal path: the actual arrow button receives the click.
