@@ -147,6 +147,27 @@ export function wireSearchSuggestions({
       input.dispatchEvent(new Event("input", { bubbles: true }));
     }
 
+    function scrollFilteredResultsToStart(){
+      const rootId = activeMode === "index" ? "indexEventsRoot" : "eventsRoot";
+      const root = $(rootId);
+      if(!root) return;
+
+      // Wait until the synchronous render triggered by onSelectOrigin has
+      // replaced the list, then align the viewport to the first visible result.
+      window.requestAnimationFrame(()=>{
+        window.requestAnimationFrame(()=>{
+          const firstResult = root.querySelector(".row--events, .row");
+          const target = firstResult || root;
+          const rect = target.getBoundingClientRect();
+          const header = document.querySelector(".header");
+          const headerH = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
+          const gap = 8;
+          const y = Math.max(0, window.scrollY + rect.top - headerH - gap);
+          window.scrollTo({ top: y, left: 0, behavior: "auto" });
+        });
+      });
+    }
+
     function sanitizeZip(){
       if(!distInput) return "";
       const raw = String(distInput.value || "");
@@ -166,6 +187,7 @@ export function wireSearchSuggestions({
       // state branch directly: INDEX => indexEvents.q, EVENTS => events.q.
       writeZipToPrimarySearch(zip);
       if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
+      scrollFilteredResultsToStart();
       close();
       distInput?.blur();
       input.blur();
