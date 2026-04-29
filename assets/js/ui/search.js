@@ -197,15 +197,55 @@ export function wireSearchSuggestions({
       });
     });
 
+    let arrowSubmitArmed = false;
+    let arrowSubmitTimer = 0;
+
+    function clearArrowSubmitTimer(){
+      if(arrowSubmitTimer){
+        window.clearTimeout(arrowSubmitTimer);
+        arrowSubmitTimer = 0;
+      }
+    }
+
+    function runArrowSubmitAttempt(delay = 0){
+      clearArrowSubmitTimer();
+      arrowSubmitTimer = window.setTimeout(()=>{
+        arrowSubmitTimer = 0;
+        if(!arrowSubmitArmed) return;
+
+        const applied = applyZip({ force: true });
+        if(applied){
+          arrowSubmitArmed = false;
+          return;
+        }
+
+        // Mobile autocomplete can visually fill the ZIP before the DOM value is
+        // committed. Keep this retry tied only to an actual arrow press so
+        // selecting a suggestion alone never promotes the ZIP to search.
+        arrowSubmitTimer = window.setTimeout(()=>{
+          arrowSubmitTimer = 0;
+          if(arrowSubmitArmed && applyZip({ force: true })) arrowSubmitArmed = false;
+        }, 140);
+      }, delay);
+    }
+
+    function armZipSubmitFromArrow(){
+      if(!distInput) return;
+      arrowSubmitArmed = true;
+      // If mobile swallows the release/click while committing an autocomplete
+      // value, this delayed armed attempt still completes the same arrow submit.
+      runArrowSubmitAttempt(220);
+    }
+
     function handleZipValueRefresh(){
-      if(!isActiveMode()) return;
+      if(!isActiveMode() && !arrowSubmitArmed) return;
       sanitizeZip();
+      if(arrowSubmitArmed) runArrowSubmitAttempt(80);
     }
 
     distInput?.addEventListener("input", handleZipValueRefresh);
     distInput?.addEventListener("change", handleZipValueRefresh);
     distInput?.addEventListener("blur", handleZipValueRefresh);
-
 
     function submitZipFromArrow(e){
       if(!distInput) return;
@@ -213,12 +253,18 @@ export function wireSearchSuggestions({
         e.preventDefault();
         e.stopPropagation();
       }
-      applyZip({ force: true });
+      arrowSubmitArmed = true;
+      distInput.blur();
+      runArrowSubmitAttempt(60);
     }
 
-    // Attach ZIP submit directly to this section's arrow button. This keeps
-    // INDEX and EVENTS on the same shared distance path while avoiding fragile
-    // parent-panel delegation during mobile keyboard/autofill commit behavior.
+    // Press-start only arms a delayed submit; it does not prevent default and
+    // does not submit immediately. This preserves mobile autocomplete commit,
+    // while giving the first arrow tap a fallback if the final click is swallowed.
+    distApply?.addEventListener("pointerdown", armZipSubmitFromArrow, { passive: true });
+    distApply?.addEventListener("touchstart", armZipSubmitFromArrow, { passive: true });
+    distApply?.addEventListener("mousedown", armZipSubmitFromArrow);
+    distApply?.addEventListener("touchend", submitZipFromArrow, { passive: false });
     distApply?.addEventListener("click", submitZipFromArrow);
 
     distInput?.addEventListener("keydown", (e)=>{
