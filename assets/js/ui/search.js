@@ -216,15 +216,10 @@ export function wireSearchSuggestions({
       applyZip({ force: true });
     }
 
-    // Use the same click/bubble path as EVENTS Quick Search. Selecting a
-    // browser ZIP suggestion only fills the ZIP box; only the arrow click
-    // promotes the ZIP into the primary search bar.
-    panel.addEventListener("click", (e)=>{
-      const target = e.target instanceof Element ? e.target : e.target?.parentElement;
-      const btn = target?.closest?.(`#${applyId}`);
-      if(!btn) return;
-      submitZipFromArrow(e);
-    });
+    // Attach ZIP submit directly to this section's arrow button. This keeps
+    // INDEX and EVENTS on the same shared distance path while avoiding fragile
+    // parent-panel delegation during mobile keyboard/autofill commit behavior.
+    distApply?.addEventListener("click", submitZipFromArrow);
 
     distInput?.addEventListener("keydown", (e)=>{
       if(!isActiveMode()) return;
