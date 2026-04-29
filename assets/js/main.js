@@ -44,6 +44,68 @@ function setSearchQueryForActiveView(val){
   setActiveEventsQuery(val, { setIndexEventsQuery, setEventsQuery });
 }
 
+function wireEventsZipDirectSubmit(){
+  let submitToken = 0;
+  let lastSubmitAt = 0;
+
+  function readZip(){
+    const zipInput = $("eventsDistanceOriginInput");
+    if(!zipInput) return "";
+    const raw = String(zipInput.value || "");
+    const zip = raw.replace(/\D/g, "").slice(0, 5);
+    if(zip !== raw) zipInput.value = zip;
+    return zip;
+  }
+
+  function applyEventsZipFromButton(){
+    const zipInput = $("eventsDistanceOriginInput");
+    const searchInput = $("eventsSearchInput");
+    const panel = $("eventsSearchSuggest");
+    if(!zipInput || !searchInput) return false;
+
+    zipInput.blur();
+
+    const token = ++submitToken;
+    const delays = [0, 40, 100, 180, 300, 500, 800, 1200];
+
+    delays.forEach((delay)=>{
+      window.setTimeout(()=>{
+        if(token !== submitToken) return;
+        const zip = readZip();
+        if(zip.length !== 5) return;
+
+        searchInput.value = zip;
+        setEventsQuery(zip);
+        setEventsDistanceFrom(zip);
+
+        if(panel) panel.setAttribute("hidden", "");
+        searchInput.blur();
+        submitToken += 1;
+        render();
+      }, delay);
+    });
+
+    return true;
+  }
+
+  function handleEventsZipSubmit(e){
+    const target = e.target instanceof Element ? e.target : e.target?.parentElement;
+    const btn = target?.closest?.("#eventsDistanceApplyBtn");
+    if(!btn) return;
+    if(state.view !== "events") return;
+
+    const now = Date.now();
+    if(now - lastSubmitAt < 120) return;
+    lastSubmitAt = now;
+
+    applyEventsZipFromButton();
+  }
+
+  document.addEventListener("touchend", handleEventsZipSubmit, { capture: true, passive: true });
+  document.addEventListener("pointerup", handleEventsZipSubmit, true);
+  document.addEventListener("click", handleEventsZipSubmit, true);
+}
+
 function renderEventsView(){
   const distRes = applyDistanceFilter(
     eventRows,
@@ -143,9 +205,9 @@ async function init(){
       setEventsDistanceFrom(label);
       render();
     },
-    setIndexEventsQuery,
-    setEventsQuery,
   });
+
+  wireEventsZipDirectSubmit();
 
   if(!state.view) state.view = "events";
   setViewUI(state.view, { $, onIndexViewOpen: syncIndexDistanceUI });
