@@ -207,49 +207,30 @@ export function wireSearchSuggestions({
     distInput?.addEventListener("blur", handleZipValueRefresh);
 
 
-    distInput?.addEventListener("keydown", (e)=>{
-      if(!isActiveMode()) return;
-      if(e.key !== "Enter") return;
-      e.preventDefault();
-      applyZip({ force: true });
-    });
-
-    let lastApplyTap = 0;
-    let applyRetryToken = 0;
-
-    function runApplyRetries(){
-      // The arrow/submit button is the only thing that promotes the ZIP
-      // into the main search bar. Mobile suggestions can commit slightly
-      // after release, so retry briefly after the submit event only.
-      distInput?.blur();
-      const token = ++applyRetryToken;
-      const delays = [0, 40, 100, 180, 300, 500, 800, 1200];
-      delays.forEach((delay)=>{
-        window.setTimeout(()=>{
-          if(token !== applyRetryToken) return;
-          if(applyZip({ force: true })) applyRetryToken += 1;
-        }, delay);
-      });
-    }
-
-    function scheduleApplyZip(e){
+    function submitZipFromArrow(e){
       if(!distInput) return;
       if(e){
         e.preventDefault();
         e.stopPropagation();
       }
-      const now = Date.now();
-      if(now - lastApplyTap < 180) return;
-      lastApplyTap = now;
-      runApplyRetries();
+      applyZip({ force: true });
     }
 
-    // Submit only from release/click/keyboard events. Do not submit from
-    // touchstart/pointerdown: on mobile that can run before the selected
-    // ZIP suggestion has become the input value.
-    distApply?.addEventListener("touchend", scheduleApplyZip, { passive: false });
-    distApply?.addEventListener("pointerup", scheduleApplyZip);
-    distApply?.addEventListener("click", scheduleApplyZip);
+    // Use the same click/bubble path as EVENTS Quick Search. Selecting a
+    // browser ZIP suggestion only fills the ZIP box; only the arrow click
+    // promotes the ZIP into the primary search bar.
+    panel.addEventListener("click", (e)=>{
+      const target = e.target instanceof Element ? e.target : e.target?.parentElement;
+      const btn = target?.closest?.(`#${applyId}`);
+      if(!btn) return;
+      submitZipFromArrow(e);
+    });
+
+    distInput?.addEventListener("keydown", (e)=>{
+      if(!isActiveMode()) return;
+      if(e.key !== "Enter") return;
+      submitZipFromArrow(e);
+    });
   }
 
   wireDistanceSection({
