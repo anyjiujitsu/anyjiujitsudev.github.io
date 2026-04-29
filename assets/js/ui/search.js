@@ -153,15 +153,19 @@ export function wireSearchSuggestions({
       if(!root) return;
 
       // Wait until the synchronous render triggered by onSelectOrigin has
-      // replaced the list, then align the viewport to the first visible result.
+      // replaced the list, then align the viewport just above the first group
+      // label. This lands slightly higher than the first result card, keeping
+      // the group name visible as the start of the filtered list.
       window.requestAnimationFrame(()=>{
         window.requestAnimationFrame(()=>{
+          const firstGroupLabel = root.querySelector(".group__label");
+          const firstGroup = root.querySelector(".group");
           const firstResult = root.querySelector(".row--events, .row");
-          const target = firstResult || root;
+          const target = firstGroupLabel || firstGroup || firstResult || root;
           const rect = target.getBoundingClientRect();
           const header = document.querySelector(".header");
           const headerH = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
-          const gap = 8;
+          const gap = 14;
           const y = Math.max(0, window.scrollY + rect.top - headerH - gap);
           window.scrollTo({ top: y, left: 0, behavior: "auto" });
         });
