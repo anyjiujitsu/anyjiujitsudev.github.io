@@ -143,6 +143,8 @@ async function init(){
       setEventsDistanceFrom(label);
       render();
     },
+    setIndexEventsQuery,
+    setEventsQuery,
   });
 
   if(!state.view) state.view = "events";
