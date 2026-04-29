@@ -249,6 +249,15 @@ export function wireSearchSuggestions({
 
     function pointIsOnApplyButton(e){
       if(!distApply || !e) return false;
+      const target = e.target instanceof Element ? e.target : e.target?.parentElement;
+
+      // The coordinate-capture fallback exists only for the mobile case where the
+      // first arrow tap is routed to the page underneath after ZIP autocomplete
+      // commits. If the browser reports that the tap began on a real distance
+      // control, let that control handle it normally. This prevents the 15/30
+      // segmented toggle from being mistaken for the nearby arrow button.
+      if(target?.closest?.(".iosSeg, .iosSeg__btn, .distance__hint, .distance__input")) return false;
+
       const x = Number(e.clientX);
       const y = Number(e.clientY);
       if(!Number.isFinite(x) || !Number.isFinite(y)) return false;
