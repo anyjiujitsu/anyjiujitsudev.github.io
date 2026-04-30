@@ -90,6 +90,43 @@ export function wireSearchSuggestions({
     if(!panel.hasAttribute("hidden")) panel.setAttribute("hidden", "");
   };
 
+
+  // DEBUG ONLY: on-screen probe for comparing INDEX vs EVENTS distance toggle behavior.
+  function distanceDebugPanel(){
+    let el = document.getElementById("distanceToggleDebugPanel");
+    if(el) return el;
+    el = document.createElement("div");
+    el.id = "distanceToggleDebugPanel";
+    el.setAttribute("style", [
+      "position:fixed", "left:6px", "right:6px", "bottom:6px", "z-index:2147483647",
+      "max-height:42vh", "overflow:auto", "background:rgba(0,0,0,.88)", "color:#00ff90",
+      "font:11px/1.35 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace", "padding:8px",
+      "border-radius:10px", "box-shadow:0 6px 20px rgba(0,0,0,.45)", "white-space:pre-wrap",
+      "pointer-events:none"
+    ].join(";"));
+    el.textContent = "DISTANCE TOGGLE DEBUG\n";
+    document.body.appendChild(el);
+    return el;
+  }
+
+  function distanceDebugLog(msg, data = {}){
+    try{
+      const el = distanceDebugPanel();
+      const line = `[${new Date().toLocaleTimeString()}] ${msg}` + (Object.keys(data).length ? ` ${JSON.stringify(data)}` : "");
+      el.textContent = `${line}\n${el.textContent}`.slice(0, 9000);
+    }catch(_){ /* debug only */ }
+  }
+
+  function shortRect(el){
+    if(!el || typeof el.getBoundingClientRect !== "function") return null;
+    const r = el.getBoundingClientRect();
+    return { l: Math.round(r.left), t: Math.round(r.top), r: Math.round(r.right), b: Math.round(r.bottom), w: Math.round(r.width), h: Math.round(r.height) };
+  }
+
+  function eventPoint(e){
+    return { x: Math.round(Number(e?.clientX)), y: Math.round(Number(e?.clientY)) };
+  }
+
   input.addEventListener("focus", ()=>{
     if(!canSuggest()) return;
     if(!String(input.value || "").trim()) open();
@@ -140,11 +177,30 @@ export function wireSearchSuggestions({
     const isActiveMode = () => mode() === activeMode || (activeMode === "events" && isSectionVisible());
     const setSectionQuery = activeMode === "index" ? setIndexEventsQuery : setEventsQuery;
 
+    function dbg(label, e){
+      distanceDebugLog(`${activeMode}:${label}`, {
+        mode: mode(),
+        activeMode,
+        panelHidden: panel.hasAttribute("hidden"),
+        sectionHidden: section.hasAttribute("hidden") || !!section.hidden,
+        distValue: String(distInput?.value || ""),
+        primaryValue: String(input?.value || ""),
+        segSelected: String(seg?.dataset?.selected || ""),
+        target: e?.target?.id || e?.target?.className || e?.target?.tagName || "",
+        point: e ? eventPoint(e) : null,
+        segRect: shortRect(seg),
+        applyRect: shortRect(distApply),
+        inputRect: shortRect(distInput),
+      });
+    }
+
     function writeZipToPrimarySearch(zip){
+      dbg(`writeZipToPrimarySearch:before:${zip}`);
       input.value = zip;
       if(typeof setSectionQuery === "function") setSectionQuery(zip);
       else if(typeof setActiveEventsQuery === "function") setActiveEventsQuery(zip);
       input.dispatchEvent(new Event("input", { bubbles: true }));
+      dbg(`writeZipToPrimarySearch:after:${zip}`);
     }
 
     function scrollFilteredResultsToStart(){
@@ -177,6 +233,7 @@ export function wireSearchSuggestions({
       const raw = String(distInput.value || "");
       const digits = raw.replace(/\D/g, "").slice(0, 5);
       if(digits !== raw) distInput.value = digits;
+      distanceDebugLog(`${activeMode}:sanitizeZip`, { raw, digits, primaryValue: String(input?.value || "") });
       return digits;
     }
 
@@ -186,12 +243,13 @@ export function wireSearchSuggestions({
     }
 
     function applyZip({ force = false } = {}){
+      dbg(`applyZip:start:force=${force}`);
       // Button/Enter actions come from this exact ZIP section, so do not let
       // the shared view-mode check block the submit. The check remains for
       // passive refreshes and distance-segment changes.
-      if(!force && !isActiveMode()) return false;
+      if(!force && !isActiveMode()) { dbg("applyZip:return:notActive"); return false; }
       const zip = sanitizeZip();
-      if(zip.length !== 5) return false;
+      if(zip.length !== 5) { dbg(`applyZip:return:badZip:${zip}`); return false; }
       // Mirror into the visible primary search bar and update the matching
       // state branch directly: INDEX => indexEvents.q, EVENTS => events.q.
       writeZipToPrimarySearch(zip);
@@ -200,6 +258,7 @@ export function wireSearchSuggestions({
       close();
       distInput?.blur();
       input.blur();
+      dbg(`applyZip:success:${zip}`);
       return true;
     }
 
@@ -217,19 +276,23 @@ export function wireSearchSuggestions({
 
     segBtns?.forEach((btn)=>{
       btn.addEventListener("click", (e)=>{
-        if(!isActiveMode()) return;
+        dbg(`segBtn:click:start:${btn.dataset.miles}`, e);
+        if(!isActiveMode()) { dbg("segBtn:click:return:notActive", e); return; }
         e.preventDefault();
         e.stopPropagation();
         const miles = Number(btn.dataset.miles);
-        if(!Number.isFinite(miles)) return;
+        if(!Number.isFinite(miles)) { dbg("segBtn:click:return:badMiles", e); return; }
         setMilesUI(miles);
         if(typeof setMiles === "function") setMiles(miles);
         const zip = sanitizeZip();
-        if(typeof onSelectOrigin === "function" && zipIsAlreadyApplied(zip)) onSelectOrigin(zip);
+        distanceDebugLog(`${activeMode}:segBtn:afterSetMiles`, { miles, zip, zipAlreadyApplied: zipIsAlreadyApplied(zip), primaryValue: String(input?.value || "") });
+        if(typeof onSelectOrigin === "function" && zipIsAlreadyApplied(zip)) { distanceDebugLog(`${activeMode}:segBtn:onSelectOrigin`, { zip }); onSelectOrigin(zip); }
+        dbg(`segBtn:click:done:${miles}`, e);
       });
     });
 
-    function handleZipValueRefresh(){
+    function handleZipValueRefresh(e){
+      dbg(`distInput:${e?.type || "refresh"}`, e);
       if(!isActiveMode()) return;
       sanitizeZip();
     }
@@ -242,15 +305,17 @@ export function wireSearchSuggestions({
     let lastArrowSubmitAt = 0;
 
     function submitZipFromArrow(e){
+      dbg(`submitZipFromArrow:start:${e?.type || "manual"}`, e);
       if(!distInput) return;
       if(e){
         e.preventDefault();
         e.stopPropagation();
       }
       const now = Date.now();
-      if(now - lastArrowSubmitAt < 180) return;
+      if(now - lastArrowSubmitAt < 180) { dbg("submitZipFromArrow:return:debounced", e); return; }
       lastArrowSubmitAt = now;
-      applyZip({ force: true });
+      const ok = applyZip({ force: true });
+      dbg(`submitZipFromArrow:done:${ok}`, e);
     }
 
     function pointIsOnApplyButton(e){
@@ -274,6 +339,7 @@ export function wireSearchSuggestions({
     }
 
     function setMilesFromSegmentPoint(e){
+      dbg("setMilesFromSegmentPoint:start", e);
       if(!seg || !e) return false;
       const x = Number(e.clientX);
       if(!Number.isFinite(x)) return false;
@@ -282,7 +348,9 @@ export function wireSearchSuggestions({
       setMilesUI(miles);
       if(typeof setMiles === "function") setMiles(miles);
       const zip = sanitizeZip();
-      if(typeof onSelectOrigin === "function" && zipIsAlreadyApplied(zip)) onSelectOrigin(zip);
+      distanceDebugLog(`${activeMode}:setMilesFromSegmentPoint:afterSetMiles`, { miles, zip, zipAlreadyApplied: zipIsAlreadyApplied(zip), primaryValue: String(input?.value || "") });
+      if(typeof onSelectOrigin === "function" && zipIsAlreadyApplied(zip)) { distanceDebugLog(`${activeMode}:setMilesFromSegmentPoint:onSelectOrigin`, { zip }); onSelectOrigin(zip); }
+      dbg(`setMilesFromSegmentPoint:done:${miles}`, e);
       return true;
     }
 
@@ -295,23 +363,33 @@ export function wireSearchSuggestions({
     // over the ZIP arrow. This prevents a distance-toggle tap from being
     // treated as a ZIP submit.
     document.addEventListener("pointerdown", (e)=>{
+      const onSeg = pointIsOnDistanceSegment(e);
+      const onApply = pointIsOnApplyButton(e);
+      distanceDebugLog(`${activeMode}:doc:pointerdown:check`, {
+        mode: mode(), activeMode,
+        active: isActiveMode(), panelHidden: panel.hasAttribute("hidden"), sectionVisible: isSectionVisible(),
+        onSeg, onApply, point: eventPoint(e), target: e?.target?.id || e?.target?.className || e?.target?.tagName || "",
+        distValue: String(distInput?.value || ""), primaryValue: String(input?.value || ""),
+        segRect: shortRect(seg), applyRect: shortRect(distApply)
+      });
       if(!isActiveMode()) return;
       if(panel.hasAttribute("hidden")) return;
       if(!isSectionVisible()) return;
 
-      if(pointIsOnDistanceSegment(e)){
+      if(onSeg){
         e.preventDefault();
         e.stopPropagation();
         setMilesFromSegmentPoint(e);
         return;
       }
 
-      if(pointIsOnApplyButton(e)){
+      if(onApply){
         submitZipFromArrow(e);
       }
     }, true);
 
     distInput?.addEventListener("keydown", (e)=>{
+      dbg(`distInput:keydown:${e.key}`, e);
       if(!isActiveMode()) return;
       if(e.key !== "Enter") return;
       submitZipFromArrow(e);
@@ -337,6 +415,7 @@ export function wireSearchSuggestions({
   });
 
   document.addEventListener("pointerdown", (e)=>{
+    distanceDebugLog("global:outsidePointerdown", { target: e?.target?.id || e?.target?.className || e?.target?.tagName || "", insideWrap: wrap.contains(e.target), point: eventPoint(e), primaryValue: String(input?.value || "") });
     if(wrap.contains(e.target)) return;
     close();
   }, true);
