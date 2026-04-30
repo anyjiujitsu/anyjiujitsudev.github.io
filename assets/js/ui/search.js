@@ -56,6 +56,70 @@ export function wireSearchSuggestions({
   const panel = $("eventsSearchSuggest");
   if(!wrap || !input || !panel) return;
 
+  const zipFlashDebug = (()=>{
+    let panelEl = null;
+    let seq = 0;
+    const maxLines = 32;
+    function ensure(){
+      if(panelEl || typeof document === "undefined") return panelEl;
+      panelEl = document.createElement("div");
+      panelEl.id = "zipFlashDebugPanel";
+      panelEl.style.cssText = [
+        "position:fixed","left:6px","right:6px","top:6px","z-index:999999","max-height:118px","overflow:auto",
+        "background:rgba(0,0,0,.82)","color:#fff","font:10px/1.25 ui-monospace,SFMono-Regular,Menlo,monospace",
+        "padding:5px 6px","border-radius:8px","pointer-events:none","white-space:pre-wrap"
+      ].join(";");
+      panelEl.textContent = "ZIP FLASH DEBUG\n";
+      document.documentElement.appendChild(panelEl);
+      return panelEl;
+    }
+    function rectBits(el){
+      if(!el) return "none";
+      const r = el.getBoundingClientRect();
+      return `t=${Math.round(r.top)} h=${Math.round(r.height)}`;
+    }
+    function snap(activeMode, label){
+      const rootId = activeMode === "index" ? "indexEventsRoot" : "eventsRoot";
+      const root = $(rootId);
+      const firstLabel = root?.querySelector?.(".group__label");
+      const firstGroup = root?.querySelector?.(".group");
+      const evZip = $("eventsDistanceOriginInput")?.value || "";
+      const idxZip = $("distanceOriginInput")?.value || "";
+      const kids = root ? root.children.length : -1;
+      return `${label} mode=${activeMode} y=${Math.round(window.scrollY)} primary=${JSON.stringify(input.value||"")} idxZip=${JSON.stringify(idxZip)} evZip=${JSON.stringify(evZip)} kids=${kids} root(${rectBits(root)}) label(${rectBits(firstLabel)}) group(${rectBits(firstGroup)}) hidden=${panel.hasAttribute("hidden")}`;
+    }
+    function log(activeMode, label, extra=""){
+      const el = ensure();
+      const line = `${String(++seq).padStart(3,"0")} ${Math.round(performance.now())} ${snap(activeMode || mode(), label)}${extra ? " " + extra : ""}`;
+      const lines = (line + "\n" + el.textContent).split("\n").slice(0, maxLines);
+      el.textContent = lines.join("\n");
+      try { console.log("[ZIP_FLASH_DEBUG]", line); } catch(_) {}
+    }
+    function markFrames(activeMode, label){
+      log(activeMode, `${label}:now`);
+      requestAnimationFrame(()=>{
+        log(activeMode, `${label}:raf1`);
+        requestAnimationFrame(()=>log(activeMode, `${label}:raf2`));
+      });
+      setTimeout(()=>log(activeMode, `${label}:t80`), 80);
+      setTimeout(()=>log(activeMode, `${label}:t180`), 180);
+    }
+    function observeRoot(activeMode){
+      const rootId = activeMode === "index" ? "indexEventsRoot" : "eventsRoot";
+      const root = $(rootId);
+      if(!root || root.dataset.zipFlashDebugObserved === "1") return;
+      root.dataset.zipFlashDebugObserved = "1";
+      try {
+        new MutationObserver((mutations)=>{
+          let added=0, removed=0;
+          mutations.forEach(m=>{ added += m.addedNodes?.length || 0; removed += m.removedNodes?.length || 0; });
+          log(activeMode, "mutation", `added=${added} removed=${removed}`);
+        }).observe(root, { childList:true, subtree:false });
+      } catch(_) {}
+    }
+    return { log, markFrames, observeRoot };
+  })();
+
   // sections inside panel
   const quick = $("eventsSearchSuggestQuick");
   const indexDist  = $("eventsSearchSuggestDistance");
@@ -80,6 +144,7 @@ export function wireSearchSuggestions({
 
   const open = ()=>{
     if(!canSuggest()) return;
+    zipFlashDebug.log(mode(), "open:start");
     setModeUI();
     if(panel.hasAttribute("hidden")) panel.removeAttribute("hidden");
     if(mode() === "index" && typeof onIndexViewOpen === "function") onIndexViewOpen();
@@ -87,7 +152,9 @@ export function wireSearchSuggestions({
   };
 
   const close = ()=>{
+    zipFlashDebug.log(mode(), "close:start");
     if(!panel.hasAttribute("hidden")) panel.setAttribute("hidden", "");
+    zipFlashDebug.log(mode(), "close:end");
   };
 
   input.addEventListener("focus", ()=>{
@@ -135,19 +202,26 @@ export function wireSearchSuggestions({
     const distApply = $(applyId);
     const seg = section.querySelector(".iosSeg");
     const segBtns = section.querySelectorAll(".iosSeg__btn");
+    zipFlashDebug.observeRoot(activeMode);
 
     const isSectionVisible = () => !section.hasAttribute("hidden") && !section.hidden;
     const isActiveMode = () => mode() === activeMode || (activeMode === "events" && isSectionVisible());
     const setSectionQuery = activeMode === "index" ? setIndexEventsQuery : setEventsQuery;
 
     function writeZipToPrimarySearch(zip, { dispatch = false } = {}){
+      zipFlashDebug.log(activeMode, "writeZip:before", `zip=${zip} dispatch=${dispatch}`);
       input.value = zip;
       if(typeof setSectionQuery === "function") setSectionQuery(zip);
       else if(typeof setActiveEventsQuery === "function") setActiveEventsQuery(zip);
-      if(dispatch) input.dispatchEvent(new Event("input", { bubbles: true }));
+      if(dispatch){
+        zipFlashDebug.log(activeMode, "writeZip:dispatchInput");
+        input.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+      zipFlashDebug.log(activeMode, "writeZip:after");
     }
 
     function prePositionResultsBeforeRender(){
+      zipFlashDebug.log(activeMode, "prePosition:start");
       const rootId = activeMode === "index" ? "indexEventsRoot" : "eventsRoot";
       const root = $(rootId);
       if(!root) return;
@@ -163,12 +237,15 @@ export function wireSearchSuggestions({
       const headerH = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
       const gap = 14;
       const y = Math.max(0, window.scrollY + rect.top - headerH - gap);
+      zipFlashDebug.log(activeMode, "prePosition:calc", `targetY=${Math.round(y)} currentY=${Math.round(window.scrollY)}`);
       if(Math.abs(window.scrollY - y) > 1){
         window.scrollTo({ top: y, left: 0, behavior: "auto" });
+        zipFlashDebug.log(activeMode, "prePosition:scrolled");
       }
     }
 
     function scrollFilteredResultsToStart(){
+      zipFlashDebug.log(activeMode, "postScroll:schedule");
       const rootId = activeMode === "index" ? "indexEventsRoot" : "eventsRoot";
       const root = $(rootId);
       if(!root) return;
@@ -178,7 +255,9 @@ export function wireSearchSuggestions({
       // label. This lands slightly higher than the first result card, keeping
       // the group name visible as the start of the filtered list.
       window.requestAnimationFrame(()=>{
+        zipFlashDebug.log(activeMode, "postScroll:raf1");
         window.requestAnimationFrame(()=>{
+          zipFlashDebug.log(activeMode, "postScroll:raf2before");
           const firstGroupLabel = root.querySelector(".group__label");
           const firstGroup = root.querySelector(".group");
           const firstResult = root.querySelector(".row--events, .row");
@@ -188,7 +267,9 @@ export function wireSearchSuggestions({
           const headerH = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
           const gap = 14;
           const y = Math.max(0, window.scrollY + rect.top - headerH - gap);
+          zipFlashDebug.log(activeMode, "postScroll:calc", `targetY=${Math.round(y)} rectTop=${Math.round(rect.top)} headerH=${headerH}`);
           window.scrollTo({ top: y, left: 0, behavior: "auto" });
+          zipFlashDebug.log(activeMode, "postScroll:afterScroll");
         });
       });
     }
@@ -207,12 +288,14 @@ export function wireSearchSuggestions({
     }
 
     function applyZip({ force = false } = {}){
+      zipFlashDebug.log(activeMode, "applyZip:start", `force=${force}`);
+      zipFlashDebug.markFrames(activeMode, "applyZip:frames-before");
       // Button/Enter actions come from this exact ZIP section, so do not let
       // the shared view-mode check block the submit. The check remains for
       // passive refreshes and distance-segment changes.
-      if(!force && !isActiveMode()) return false;
+      if(!force && !isActiveMode()){ zipFlashDebug.log(activeMode, "applyZip:returnInactive"); return false; }
       const zip = sanitizeZip();
-      if(zip.length !== 5) return false;
+      if(zip.length !== 5){ zipFlashDebug.log(activeMode, "applyZip:returnBadZip", `zip=${zip}`); return false; }
       // Close/blur and pre-position before the render so the updated rows do
       // not briefly paint under the sticky header. Then mirror into the visible
       // primary search bar and update the matching state branch directly:
@@ -222,8 +305,12 @@ export function wireSearchSuggestions({
       input.blur();
       prePositionResultsBeforeRender();
       writeZipToPrimarySearch(zip, { dispatch: false });
+      zipFlashDebug.log(activeMode, "onSelectOrigin:before", `zip=${zip}`);
       if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
+      zipFlashDebug.log(activeMode, "onSelectOrigin:after");
+      zipFlashDebug.markFrames(activeMode, "applyZip:frames-after-render");
       scrollFilteredResultsToStart();
+      zipFlashDebug.log(activeMode, "applyZip:end");
       return true;
     }
 
@@ -324,7 +411,11 @@ export function wireSearchSuggestions({
       if(panel.hasAttribute("hidden")) return;
       if(!isSectionVisible()) return;
 
-      if(pointIsOnDistanceSegment(e)){
+      const onSeg = pointIsOnDistanceSegment(e);
+      const onApply = pointIsOnApplyButton(e);
+      if(onSeg || onApply) zipFlashDebug.log(activeMode, "pointerdown:hit", `onSeg=${onSeg} onApply=${onApply} x=${Math.round(Number(e.clientX)||0)} y=${Math.round(Number(e.clientY)||0)}`);
+
+      if(onSeg){
         e.preventDefault();
         if(typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
         else e.stopPropagation();
@@ -332,7 +423,7 @@ export function wireSearchSuggestions({
         return;
       }
 
-      if(pointIsOnApplyButton(e)){
+      if(onApply){
         submitZipFromArrow(e);
       }
     }, true);
@@ -372,12 +463,16 @@ export function wireSearchSuggestions({
   }
 
   document.addEventListener("pointerdown", (e)=>{
-    if(wrap.contains(e.target)) return;
+    const active = mode();
+    const insideWrap = wrap.contains(e.target);
+    const insidePanelRect = !panel.hasAttribute("hidden") && pointIsInsideRect(e, panel, 10);
+    if(!panel.hasAttribute("hidden")) zipFlashDebug.log(active, "outsidePointer", `insideWrap=${insideWrap} insidePanelRect=${insidePanelRect} target=${e.target?.tagName || "?"}.${e.target?.className || ""}`);
+    if(insideWrap) return;
     // On mobile, taps on the visible helper controls can be reported as
     // targets on the page underneath. Treat the physical helper-panel
     // rectangle as inside as well, so distance toggles do not close or
     // behave like an apply action.
-    if(!panel.hasAttribute("hidden") && pointIsInsideRect(e, panel, 10)) return;
+    if(insidePanelRect) return;
     if(pointIsInsideRect(e, wrap, 10)) return;
     close();
   }, true);
