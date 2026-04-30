@@ -144,11 +144,7 @@ export function wireSearchSuggestions({
       input.value = zip;
       if(typeof setSectionQuery === "function") setSectionQuery(zip);
       else if(typeof setActiveEventsQuery === "function") setActiveEventsQuery(zip);
-      // Do not dispatch a synthetic input event here. ZIP submit already updates
-      // the correct state branch directly, then the distance-origin callback
-      // performs the single render after distFrom is active. Dispatching input
-      // creates a visible intermediate EVENTS render where q=ZIP but distFrom
-      // has not been set yet.
+      input.dispatchEvent(new Event("input", { bubbles: true }));
     }
 
     function scrollFilteredResultsToStart(){
@@ -171,7 +167,9 @@ export function wireSearchSuggestions({
           const headerH = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
           const gap = 14;
           const y = Math.max(0, window.scrollY + rect.top - headerH - gap);
-          window.scrollTo({ top: y, left: 0, behavior: "auto" });
+          if(window.scrollY > y + 2){
+            window.scrollTo({ top: y, left: 0, behavior: "auto" });
+          }
         });
       });
     }
@@ -196,18 +194,14 @@ export function wireSearchSuggestions({
       if(!force && !isActiveMode()) return false;
       const zip = sanitizeZip();
       if(zip.length !== 5) return false;
-      // Stabilize the helper/header before rendering the filtered list so the
-      // viewport does not visibly flash through an intermediate header/panel state.
-      close();
-      distInput?.blur();
-      input.blur();
-
       // Mirror into the visible primary search bar and update the matching
       // state branch directly: INDEX => indexEvents.q, EVENTS => events.q.
-      // The distance-origin callback then renders once with both q and distFrom set.
       writeZipToPrimarySearch(zip);
       if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
       scrollFilteredResultsToStart();
+      close();
+      distInput?.blur();
+      input.blur();
       return true;
     }
 
