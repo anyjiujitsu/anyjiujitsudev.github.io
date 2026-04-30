@@ -56,6 +56,59 @@ export function wireSearchSuggestions({
   const panel = $("eventsSearchSuggest");
   if(!wrap || !input || !panel) return;
 
+  const zipScrollDebug = (()=>{
+    const max = 28;
+    const lines = [];
+    let box = null;
+    function ensure(){
+      if(box) return box;
+      box = document.createElement("div");
+      box.id = "zipScrollDebugPanel";
+      box.setAttribute("aria-hidden", "true");
+      Object.assign(box.style, {
+        position: "fixed",
+        left: "6px",
+        right: "6px",
+        top: "6px",
+        zIndex: "2147483647",
+        maxHeight: "112px",
+        overflow: "auto",
+        background: "rgba(0,0,0,.82)",
+        color: "#fff",
+        font: "10px/1.25 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+        padding: "5px 6px",
+        borderRadius: "8px",
+        pointerEvents: "none",
+        whiteSpace: "pre-wrap",
+        boxShadow: "0 2px 12px rgba(0,0,0,.35)"
+      });
+      document.documentElement.appendChild(box);
+      return box;
+    }
+    function val(id){
+      const el = typeof $ === "function" ? $(id) : document.getElementById(id);
+      return el ? String(el.value || "") : "∅";
+    }
+    function view(){
+      try { return mode(); } catch { return "?"; }
+    }
+    function log(label, data = {}){
+      const y = Math.round(window.scrollY || 0);
+      const payload = Object.entries(data).map(([k,v])=>`${k}=${v}`).join(" ");
+      const line = `${new Date().toLocaleTimeString().split(" ")[0]} ${view()} y=${y} p=${val("eventsSearchInput")} iz=${val("distanceOriginInput")} ez=${val("eventsDistanceOriginInput")} ${label}${payload ? " " + payload : ""}`;
+      lines.unshift(line);
+      lines.length = Math.min(lines.length, max);
+      ensure().textContent = ["ZIP SCROLL DEBUG", ...lines].join("\n");
+      window.__zipScrollDebugLogs = lines.slice();
+    }
+    function rect(el){
+      if(!el) return "∅";
+      const r = el.getBoundingClientRect();
+      return `${Math.round(r.top)},${Math.round(r.bottom)},h${Math.round(r.height)}`;
+    }
+    return { log, rect };
+  })();
+
   // sections inside panel
   const quick = $("eventsSearchSuggestQuick");
   const indexDist  = $("eventsSearchSuggestDistance");
@@ -82,11 +135,13 @@ export function wireSearchSuggestions({
     if(!canSuggest()) return;
     setModeUI();
     if(panel.hasAttribute("hidden")) panel.removeAttribute("hidden");
+    zipScrollDebug.log("panel:open", { panel: zipScrollDebug.rect(panel) });
     if(mode() === "index" && typeof onIndexViewOpen === "function") onIndexViewOpen();
     if(mode() === "events" && typeof onEventsViewOpen === "function") onEventsViewOpen();
   };
 
   const close = ()=>{
+    zipScrollDebug.log("panel:close", { panel: zipScrollDebug.rect(panel) });
     if(!panel.hasAttribute("hidden")) panel.setAttribute("hidden", "");
   };
 
@@ -141,31 +196,43 @@ export function wireSearchSuggestions({
     const setSectionQuery = activeMode === "index" ? setIndexEventsQuery : setEventsQuery;
 
     function writeZipToPrimarySearch(zip){
+      zipScrollDebug.log(`${activeMode}:writeZip:before`, { zip });
       input.value = zip;
       if(typeof setSectionQuery === "function") setSectionQuery(zip);
       else if(typeof setActiveEventsQuery === "function") setActiveEventsQuery(zip);
+      zipScrollDebug.log(`${activeMode}:writeZip:dispatchInput`, { zip });
       input.dispatchEvent(new Event("input", { bubbles: true }));
+      zipScrollDebug.log(`${activeMode}:writeZip:after`, { zip });
     }
 
     function scrollFilteredResultsToStart(){
       const rootId = activeMode === "index" ? "indexEventsRoot" : "eventsRoot";
       const root = $(rootId);
-      if(!root) return;
+      if(!root) { zipScrollDebug.log(`${activeMode}:scroll:noRoot`, { rootId }); return; }
 
-      // onSelectOrigin renders synchronously before this function is called.
-      // Scroll immediately in the same tap frame instead of waiting two
-      // animation frames; the delayed scroll was allowing the newly filtered
-      // rows to briefly paint behind/through the sticky header before settling.
-      const firstGroupLabel = root.querySelector(".group__label");
-      const firstGroup = root.querySelector(".group");
-      const firstResult = root.querySelector(".row--events, .row");
-      const target = firstGroupLabel || firstGroup || firstResult || root;
-      const rect = target.getBoundingClientRect();
-      const header = document.querySelector(".header");
-      const headerH = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
-      const gap = 14;
-      const y = Math.max(0, window.scrollY + rect.top - headerH - gap);
-      window.scrollTo({ top: y, left: 0, behavior: "auto" });
+      zipScrollDebug.log(`${activeMode}:scroll:schedule`, { rootId, root: zipScrollDebug.rect(root) });
+      window.requestAnimationFrame(()=>{
+        zipScrollDebug.log(`${activeMode}:scroll:raf1`, { root: zipScrollDebug.rect(root) });
+        window.requestAnimationFrame(()=>{
+          const firstGroupLabel = root.querySelector(".group__label");
+          const firstGroup = root.querySelector(".group");
+          const firstResult = root.querySelector(".row--events, .row");
+          const target = firstGroupLabel || firstGroup || firstResult || root;
+          const rect = target.getBoundingClientRect();
+          const header = document.querySelector(".header");
+          const headerH = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
+          const gap = 14;
+          const y = Math.max(0, window.scrollY + rect.top - headerH - gap);
+          zipScrollDebug.log(`${activeMode}:scroll:raf2:before`, {
+            target: target.className || target.id || target.tagName,
+            rect: zipScrollDebug.rect(target),
+            header: zipScrollDebug.rect(header),
+            headerH, gap, to: Math.round(y)
+          });
+          window.scrollTo({ top: y, left: 0, behavior: "auto" });
+          zipScrollDebug.log(`${activeMode}:scroll:afterScroll`, { to: Math.round(y), target: zipScrollDebug.rect(target) });
+        });
+      });
     }
 
     function sanitizeZip(){
@@ -182,20 +249,24 @@ export function wireSearchSuggestions({
     }
 
     function applyZip({ force = false } = {}){
+      zipScrollDebug.log(`${activeMode}:applyZip:start`, { force, active: isActiveMode(), section: isSectionVisible() });
       // Button/Enter actions come from this exact ZIP section, so do not let
       // the shared view-mode check block the submit. The check remains for
       // passive refreshes and distance-segment changes.
-      if(!force && !isActiveMode()) return false;
+      if(!force && !isActiveMode()) { zipScrollDebug.log(`${activeMode}:applyZip:return:notActive`); return false; }
       const zip = sanitizeZip();
-      if(zip.length !== 5) return false;
+      if(zip.length !== 5) { zipScrollDebug.log(`${activeMode}:applyZip:return:badZip`, { zip }); return false; }
       // Mirror into the visible primary search bar and update the matching
       // state branch directly: INDEX => indexEvents.q, EVENTS => events.q.
       writeZipToPrimarySearch(zip);
+      zipScrollDebug.log(`${activeMode}:applyZip:beforeOnSelect`, { zip });
       if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
+      zipScrollDebug.log(`${activeMode}:applyZip:afterOnSelect`, { zip });
       scrollFilteredResultsToStart();
       close();
       distInput?.blur();
       input.blur();
+      zipScrollDebug.log(`${activeMode}:applyZip:done`, { zip });
       return true;
     }
 
@@ -238,6 +309,7 @@ export function wireSearchSuggestions({
     let lastArrowSubmitAt = 0;
 
     function submitZipFromArrow(e){
+      zipScrollDebug.log(`${activeMode}:submitArrow:start`, { type: e?.type || "manual" });
       if(!distInput) return;
       if(e){
         e.preventDefault();
@@ -245,7 +317,7 @@ export function wireSearchSuggestions({
         else e.stopPropagation();
       }
       const now = Date.now();
-      if(now - lastArrowSubmitAt < 180) return;
+      if(now - lastArrowSubmitAt < 180) { zipScrollDebug.log(`${activeMode}:submitArrow:debounced`); return; }
       lastArrowSubmitAt = now;
       applyZip({ force: true });
     }
@@ -295,8 +367,11 @@ export function wireSearchSuggestions({
       if(!isActiveMode()) return;
       if(panel.hasAttribute("hidden")) return;
       if(!isSectionVisible()) return;
+      const onSeg = pointIsOnDistanceSegment(e);
+      const onApply = pointIsOnApplyButton(e);
+      zipScrollDebug.log(`${activeMode}:docPointer`, { x: Math.round(e.clientX||0), y: Math.round(e.clientY||0), onSeg, onApply });
 
-      if(pointIsOnDistanceSegment(e)){
+      if(onSeg){
         e.preventDefault();
         if(typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
         else e.stopPropagation();
@@ -304,7 +379,7 @@ export function wireSearchSuggestions({
         return;
       }
 
-      if(pointIsOnApplyButton(e)){
+      if(onApply){
         submitZipFromArrow(e);
       }
     }, true);
@@ -344,13 +419,17 @@ export function wireSearchSuggestions({
   }
 
   document.addEventListener("pointerdown", (e)=>{
-    if(wrap.contains(e.target)) return;
+    const inWrap = wrap.contains(e.target);
+    const inPanelRect = !panel.hasAttribute("hidden") && pointIsInsideRect(e, panel, 10);
+    const inWrapRect = pointIsInsideRect(e, wrap, 10);
+    zipScrollDebug.log("outside:pointer", { x: Math.round(e.clientX||0), y: Math.round(e.clientY||0), inWrap, inPanelRect, inWrapRect });
+    if(inWrap) return;
     // On mobile, taps on the visible helper controls can be reported as
     // targets on the page underneath. Treat the physical helper-panel
     // rectangle as inside as well, so distance toggles do not close or
     // behave like an apply action.
-    if(!panel.hasAttribute("hidden") && pointIsInsideRect(e, panel, 10)) return;
-    if(pointIsInsideRect(e, wrap, 10)) return;
+    if(inPanelRect) return;
+    if(inWrapRect) return;
     close();
   }, true);
 
