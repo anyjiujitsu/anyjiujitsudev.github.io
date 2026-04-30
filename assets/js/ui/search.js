@@ -283,31 +283,26 @@ export function wireSearchSuggestions({
     // Normal path: the actual arrow button receives the click.
     distApply?.addEventListener("click", submitZipFromArrow);
 
-    // Mobile Safari/Chrome can commit an autocomplete ZIP, then send the first
-    // arrow tap through to the page underneath instead of to the visible button.
-    // Capture that same physical tap by coordinates before the outside-click
-    // closer runs. This remains shared for INDEX and EVENTS; it is not an
-    // EVENTS-only workaround, and it only fires when the tap lands on the
-    // visible arrow button rectangle.
+    // Mobile Safari/Chrome can report taps on the visible helper controls as
+    // taps on the page underneath. Use one shared coordinate-capture path for
+    // both INDEX and EVENTS, with the 15/30 segmented control taking priority
+    // over the ZIP arrow. This prevents a distance-toggle tap from being
+    // treated as a ZIP submit.
     document.addEventListener("pointerdown", (e)=>{
       if(!isActiveMode()) return;
       if(panel.hasAttribute("hidden")) return;
       if(!isSectionVisible()) return;
-      if(!pointIsOnApplyButton(e)) return;
-      submitZipFromArrow(e);
-    }, true);
 
-    // Mobile browsers can also report a tap on the visible 15/30 segmented
-    // control as the row underneath the dropdown. Capture by coordinates so
-    // the tap changes distance instead of falling through to close/submit.
-    document.addEventListener("pointerdown", (e)=>{
-      if(!isActiveMode()) return;
-      if(panel.hasAttribute("hidden")) return;
-      if(!isSectionVisible()) return;
-      if(!pointIsOnDistanceSegment(e)) return;
-      e.preventDefault();
-      e.stopPropagation();
-      setMilesFromSegmentPoint(e);
+      if(pointIsOnDistanceSegment(e)){
+        e.preventDefault();
+        e.stopPropagation();
+        setMilesFromSegmentPoint(e);
+        return;
+      }
+
+      if(pointIsOnApplyButton(e)){
+        submitZipFromArrow(e);
+      }
     }, true);
 
     distInput?.addEventListener("keydown", (e)=>{
