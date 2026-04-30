@@ -98,9 +98,9 @@ export function wireSearchSuggestions({
     el = document.createElement("div");
     el.id = "distanceToggleDebugPanel";
     el.setAttribute("style", [
-      "position:fixed", "left:6px", "right:6px", "bottom:6px", "z-index:2147483647",
-      "max-height:42vh", "overflow:auto", "background:rgba(0,0,0,.88)", "color:#00ff90",
-      "font:11px/1.35 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace", "padding:8px",
+      "position:fixed", "left:6px", "right:6px", "top:6px", "z-index:2147483647",
+      "max-height:96px", "overflow:hidden", "background:rgba(0,0,0,.76)", "color:#00ff90",
+      "font:9px/1.2 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace", "padding:4px",
       "border-radius:10px", "box-shadow:0 6px 20px rgba(0,0,0,.45)", "white-space:pre-wrap",
       "pointer-events:none"
     ].join(";"));
@@ -113,7 +113,7 @@ export function wireSearchSuggestions({
     try{
       const el = distanceDebugPanel();
       const line = `[${new Date().toLocaleTimeString()}] ${msg}` + (Object.keys(data).length ? ` ${JSON.stringify(data)}` : "");
-      el.textContent = `${line}\n${el.textContent}`.slice(0, 9000);
+      el.textContent = `${line}\n${el.textContent}`.slice(0, 3000);
     }catch(_){ /* debug only */ }
   }
 
