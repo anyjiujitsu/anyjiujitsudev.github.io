@@ -56,29 +56,6 @@ export function wireSearchSuggestions({
   const panel = $("eventsSearchSuggest");
   if(!wrap || !input || !panel) return;
 
-  function distanceDebugPanel(){
-    let el = document.getElementById("distanceToggleDebugPanel");
-    if(el) return el;
-    el = document.createElement("div");
-    el.id = "distanceToggleDebugPanel";
-    el.style.cssText = "position:fixed;left:6px;right:6px;bottom:6px;z-index:2147483647;max-height:36vh;overflow:auto;background:rgba(0,0,0,.88);color:#fff;font:11px/1.35 monospace;padding:8px;border-radius:8px;white-space:pre-wrap;";
-    el.textContent = "DISTANCE TOGGLE DEBUG\n";
-    document.body.appendChild(el);
-    return el;
-  }
-
-  function distanceDebugLog(msg){
-    const el = distanceDebugPanel();
-    const line = `[${new Date().toLocaleTimeString()}] ${msg}`;
-    el.textContent = `${line}\n${el.textContent}`.slice(0, 9000);
-  }
-
-  function rectSummary(el){
-    if(!el) return "none";
-    const r = el.getBoundingClientRect();
-    return `L${Math.round(r.left)} T${Math.round(r.top)} R${Math.round(r.right)} B${Math.round(r.bottom)} W${Math.round(r.width)} H${Math.round(r.height)}`;
-  }
-
   // sections inside panel
   const quick = $("eventsSearchSuggestQuick");
   const indexDist  = $("eventsSearchSuggestDistance");
@@ -235,16 +212,14 @@ export function wireSearchSuggestions({
 
     segBtns?.forEach((btn)=>{
       btn.addEventListener("click", (e)=>{
-        distanceDebugLog(`${activeMode}:seg click START targetMiles=${btn.dataset.miles} zip=${distInput?.value || ""} primary=${input?.value || ""} segRect=${rectSummary(seg)} applyRect=${rectSummary(distApply)} target=${e.target?.className || e.target?.id || e.target?.tagName}`);
-        if(!isActiveMode()) { distanceDebugLog(`${activeMode}:seg click ignored inactive`); return; }
+        if(!isActiveMode()) return;
         e.preventDefault();
         e.stopPropagation();
         const miles = Number(btn.dataset.miles);
-        if(!Number.isFinite(miles)) { distanceDebugLog(`${activeMode}:seg click bad miles`); return; }
+        if(!Number.isFinite(miles)) return;
         setMilesUI(miles);
         if(typeof setMiles === "function") setMiles(miles);
         if(typeof onSelectOrigin === "function" && sanitizeZip().length === 5) onSelectOrigin(sanitizeZip());
-        distanceDebugLog(`${activeMode}:seg click DONE miles=${miles} zip=${distInput?.value || ""} primary=${input?.value || ""}`);
       });
     });
 
@@ -261,49 +236,52 @@ export function wireSearchSuggestions({
     let lastArrowSubmitAt = 0;
 
     function submitZipFromArrow(e){
-      distanceDebugLog(`${activeMode}:submitZipFromArrow event=${e?.type || "none"} x=${Math.round(Number(e?.clientX))} y=${Math.round(Number(e?.clientY))} zip=${distInput?.value || ""} primaryBefore=${input?.value || ""}`);
       if(!distInput) return;
       if(e){
         e.preventDefault();
         e.stopPropagation();
       }
       const now = Date.now();
-      if(now - lastArrowSubmitAt < 180) { distanceDebugLog(`${activeMode}:submit debounced`); return; }
+      if(now - lastArrowSubmitAt < 180) return;
       lastArrowSubmitAt = now;
-      const ok = applyZip({ force: true });
-      distanceDebugLog(`${activeMode}:submitZipFromArrow after ok=${ok} primaryAfter=${input?.value || ""}`);
-    }
-
-    function pointIsInsideElement(e, el, slop = 0){
-      if(!el || !e) return false;
-      const x = Number(e.clientX);
-      const y = Number(e.clientY);
-      if(!Number.isFinite(x) || !Number.isFinite(y)) return false;
-      const r = el.getBoundingClientRect();
-      return x >= r.left - slop &&
-             x <= r.right + slop &&
-             y >= r.top - slop &&
-             y <= r.bottom + slop;
+      applyZip({ force: true });
     }
 
     function pointIsOnApplyButton(e){
       if(!distApply || !e) return false;
+      const x = Number(e.clientX);
+      const y = Number(e.clientY);
+      if(!Number.isFinite(x) || !Number.isFinite(y)) return false;
+      const r = distApply.getBoundingClientRect();
+      const slop = 10;
+      return x >= r.left - slop && x <= r.right + slop && y >= r.top - slop && y <= r.bottom + slop;
+    }
 
-      const hint = section.querySelector(".distance__hint");
-      const inSeg = pointIsInsideElement(e, seg, 14);
-      const inHint = pointIsInsideElement(e, hint, 8);
-      const inInput = pointIsInsideElement(e, distInput, 6);
-      const inApply = pointIsInsideElement(e, distApply, 10);
-      const result = !inSeg && !inHint && !inInput && inApply;
-      distanceDebugLog(`${activeMode}:pointCheck type=${e.type} x=${Math.round(Number(e.clientX))} y=${Math.round(Number(e.clientY))} target=${e.target?.className || e.target?.id || e.target?.tagName} inSeg=${inSeg} inHint=${inHint} inInput=${inInput} inApply=${inApply} RESULT=${result} seg=${rectSummary(seg)} hint=${rectSummary(hint)} apply=${rectSummary(distApply)}`);
-      return result;
+    function pointIsOnDistanceSegment(e){
+      if(!seg || !e) return false;
+      const x = Number(e.clientX);
+      const y = Number(e.clientY);
+      if(!Number.isFinite(x) || !Number.isFinite(y)) return false;
+      const r = seg.getBoundingClientRect();
+      const slop = 10;
+      return x >= r.left - slop && x <= r.right + slop && y >= r.top - slop && y <= r.bottom + slop;
+    }
+
+    function setMilesFromSegmentPoint(e){
+      if(!seg || !e) return false;
+      const x = Number(e.clientX);
+      if(!Number.isFinite(x)) return false;
+      const r = seg.getBoundingClientRect();
+      const miles = x < (r.left + (r.width / 2)) ? 15 : 30;
+      setMilesUI(miles);
+      if(typeof setMiles === "function") setMiles(miles);
+      const zip = sanitizeZip();
+      if(typeof onSelectOrigin === "function" && zip.length === 5) onSelectOrigin(zip);
+      return true;
     }
 
     // Normal path: the actual arrow button receives the click.
-    distApply?.addEventListener("click", (e)=>{
-      distanceDebugLog(`${activeMode}:distApply CLICK target=${e.target?.className || e.target?.id || e.target?.tagName}`);
-      submitZipFromArrow(e);
-    });
+    distApply?.addEventListener("click", submitZipFromArrow);
 
     // Mobile Safari/Chrome can commit an autocomplete ZIP, then send the first
     // arrow tap through to the page underneath instead of to the visible button.
@@ -315,9 +293,21 @@ export function wireSearchSuggestions({
       if(!isActiveMode()) return;
       if(panel.hasAttribute("hidden")) return;
       if(!isSectionVisible()) return;
-      distanceDebugLog(`${activeMode}:doc pointerdown active visible x=${Math.round(Number(e.clientX))} y=${Math.round(Number(e.clientY))} target=${e.target?.className || e.target?.id || e.target?.tagName} zip=${distInput?.value || ""} primary=${input?.value || ""}`);
       if(!pointIsOnApplyButton(e)) return;
       submitZipFromArrow(e);
+    }, true);
+
+    // Mobile browsers can also report a tap on the visible 15/30 segmented
+    // control as the row underneath the dropdown. Capture by coordinates so
+    // the tap changes distance instead of falling through to close/submit.
+    document.addEventListener("pointerdown", (e)=>{
+      if(!isActiveMode()) return;
+      if(panel.hasAttribute("hidden")) return;
+      if(!isSectionVisible()) return;
+      if(!pointIsOnDistanceSegment(e)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setMilesFromSegmentPoint(e);
     }, true);
 
     distInput?.addEventListener("keydown", (e)=>{
@@ -346,9 +336,7 @@ export function wireSearchSuggestions({
   });
 
   document.addEventListener("pointerdown", (e)=>{
-    const inside = wrap.contains(e.target);
-    distanceDebugLog(`OUTSIDE-CLOSE pointerdown insideWrap=${inside} target=${e.target?.className || e.target?.id || e.target?.tagName} x=${Math.round(Number(e.clientX))} y=${Math.round(Number(e.clientY))}`);
-    if(inside) return;
+    if(wrap.contains(e.target)) return;
     close();
   }, true);
 
