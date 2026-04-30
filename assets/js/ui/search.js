@@ -1,69 +1,6 @@
 // ui/search.js
 // purpose: wire search inputs + search suggestion UX
 
-function flashDebugLog(label, data = {}){
-  try{
-    const stamp = (performance.now() / 1000).toFixed(3);
-    const parts = Object.entries(data).map(([k,v])=>`${k}=${String(v)}`);
-    const line = `${stamp} ${label}${parts.length ? " | " + parts.join(" ") : ""}`;
-    window.__ANY_FLASH_LOGS = window.__ANY_FLASH_LOGS || [];
-    window.__ANY_FLASH_LOGS.unshift(line);
-    window.__ANY_FLASH_LOGS.length = Math.min(window.__ANY_FLASH_LOGS.length, 80);
-    let box = document.getElementById("anyFlashDebugPanel");
-    if(!box){
-      box = document.createElement("pre");
-      box.id = "anyFlashDebugPanel";
-      box.setAttribute("aria-hidden", "true");
-      Object.assign(box.style, {
-        position: "fixed",
-        left: "6px",
-        right: "6px",
-        top: "6px",
-        maxHeight: "118px",
-        overflow: "hidden",
-        margin: "0",
-        padding: "5px 6px",
-        zIndex: "2147483647",
-        background: "rgba(0,0,0,.78)",
-        color: "#b9ffb9",
-        font: "9px/1.15 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
-        borderRadius: "7px",
-        whiteSpace: "pre-wrap",
-        pointerEvents: "none"
-      });
-      document.documentElement.appendChild(box);
-    }
-    box.textContent = window.__ANY_FLASH_LOGS.slice(0, 13).join("\n");
-    if(window.console && console.debug) console.debug("[ANY flash]", line);
-  }catch(_err){}
-}
-
-function flashRect(id){
-  try{
-    const el = document.getElementById(id) || document.querySelector(id);
-    if(!el) return "missing";
-    const r = el.getBoundingClientRect();
-    return `${Math.round(r.top)},${Math.round(r.height)},${Math.round(r.bottom)}`;
-  }catch(_err){ return "err"; }
-}
-
-function flashCounts(){
-  const evRoot = document.getElementById("eventsRoot");
-  const idxRoot = document.getElementById("indexEventsRoot");
-  return {
-    y: Math.round(window.scrollY || 0),
-    header: flashRect("header"),
-    sticky: flashRect("stickyFilters"),
-    evRoot: flashRect("eventsRoot"),
-    idxRoot: flashRect("indexEventsRoot"),
-    evKids: evRoot ? evRoot.children.length : "?",
-    idxKids: idxRoot ? idxRoot.children.length : "?",
-    evVal: document.getElementById("eventsSearchInput")?.value || "",
-    idxVal: document.getElementById("searchInput")?.value || "",
-  };
-}
-
-
 export function wireSearch({ $, state, setIndexQuery, setIndexEventsQuery, setActiveEventsQuery, setIndexDistanceMiles, render, isIndexView, isEventsView, clearIndexDistance, clearEventsDistance }){
   const idxIn = $("searchInput");
   const evIn  = $("eventsSearchInput");
@@ -142,7 +79,6 @@ export function wireSearchSuggestions({
   }
 
   const open = ()=>{
-    flashDebugLog("search:open:start", { mode: mode(), ...flashCounts() });
     if(!canSuggest()) return;
     setModeUI();
     if(panel.hasAttribute("hidden")) panel.removeAttribute("hidden");
@@ -151,7 +87,6 @@ export function wireSearchSuggestions({
   };
 
   const close = ()=>{
-    flashDebugLog("search:close", { mode: mode(), ...flashCounts() });
     if(!panel.hasAttribute("hidden")) panel.setAttribute("hidden", "");
   };
 
@@ -206,19 +141,13 @@ export function wireSearchSuggestions({
     const setSectionQuery = activeMode === "index" ? setIndexEventsQuery : setEventsQuery;
 
     function writeZipToPrimarySearch(zip, { dispatch = false } = {}){
-      flashDebugLog(`${activeMode}:writeZip:before`, { zip, dispatch, ...flashCounts() });
       input.value = zip;
       if(typeof setSectionQuery === "function") setSectionQuery(zip);
       else if(typeof setActiveEventsQuery === "function") setActiveEventsQuery(zip);
-      if(dispatch){
-        flashDebugLog(`${activeMode}:writeZip:dispatchInput`, flashCounts());
-        input.dispatchEvent(new Event("input", { bubbles: true }));
-      }
-      flashDebugLog(`${activeMode}:writeZip:after`, { zip, dispatch, ...flashCounts() });
+      if(dispatch) input.dispatchEvent(new Event("input", { bubbles: true }));
     }
 
     function prePositionResultsBeforeRender(){
-      flashDebugLog(`${activeMode}:prePosition:start`, flashCounts());
       const rootId = activeMode === "index" ? "indexEventsRoot" : "eventsRoot";
       const root = $(rootId);
       if(!root) return;
@@ -234,15 +163,12 @@ export function wireSearchSuggestions({
       const headerH = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
       const gap = 14;
       const y = Math.max(0, window.scrollY + rect.top - headerH - gap);
-      flashDebugLog(`${activeMode}:prePosition:target`, { y: Math.round(y), curY: Math.round(window.scrollY || 0), rootRect: flashRect(rootId), header: flashRect("header") });
       if(Math.abs(window.scrollY - y) > 1){
         window.scrollTo({ top: y, left: 0, behavior: "auto" });
-        flashDebugLog(`${activeMode}:prePosition:afterScroll`, flashCounts());
       }
     }
 
     function scrollFilteredResultsToStart(){
-      flashDebugLog(`${activeMode}:postScroll:schedule`, flashCounts());
       const rootId = activeMode === "index" ? "indexEventsRoot" : "eventsRoot";
       const root = $(rootId);
       if(!root) return;
@@ -252,9 +178,7 @@ export function wireSearchSuggestions({
       // label. This lands slightly higher than the first result card, keeping
       // the group name visible as the start of the filtered list.
       window.requestAnimationFrame(()=>{
-        flashDebugLog(`${activeMode}:postScroll:raf1`, flashCounts());
         window.requestAnimationFrame(()=>{
-          flashDebugLog(`${activeMode}:postScroll:raf2`, flashCounts());
           const firstGroupLabel = root.querySelector(".group__label");
           const firstGroup = root.querySelector(".group");
           const firstResult = root.querySelector(".row--events, .row");
@@ -264,9 +188,7 @@ export function wireSearchSuggestions({
           const headerH = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
           const gap = 14;
           const y = Math.max(0, window.scrollY + rect.top - headerH - gap);
-          flashDebugLog(`${activeMode}:postScroll:target`, { y: Math.round(y), targetTop: Math.round(rect.top), headerH, ...flashCounts() });
           window.scrollTo({ top: y, left: 0, behavior: "auto" });
-          flashDebugLog(`${activeMode}:postScroll:after`, flashCounts());
         });
       });
     }
@@ -285,29 +207,23 @@ export function wireSearchSuggestions({
     }
 
     function applyZip({ force = false } = {}){
-      flashDebugLog(`${activeMode}:applyZip:start`, { force, zip: distInput?.value || "", ...flashCounts() });
       // Button/Enter actions come from this exact ZIP section, so do not let
       // the shared view-mode check block the submit. The check remains for
       // passive refreshes and distance-segment changes.
-      if(!force && !isActiveMode()){ flashDebugLog(`${activeMode}:applyZip:return:notActive`, flashCounts()); return false; }
+      if(!force && !isActiveMode()) return false;
       const zip = sanitizeZip();
-      if(zip.length !== 5){ flashDebugLog(`${activeMode}:applyZip:return:badZip`, { zip, ...flashCounts() }); return false; }
+      if(zip.length !== 5) return false;
       // Pre-position first, then update q + distFrom in the same synchronous
       // path. Do not close the helper until after render has rebuilt the final
       // filtered list; this keeps the helper covering the old list during the
       // update and avoids the visible old-list/new-list flash on EVENTS.
       prePositionResultsBeforeRender();
       writeZipToPrimarySearch(zip, { dispatch: false });
-      if(typeof onSelectOrigin === "function"){
-        flashDebugLog(`${activeMode}:onSelectOrigin:before`, { zip, ...flashCounts() });
-        onSelectOrigin(zip);
-        flashDebugLog(`${activeMode}:onSelectOrigin:after`, { zip, ...flashCounts() });
-      }
+      if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
       scrollFilteredResultsToStart();
       close();
       distInput?.blur();
       input.blur();
-      flashDebugLog(`${activeMode}:applyZip:done`, flashCounts());
       return true;
     }
 
@@ -350,7 +266,6 @@ export function wireSearchSuggestions({
     let lastArrowSubmitAt = 0;
 
     function submitZipFromArrow(e){
-      flashDebugLog(`${activeMode}:submitArrow:start`, { type: e?.type || "", x: Math.round(Number(e?.clientX)||0), y: Math.round(Number(e?.clientY)||0), ...flashCounts() });
       if(!distInput) return;
       if(e){
         e.preventDefault();
@@ -406,7 +321,6 @@ export function wireSearchSuggestions({
     // treated as a ZIP submit.
     document.addEventListener("pointerdown", (e)=>{
       if(!isActiveMode()) return;
-      flashDebugLog(`${activeMode}:docPointer`, { x: Math.round(Number(e.clientX)||0), y: Math.round(Number(e.clientY)||0), onSeg: pointIsOnDistanceSegment(e), onApply: pointIsOnApplyButton(e), target: e.target?.id || e.target?.className || e.target?.tagName || "", ...flashCounts() });
       if(panel.hasAttribute("hidden")) return;
       if(!isSectionVisible()) return;
 
@@ -458,7 +372,6 @@ export function wireSearchSuggestions({
   }
 
   document.addEventListener("pointerdown", (e)=>{
-    flashDebugLog("outside:pointer", { target: e.target?.id || e.target?.className || e.target?.tagName || "", inWrap: wrap.contains(e.target), inPanelRect: (!panel.hasAttribute("hidden") && pointIsInsideRect(e, panel, 10)), ...flashCounts() });
     if(wrap.contains(e.target)) return;
     // On mobile, taps on the visible helper controls can be reported as
     // targets on the page underneath. Treat the physical helper-panel
