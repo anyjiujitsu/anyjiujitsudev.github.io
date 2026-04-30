@@ -180,6 +180,11 @@ export function wireSearchSuggestions({
       return digits;
     }
 
+    function zipIsAlreadyApplied(zip){
+      if(zip.length !== 5) return false;
+      return String(input.value || "").trim() === zip;
+    }
+
     function applyZip({ force = false } = {}){
       // Button/Enter actions come from this exact ZIP section, so do not let
       // the shared view-mode check block the submit. The check remains for
@@ -219,7 +224,8 @@ export function wireSearchSuggestions({
         if(!Number.isFinite(miles)) return;
         setMilesUI(miles);
         if(typeof setMiles === "function") setMiles(miles);
-        if(typeof onSelectOrigin === "function" && sanitizeZip().length === 5) onSelectOrigin(sanitizeZip());
+        const zip = sanitizeZip();
+        if(typeof onSelectOrigin === "function" && zipIsAlreadyApplied(zip)) onSelectOrigin(zip);
       });
     });
 
@@ -276,7 +282,7 @@ export function wireSearchSuggestions({
       setMilesUI(miles);
       if(typeof setMiles === "function") setMiles(miles);
       const zip = sanitizeZip();
-      if(typeof onSelectOrigin === "function" && zip.length === 5) onSelectOrigin(zip);
+      if(typeof onSelectOrigin === "function" && zipIsAlreadyApplied(zip)) onSelectOrigin(zip);
       return true;
     }
 
