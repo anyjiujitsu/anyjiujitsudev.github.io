@@ -144,7 +144,7 @@ export function wireSearchSuggestions({
       input.value = zip;
       if(typeof setSectionQuery === "function") setSectionQuery(zip);
       else if(typeof setActiveEventsQuery === "function") setActiveEventsQuery(zip);
-      input.dispatchEvent(new Event("input", { bubbles: true }));
+      // No synthetic input event here; applyZip renders after distFrom is set.
     }
 
     function scrollFilteredResultsToStart(){
