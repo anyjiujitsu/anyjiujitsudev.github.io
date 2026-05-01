@@ -36,6 +36,17 @@ export const CUSTOMIZATION = Object.freeze({
   // Leave blank to auto-generate a unique key from adminGitHubOwner + adminGitHubRepo.
   adminTokenStorageKey: "",
 
+  // ADMIN STATE OPTIONS: values shown in the STATE dropdowns on admin forms.
+  // Edit this list to match the region/state coverage for your site.
+  adminStates: [
+    "Massachusetts",
+    "New Hampshire",
+    "Vermont",
+    "Maine",
+    "Connecticut",
+    "Rhode Island"
+  ],
+
   // ADMIN TITLE SUFFIX: browser/tab suffix for the admin page
   adminTitleSuffix: "Admin",
 
