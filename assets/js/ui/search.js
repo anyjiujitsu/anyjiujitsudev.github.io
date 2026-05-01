@@ -1,6 +1,130 @@
 // ui/search.js
 // purpose: wire search inputs + search suggestion UX
 
+
+/* DEBUG ONLY: suggestion-selection row/header flash tracer */
+function ensureZipSuggestionFlashDebug(){
+  if(typeof window === "undefined" || window.__anyZipSuggestionFlashDebug) return window.__anyZipSuggestionFlashDebug;
+  const state = { rows: [], rafs: 0, lastZipChangeAt: 0 };
+  function panel(){
+    let el = document.getElementById("zipSuggestionFlashDebugPanel");
+    if(!el){
+      el = document.createElement("div");
+      el.id = "zipSuggestionFlashDebugPanel";
+      el.style.cssText = [
+        "position:fixed", "left:6px", "right:6px", "bottom:6px", "z-index:2147483647",
+        "max-height:112px", "overflow:hidden", "background:rgba(0,0,0,.82)", "color:#d8ffd8",
+        "font:10px/1.22 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace", "padding:5px 6px",
+        "border-radius:8px", "pointer-events:none", "white-space:pre-wrap", "box-shadow:0 2px 14px rgba(0,0,0,.35)"
+      ].join(";");
+      document.documentElement.appendChild(el);
+    }
+    return el;
+  }
+  function mode(){
+    const title = document.getElementById("viewTitle")?.textContent || "";
+    return /index/i.test(title) ? "index" : "events";
+  }
+  function rectInfo(el){
+    if(!el) return "none";
+    const r = el.getBoundingClientRect();
+    return `${Math.round(r.top)}/${Math.round(r.bottom)}`;
+  }
+  function rootForMode(m){ return document.getElementById(m === "index" ? "indexEventsRoot" : "eventsRoot"); }
+  function firstRowForMode(m){
+    const root = rootForMode(m);
+    return root?.querySelector(".row--events, .row, .cell, .group") || null;
+  }
+  function groupForMode(m){
+    const root = rootForMode(m);
+    return root?.querySelector(".group__label, .group") || null;
+  }
+  function metrics(label){
+    const m = mode();
+    const header = document.querySelector(".header");
+    const sticky = document.getElementById("stickyFilters") || document.querySelector(".stickyFilters");
+    const row = firstRowForMode(m);
+    const group = groupForMode(m);
+    const boundaryEl = sticky || header;
+    const boundary = boundaryEl ? boundaryEl.getBoundingClientRect().bottom : 0;
+    const rowTop = row ? row.getBoundingClientRect().top : NaN;
+    const groupTop = group ? group.getBoundingClientRect().top : NaN;
+    const breach = (Number.isFinite(rowTop) && rowTop < boundary - 1) || (Number.isFinite(groupTop) && groupTop < boundary - 1);
+    return `${label} m=${m} y=${Math.round(window.scrollY)} head=${rectInfo(header)} stick=${rectInfo(sticky)} grpT=${Number.isFinite(groupTop)?Math.round(groupTop):"na"} rowT=${Number.isFinite(rowTop)?Math.round(rowTop):"na"} breach=${breach}`;
+  }
+  function log(msg){
+    const line = `${Math.round(performance.now())} ${msg}`;
+    state.rows.unshift(line);
+    state.rows = state.rows.slice(0, 11);
+    panel().textContent = state.rows.join("\n");
+  }
+  function sampleFrames(reason, count=14){
+    if(state.rafs > 0) return;
+    state.rafs = count;
+    let i = 0;
+    function step(){
+      log(metrics(`frame:${reason}:${i}`));
+      i += 1;
+      state.rafs -= 1;
+      if(state.rafs > 0) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  const origScrollTo = window.scrollTo.bind(window);
+  const origScrollBy = window.scrollBy.bind(window);
+  window.scrollTo = function(...args){
+    try{ log(`CALL scrollTo args=${JSON.stringify(args)} ${metrics("before")}`); sampleFrames("scrollTo", 8); }catch(_e){}
+    return origScrollTo(...args);
+  };
+  window.scrollBy = function(...args){
+    try{ log(`CALL scrollBy args=${JSON.stringify(args)} ${metrics("before")}`); sampleFrames("scrollBy", 8); }catch(_e){}
+    return origScrollBy(...args);
+  };
+  const origSiv = Element.prototype.scrollIntoView;
+  if(origSiv){
+    Element.prototype.scrollIntoView = function(...args){
+      try{ log(`CALL scrollIntoView target=#${this.id||this.className||this.tagName} ${metrics("before")}`); sampleFrames("scrollIntoView", 8); }catch(_e){}
+      return origSiv.apply(this, args);
+    };
+  }
+  window.addEventListener("scroll", ()=>{ log(metrics("EVENT scroll")); }, { passive:true });
+  const mo = new MutationObserver((mutations)=>{
+    const names = new Set();
+    for(const mu of mutations){
+      const t = mu.target;
+      if(t?.id) names.add(`#${t.id}`);
+      else if(t?.className && typeof t.className === "string") names.add(`.${t.className.split(/\s+/).slice(0,2).join(".")}`);
+      else names.add(t?.tagName || "node");
+    }
+    log(`MUT ${Array.from(names).slice(0,5).join(",")} ${metrics("mut")}`);
+    if(performance.now() - state.lastZipChangeAt < 900) sampleFrames("mutationAfterZip", 12);
+  });
+  queueMicrotask(()=>{
+    [document.body, document.documentElement, document.getElementById("eventsRoot"), document.getElementById("indexEventsRoot"), document.querySelector(".header"), document.getElementById("stickyFilters"), document.getElementById("eventsSearchSuggest")].filter(Boolean).forEach((el)=>{
+      try{ mo.observe(el, { attributes:true, childList:true, subtree: el.id === "eventsRoot" || el.id === "indexEventsRoot" }); }catch(_e){}
+    });
+  });
+  function watchInput(id){
+    const el = document.getElementById(id);
+    if(!el) return;
+    ["beforeinput","input","change","blur","focusout","focus"].forEach((type)=>{
+      el.addEventListener(type, (e)=>{
+        state.lastZipChangeAt = performance.now();
+        log(`ZIP ${id}:${type} val=${JSON.stringify(el.value)} target=${e.target?.id||e.target?.tagName} ${metrics("zipEvt")}`);
+        sampleFrames(`${id}:${type}`, 18);
+      }, true);
+    });
+  }
+  queueMicrotask(()=>{
+    watchInput("eventsDistanceOriginInput");
+    watchInput("distanceOriginInput");
+    log(metrics("debug-ready"));
+  });
+  window.__anyZipSuggestionFlashDebug = { log, metrics, sampleFrames };
+  return window.__anyZipSuggestionFlashDebug;
+}
+
+
 export function wireSearch({ $, state, setIndexQuery, setIndexEventsQuery, setActiveEventsQuery, setIndexDistanceMiles, render, isIndexView, isEventsView, clearIndexDistance, clearEventsDistance }){
   const idxIn = $("searchInput");
   const evIn  = $("eventsSearchInput");
@@ -55,6 +179,8 @@ export function wireSearchSuggestions({
   const input = $("eventsSearchInput");
   const panel = $("eventsSearchSuggest");
   if(!wrap || !input || !panel) return;
+  const zipFlashDebug = ensureZipSuggestionFlashDebug();
+  zipFlashDebug?.log?.("wireSearchSuggestions:init");
 
   // sections inside panel
   const quick = $("eventsSearchSuggestQuick");
@@ -78,29 +204,22 @@ export function wireSearchSuggestions({
     if(indexDist) indexDist.hidden = (m !== "index");
   }
 
-  const openStabilizers = [];
-
   const open = ()=>{
+    zipFlashDebug?.log?.(`open:before ${zipFlashDebug.metrics?.("openBefore") || ""}`);
     if(!canSuggest()) return;
     setModeUI();
     if(panel.hasAttribute("hidden")) panel.removeAttribute("hidden");
     if(mode() === "index" && typeof onIndexViewOpen === "function") onIndexViewOpen();
     if(mode() === "events" && typeof onEventsViewOpen === "function") onEventsViewOpen();
-
-    // Stabilize the results area when the helper opens, before mobile ZIP
-    // suggestion/autofill commits a value into the ZIP field. This preserves
-    // the validated smooth arrow-submit behavior without causing a visible
-    // row/header flash at the moment the suggested ZIP is selected.
-    const openedMode = mode();
-    window.setTimeout(()=>{
-      openStabilizers.forEach((fn)=>{
-        if(typeof fn === "function") fn(openedMode);
-      });
-    }, 35);
+    zipFlashDebug?.log?.(`open:after mode=${mode()} ${zipFlashDebug.metrics?.("openAfter") || ""}`);
+    zipFlashDebug?.sampleFrames?.("afterOpen", 10);
   };
 
   const close = ()=>{
+    zipFlashDebug?.log?.(`close:before ${zipFlashDebug.metrics?.("closeBefore") || ""}`);
     if(!panel.hasAttribute("hidden")) panel.setAttribute("hidden", "");
+    zipFlashDebug?.log?.(`close:after ${zipFlashDebug.metrics?.("closeAfter") || ""}`);
+    zipFlashDebug?.sampleFrames?.("afterClose", 10);
   };
 
   input.addEventListener("focus", ()=>{
@@ -206,31 +325,46 @@ export function wireSearchSuggestions({
       });
     }
 
-    function stabilizeHelperOpenAnchor(openedMode){
-      if(openedMode && openedMode !== activeMode) return;
+    function stabilizeOpenHelperScroll(){
+      zipFlashDebug?.log?.(`${activeMode}:stabilize:start ${zipFlashDebug.metrics?.("stabStart") || ""}`);
       if(!isActiveMode()) return;
       if(panel.hasAttribute("hidden")) return;
       if(!isSectionVisible()) return;
+
+      const zip = sanitizeZip();
+      if(zip.length !== 5) return;
 
       const rootId = activeMode === "index" ? "indexEventsRoot" : "eventsRoot";
       const root = $(rootId);
       if(!root) return;
 
-      // Do the same top-anchor normalization that made the final ZIP submit
-      // smooth, but do it when the helper opens instead of after a suggested
-      // ZIP lands in the ZIP input. Selecting a suggestion should only fill
-      // the ZIP box and should not trigger visible list/header movement.
+      // Mobile autocomplete can leave EVENTS scrolled partway down while the
+      // helper is still open. INDEX is already sitting at this top anchor when
+      // submit happens, which is why its filter transition feels smooth. Bring
+      // the page to the same helper-open anchor before the arrow submit, without
+      // submitting the ZIP, changing the search input, or closing the helper.
       const rect = root.getBoundingClientRect();
       const header = document.querySelector(".header");
       const headerH = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
       const gap = 14;
       const y = Math.max(0, window.scrollY + rect.top - headerH - gap);
       if(Math.abs(window.scrollY - y) > 2){
+        zipFlashDebug?.log?.(`${activeMode}:stabilize:scrollTo y=${Math.round(y)} ${zipFlashDebug.metrics?.("stabBeforeScroll") || ""}`);
         window.scrollTo({ top: y, left: 0, behavior: "auto" });
+        zipFlashDebug?.sampleFrames?.(`${activeMode}:afterStabilizeScroll`, 12);
       }
+      zipFlashDebug?.log?.(`${activeMode}:stabilize:end targetY=${Math.round(y)} ${zipFlashDebug.metrics?.("stabEnd") || ""}`);
     }
 
-    openStabilizers.push(stabilizeHelperOpenAnchor);
+    let stabilizeZipScrollTimer = 0;
+    function scheduleOpenHelperScrollStabilize(){
+      zipFlashDebug?.log?.(`${activeMode}:scheduleStabilize ${zipFlashDebug.metrics?.("sched") || ""}`);
+      if(stabilizeZipScrollTimer) window.clearTimeout(stabilizeZipScrollTimer);
+      stabilizeZipScrollTimer = window.setTimeout(()=>{
+        stabilizeZipScrollTimer = 0;
+        stabilizeOpenHelperScroll();
+      }, 35);
+    }
 
     function sanitizeZip(){
       if(!distInput) return "";
@@ -246,6 +380,7 @@ export function wireSearchSuggestions({
     }
 
     function applyZip({ force = false } = {}){
+      zipFlashDebug?.log?.(`${activeMode}:applyZip:start force=${force} ${zipFlashDebug.metrics?.("applyStart") || ""}`);
       // Button/Enter actions come from this exact ZIP section, so do not let
       // the shared view-mode check block the submit. The check remains for
       // passive refreshes and distance-segment changes.
@@ -260,6 +395,7 @@ export function wireSearchSuggestions({
       writeZipToPrimarySearch(zip, { dispatch: false });
       if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
       scrollFilteredResultsToStart();
+      zipFlashDebug?.log?.(`${activeMode}:applyZip:afterOnSelect ${zipFlashDebug.metrics?.("applyAfterOnSelect") || ""}`);
       close();
       distInput?.blur();
       input.blur();
@@ -293,8 +429,11 @@ export function wireSearchSuggestions({
     });
 
     function handleZipValueRefresh(){
+      zipFlashDebug?.log?.(`${activeMode}:handleZipValueRefresh:start val=${JSON.stringify(distInput?.value || "")} ${zipFlashDebug.metrics?.("refreshStart") || ""}`);
       if(!isActiveMode()) return;
-      sanitizeZip();
+      const zip = sanitizeZip();
+      zipFlashDebug?.log?.(`${activeMode}:handleZipValueRefresh:zip=${zip} ${zipFlashDebug.metrics?.("refreshZip") || ""}`);
+      if(zip.length === 5) scheduleOpenHelperScrollStabilize();
     }
 
     distInput?.addEventListener("input", handleZipValueRefresh);
