@@ -20,10 +20,11 @@ async function loadAdminCustomization(){
     const siteName = typeof customization.siteHeaderName === "string"
       ? customization.siteHeaderName.trim()
       : "";
+    const adminSuffix = typeof customization.adminTitleSuffix === "string" && customization.adminTitleSuffix.trim()
+      ? customization.adminTitleSuffix.trim()
+      : "Admin";
 
-    if(siteName){
-      document.title = `${siteName} - Admin`;
-    }
+    document.title = `${siteName || "UNDEFINED"} - ${adminSuffix}`;
   } catch(err){
     console.warn("Admin customization failed to load", err);
   }
