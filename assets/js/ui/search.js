@@ -60,7 +60,6 @@ export function wireSearchSuggestions({
   const quick = $("eventsSearchSuggestQuick");
   const indexDist  = $("eventsSearchSuggestDistance");
   const eventsDist = $("eventsSearchSuggestEventsDistance");
-  let suppressQuickForEventsZip = false;
 
   const canSuggest = () => {
     const ev = (typeof isEventsView !== "function") ? true : !!isEventsView();
@@ -74,7 +73,7 @@ export function wireSearchSuggestions({
 
   function setModeUI(){
     const m = mode();
-    if(quick) quick.hidden = (m !== "events") || suppressQuickForEventsZip;
+    if(quick) quick.hidden = (m !== "events");
     if(eventsDist) eventsDist.hidden = (m !== "events");
     if(indexDist) indexDist.hidden = (m !== "index");
   }
@@ -88,7 +87,6 @@ export function wireSearchSuggestions({
   };
 
   const close = ()=>{
-    suppressQuickForEventsZip = false;
     if(!panel.hasAttribute("hidden")) panel.setAttribute("hidden", "");
   };
 
@@ -231,6 +229,52 @@ export function wireSearchSuggestions({
       }, 35);
     }
 
+    let zipFocusLockTimer = 0;
+    let zipFocusLockedY = 0;
+    let zipFocusRestoring = false;
+
+    function stopZipFocusScrollLock(){
+      if(zipFocusLockTimer) window.clearTimeout(zipFocusLockTimer);
+      zipFocusLockTimer = 0;
+    }
+
+    function restoreZipFocusScroll(){
+      if(!zipFocusLockTimer) return;
+      if(zipFocusRestoring) return;
+      if(!distInput || document.activeElement !== distInput) return;
+      if(panel.hasAttribute("hidden") || !isSectionVisible()) return;
+
+      const currentY = Number(window.scrollY || 0);
+      const targetY = Number(zipFocusLockedY || 0);
+      if(Math.abs(currentY - targetY) <= 1) return;
+
+      zipFocusRestoring = true;
+      window.scrollTo({ top: targetY, left: 0, behavior: "auto" });
+      window.requestAnimationFrame(()=>{ zipFocusRestoring = false; });
+    }
+
+    function startZipFocusScrollLock(){
+      if(!distInput) return;
+      if(!isActiveMode()) return;
+      if(panel.hasAttribute("hidden") || !isSectionVisible()) return;
+      // INDEX already remains visually stable during iOS suggestion selection.
+      // EVENTS can be auto-scrolled by iOS while its ZIP input is focused,
+      // which lets rows briefly paint into the sticky header area. Lock only
+      // the focus/autocomplete window for EVENTS; do not submit, filter, or
+      // alter the helper layout.
+      if(activeMode !== "events") return;
+
+      zipFocusLockedY = Number(window.scrollY || 0);
+      stopZipFocusScrollLock();
+      zipFocusLockTimer = window.setTimeout(()=>{
+        zipFocusLockTimer = 0;
+      }, 900);
+
+      window.requestAnimationFrame(restoreZipFocusScroll);
+      window.setTimeout(restoreZipFocusScroll, 35);
+      window.setTimeout(restoreZipFocusScroll, 90);
+    }
+
     function sanitizeZip(){
       if(!distInput) return "";
       const raw = String(distInput.value || "");
@@ -293,26 +337,28 @@ export function wireSearchSuggestions({
 
     function handleZipValueRefresh(){
       if(!isActiveMode()) return;
+      restoreZipFocusScroll();
       const zip = sanitizeZip();
       if(zip.length === 5) scheduleOpenHelperScrollStabilize();
     }
 
+    distInput?.addEventListener("focus", startZipFocusScrollLock);
     distInput?.addEventListener("input", handleZipValueRefresh);
     distInput?.addEventListener("change", handleZipValueRefresh);
-    distInput?.addEventListener("blur", handleZipValueRefresh);
+    distInput?.addEventListener("blur", ()=>{
+      handleZipValueRefresh();
+      window.setTimeout(stopZipFocusScrollLock, 120);
+    });
+    distInput?.addEventListener("focusout", ()=>{
+      window.setTimeout(stopZipFocusScrollLock, 120);
+    });
 
-    // EVENTS has Quick Searches above Events Near, which places its ZIP input
-    // lower than INDEX's ZIP input. On iOS, focusing that lower input can
-    // auto-scroll the page/header while postal suggestions are shown. Match
-    // the INDEX helper layout during EVENTS ZIP entry by temporarily hiding
-    // Quick Searches only while the current helper session is open.
-    if(activeMode === "events"){
-      distInput?.addEventListener("focus", ()=>{
-        if(mode() !== "events") return;
-        suppressQuickForEventsZip = true;
-        if(quick) quick.hidden = true;
-      });
+    window.addEventListener("scroll", restoreZipFocusScroll, { passive: true });
+    if(window.visualViewport){
+      window.visualViewport.addEventListener("scroll", restoreZipFocusScroll, { passive: true });
+      window.visualViewport.addEventListener("resize", restoreZipFocusScroll, { passive: true });
     }
+
 
     let lastArrowSubmitAt = 0;
 
@@ -326,6 +372,7 @@ export function wireSearchSuggestions({
       const now = Date.now();
       if(now - lastArrowSubmitAt < 180) return;
       lastArrowSubmitAt = now;
+      stopZipFocusScrollLock();
       applyZip({ force: true });
     }
 
