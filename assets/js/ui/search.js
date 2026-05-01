@@ -5,16 +5,16 @@
 /* DEBUG ONLY: suggestion-selection row/header flash tracer */
 function ensureZipSuggestionFlashDebug(){
   if(typeof window === "undefined" || window.__anyZipSuggestionFlashDebug) return window.__anyZipSuggestionFlashDebug;
-  const state = { rows: [], rafs: 0, lastZipChangeAt: 0 };
+  const state = { rows: [], rafs: 0, lastZipChangeAt: 0, lastBreach: "LAST BREACH: none" };
   function panel(){
     let el = document.getElementById("zipSuggestionFlashDebugPanel");
     if(!el){
       el = document.createElement("div");
       el.id = "zipSuggestionFlashDebugPanel";
       el.style.cssText = [
-        "position:fixed", "left:6px", "right:6px", "bottom:6px", "z-index:2147483647",
-        "max-height:112px", "overflow:hidden", "background:rgba(0,0,0,.82)", "color:#d8ffd8",
-        "font:10px/1.22 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace", "padding:5px 6px",
+        "position:fixed", "left:6px", "right:6px", "top:calc(env(safe-area-inset-top, 0px) + 6px)", "z-index:2147483647",
+        "max-height:92px", "overflow:hidden", "background:rgba(0,0,0,.84)", "color:#d8ffd8",
+        "font:9px/1.16 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace", "padding:4px 6px",
         "border-radius:8px", "pointer-events:none", "white-space:pre-wrap", "box-shadow:0 2px 14px rgba(0,0,0,.35)"
       ].join(";");
       document.documentElement.appendChild(el);
@@ -50,13 +50,15 @@ function ensureZipSuggestionFlashDebug(){
     const rowTop = row ? row.getBoundingClientRect().top : NaN;
     const groupTop = group ? group.getBoundingClientRect().top : NaN;
     const breach = (Number.isFinite(rowTop) && rowTop < boundary - 1) || (Number.isFinite(groupTop) && groupTop < boundary - 1);
-    return `${label} m=${m} y=${Math.round(window.scrollY)} head=${rectInfo(header)} stick=${rectInfo(sticky)} grpT=${Number.isFinite(groupTop)?Math.round(groupTop):"na"} rowT=${Number.isFinite(rowTop)?Math.round(rowTop):"na"} breach=${breach}`;
+    const out = `${label} m=${m} y=${Math.round(window.scrollY)} head=${rectInfo(header)} stick=${rectInfo(sticky)} grpT=${Number.isFinite(groupTop)?Math.round(groupTop):"na"} rowT=${Number.isFinite(rowTop)?Math.round(rowTop):"na"} breach=${breach}`;
+    if(breach) state.lastBreach = `LAST BREACH: ${Math.round(performance.now())} ${out}`;
+    return out;
   }
   function log(msg){
     const line = `${Math.round(performance.now())} ${msg}`;
     state.rows.unshift(line);
-    state.rows = state.rows.slice(0, 11);
-    panel().textContent = state.rows.join("\n");
+    state.rows = state.rows.slice(0, 8);
+    panel().textContent = [state.lastBreach, ...state.rows].join("\n");
   }
   function sampleFrames(reason, count=14){
     if(state.rafs > 0) return;
