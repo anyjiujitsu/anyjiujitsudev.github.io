@@ -32,6 +32,10 @@ export const CUSTOMIZATION = Object.freeze({
   // ADMIN DIRECTORY CSV PATH: repo path to the directory CSV edited by admin
   adminDirectoryCsvPath: "data/directory.csv",
 
+  // ADMIN TOKEN STORAGE KEY: optional local browser storage key for the GitHub token.
+  // Leave blank to auto-generate a unique key from adminGitHubOwner + adminGitHubRepo.
+  adminTokenStorageKey: "",
+
   // ADMIN TITLE SUFFIX: browser/tab suffix for the admin page
   adminTitleSuffix: "Admin",
 
