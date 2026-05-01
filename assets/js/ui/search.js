@@ -56,6 +56,81 @@ export function wireSearchSuggestions({
   const panel = $("eventsSearchSuggest");
   if(!wrap || !input || !panel) return;
 
+  const FLASH_DEBUG = true;
+  let flashDebugEl = null;
+  let flashDebugLines = [];
+
+  function flashDebugPanel(){
+    if(!FLASH_DEBUG) return null;
+    if(flashDebugEl) return flashDebugEl;
+    flashDebugEl = document.createElement("div");
+    flashDebugEl.id = "zipFlashDebugPanel";
+    flashDebugEl.setAttribute("aria-hidden", "true");
+    flashDebugEl.style.cssText = [
+      "position:fixed",
+      "left:0",
+      "right:0",
+      "bottom:0",
+      "z-index:2147483647",
+      "max-height:112px",
+      "overflow:hidden",
+      "padding:4px 6px",
+      "box-sizing:border-box",
+      "background:rgba(0,0,0,.84)",
+      "color:#fff",
+      "font:10px/1.25 ui-monospace,SFMono-Regular,Menlo,monospace",
+      "white-space:pre-wrap",
+      "pointer-events:none"
+    ].join(";");
+    document.body.appendChild(flashDebugEl);
+    return flashDebugEl;
+  }
+
+  function flashMetric(){
+    const header = document.querySelector(".header");
+    const sticky = document.querySelector("#stickyFilters");
+    const root = $(mode() === "index" ? "indexEventsRoot" : "eventsRoot");
+    const target = root?.querySelector?.(".group__label") || root?.querySelector?.(".group") || root?.querySelector?.(".row--events,.row") || root;
+    const row = root?.querySelector?.(".row--events,.row");
+    const headerRect = header?.getBoundingClientRect?.();
+    const stickyRect = sticky?.getBoundingClientRect?.();
+    const targetRect = target?.getBoundingClientRect?.();
+    const rowRect = row?.getBoundingClientRect?.();
+    const headerBottom = headerRect ? Math.round(headerRect.bottom) : -1;
+    const stickyBottom = stickyRect ? Math.round(stickyRect.bottom) : -1;
+    const targetTop = targetRect ? Math.round(targetRect.top) : -1;
+    const rowTop = rowRect ? Math.round(rowRect.top) : -1;
+    const breachTarget = targetTop >= 0 && headerBottom >= 0 && targetTop < headerBottom;
+    const breachRow = rowTop >= 0 && headerBottom >= 0 && rowTop < headerBottom;
+    const panelState = panel.hasAttribute("hidden") ? "closed" : "open";
+    return `m=${mode()} y=${Math.round(window.scrollY)} hb=${headerBottom} sb=${stickyBottom} gt=${targetTop} rt=${rowTop} breach=${breachTarget||breachRow} panel=${panelState}`;
+  }
+
+  function flashLog(label, extra = ""){
+    if(!FLASH_DEBUG) return;
+    const t = Math.round(performance.now());
+    const line = `${t} ${label} ${flashMetric()} ${extra}`.slice(0, 260);
+    flashDebugLines.unshift(line);
+    flashDebugLines = flashDebugLines.slice(0, 9);
+    const el = flashDebugPanel();
+    if(el) el.textContent = flashDebugLines.join("\n");
+  }
+
+  function flashTraceFrames(label, frames = 22){
+    if(!FLASH_DEBUG) return;
+    let i = 0;
+    function step(){
+      flashLog(`${label}:f${i}`);
+      i += 1;
+      if(i < frames) window.requestAnimationFrame(step);
+    }
+    window.requestAnimationFrame(step);
+  }
+
+  window.addEventListener("scroll", ()=>{
+    flashLog("window:scroll");
+  }, { passive: true });
+
   // sections inside panel
   const quick = $("eventsSearchSuggestQuick");
   const indexDist  = $("eventsSearchSuggestDistance");
@@ -80,14 +155,18 @@ export function wireSearchSuggestions({
 
   const open = ()=>{
     if(!canSuggest()) return;
+    flashLog("panel:open:before");
     setModeUI();
     if(panel.hasAttribute("hidden")) panel.removeAttribute("hidden");
     if(mode() === "index" && typeof onIndexViewOpen === "function") onIndexViewOpen();
     if(mode() === "events" && typeof onEventsViewOpen === "function") onEventsViewOpen();
+    flashLog("panel:open:after");
   };
 
   const close = ()=>{
+    flashLog("panel:close:before");
     if(!panel.hasAttribute("hidden")) panel.setAttribute("hidden", "");
+    flashLog("panel:close:after");
   };
 
   input.addEventListener("focus", ()=>{
@@ -148,6 +227,7 @@ export function wireSearchSuggestions({
     }
 
     function prePositionResultsBeforeRender(){
+      flashLog(`${activeMode}:prePosition:start`);
       const rootId = activeMode === "index" ? "indexEventsRoot" : "eventsRoot";
       const root = $(rootId);
       if(!root) return;
@@ -163,12 +243,15 @@ export function wireSearchSuggestions({
       const headerH = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
       const gap = 14;
       const y = Math.max(0, window.scrollY + rect.top - headerH - gap);
+      flashLog(`${activeMode}:prePosition:target`, `targetY=${Math.round(y)}`);
       if(Math.abs(window.scrollY - y) > 1){
         window.scrollTo({ top: y, left: 0, behavior: "auto" });
+        flashLog(`${activeMode}:prePosition:afterScroll`);
       }
     }
 
     function scrollFilteredResultsToStart(){
+      flashLog(`${activeMode}:postScroll:schedule`);
       const rootId = activeMode === "index" ? "indexEventsRoot" : "eventsRoot";
       const root = $(rootId);
       if(!root) return;
@@ -188,12 +271,16 @@ export function wireSearchSuggestions({
           const headerH = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
           const gap = 14;
           const y = Math.max(0, window.scrollY + rect.top - headerH - gap);
+          flashLog(`${activeMode}:postScroll:target`, `targetY=${Math.round(y)}`);
           window.scrollTo({ top: y, left: 0, behavior: "auto" });
+          flashLog(`${activeMode}:postScroll:after`);
+          flashTraceFrames(`${activeMode}:afterPostScroll`, 18);
         });
       });
     }
 
     function stabilizeOpenHelperScroll(){
+      flashLog(`${activeMode}:stabilize:start`);
       if(!isActiveMode()) return;
       if(panel.hasAttribute("hidden")) return;
       if(!isSectionVisible()) return;
@@ -215,8 +302,10 @@ export function wireSearchSuggestions({
       const headerH = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
       const gap = 14;
       const y = Math.max(0, window.scrollY + rect.top - headerH - gap);
+      flashLog(`${activeMode}:stabilize:target`, `targetY=${Math.round(y)}`);
       if(Math.abs(window.scrollY - y) > 2){
         window.scrollTo({ top: y, left: 0, behavior: "auto" });
+        flashLog(`${activeMode}:stabilize:afterScroll`);
       }
     }
 
@@ -243,23 +332,30 @@ export function wireSearchSuggestions({
     }
 
     function applyZip({ force = false } = {}){
+      flashLog(`${activeMode}:applyZip:start`, `force=${force}`);
+      flashTraceFrames(`${activeMode}:applyZipTrace`, 24);
       // Button/Enter actions come from this exact ZIP section, so do not let
       // the shared view-mode check block the submit. The check remains for
       // passive refreshes and distance-segment changes.
-      if(!force && !isActiveMode()) return false;
+      if(!force && !isActiveMode()){ flashLog(`${activeMode}:applyZip:return:notActive`); return false; }
       const zip = sanitizeZip();
-      if(zip.length !== 5) return false;
+      if(zip.length !== 5){ flashLog(`${activeMode}:applyZip:return:badZip`, `zip=${zip}`); return false; }
       // Pre-position first, then update q + distFrom in the same synchronous
       // path. Do not close the helper until after render has rebuilt the final
       // filtered list; this keeps the helper covering the old list during the
       // update and avoids the visible old-list/new-list flash on EVENTS.
       prePositionResultsBeforeRender();
+      flashLog(`${activeMode}:writeZip:before`, `zip=${zip}`);
       writeZipToPrimarySearch(zip, { dispatch: false });
+      flashLog(`${activeMode}:writeZip:after`);
+      flashLog(`${activeMode}:onSelectOrigin:before`);
       if(typeof onSelectOrigin === "function") onSelectOrigin(zip);
+      flashLog(`${activeMode}:onSelectOrigin:after`);
       scrollFilteredResultsToStart();
       close();
       distInput?.blur();
       input.blur();
+      flashLog(`${activeMode}:applyZip:done`);
       return true;
     }
 
@@ -303,6 +399,7 @@ export function wireSearchSuggestions({
     let lastArrowSubmitAt = 0;
 
     function submitZipFromArrow(e){
+      flashLog(`${activeMode}:submitArrow`, e ? `type=${e.type}` : "");
       if(!distInput) return;
       if(e){
         e.preventDefault();
@@ -398,6 +495,31 @@ export function wireSearchSuggestions({
     setMiles: setEventsDistanceMiles,
     onSelectOrigin: onEventsDistanceSelectOrigin,
   });
+
+  try{
+    const obsCfg = { attributes: true, childList: true, subtree: false };
+    const watch = (id, label)=>{
+      const el = $(id);
+      if(!el || typeof MutationObserver !== "function") return;
+      const mo = new MutationObserver((records)=>{
+        const bits = records.map(r=>r.type === "attributes" ? `attr:${r.attributeName}` : `child:${r.addedNodes.length}/${r.removedNodes.length}`).join(",");
+        flashLog(`mut:${label}`, bits);
+      });
+      mo.observe(el, obsCfg);
+    };
+    watch("eventsRoot", "eventsRoot");
+    watch("indexEventsRoot", "indexRoot");
+    watch("stickyFilters", "stickyFilters");
+    watch("eventsSearchWrap", "searchWrap");
+    const header = document.querySelector(".header");
+    if(header && typeof MutationObserver === "function"){
+      const mo = new MutationObserver((records)=>{
+        const bits = records.map(r=>r.type === "attributes" ? `attr:${r.attributeName}` : `child:${r.addedNodes.length}/${r.removedNodes.length}`).join(",");
+        flashLog("mut:header", bits);
+      });
+      mo.observe(header, obsCfg);
+    }
+  }catch(_err){}
 
   function pointIsInsideRect(e, el, slop = 0){
     if(!el || !e) return false;
