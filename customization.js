@@ -8,6 +8,9 @@ export const CUSTOMIZATION = Object.freeze({
   // SITE HEADER NAME: browser/tab title value
   siteHeaderName: "ANY N.E. GRAPPLING (DEV)",
 
+  // GITHUB LINK: GitHub icon destination
+  githubLink: "https://github.com/anyjiujitsu/anyjiujitsu.github.io",
+
   // CONTACT LINK: message icon destination
   contactLink: "https://ig.me/m/any.jiujitsu",
 
