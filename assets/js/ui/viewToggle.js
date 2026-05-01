@@ -113,7 +113,7 @@ export function setViewUI(view, { $, onIndexViewOpen } = {}){
   if(evStatus) evStatus.hidden = (view !== "events");
   if(idxStatus) idxStatus.hidden = (view !== "index");
 
-  document.title = CUSTOMIZATION.siteHeaderName || "ANY N.E. GRAPPLING (DEV)";
+  document.title = CUSTOMIZATION.siteHeaderName || "UNDEFINED";
 
   setTransition(260);
   refreshEventsPillDots({ $, activeEventsState });
