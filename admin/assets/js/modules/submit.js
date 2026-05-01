@@ -158,7 +158,7 @@ async function appendCsvRow({ path, form, commitPrefix, validateAndStoreToken })
   return true;
 }
 
-export function initAdminForms({ validateAndStoreToken, setTokenStatus, geoController }){
+export function initAdminForms({ validateAndStoreToken, setTokenStatus, geoController, geoControllers }){
   const eventForm = document.getElementById('eventForm');
   const indexForm = document.getElementById('indexForm');
   const dateInput = eventForm?.querySelector('input[name="DATE"]');
@@ -178,7 +178,8 @@ export function initAdminForms({ validateAndStoreToken, setTokenStatus, geoContr
     const form = which === 'index' ? indexForm : eventForm;
     form?.reset();
     setCreatedDate(form);
-    if(which === 'index') geoController?.reset();
+    const controller = geoControllers?.[which] || (which === 'index' ? geoController : null);
+    controller?.reset();
     clearOpensDisplay(indexForm);
     if(which === 'event' && dayInput) dayInput.value = '';
   });
@@ -194,6 +195,7 @@ export function initAdminForms({ validateAndStoreToken, setTokenStatus, geoContr
       });
       eventForm.reset();
       setCreatedDate(eventForm);
+      geoControllers?.event?.reset();
       if(dayInput) dayInput.value = '';
     }catch(_e){
       setTokenStatus('FAILED');
@@ -211,6 +213,8 @@ export function initAdminForms({ validateAndStoreToken, setTokenStatus, geoContr
       });
       indexForm.reset();
       setCreatedDate(indexForm);
+      geoControllers?.index?.reset();
+      if(!geoControllers?.index) geoController?.reset();
       clearOpensDisplay(indexForm);
     }catch(_e){
       setTokenStatus('FAILED');
