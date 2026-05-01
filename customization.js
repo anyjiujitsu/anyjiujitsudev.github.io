@@ -17,6 +17,24 @@ export const CUSTOMIZATION = Object.freeze({
   // INSTAGRAM LINK: instagram icon destination
   instagramLink: "https://www.instagram.com/any.jiujitsu/",
 
+  // ADMIN GITHUB OWNER: GitHub account/organization that receives admin CSV commits
+  adminGitHubOwner: "anyjiujitsu",
+
+  // ADMIN GITHUB REPO: GitHub repository that receives admin CSV commits
+  adminGitHubRepo: "anyjiujitsudev.github.io",
+
+  // ADMIN GITHUB BRANCH: branch that receives admin CSV commits
+  adminGitHubBranch: "main",
+
+  // ADMIN EVENTS CSV PATH: repo path to the events CSV edited by admin
+  adminEventsCsvPath: "data/events.csv",
+
+  // ADMIN DIRECTORY CSV PATH: repo path to the directory CSV edited by admin
+  adminDirectoryCsvPath: "data/directory.csv",
+
+  // ADMIN TITLE SUFFIX: browser/tab suffix for the admin page
+  adminTitleSuffix: "Admin",
+
   // PAGE HEADER COLOR: title/filter/header accent color
   pageHeaderColor: "#234c31",
 
@@ -77,4 +95,16 @@ export function applyCustomization(customization = CUSTOMIZATION){
   if(contactLink && typeof customization.contactLink === "string" && customization.contactLink.trim()){
     contactLink.href = customization.contactLink.trim();
   }
+
+  const logoLabel = typeof customization.siteHeaderName === "string" && customization.siteHeaderName.trim()
+    ? `${customization.siteHeaderName.trim()} logo`
+    : "Site logo";
+
+  document.querySelectorAll('[data-customization-logo-label]').forEach((el) => {
+    el.setAttribute("aria-label", logoLabel);
+  });
+
+  document.querySelectorAll('[data-customization-logo-alt]').forEach((el) => {
+    el.setAttribute("alt", logoLabel);
+  });
 }
