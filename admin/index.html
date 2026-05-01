@@ -125,6 +125,15 @@
                   <option value="Rhode Island">Rhode Island</option>
                 </select>
 
+                <label class="adminLabel">LOCATION</label>
+                <div class="adminLatLonRow" aria-label="Event location coordinates">
+                  <!-- Display-only; hidden inputs carry values for submit -->
+                  <input class="adminInput" name="LON_display" inputmode="decimal" readonly placeholder="Longitude" />
+                  <input class="adminInput" name="LAT_display" inputmode="decimal" readonly placeholder="Latitude" />
+                  <input type="hidden" name="LON" />
+                  <input type="hidden" name="LAT" />
+                </div>
+
                 <label class="adminLabel">DATE<span class="req">*</span></label>
                 <!-- iOS Safari can oversize native date inputs; wrap + clip to keep width uniform -->
                 <div class="adminDateWrap" aria-label="Event date">
