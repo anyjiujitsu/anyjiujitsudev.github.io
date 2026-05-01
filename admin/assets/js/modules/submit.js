@@ -9,8 +9,8 @@ function customizationString(key, fallback){
   return typeof value === 'string' && value.trim() ? value.trim() : fallback;
 }
 
-const OWNER  = customizationString('adminGitHubOwner', 'anyjiujitsu');
-const REPO   = customizationString('adminGitHubRepo', 'anyjiujitsudev.github.io');
+const OWNER  = customizationString('adminGitHubOwner', '');
+const REPO   = customizationString('adminGitHubRepo', '');
 const BRANCH = customizationString('adminGitHubBranch', 'main');
 const EVENT_CSV_PATH = customizationString('adminEventsCsvPath', 'data/events.csv');
 const INDEX_CSV_PATH = customizationString('adminDirectoryCsvPath', 'data/directory.csv');
