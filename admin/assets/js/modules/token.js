@@ -1,7 +1,31 @@
 // admin/modules/token.js
 // purpose: GitHub token input, validation, and localStorage persistence
 
-const TOKEN_KEY = 'anyjj_admin_github_token';
+import { CUSTOMIZATION } from '../../../../customization.js';
+
+function customizationString(key, fallback = ''){
+  const value = CUSTOMIZATION?.[key];
+  return typeof value === 'string' && value.trim() ? value.trim() : fallback;
+}
+
+function tokenStorageKey(){
+  const explicitKey = customizationString('adminTokenStorageKey');
+  if(explicitKey) return explicitKey;
+
+  const owner = customizationString('adminGitHubOwner', 'site')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+  const repo = customizationString('adminGitHubRepo', 'repo')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+
+  return `admin_github_token_${owner || 'site'}_${repo || 'repo'}`;
+}
+
+const TOKEN_KEY = tokenStorageKey();
+const LEGACY_TOKEN_KEY = 'anyjj_admin_github_token';
 
 export function initTokenControls(){
   const tokenInput = document.getElementById('ghToken');
@@ -9,7 +33,7 @@ export function initTokenControls(){
   const eyeBtn = document.getElementById('toggleToken');
   const tokenStatus = document.getElementById('tokenStatus');
 
-  const saved = localStorage.getItem(TOKEN_KEY);
+  const saved = localStorage.getItem(TOKEN_KEY) || localStorage.getItem(LEGACY_TOKEN_KEY);
   if(saved && tokenInput) tokenInput.value = saved;
 
   function setTokenStatus(status){
