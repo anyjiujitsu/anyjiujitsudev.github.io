@@ -193,6 +193,71 @@ export function wireSearchSuggestions({
       });
     }
 
+    function guardResultsPaintDuringHelperScroll(root, fn){
+      // EVENTS needs the helper-open scroll stabilization from the validated
+      // ZIP flow, but mobile can briefly paint rows through the sticky header
+      // during that tiny scroll correction. Keep layout intact while suppressing
+      // only the results paint for the stabilization frame. This does not submit,
+      // filter, close the helper, or change INDEX behavior.
+      if(activeMode !== "events" || !root){
+        fn();
+        return;
+      }
+
+      const prevVisibility = root.style.visibility;
+      const prevPointerEvents = root.style.pointerEvents;
+      root.style.visibility = "hidden";
+      root.style.pointerEvents = "none";
+
+      try{
+        fn();
+      }finally{
+        window.requestAnimationFrame(()=>{
+          window.requestAnimationFrame(()=>{
+            root.style.visibility = prevVisibility;
+            root.style.pointerEvents = prevPointerEvents;
+          });
+        });
+      }
+    }
+
+    function stabilizeOpenHelperScroll(){
+      if(!isActiveMode()) return;
+      if(panel.hasAttribute("hidden")) return;
+      if(!isSectionVisible()) return;
+
+      const zip = sanitizeZip();
+      if(zip.length !== 5) return;
+
+      const rootId = activeMode === "index" ? "indexEventsRoot" : "eventsRoot";
+      const root = $(rootId);
+      if(!root) return;
+
+      // Mobile autocomplete can leave EVENTS scrolled partway down while the
+      // helper is still open. INDEX is already sitting at this top anchor when
+      // submit happens, which is why its filter transition feels smooth. Bring
+      // the page to the same helper-open anchor before the arrow submit, without
+      // submitting the ZIP, changing the search input, or closing the helper.
+      const rect = root.getBoundingClientRect();
+      const header = document.querySelector(".header");
+      const headerH = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
+      const gap = 14;
+      const y = Math.max(0, window.scrollY + rect.top - headerH - gap);
+      if(Math.abs(window.scrollY - y) > 2){
+        guardResultsPaintDuringHelperScroll(root, ()=>{
+          window.scrollTo({ top: y, left: 0, behavior: "auto" });
+        });
+      }
+    }
+
+    let stabilizeZipScrollTimer = 0;
+    function scheduleOpenHelperScrollStabilize(){
+      if(stabilizeZipScrollTimer) window.clearTimeout(stabilizeZipScrollTimer);
+      stabilizeZipScrollTimer = window.setTimeout(()=>{
+        stabilizeZipScrollTimer = 0;
+        stabilizeOpenHelperScroll();
+      }, 35);
+    }
 
     function sanitizeZip(){
       if(!distInput) return "";
@@ -256,7 +321,8 @@ export function wireSearchSuggestions({
 
     function handleZipValueRefresh(){
       if(!isActiveMode()) return;
-      sanitizeZip();
+      const zip = sanitizeZip();
+      if(zip.length === 5) scheduleOpenHelperScrollStabilize();
     }
 
     distInput?.addEventListener("input", handleZipValueRefresh);
