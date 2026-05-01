@@ -232,17 +232,24 @@ export function wireSearchSuggestions({
     let zipFocusLockTimer = 0;
     let zipFocusLockedY = 0;
     let zipFocusRestoring = false;
+    let zipFocusLockUntil = 0;
 
     function stopZipFocusScrollLock(){
       if(zipFocusLockTimer) window.clearTimeout(zipFocusLockTimer);
       zipFocusLockTimer = 0;
+      zipFocusLockUntil = 0;
     }
 
     function restoreZipFocusScroll(){
-      if(!zipFocusLockTimer) return;
+      const lockActive = zipFocusLockTimer || Date.now() < zipFocusLockUntil;
+      if(!lockActive) return;
       if(zipFocusRestoring) return;
-      if(!distInput || document.activeElement !== distInput) return;
+      if(!distInput) return;
       if(panel.hasAttribute("hidden") || !isSectionVisible()) return;
+      // On iOS the viewport can shift before focus fully lands on the input,
+      // and again while the autocomplete suggestion commits. Do not require
+      // activeElement here; the timed lock window is intentionally narrow.
+      if(activeMode !== "events") return;
 
       const currentY = Number(window.scrollY || 0);
       const targetY = Number(zipFocusLockedY || 0);
@@ -251,6 +258,21 @@ export function wireSearchSuggestions({
       zipFocusRestoring = true;
       window.scrollTo({ top: targetY, left: 0, behavior: "auto" });
       window.requestAnimationFrame(()=>{ zipFocusRestoring = false; });
+    }
+
+    function holdZipFocusScrollLock(ms = 1100){
+      zipFocusLockUntil = Math.max(zipFocusLockUntil, Date.now() + ms);
+      if(zipFocusLockTimer) window.clearTimeout(zipFocusLockTimer);
+      zipFocusLockTimer = window.setTimeout(()=>{
+        zipFocusLockTimer = 0;
+      }, ms);
+
+      window.requestAnimationFrame(restoreZipFocusScroll);
+      window.setTimeout(restoreZipFocusScroll, 0);
+      window.setTimeout(restoreZipFocusScroll, 25);
+      window.setTimeout(restoreZipFocusScroll, 75);
+      window.setTimeout(restoreZipFocusScroll, 150);
+      window.setTimeout(restoreZipFocusScroll, 300);
     }
 
     function startZipFocusScrollLock(){
@@ -264,15 +286,8 @@ export function wireSearchSuggestions({
       // alter the helper layout.
       if(activeMode !== "events") return;
 
-      zipFocusLockedY = Number(window.scrollY || 0);
-      stopZipFocusScrollLock();
-      zipFocusLockTimer = window.setTimeout(()=>{
-        zipFocusLockTimer = 0;
-      }, 900);
-
-      window.requestAnimationFrame(restoreZipFocusScroll);
-      window.setTimeout(restoreZipFocusScroll, 35);
-      window.setTimeout(restoreZipFocusScroll, 90);
+      if(!zipFocusLockTimer) zipFocusLockedY = Number(window.scrollY || 0);
+      holdZipFocusScrollLock(1200);
     }
 
     function sanitizeZip(){
@@ -337,20 +352,28 @@ export function wireSearchSuggestions({
 
     function handleZipValueRefresh(){
       if(!isActiveMode()) return;
+      if(activeMode === "events") holdZipFocusScrollLock(900);
       restoreZipFocusScroll();
       const zip = sanitizeZip();
       if(zip.length === 5) scheduleOpenHelperScrollStabilize();
     }
 
+    // Start the short iOS scroll lock before focus, so the locked scrollY is
+    // captured before Safari/Chrome auto-scrolls the viewport for suggestions.
+    ["pointerdown", "touchstart", "mousedown"].forEach((type)=>{
+      distInput?.addEventListener(type, startZipFocusScrollLock, { passive: true });
+    });
     distInput?.addEventListener("focus", startZipFocusScrollLock);
     distInput?.addEventListener("input", handleZipValueRefresh);
     distInput?.addEventListener("change", handleZipValueRefresh);
     distInput?.addEventListener("blur", ()=>{
       handleZipValueRefresh();
-      window.setTimeout(stopZipFocusScrollLock, 120);
+      holdZipFocusScrollLock(550);
+      window.setTimeout(stopZipFocusScrollLock, 620);
     });
     distInput?.addEventListener("focusout", ()=>{
-      window.setTimeout(stopZipFocusScrollLock, 120);
+      holdZipFocusScrollLock(550);
+      window.setTimeout(stopZipFocusScrollLock, 620);
     });
 
     window.addEventListener("scroll", restoreZipFocusScroll, { passive: true });
@@ -423,6 +446,7 @@ export function wireSearchSuggestions({
       if(!isSectionVisible()) return;
 
       if(pointIsOnDistanceSegment(e)){
+        stopZipFocusScrollLock();
         e.preventDefault();
         if(typeof e.stopImmediatePropagation === "function") e.stopImmediatePropagation();
         else e.stopPropagation();
