@@ -2,12 +2,18 @@
 // purpose: form normalization + GitHub CSV append/commit
 
 import { clearOpensDisplay, normalizeDirectoryTime } from './time.js';
+import { CUSTOMIZATION } from '../../../../customization.js';
 
-const OWNER  = 'anyjiujitsu';
-const REPO   = 'anyjiujitsudev.github.io';
-const BRANCH = 'main';
-const EVENT_CSV_PATH = 'data/events.csv';
-const INDEX_CSV_PATH = 'data/directory.csv';
+function customizationString(key, fallback){
+  const value = CUSTOMIZATION?.[key];
+  return typeof value === 'string' && value.trim() ? value.trim() : fallback;
+}
+
+const OWNER  = customizationString('adminGitHubOwner', 'anyjiujitsu');
+const REPO   = customizationString('adminGitHubRepo', 'anyjiujitsudev.github.io');
+const BRANCH = customizationString('adminGitHubBranch', 'main');
+const EVENT_CSV_PATH = customizationString('adminEventsCsvPath', 'data/events.csv');
+const INDEX_CSV_PATH = customizationString('adminDirectoryCsvPath', 'data/directory.csv');
 
 function b64DecodeUnicode(str){
   str = (str || '').replace(/\n/g,'');
