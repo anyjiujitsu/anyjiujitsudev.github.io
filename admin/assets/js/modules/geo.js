@@ -1,30 +1,36 @@
 // admin/modules/geo.js
-// purpose: Index form city/state -> LAT/LON auto-fill
+// purpose: Admin form city/state -> LAT/LON auto-fill for Index and Events
 
-export function setupIndexGeocode(indexForm){
-  const idxCity  = indexForm?.querySelector('input[name="CITY"]');
-  const idxState = indexForm?.querySelector('select[name="STATE"]');
-  const idxLat   = indexForm?.querySelector('input[name="LAT"]');
-  const idxLon   = indexForm?.querySelector('input[name="LON"]');
-  const idxLatD  = indexForm?.querySelector('input[name="LAT_display"]');
-  const idxLonD  = indexForm?.querySelector('input[name="LON_display"]');
+function getGeoFields(form){
+  return {
+    city: form?.querySelector('input[name="CITY"]'),
+    state: form?.querySelector('select[name="STATE"]'),
+    lat: form?.querySelector('input[name="LAT"]'),
+    lon: form?.querySelector('input[name="LON"]'),
+    latDisplay: form?.querySelector('input[name="LAT_display"]'),
+    lonDisplay: form?.querySelector('input[name="LON_display"]')
+  };
+}
+
+export function setupAdminGeocode(form){
+  const fields = getGeoFields(form);
 
   let geoTimer = null;
   let lastGeoQ = '';
 
-  function setIdxLatLon(lat, lon){
+  function setLatLon(lat, lon){
     const _lat = lat || '';
     const _lon = lon || '';
-    if(idxLat)  idxLat.value  = _lat;
-    if(idxLon)  idxLon.value  = _lon;
-    if(idxLatD) idxLatD.value = _lat;
-    if(idxLonD) idxLonD.value = _lon;
+    if(fields.lat) fields.lat.value = _lat;
+    if(fields.lon) fields.lon.value = _lon;
+    if(fields.latDisplay) fields.latDisplay.value = _lat;
+    if(fields.lonDisplay) fields.lonDisplay.value = _lon;
   }
 
   async function geocodeCityState(city, state){
     const q = `${city}, ${state}, USA`.trim();
     if(!city || !state){
-      setIdxLatLon('', '');
+      setLatLon('', '');
       return;
     }
     if(q === lastGeoQ) return;
@@ -36,30 +42,38 @@ export function setupIndexGeocode(indexForm){
       if(!res.ok) throw new Error('geocode_http_' + res.status);
       const data = await res.json();
       if(Array.isArray(data) && data[0] && data[0].lat && data[0].lon){
-        setIdxLatLon(String(data[0].lat), String(data[0].lon));
+        setLatLon(String(data[0].lat), String(data[0].lon));
       }else{
-        setIdxLatLon('', '');
+        setLatLon('', '');
       }
     }catch(_e){
-      setIdxLatLon('', '');
+      setLatLon('', '');
     }
   }
 
   function scheduleGeocode(){
-    if(!idxCity || !idxState) return;
-    const city = (idxCity.value || '').trim();
-    const state = (idxState.value || '').trim();
+    if(!fields.city || !fields.state) return;
+    const city = (fields.city.value || '').trim();
+    const state = (fields.state.value || '').trim();
     if(geoTimer) clearTimeout(geoTimer);
     geoTimer = setTimeout(() => geocodeCityState(city, state), 450);
   }
 
-  idxCity?.addEventListener('input', scheduleGeocode);
-  idxState?.addEventListener('change', scheduleGeocode);
+  fields.city?.addEventListener('input', scheduleGeocode);
+  fields.state?.addEventListener('change', scheduleGeocode);
 
   return {
     reset(){
+      if(geoTimer) clearTimeout(geoTimer);
+      geoTimer = null;
       lastGeoQ = '';
-      setIdxLatLon('', '');
-    }
+      setLatLon('', '');
+    },
+    refresh: scheduleGeocode
   };
+}
+
+// Backward-compatible export name for older admin.js versions.
+export function setupIndexGeocode(indexForm){
+  return setupAdminGeocode(indexForm);
 }
