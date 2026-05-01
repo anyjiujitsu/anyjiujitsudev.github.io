@@ -275,6 +275,34 @@ export function wireSearchSuggestions({
       window.setTimeout(restoreZipFocusScroll, 300);
     }
 
+    function prePositionZipInputForFocus(){
+      if(!distInput) return;
+      if(!isActiveMode()) return;
+      if(panel.hasAttribute("hidden") || !isSectionVisible()) return;
+      if(activeMode !== "events") return;
+
+      // iOS can push the entire page when focusing the lower EVENTS ZIP field.
+      // Put that field in a safe visible band before native focus/autocomplete
+      // runs, then lock that pre-focus Y through the suggestion commit window.
+      const rect = distInput.getBoundingClientRect();
+      const header = document.querySelector(".header");
+      const headerH = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
+      const safeTop = headerH + 92;
+      const safeBottom = Math.max(safeTop + 72, Math.floor((window.visualViewport?.height || window.innerHeight || 0) * 0.48));
+
+      let targetY = Number(window.scrollY || 0);
+      if(rect.top > safeBottom){
+        targetY = Math.max(0, targetY + rect.top - safeBottom);
+      }else if(rect.top < safeTop){
+        targetY = Math.max(0, targetY + rect.top - safeTop);
+      }
+
+      if(Math.abs(Number(window.scrollY || 0) - targetY) > 1){
+        window.scrollTo({ top: targetY, left: 0, behavior: "auto" });
+      }
+      zipFocusLockedY = Number(window.scrollY || 0);
+    }
+
     function startZipFocusScrollLock(){
       if(!distInput) return;
       if(!isActiveMode()) return;
@@ -286,8 +314,9 @@ export function wireSearchSuggestions({
       // alter the helper layout.
       if(activeMode !== "events") return;
 
+      prePositionZipInputForFocus();
       if(!zipFocusLockTimer) zipFocusLockedY = Number(window.scrollY || 0);
-      holdZipFocusScrollLock(1200);
+      holdZipFocusScrollLock(1400);
     }
 
     function sanitizeZip(){
