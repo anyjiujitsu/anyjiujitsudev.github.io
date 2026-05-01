@@ -696,7 +696,7 @@
 }
 
 .adminTokenStatus{
-  background: #e2e4e4 !important;
+  background: var(--table-field-column-color) !important;
   color: rgba(0,0,0,0.45) !important;
 }
 
@@ -705,7 +705,7 @@
   background: rgba(255,255,255,0.95) !important;
   border: 1px solid rgba(0,0,0,0.10) !important;
   box-shadow: 0 3px 8px rgba(0,0,0,0.12) !important;
-  color: #234c31 !important;
+  color: var(--icons-color) !important;
 }
 
 .adminFilters .distance__apply:hover,
