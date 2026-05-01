@@ -8,6 +8,47 @@ import { initWhereCitySuggestions } from './modules/suggestions.js';
 import { setupOpensTimeSync } from './modules/time.js';
 import { initTokenControls } from './modules/token.js';
 
+const FALLBACK_ADMIN_STATES = Object.freeze([
+  "Massachusetts",
+  "New Hampshire",
+  "Vermont",
+  "Maine",
+  "Connecticut",
+  "Rhode Island"
+]);
+
+function getAdminStateOptions(customization){
+  if(!customization || !Array.isArray(customization.adminStates)){
+    return FALLBACK_ADMIN_STATES;
+  }
+
+  const states = customization.adminStates
+    .map((state) => typeof state === "string" ? state.trim() : "")
+    .filter(Boolean);
+
+  return states.length ? states : FALLBACK_ADMIN_STATES;
+}
+
+function populateAdminStateSelects(customization){
+  const states = getAdminStateOptions(customization);
+
+  document.querySelectorAll('select[data-customization-select="adminStates"]').forEach((select) => {
+    const currentValue = select.value;
+    select.innerHTML = '<option value="">Select…</option>';
+
+    states.forEach((state) => {
+      const option = document.createElement("option");
+      option.value = state;
+      option.textContent = state;
+      select.appendChild(option);
+    });
+
+    if(currentValue && states.includes(currentValue)){
+      select.value = currentValue;
+    }
+  });
+}
+
 async function loadAdminCustomization(){
   try{
     const mod = await import(`../../../customization.js?v=${Date.now()}`);
@@ -17,6 +58,8 @@ async function loadAdminCustomization(){
       mod.applyCustomization(customization);
     }
 
+    populateAdminStateSelects(customization);
+
     const siteName = typeof customization.siteHeaderName === "string"
       ? customization.siteHeaderName.trim()
       : "";
@@ -25,8 +68,11 @@ async function loadAdminCustomization(){
       : "Admin";
 
     document.title = `${siteName || "UNDEFINED"} - ${adminSuffix}`;
+    return customization;
   } catch(err){
     console.warn("Admin customization failed to load", err);
+    populateAdminStateSelects({});
+    return {};
   }
 }
 
