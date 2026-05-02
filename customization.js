@@ -27,10 +27,10 @@ export const CUSTOMIZATION = Object.freeze({
   adminGitHubBranch: "main",
 
   // ADMIN EVENTS CSV PATH: repo path to the events CSV edited by admin
-  adminEventsCsvPath: "data/events.csv",
+  adminEventsCsvPath: "events.csv",
 
   // ADMIN DIRECTORY CSV PATH: repo path to the directory CSV edited by admin
-  adminDirectoryCsvPath: "data/directory.csv",
+  adminDirectoryCsvPath: "directory.csv",
 
   // ADMIN TOKEN STORAGE KEY: optional local browser storage key for the GitHub token.
   // Leave blank to auto-generate a unique key from adminGitHubOwner + adminGitHubRepo.
