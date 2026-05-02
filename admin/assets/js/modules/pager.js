@@ -13,7 +13,7 @@ export function initAdminPager(){
     const isIndex = view === 'index';
     tabs.forEach(btn => btn.setAttribute('aria-selected', String(btn.dataset.view === view)));
     toggle.style.setProperty('--viewProgress', isIndex ? 1 : 0);
-    titleEl.textContent = isIndex ? 'INDEX – ADD NEW' : 'EVENTS – ADD NEW (DEV)';
+    titleEl.textContent = isIndex ? 'INDEX – ADD NEW' : 'EVENTS – ADD NEW';
   }
 
   function scrollToView(view){
