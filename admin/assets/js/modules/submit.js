@@ -12,8 +12,8 @@ function customizationString(key, fallback){
 const OWNER  = customizationString('adminGitHubOwner', '');
 const REPO   = customizationString('adminGitHubRepo', '');
 const BRANCH = customizationString('adminGitHubBranch', 'main');
-const EVENT_CSV_PATH = customizationString('adminEventsCsvPath', 'data/events.csv');
-const INDEX_CSV_PATH = customizationString('adminDirectoryCsvPath', 'data/directory.csv');
+const EVENT_CSV_PATH = customizationString('adminEventsCsvPath', 'events.csv');
+const INDEX_CSV_PATH = customizationString('adminDirectoryCsvPath', 'directory.csv');
 
 function b64DecodeUnicode(str){
   str = (str || '').replace(/\n/g,'');
