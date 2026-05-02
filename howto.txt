@@ -1,0 +1,951 @@
+# ANY Site Setup How-To
+
+This guide walks you through how to take the completed ANY site codebase and turn it into your own live website.
+
+The goal is to let a new user copy the site, customize the branding, replace the starter data, and use the admin panel to update the site later.
+
+---
+
+## 1. What You Need Before Starting
+
+Before you begin, have these ready:
+
+- A GitHub account
+- The completed site codebase ZIP file
+- A replacement logo named `logo.png`
+- Your completed `events.csv` file
+- Your completed `directory.csv` file
+- A safe place to save your GitHub admin token later
+
+You do not need to install coding software to complete the basic setup. The setup can be done through GitHub in a web browser.
+
+---
+
+## 2. Create a GitHub Account
+
+Go to GitHub and create a free account.
+
+Important: your GitHub username matters.
+
+For the easiest version of this setup, your GitHub username becomes part of your live website address.
+
+For example, if your GitHub username is:
+
+```text
+bostonbjjfinder
+```
+
+then your site can become:
+
+```text
+https://bostonbjjfinder.github.io
+```
+
+Choose the username carefully. It should be short, readable, and connected to the website name or brand you want people to see.
+
+After creating the account, verify your email address if GitHub asks you to.
+
+Reference: GitHub's account setup documentation says a personal account requires creating the account and verifying the email address.
+
+---
+
+## 3. Create the Correct GitHub Repository
+
+Once your GitHub account is created, you need to create the repository that will hold the website files.
+
+A repository is the folder on GitHub where the website code lives.
+
+For a simple GitHub Pages website, name the repository exactly like this:
+
+```text
+YOUR-GITHUB-USERNAME.github.io
+```
+
+Replace `YOUR-GITHUB-USERNAME` with your actual GitHub username.
+
+Example:
+
+```text
+bostonbjjfinder.github.io
+```
+
+If your username is `bostonbjjfinder`, then the repository should be:
+
+```text
+bostonbjjfinder.github.io
+```
+
+This naming is important because GitHub Pages uses this format to create the default live website address.
+
+### Repository Settings
+
+When creating the repository:
+
+- Set the repository name to `yourusername.github.io`
+- Set visibility to `Public`
+- Do not add a README if you are uploading the full codebase immediately
+- Create the repository
+
+Reference: GitHub's Pages quickstart uses `username.github.io` as the repository name for a user site.
+
+---
+
+## 4. Upload the Codebase ZIP Contents to GitHub
+
+You should upload the contents of the completed codebase ZIP into your new GitHub repository.
+
+Important: upload the files inside the ZIP, not the ZIP file itself.
+
+### Steps
+
+1. Open the codebase ZIP on your computer.
+2. Open the folder inside the ZIP.
+3. Select all the files and folders inside it.
+4. Go to your GitHub repository.
+5. Click **Add file**.
+6. Click **Upload files**.
+7. Drag the selected files and folders into GitHub.
+8. Scroll down and click **Commit changes**.
+
+After upload, your repository should show files like:
+
+```text
+index.html
+customization.js
+logo.png
+events.csv
+directory.csv
+*howto.md
+admin/
+assets/
+```
+
+If you only see one uploaded ZIP file, the site will not work. You need the actual files and folders extracted into the repository.
+
+---
+
+## 5. Make the Page a Live Website
+
+After the files are uploaded, turn on GitHub Pages.
+
+### Steps
+
+1. Open your repository on GitHub.
+2. Click **Settings**.
+3. In the left menu, click **Pages**.
+4. Under **Build and deployment**, find **Source**.
+5. Select **Deploy from a branch** if it is not already selected.
+6. Under **Branch**, choose:
+
+```text
+main
+```
+
+7. Choose the root folder option:
+
+```text
+/ (root)
+```
+
+8. Click **Save**.
+
+GitHub will publish the website from the files in your repository.
+
+Your site address should look like:
+
+```text
+https://YOUR-GITHUB-USERNAME.github.io
+```
+
+Example:
+
+```text
+https://bostonbjjfinder.github.io
+```
+
+### First Site Check
+
+Open the live site and confirm the default version loads before customizing anything.
+
+Check that:
+
+- The homepage loads
+- The events page loads
+- The directory/search area loads
+- The admin page opens
+- The logo appears
+- The sample ANY data appears
+
+This gives you a baseline. If something breaks later, it most likely came from a customization or data change.
+
+Reference: GitHub Pages can publish a website directly from a repository, and GitHub's Pages setup allows selecting a branch as the publishing source.
+
+---
+
+## 6. Files You Should Edit
+
+Most users only need to edit these files:
+
+```text
+customization.js
+logo.png
+events.csv
+directory.csv
+```
+
+These are the main files that turn the starter ANY site into your own site.
+
+---
+
+## 7. Files You Should Not Edit Unless You Know What You Are Doing
+
+Avoid editing these unless you are intentionally changing the site code:
+
+```text
+index.html
+admin/index.html
+assets/js/
+assets/css/
+admin/assets/js/
+admin/assets/css/
+```
+
+The site is already wired to read from the customization and CSV files. For normal setup, you should not need to change the HTML, CSS, or JavaScript files.
+
+---
+
+## 8. Update `customization.js`
+
+The `customization.js` file controls the site's brand name, social links, admin repository connection, dropdown options, and colors.
+
+Open:
+
+```text
+customization.js
+```
+
+Only edit the values inside the quotes or the listed dropdown values. Do not rename the setting keys.
+
+### Mandatory Changes
+
+These should be changed so the site no longer points to ANY branding or ANY GitHub settings.
+
+#### Site Header Name
+
+```js
+siteHeaderName: "ANY N.E. GRAPPLING (DEV)",
+```
+
+Change this to your site name.
+
+Example:
+
+```js
+siteHeaderName: "BOSTON BJJ FINDER",
+```
+
+This controls the browser/tab title and logo accessibility label.
+
+#### GitHub Link
+
+```js
+githubLink: "https://github.com/anyjiujitsu/anyjiujitsu.github.io",
+```
+
+Change this to your GitHub repository link.
+
+Example:
+
+```js
+githubLink: "https://github.com/bostonbjjfinder/bostonbjjfinder.github.io",
+```
+
+#### Contact Link
+
+```js
+contactLink: "https://ig.me/m/any.jiujitsu",
+```
+
+Change this to the contact method you want users to use.
+
+Example:
+
+```js
+contactLink: "https://ig.me/m/bostonbjjfinder",
+```
+
+#### Instagram Link
+
+```js
+instagramLink: "https://www.instagram.com/any.jiujitsu/",
+```
+
+Change this to your Instagram page.
+
+Example:
+
+```js
+instagramLink: "https://www.instagram.com/bostonbjjfinder/",
+```
+
+#### Admin GitHub Owner
+
+```js
+adminGitHubOwner: "anyjiujitsu",
+```
+
+Change this to your GitHub username.
+
+Example:
+
+```js
+adminGitHubOwner: "bostonbjjfinder",
+```
+
+#### Admin GitHub Repo
+
+```js
+adminGitHubRepo: "anyjiujitsudev.github.io",
+```
+
+Change this to your repository name.
+
+Example:
+
+```js
+adminGitHubRepo: "bostonbjjfinder.github.io",
+```
+
+#### Admin GitHub Branch
+
+```js
+adminGitHubBranch: "main",
+```
+
+Most users should leave this as:
+
+```js
+adminGitHubBranch: "main",
+```
+
+Only change it if your repository uses a different branch.
+
+#### Admin CSV Paths
+
+```js
+adminEventsCsvPath: "events.csv",
+adminDirectoryCsvPath: "directory.csv",
+```
+
+Leave these as-is unless you intentionally move the CSV files.
+
+For the current codebase, the CSV files live in the root of the repository, so these paths should stay:
+
+```js
+adminEventsCsvPath: "events.csv",
+adminDirectoryCsvPath: "directory.csv",
+```
+
+### Recommended Changes
+
+#### Admin State Options
+
+This controls the state dropdown values in the admin panel.
+
+```js
+adminStates: [
+  "Massachusetts",
+  "New Hampshire",
+  "Vermont",
+  "Maine",
+  "Connecticut",
+  "Rhode Island"
+],
+```
+
+Change this list to match your region.
+
+Example:
+
+```js
+adminStates: [
+  "Massachusetts",
+  "Rhode Island",
+  "Connecticut"
+],
+```
+
+#### Admin Event Type Options
+
+This controls the event type dropdown in the admin panel.
+
+```js
+adminEventTypes: [
+  "Seminar",
+  "Open Mat",
+  "Women's Only",
+  "Workshop",
+  "Charity Event",
+  "Comp",
+  "Comp (Invite)",
+  "Tournament",
+  "Grand Opening",
+  "Kids Event",
+  "Open House",
+  "Self Defense"
+],
+```
+
+Edit the list to match the categories your site should use.
+
+### Optional Changes
+
+You can also update the site colors:
+
+```js
+pageHeaderColor
+iconsColor
+pageBackgroundColor
+tableHeaderColumnColor
+tableFieldColumnColor
+tableTextLine1Color
+tableTextLine2Color
+```
+
+Color values can be hex values like:
+
+```text
+#234c31
+```
+
+Keep the commas and quotes in place.
+
+---
+
+## 9. Replace `logo.png`
+
+The logo file is named:
+
+```text
+logo.png
+```
+
+To customize the logo, replace the existing `logo.png` file with your own file using the exact same file name.
+
+### Logo Requirements
+
+Use:
+
+```text
+logo.png
+```
+
+Recommended dimensions:
+
+```text
+1200 x 710 px
+```
+
+The current production logo uses those dimensions.
+
+Recommended format:
+
+```text
+PNG with a transparent background
+```
+
+A transparent background helps the logo sit cleanly on the site header without a visible box around it.
+
+### How to Replace It
+
+1. Create your new logo as a PNG.
+2. Make sure it is named exactly:
+
+```text
+logo.png
+```
+
+3. In GitHub, open your repository.
+4. Click the existing `logo.png` file.
+5. Delete or replace it with your new `logo.png`.
+6. Commit the change.
+
+Do not rename it to something like:
+
+```text
+my-logo.png
+Logo.png
+logo-final.png
+```
+
+The code is looking for:
+
+```text
+logo.png
+```
+
+---
+
+## 10. Prepare the CSV Data Files
+
+The site uses two main CSV files:
+
+```text
+events.csv
+directory.csv
+```
+
+These files power the public site and the admin panel.
+
+You will download the templates, add your own data, save them as CSV files, and upload them to overwrite the starter files.
+
+---
+
+## 11. Events CSV
+
+The events file must be named:
+
+```text
+events.csv
+```
+
+The header row must stay exactly:
+
+```csv
+EVENT,FOR,WHERE,CITY,STATE,DAY,DATE,MEMBER,NONMEMBER,PRESALE,CASH,VENMO,SIGN UP,LAT,LON,CREATED
+```
+
+Do not rename, reorder, or delete the columns.
+
+### Events Template
+
+The starter template is:
+
+```csv
+EVENT,FOR,WHERE,CITY,STATE,DAY,DATE,MEMBER,NONMEMBER,PRESALE,CASH,VENMO,SIGN UP,LAT,LON,CREATED
+,,,,,,,,,,,,,,,
+```
+
+### Events Field Notes
+
+- `EVENT`: event type, such as Seminar, Open Mat, Tournament, Workshop
+- `FOR`: who the event is for or who is teaching it, depending on the event
+- `WHERE`: gym, academy, or venue name
+- `CITY`: city
+- `STATE`: state
+- `DAY`: day of week
+- `DATE`: event date
+- `MEMBER`: member price, if applicable
+- `NONMEMBER`: non-member price, if applicable
+- `PRESALE`: presale price, if applicable
+- `CASH`: cash payment info, if applicable
+- `VENMO`: Venmo/payment info, if applicable
+- `SIGN UP`: signup link, if applicable
+- `LAT`: approximate latitude
+- `LON`: approximate longitude
+- `CREATED`: created date or tracking date
+
+Blank fields are okay when a value does not apply.
+
+---
+
+## 12. Directory CSV
+
+The directory file must be named:
+
+```text
+directory.csv
+```
+
+The header row must stay exactly:
+
+```csv
+STATE,CITY,NAME,IG,SAT,SUN,OTA,CREATED,LAT,LON
+```
+
+Do not rename, reorder, or delete the columns.
+
+### Directory Template
+
+The starter template is:
+
+```csv
+STATE,CITY,NAME,IG,SAT,SUN,OTA,CREATED,LAT,LON
+,,,,,,,,,
+```
+
+### Directory Field Notes
+
+- `STATE`: state
+- `CITY`: city
+- `NAME`: gym or academy name
+- `IG`: Instagram handle or Instagram link
+- `SAT`: Saturday open mat or schedule info
+- `SUN`: Sunday open mat or schedule info
+- `OTA`: open to all; use `Y`, `N`, or leave blank
+- `CREATED`: created date or tracking date
+- `LAT`: approximate latitude
+- `LON`: approximate longitude
+
+Important: `LAT` and `LON` are approximate city/state coordinates. They are not intended to be exact street-address coordinates.
+
+---
+
+## 13. CSV Formatting Rules
+
+Follow these rules for both CSV files:
+
+- Keep the exact header row
+- Keep the file saved as `.csv`
+- Do not upload an `.xlsx` Excel file in place of the CSV
+- Do not rename the files
+- Do not delete required columns
+- Avoid commas inside fields unless your CSV editor properly wraps the field in quotes
+- Blank fields are allowed
+- Save using standard CSV formatting
+
+The two required file names are:
+
+```text
+events.csv
+directory.csv
+```
+
+---
+
+## 14. Using GPT to Fill LAT and LON Values
+
+The site uses approximate `LAT` and `LON` values for city/state locations.
+
+You can use GPT to help fill those values from your CSV.
+
+### Recommended GPT Prompt
+
+Copy your CSV data into GPT and use this prompt:
+
+```text
+I am going to provide a CSV for my website. Please fill in the LAT and LON columns using approximate city/state coordinates only. Do not use exact street addresses. Do not change any existing values, column names, row order, spelling, punctuation, or formatting other than filling blank LAT and LON fields. Return the full CSV back to me with the same headers and all original rows preserved.
+
+Use coordinates in decimal format similar to:
+42.5874097,-72.6002294
+
+If a city/state is ambiguous, use the approximate center of that city in that state. If LAT or LON is already filled, leave it unchanged.
+```
+
+Then paste the CSV below the prompt.
+
+### Important Review Step
+
+After GPT returns the CSV:
+
+1. Check that all rows are still present.
+2. Check that the header row did not change.
+3. Check that the order of rows did not change.
+4. Check that only `LAT` and `LON` were filled.
+5. Save the result as CSV.
+
+---
+
+## 15. Upload Your CSV Files to GitHub
+
+After your CSV files are complete, upload them to GitHub and overwrite the starter files.
+
+### Replace `events.csv`
+
+1. Open your GitHub repository.
+2. Click `events.csv`.
+3. Use GitHub's edit/upload controls to replace the contents or upload the new file.
+4. Make sure the file is still named exactly:
+
+```text
+events.csv
+```
+
+5. Commit the change.
+
+### Replace `directory.csv`
+
+1. Open your GitHub repository.
+2. Click `directory.csv`.
+3. Use GitHub's edit/upload controls to replace the contents or upload the new file.
+4. Make sure the file is still named exactly:
+
+```text
+directory.csv
+```
+
+5. Commit the change.
+
+After committing, refresh your live site and confirm the new data appears.
+
+---
+
+## 16. Two Ways to Update Data Later
+
+After the site is live, you have two ways to update your event and directory data.
+
+### Option 1: Manually Replace the CSV Files in GitHub
+
+You can directly edit or replace:
+
+```text
+events.csv
+directory.csv
+```
+
+inside GitHub.
+
+This is useful for large updates or bulk CSV cleanup.
+
+### Option 2: Use the Admin Panel
+
+The admin panel lets you add/update data from the website interface.
+
+For the admin panel to save changes back to GitHub, it needs a fine-grained GitHub token.
+
+The token acts like a password that allows the admin panel to update the CSV files in your repository.
+
+---
+
+## 17. Create the Fine-Grained GitHub Token for the Admin Panel
+
+The admin panel needs permission to write updates to your repository.
+
+To do that, create a fine-grained personal access token in GitHub.
+
+Think of this token as the admin password for updating your site's data tables.
+
+### Important Safety Rules
+
+Treat this token like a password.
+
+Do not:
+
+- Post it publicly
+- Put it in `customization.js`
+- Commit it into GitHub
+- Share it with people who should not edit your site
+- Screenshot it publicly
+
+Do:
+
+- Save it somewhere private
+- Use it only in your admin panel
+- Regenerate it if you think it was exposed
+
+Reference: GitHub describes personal access tokens as password-like credentials and recommends fine-grained tokens when possible because they can be limited to specific repositories and permissions.
+
+### Suggested Token Setup
+
+In GitHub:
+
+1. Click your profile picture.
+2. Click **Settings**.
+3. Go to **Developer settings**.
+4. Go to **Personal access tokens**.
+5. Choose **Fine-grained tokens**.
+6. Click **Generate new token**.
+7. Give the token a clear name, such as:
+
+```text
+ANY Site Admin Token
+```
+
+8. Set the resource owner to your GitHub account.
+9. Select only your website repository.
+10. Set repository permissions for contents so the admin panel can read and write the CSV files.
+11. Generate the token.
+12. Copy it immediately.
+13. Save it somewhere private.
+
+GitHub may only show the token once. If you lose it, you may need to create a new one.
+
+---
+
+## 18. Use the Token in the Admin Panel
+
+After the token is created and saved, open your admin page.
+
+Your admin page should be located at:
+
+```text
+https://YOUR-GITHUB-USERNAME.github.io/admin/
+```
+
+Example:
+
+```text
+https://bostonbjjfinder.github.io/admin/
+```
+
+Paste the token into the token field in the admin panel.
+
+The admin panel uses the token to save changes to:
+
+```text
+events.csv
+directory.csv
+```
+
+Once the token is entered, test by adding or editing one small entry.
+
+Then check GitHub to confirm the CSV file updated.
+
+Then refresh the live site to confirm the public page displays the update.
+
+---
+
+## 19. Final Launch Checklist
+
+Before sharing the website publicly, test the full site.
+
+### Public Site
+
+Check:
+
+- Homepage loads
+- Logo appears correctly
+- Site name/browser title is correct
+- GitHub icon link works
+- Instagram icon link works
+- Contact link works
+- Events data appears
+- Directory data appears
+- Search works
+- Filters work
+- Mobile layout looks good
+- Desktop layout looks good
+
+### CSV/Data
+
+Check:
+
+- `events.csv` has the correct header
+- `directory.csv` has the correct header
+- Files are saved as `.csv`
+- LAT/LON values are filled where needed
+- No rows are missing
+- No columns were renamed
+
+### Admin Panel
+
+Check:
+
+- Admin page opens
+- Token can be entered
+- State dropdown has the correct states
+- Event dropdown has the correct event types
+- A test update saves to GitHub
+- The public site reflects the update after refresh
+
+---
+
+## 20. Optional: Connect a Custom Domain Later
+
+The default website address will look like:
+
+```text
+https://YOUR-GITHUB-USERNAME.github.io
+```
+
+Later, you can connect a custom domain if you want the site to use something like:
+
+```text
+https://yourbrand.com
+```
+
+This is optional and not required for the basic site setup.
+
+Reference: GitHub Pages supports custom domains through repository settings and DNS configuration.
+
+---
+
+## 21. Common Mistakes to Avoid
+
+### Uploading the ZIP Instead of the Files
+
+Wrong:
+
+```text
+ANYJJPROD_5.0.0.zip
+```
+
+Right:
+
+```text
+index.html
+customization.js
+logo.png
+events.csv
+directory.csv
+admin/
+assets/
+```
+
+### Naming the Repository Incorrectly
+
+Wrong:
+
+```text
+my-website
+```
+
+Right for a user GitHub Pages site:
+
+```text
+yourusername.github.io
+```
+
+### Renaming Required Files
+
+Do not rename:
+
+```text
+logo.png
+events.csv
+directory.csv
+customization.js
+```
+
+### Changing CSV Headers
+
+Do not change the header rows.
+
+The site expects the exact column names.
+
+### Putting the Token in the Code
+
+Do not paste the GitHub token into any code file.
+
+The token should only be entered into the admin panel and stored privately.
+
+---
+
+## 22. Quick Setup Summary
+
+1. Create a GitHub account.
+2. Choose your GitHub username carefully because it becomes part of your site URL.
+3. Create a repository named `yourusername.github.io`.
+4. Upload the extracted codebase files, not the ZIP itself.
+5. Enable GitHub Pages from the `main` branch and root folder.
+6. Confirm the default site loads.
+7. Edit `customization.js` with your site name, links, GitHub owner, and GitHub repo.
+8. Replace `logo.png` with a transparent PNG, recommended size `1200 x 710 px`.
+9. Fill out `events.csv` and `directory.csv` using the templates.
+10. Use GPT to help fill approximate LAT/LON values if needed.
+11. Upload the completed CSV files to overwrite the starter files.
+12. Create a fine-grained GitHub token for admin access.
+13. Save the token privately.
+14. Enter the token in the admin panel.
+15. Test the site on desktop and mobile.
+
+---
+
+## Source References
+
+- GitHub account setup: https://docs.github.com/en/get-started/start-your-journey/creating-an-account-on-github
+- GitHub Pages quickstart: https://docs.github.com/pages/quickstart
+- Creating a GitHub Pages site: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site
+- Managing personal access tokens: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
+- Fine-grained token permissions: https://docs.github.com/en/rest/authentication/permissions-required-for-fine-grained-personal-access-tokens
+- GitHub Pages custom domains: https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site
