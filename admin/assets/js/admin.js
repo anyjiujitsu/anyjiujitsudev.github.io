@@ -17,36 +17,56 @@ const FALLBACK_ADMIN_STATES = Object.freeze([
   "Rhode Island"
 ]);
 
-function getAdminStateOptions(customization){
-  if(!customization || !Array.isArray(customization.adminStates)){
-    return FALLBACK_ADMIN_STATES;
+const FALLBACK_ADMIN_EVENT_TYPES = Object.freeze([
+  "Seminar",
+  "Open Mat",
+  "Women's Only",
+  "Workshop",
+  "Charity Event",
+  "Comp",
+  "Comp (Invite)",
+  "Tournament",
+  "Grand Opening",
+  "Kids Event",
+  "Open House",
+  "Self Defense"
+]);
+
+function getCustomizationList(customization, key, fallbackValues){
+  if(!customization || !Array.isArray(customization[key])){
+    return fallbackValues;
   }
 
-  const states = customization.adminStates
-    .map((state) => typeof state === "string" ? state.trim() : "")
+  const values = customization[key]
+    .map((value) => typeof value === "string" ? value.trim() : "")
     .filter(Boolean);
 
-  return states.length ? states : FALLBACK_ADMIN_STATES;
+  return values.length ? values : fallbackValues;
 }
 
-function populateAdminStateSelects(customization){
-  const states = getAdminStateOptions(customization);
+function populateCustomizationSelects(customization, key, fallbackValues){
+  const values = getCustomizationList(customization, key, fallbackValues);
 
-  document.querySelectorAll('select[data-customization-select="adminStates"]').forEach((select) => {
+  document.querySelectorAll(`select[data-customization-select="${key}"]`).forEach((select) => {
     const currentValue = select.value;
     select.innerHTML = '<option value="">Select…</option>';
 
-    states.forEach((state) => {
+    values.forEach((value) => {
       const option = document.createElement("option");
-      option.value = state;
-      option.textContent = state;
+      option.value = value;
+      option.textContent = value;
       select.appendChild(option);
     });
 
-    if(currentValue && states.includes(currentValue)){
+    if(currentValue && values.includes(currentValue)){
       select.value = currentValue;
     }
   });
+}
+
+function populateAdminSelects(customization){
+  populateCustomizationSelects(customization, "adminStates", FALLBACK_ADMIN_STATES);
+  populateCustomizationSelects(customization, "adminEventTypes", FALLBACK_ADMIN_EVENT_TYPES);
 }
 
 async function loadAdminCustomization(){
@@ -58,7 +78,7 @@ async function loadAdminCustomization(){
       mod.applyCustomization(customization);
     }
 
-    populateAdminStateSelects(customization);
+    populateAdminSelects(customization);
 
     const siteName = typeof customization.siteHeaderName === "string"
       ? customization.siteHeaderName.trim()
@@ -71,7 +91,7 @@ async function loadAdminCustomization(){
     return customization;
   } catch(err){
     console.warn("Admin customization failed to load", err);
-    populateAdminStateSelects({});
+    populateAdminSelects({});
     return {};
   }
 }
