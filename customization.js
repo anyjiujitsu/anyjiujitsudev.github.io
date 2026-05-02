@@ -47,6 +47,23 @@ export const CUSTOMIZATION = Object.freeze({
     "Rhode Island"
   ],
 
+  // ADMIN EVENT TYPE OPTIONS: values shown in the EVENT dropdown on the admin event form.
+  // Edit this list to match the event categories for your site.
+  adminEventTypes: [
+    "Seminar",
+    "Open Mat",
+    "Women's Only",
+    "Workshop",
+    "Charity Event",
+    "Comp",
+    "Comp (Invite)",
+    "Tournament",
+    "Grand Opening",
+    "Kids Event",
+    "Open House",
+    "Self Defense"
+  ],
+
   // ADMIN TITLE SUFFIX: browser/tab suffix for the admin page
   adminTitleSuffix: "Admin",
 
