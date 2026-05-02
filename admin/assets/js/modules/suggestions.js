@@ -3,7 +3,7 @@
 
 import { parseCSVRows } from '../../../../assets/js/utils/csv.js';
 
-const PUBLIC_EVENTS_CSV = '../data/events.csv';
+const PUBLIC_EVENTS_CSV = '../events.csv';
 
 function uniqueNonEmpty(values){
   const seen = new Set();
