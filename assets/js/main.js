@@ -157,8 +157,8 @@ async function init(){
   $("eventsStatus").textContent = "Loading...";
 
   const [dirRaw, evRaw] = await Promise.all([
-    loadCSV("data/directory.csv"),
-    loadCSV("data/events.csv").catch(()=>[])
+    loadCSV("directory.csv"),
+    loadCSV("events.csv").catch(()=>[])
   ]);
 
   directoryRows = dirRaw.map(normalizeDirectoryRow);
