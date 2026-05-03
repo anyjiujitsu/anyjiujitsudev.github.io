@@ -22,7 +22,11 @@ function clauses(q){
 function includesAllWords(hay, needle){
   const words = norm(needle).split(" ").filter(Boolean);
   if(!words.length) return true;
-  const h = String(hay ?? "");
+
+  // Normalize the searchable text too, not only the typed query.
+  // This keeps generated group labels like "June 2026" searchable when
+  // the user types lowercase values like "june" or "june 2026".
+  const h = norm(hay);
   return words.every(w => h.includes(w));
 }
 
