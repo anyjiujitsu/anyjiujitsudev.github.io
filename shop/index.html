@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="../assets/css/components.css" />
 
   <style>
-    /* section: shop page | purpose: standalone shop layout matching main site theme */
+    /* section: shop page | purpose: standalone storefront matching the main ANY site theme */
     .shopPage{
       min-height: 100svh;
       background: var(--bg);
@@ -26,7 +26,7 @@
     .shopContent{
       max-width: var(--maxW);
       margin: 0 auto;
-      padding: 18px var(--pagePad) 64px;
+      padding: 18px var(--pagePad) 72px;
     }
 
     .shopIntro{
@@ -34,11 +34,12 @@
       color: var(--muted);
       font-size: 14px;
       line-height: 1.45;
+      text-align: center;
     }
 
     .shopList{
       display: grid;
-      gap: 22px;
+      gap: 24px;
     }
 
     .shopItem{
@@ -51,30 +52,22 @@
 
     .shopItem__media{
       background:
-        linear-gradient(135deg, rgba(232, 221, 198, 0.90), rgba(226, 228, 228, 0.95));
+        radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.78), rgba(232, 221, 198, 0.80) 38%, rgba(226, 228, 228, 0.95) 100%);
       border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-      min-height: 360px;
+      min-height: 390px;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 28px;
+      padding: 26px 18px;
     }
 
-    .shopItem__placeholder{
-      width: min(100%, 420px);
-      aspect-ratio: 1 / 1;
-      border: 2px dashed rgba(35, 76, 49, 0.35);
-      border-radius: calc(var(--radius) + 6px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      color: rgba(35, 76, 49, 0.70);
-      font-family: 'Fixture', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-      font-size: 22px;
-      font-weight: 900;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+    .shopItem__image{
+      display: block;
+      width: 100%;
+      max-width: 580px;
+      max-height: 520px;
+      object-fit: contain;
+      filter: drop-shadow(0 16px 20px rgba(0, 0, 0, 0.20));
     }
 
     .shopItem__body{
@@ -163,12 +156,12 @@
       }
 
       .shopItem__media{
-        min-height: 280px;
-        padding: 18px;
+        min-height: 300px;
+        padding: 14px 10px;
       }
 
-      .shopItem__placeholder{
-        font-size: 16px;
+      .shopItem__image{
+        max-height: 360px;
       }
 
       .shopItem__body{
@@ -238,21 +231,61 @@
     </header>
 
     <main class="shopContent" aria-label="Shop items">
-      <p class="shopIntro">Limited ANY drops will live here. Items are shown one at a time as you scroll.</p>
+      <p class="shopIntro">Limited ANY drops. Items are shown one at a time as you scroll.</p>
 
       <section class="shopList">
-        <!--
-          DUPLICATE THIS ARTICLE FOR EACH NEW SHOP ITEM.
-          Replace the placeholder block with an <img> when product photos are ready, for example:
-          <img src="item-name.png" alt="Product name" />
-        -->
         <article class="shopItem">
           <div class="shopItem__media">
-            <div class="shopItem__placeholder">Item Image</div>
+            <img class="shopItem__image" src="images/any-hoodie-forest.png" alt="Forest green ANY hoodie" />
           </div>
           <div class="shopItem__body">
-            <h2 class="shopItem__name">ANY Shop Item</h2>
-            <p class="shopItem__meta">Product details will go here once the first item is ready.</p>
+            <h2 class="shopItem__name">Forest Green Hoodie</h2>
+            <p class="shopItem__meta">ANY N.E. Grappling pullover hoodie.</p>
+            <p class="shopItem__price">$—</p>
+            <div class="shopItem__actions">
+              <button class="shopButton" type="button" disabled aria-disabled="true">Buy Now</button>
+              <span class="shopStatus">Sold Out</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="shopItem">
+          <div class="shopItem__media">
+            <img class="shopItem__image" src="images/any-hoodie-maroon.png" alt="Maroon ANY hoodie" />
+          </div>
+          <div class="shopItem__body">
+            <h2 class="shopItem__name">Maroon Hoodie</h2>
+            <p class="shopItem__meta">ANY N.E. Grappling pullover hoodie.</p>
+            <p class="shopItem__price">$—</p>
+            <div class="shopItem__actions">
+              <button class="shopButton" type="button" disabled aria-disabled="true">Buy Now</button>
+              <span class="shopStatus">Sold Out</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="shopItem">
+          <div class="shopItem__media">
+            <img class="shopItem__image" src="images/any-pocket-tee-black.png" alt="Black ANY pocket tee" />
+          </div>
+          <div class="shopItem__body">
+            <h2 class="shopItem__name">Black Pocket Tee</h2>
+            <p class="shopItem__meta">ANY N.E. Grappling short sleeve pocket tee.</p>
+            <p class="shopItem__price">$—</p>
+            <div class="shopItem__actions">
+              <button class="shopButton" type="button" disabled aria-disabled="true">Buy Now</button>
+              <span class="shopStatus">Sold Out</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="shopItem">
+          <div class="shopItem__media">
+            <img class="shopItem__image" src="images/any-pocket-tee-white.png" alt="White ANY pocket tee" />
+          </div>
+          <div class="shopItem__body">
+            <h2 class="shopItem__name">White Pocket Tee</h2>
+            <p class="shopItem__meta">ANY N.E. Grappling short sleeve pocket tee.</p>
             <p class="shopItem__price">$—</p>
             <div class="shopItem__actions">
               <button class="shopButton" type="button" disabled aria-disabled="true">Buy Now</button>
@@ -262,7 +295,7 @@
         </article>
       </section>
 
-      <p class="shopFooterNote">More items can be added below this first card as future drops are ready.</p>
+      <p class="shopFooterNote">More items can be added below as future drops are ready.</p>
     </main>
   </div>
 
