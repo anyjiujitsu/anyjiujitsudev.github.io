@@ -1,0 +1,6 @@
+name = "any-printful-api"
+main = "worker.js"
+compatibility_date = "2026-09-24"
+
+[vars]
+ALLOWED_ORIGIN = "https://anyjiujitsu.github.io"
