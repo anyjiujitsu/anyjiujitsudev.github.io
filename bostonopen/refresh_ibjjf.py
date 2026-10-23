@@ -99,33 +99,45 @@ def schedule_brackets(soup):
 
 
 def parse_fights(soup):
-    """Find bracket fight blocks and their stated mat/day/time.
-
-    Text order matches published bracket: FIGHT N: Mat X, date/time, participant
-    names, followed by next FIGHT. Ranking and BYE sections aren't fights.
-    """
+    """Extract fight mat/time/day across common rendered BJJCompSystem layouts."""
     container = soup.select_one('main') or soup.body or soup
     lines = [clean(x) for x in container.get_text('\n', strip=True).splitlines()]
     lines = [x for x in lines if x]
-    pattern = re.compile(r'^FIGHT\s+\d+:\s*Mat\s*(\d+)', re.I)
-    when = re.compile(r'\b(Sat|Sun|Mon|Tue|Wed|Thu|Fri)\s+(\d{1,2}/\d{1,2})\s+at\s+(\d{1,2}:\d{2}\s*[AP]M)\b', re.I)
-    fights = []
-    current = None
+    # Some bracket layouts put 'FIGHT 5:' and 'Mat 4' on separate lines.
+    fight_marker = re.compile(r'^(?:FIGHT\s*#?\d+\s*:?)$', re.I)
+    combined = re.compile(r'^FIGHT\s*#?\d+\s*:?\s*(.*)$', re.I)
+    mat_marker = re.compile(r'\bMat\s*(?:#|No\.?\s*)?(\d+)\b', re.I)
+    when = re.compile(r'\b(Sat(?:urday)?|Sun(?:day)?|Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?)\s+(\d{1,2}/\d{1,2})(?:/\d{2,4})?\s+(?:at\s+)?(\d{1,2}:\d{2}\s*[AP]M)\b', re.I)
+    time_only = re.compile(r'\b(\d{1,2}:\d{2}\s*[AP]M)\b', re.I)
+    date_only = re.compile(r'\b(Sat|Sun|Mon|Tue|Wed|Thu|Fri)[a-z]*\s+(\d{1,2}/\d{1,2})', re.I)
+    fights=[]; current=None
+    def finish():
+        if current and current.get('mat') and current.get('day') and current.get('time'):
+            fights.append(current)
     for line in lines:
-        m = pattern.match(line)
-        if m:
-            if current: fights.append(current)
-            current = {'mat':m.group(1), 'lines':[], 'day':'', 'time':'', 'date':''}
+        header=combined.match(line)
+        if header:
+            finish()
+            current={'mat':'', 'lines':[], 'day':'', 'time':'', 'date':''}
+            remaining=clean(header.group(1))
+            if remaining: current['lines'].append(remaining)
+        elif current is not None and (line.lower() in ('ranking','swaps') or line.lower().startswith('ranking ')):
+            finish();current=None;continue
         elif current is not None:
-            if line in ('Ranking', 'Swaps') or line.startswith('### Ranking'):
-                fights.append(current)
-                current = None
-                continue
             current['lines'].append(line)
-            if (t := when.search(line)):
-                current['day'], current['date'], current['time'] = t.group(1).title(), t.group(2), clean(t.group(3))
-    if current: fights.append(current)
-    return [f for f in fights if f['day'] and f['time']]
+        if current is None: continue
+        m=mat_marker.search(line)
+        if m: current['mat']=m.group(1)
+        m=when.search(line)
+        if m:
+            current['day']=m.group(1)[:3].title();current['date']=m.group(2);current['time']=clean(m.group(3))
+        else:
+            d=date_only.search(line)
+            if d: current['day']=d.group(1).title();current['date']=d.group(2)
+            t=time_only.search(line)
+            if t and current['day']: current['time']=clean(t.group(1))
+    finish()
+    return fights
 
 
 def fill_assignments(athletes, bracket_entries, previous_by_key):
@@ -141,6 +153,9 @@ def fill_assignments(athletes, bracket_entries, previous_by_key):
         info = bracket_entries.get(category)
         if not info:
             missed += len(group)
+            for athlete in group:
+                old = previous_by_key.get((athlete['competition_id'], athlete['name'], athlete['bracket']))
+                if old: athlete.update({k: old.get(k, '') for k in ('time', 'mat', 'day', 'bracket_url', 'time_type')})
             continue
         # Estimated schedule is useful only for missing first-fight timings.
         for athlete in group:
@@ -158,6 +173,10 @@ def fill_assignments(athletes, bracket_entries, previous_by_key):
                     athlete['mat'], athlete['time'], athlete['day'] = first['mat'], first['time'], first['day']
                     athlete['time_type'] = 'first listed fight'
                     completed += 1
+                else:
+                    old = previous_by_key.get((athlete['competition_id'], athlete['name'], athlete['bracket']))
+                    if old and old.get('mat'):
+                        athlete.update({k:old.get(k,'') for k in ('mat','time','day','time_type')})
         except (requests.RequestException, ValueError) as exc:
             print(f'Bracket unavailable {info["url"]}: {exc}')
             for athlete in group:
