@@ -153,7 +153,7 @@ function appendBracketCell(parent, bracketText) {
   gender.textContent = parts[2] || '—';
   const weight = document.createElement('span');
   weight.className = 'boston-bracket-line';
-  weight.textContent = parts.slice(3).join(' / ') || '—';
+  weight.textContent = (parts.slice(3).join(' / ').replace(/\s*\(\s*[\d.,]+\s*(?:lb|lbs|kg)?\s*\)/gi, '').trim()) || '—';
   lines.append(age, gender, weight);
   cell.append(bar, lines);
   parent.append(cell);
