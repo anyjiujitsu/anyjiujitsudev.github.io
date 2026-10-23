@@ -99,45 +99,56 @@ def schedule_brackets(soup):
 
 
 def parse_fights(soup):
-    """Extract fight mat/time/day across common rendered BJJCompSystem layouts."""
+    """Read the fight heading shown above each matchup: FIGHT 1: Mat 2.
+
+    Each heading begins a new record; the next fight heading ends it.  Competitor
+    names appear below the heading, sometimes preceded by ranking/seed numbers.
+    """
     container = soup.select_one('main') or soup.body or soup
-    lines = [clean(x) for x in container.get_text('\n', strip=True).splitlines()]
-    lines = [x for x in lines if x]
-    # Some bracket layouts put 'FIGHT 5:' and 'Mat 4' on separate lines.
-    fight_marker = re.compile(r'^(?:FIGHT\s*#?\d+\s*:?)$', re.I)
-    combined = re.compile(r'^FIGHT\s*#?\d+\s*:?\s*(.*)$', re.I)
-    mat_marker = re.compile(r'\bMat\s*(?:#|No\.?\s*)?(\d+)\b', re.I)
+    lines = [clean(v) for v in container.get_text('\n', strip=True).splitlines()]
+    lines = [v for v in lines if v]
+    header = re.compile(r'^FIGHT\s*#?\s*(\d+)\s*:?\s*(.*)$', re.I)
+    mat_re = re.compile(r'\bMat\s*(?:#|No\.?\s*)?(\d+)\b', re.I)
     when = re.compile(r'\b(Sat(?:urday)?|Sun(?:day)?|Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?)\s+(\d{1,2}/\d{1,2})(?:/\d{2,4})?\s+(?:at\s+)?(\d{1,2}:\d{2}\s*[AP]M)\b', re.I)
-    time_only = re.compile(r'\b(\d{1,2}:\d{2}\s*[AP]M)\b', re.I)
-    date_only = re.compile(r'\b(Sat|Sun|Mon|Tue|Wed|Thu|Fri)[a-z]*\s+(\d{1,2}/\d{1,2})', re.I)
-    fights=[]; current=None
-    def finish():
-        if current and current.get('mat') and current.get('day') and current.get('time'):
-            fights.append(current)
+    fights = []
+    current = None
     for line in lines:
-        header=combined.match(line)
-        if header:
-            finish()
-            current={'mat':'', 'lines':[], 'day':'', 'time':'', 'date':''}
-            remaining=clean(header.group(1))
-            if remaining: current['lines'].append(remaining)
-        elif current is not None and (line.lower() in ('ranking','swaps') or line.lower().startswith('ranking ')):
-            finish();current=None;continue
+        m = header.match(line)
+        if m:
+            if current and all(current.get(k) for k in ('mat', 'time', 'day')):
+                fights.append(current)
+            current = {'number':int(m.group(1)), 'mat':'', 'time':'', 'day':'', 'date':'', 'lines':[]}
+            remainder = clean(m.group(2))
+            if remainder:
+                current['lines'].append(remainder)
         elif current is not None:
             current['lines'].append(line)
-        if current is None: continue
-        m=mat_marker.search(line)
-        if m: current['mat']=m.group(1)
-        m=when.search(line)
-        if m:
-            current['day']=m.group(1)[:3].title();current['date']=m.group(2);current['time']=clean(m.group(3))
-        else:
-            d=date_only.search(line)
-            if d: current['day']=d.group(1).title();current['date']=d.group(2)
-            t=time_only.search(line)
-            if t and current['day']: current['time']=clean(t.group(1))
-    finish()
+        if current is None:
+            continue
+        mat = mat_re.search(line)
+        if mat and not current['mat']:
+            current['mat'] = mat.group(1)
+        scheduled = when.search(line)
+        if scheduled:
+            current['day'] = scheduled.group(1)[:3].title()
+            current['date'] = scheduled.group(2)
+            current['time'] = clean(scheduled.group(3))
+    if current and all(current.get(k) for k in ('mat', 'time', 'day')):
+        fights.append(current)
     return fights
+
+
+def fight_contains_athlete(fight, name):
+    """Recognize a competitor row with a leading seed (e.g. '16 JOHN DOE').
+
+    Do not match winner-of-fight placeholders or arbitrary partial names.
+    """
+    target = key(name)
+    for line in fight['lines']:
+        normalized = key(re.sub(r'^\s*\d{1,3}\s+', '', line))
+        if normalized == target or normalized.startswith(target + ' '):
+            return True
+    return False
 
 
 def fill_assignments(athletes, bracket_entries, previous_by_key):
@@ -165,8 +176,9 @@ def fill_assignments(athletes, bracket_entries, previous_by_key):
             athlete['time_type'] = 'estimated division start'
         try:
             fights = parse_fights(get_soup(info['url']))
+            print(f'    {info["url"]}: {len(fights)} dated/matted fights parsed', flush=True)
             for athlete in group:
-                matching = [f for f in fights if key(athlete['name']) in {key(x) for x in f['lines']}]
+                matching = [f for f in fights if fight_contains_athlete(f, athlete['name'])]
                 if matching:
                     # Byes can display a name in later fights: use earliest stated fight time.
                     first = min(matching, key=lambda f: datetime.strptime(f['date'] + ' ' + f['time'], '%m/%d %I:%M %p'))
