@@ -43,15 +43,37 @@
     .boston-submit:disabled { opacity:.55; cursor:wait; }
     .boston-status { min-height:20px; font-size:13px; color:var(--muted, #777); margin:12px 0; }
     .boston-results { width:100%; margin-top:12px; }
-    .boston-results-head, .boston-results-row { display:grid; grid-template-columns:minmax(120px,2fr) minmax(95px,2fr) 75px 55px 72px; gap:10px; align-items:center; }
+    .boston-results-head, .boston-results-row { display:grid; grid-template-columns:minmax(0,2.2fr) minmax(0,2.65fr) minmax(0,.92fr) minmax(0,.48fr) minmax(0,.6fr); gap:12px; align-items:start; }
     .boston-results-head { font-size:10px; font-weight:700; letter-spacing:.08em; padding:12px; border-bottom:2px solid #8887; }
     .boston-results-row { align-items:start; padding:14px 12px; border-bottom:1px solid #8885; font-size:13px; }
     .boston-results-row a { color:inherit; text-decoration:underline; text-underline-offset:2px; }
-    .boston-results-row > span { overflow-wrap:anywhere; }
+    .boston-results-row > span { overflow-wrap:anywhere; align-self:start; }
     .boston-results-row small { display:block; font-size:10px; opacity:.7; margin-top:3px; }
     .boston-empty { padding:30px 12px; color:var(--muted,#666); font-size:13px; }
-    @media (max-width:680px) { .boston-results-head, .boston-results-row { grid-template-columns:minmax(100px,1.5fr) minmax(80px,1.3fr) 58px 38px 55px; gap:5px; font-size:11px; padding-left:4px; padding-right:4px; } .boston-results-head { font-size:9px; } }
-    @media (max-width:500px) { .boston-controls { align-items:stretch; } .boston-picker, .boston-search-form { flex-basis:100%; max-width:none; } .boston-filter-strip { min-height:0; } }
+    .boston-clear { background:transparent; color:#fff; border:1px solid #ffffffa8; white-space:nowrap; }
+    .boston-clear:hover { background:#ffffff20; }
+    @media (max-width:680px) {
+      .boston-controls { flex-wrap:nowrap; gap:5px; }
+      .boston-picker { min-width:0; max-width:none; flex:1 1 42%; }
+      .boston-search-form { min-width:0; flex:1 1 58%; gap:5px; }
+      .boston-gym-picker { min-width:0; flex:1 1 auto; }
+      .boston-pill { min-height:30px; border-radius:18px; padding:5px 7px; gap:4px; font-size:clamp(8px,1.9vw,11px); }
+      .boston-pill .boston-dot { width:6px; height:6px; }
+      .boston-submit { min-height:30px; border-radius:18px; padding:5px 9px; font-size:clamp(9px,2vw,11px); }
+      .boston-results-head, .boston-results-row { grid-template-columns:minmax(0,2fr) minmax(0,2.45fr) minmax(0,.85fr) minmax(0,.45fr) minmax(0,.55fr); gap:5px; font-size:11px; padding-left:4px; padding-right:4px; }
+      .boston-results-head { font-size:9px; }
+      .boston-results-row small { font-size:9px; }
+    }
+    @media (max-width:430px) {
+      .boston-controls, .boston-search-form { gap:4px; }
+      .boston-pill { padding:5px 5px; font-size:8px; }
+      .boston-submit { padding:5px 7px; font-size:9px; }
+      .boston-filter-strip { min-height:40px; }
+    }
+    @media (max-width:350px) {
+      .boston-pill { font-size:7px; }
+      .boston-submit { padding:5px; font-size:8px; }
+    }
 
     @media (max-width:430px) {
       .boston-social { gap:8px; padding-bottom:0; }
@@ -99,7 +121,8 @@
                     <div id="academyOptions">Select a competition first.</div>
                   </div>
                 </div>
-                <button type="submit" class="boston-submit" id="athleteSearchButton">SEARCH</button>
+                <button type="submit" class="boston-submit" id="athleteSearchButton">GO</button>
+                <button type="button" class="boston-submit boston-clear" id="clearAllButton">CLEAR</button>
               </form>
             </div>
           </div>
@@ -116,6 +139,6 @@
       </div>
     </main>
   </div>
-  <script type="module" src="./boston-open.js?v=multigym-mats-20261023"></script>
+  <script type="module" src="./boston-open.js?v=responsive-sort-clear-20261023"></script>
 </body>
 </html>
