@@ -17,6 +17,46 @@ const academyLabel = $('academyLabel');
 let competitions = [];
 let roster = { athletes: [], loaded_competition_ids: [], errors: {} };
 const normalized = v => String(v || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
+const SAVED_SEARCH_KEY = 'bostonopen:last-search:v1';
+function saveSearch() {
+  try {
+    localStorage.setItem(SAVED_SEARCH_KEY, JSON.stringify({
+      competitions: [...chosen],
+      academies: [...chosenAcademies]
+    }));
+  } catch (error) { console.warn('Could not save Boston Open search:', error); }
+}
+function readSavedSearch() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(SAVED_SEARCH_KEY) || 'null');
+    if (!saved || !Array.isArray(saved.competitions) || !Array.isArray(saved.academies)) return null;
+    return saved;
+  } catch (error) { return null; }
+}
+function forgetSearch() {
+  try { localStorage.removeItem(SAVED_SEARCH_KEY); }
+  catch (error) { console.warn('Could not clear Boston Open search:', error); }
+}
+function restoreSearch() {
+  const saved = readSavedSearch();
+  if (!saved) return;
+  const validCompetitions = new Set(competitions.map(c => c.id));
+  chosen.clear();
+  for (const id of saved.competitions) {
+    if (validCompetitions.has(String(id))) chosen.add(String(id));
+  }
+  updateLabel();
+  showOptions();
+  updateAcademies();
+  const availableAcademies = new Set(eligibleAcademies().map(([key]) => key));
+  for (const key of saved.academies) {
+    if (availableAcademies.has(normalized(key))) chosenAcademies.add(normalized(key));
+  }
+  updateAcademies();
+  if (chosen.size && chosenAcademies.size) {
+    $('athleteSearchForm').requestSubmit();
+  }
+}
 function setStatus(s) { status.textContent = s; }
 function updateLabel() {
   label.textContent = chosen.size ? `COMPETITIONS · ${chosen.size} SELECTED` : 'COMPETITIONS · SELECT';
@@ -55,7 +95,7 @@ function updateAcademies() {
   const allowed = new Set(available.map(a=>a[0]));
   for (const name of chosenAcademies) if (!allowed.has(name)) chosenAcademies.delete(name);
   academyLabel.textContent = chosenAcademies.size ? `ACADEMIES · ${chosenAcademies.size} SELECTED` :
-    (!chosen.size ? 'ACADEMIES · SELECT COMPETITIONS' : available.length ? 'ACADEMIES · SELECT' : 'ACADEMIES · NO ROSTER');
+    (!chosen.size ? 'ACADEMIES · SELECT' : available.length ? 'ACADEMIES · SELECT' : 'ACADEMIES · NO ROSTER');
   academyToggle.classList.toggle('has-selection', chosenAcademies.size > 0);
   academyOptions.replaceChildren();
   if (!available.length) {
@@ -115,11 +155,12 @@ function timeRank(value) {
   return (Number(t[1]) % 12 + (t[3].toUpperCase()==='PM' ? 12 : 0))*60 + Number(t[2]);
 }
 $('clearAllButton').addEventListener('click', () => {
+  forgetSearch();
   chosen.clear(); chosenAcademies.clear();
   updateLabel(); showOptions(); updateAcademies();
   rows.replaceChildren();
   const empty = document.createElement('div');
-  empty.className = 'boston-empty'; empty.textContent = 'Choose competitions and academies, then select GO.';
+  empty.className = 'boston-empty'; empty.textContent = ' ';
   rows.append(empty);
   setStatus('Selections cleared. Choose competitions and academies to search.');
   setMenu(false); setAcademyMenu(false);
@@ -128,6 +169,7 @@ $('athleteSearchForm').addEventListener('submit', event => {
   event.preventDefault();
   if (!chosen.size) { setStatus('Select at least one Boston competition first.'); setMenu(true); return; }
   if (!chosenAcademies.size) { setStatus('Select at least one academy.'); setAcademyMenu(true); return; }
+  saveSearch();
   const found = (roster.athletes || []).filter(a => chosen.has(String(a.competition_id)) && chosenAcademies.has(normalized(a.team)));
   found.sort((a,b) => {
     const da=dayRank(a.day), db=dayRank(b.day);
@@ -154,8 +196,9 @@ async function initialize() {
     updateAcademies();
     const loadedCount = (roster.loaded_competition_ids || []).filter(id => competitions.some(c => c.id === String(id))).length;
     const errorSummary = Object.values(roster.errors || {}).filter(Boolean).slice(0, 2).join(' / ');
-    if (!status.textContent.includes('unavailable')) setStatus(`${competitions.length} Boston competition${competitions.length === 1 ? '' : 's'} after July 1, 2026. ${loadedCount} athlete roster${loadedCount === 1 ? '' : 's'} synced.${loadedCount ? ' Select competitions and academies, then search.' : ` Run the GitHub Actions roster refresh to enable athlete results.${errorSummary ? ' Refresh issue: ' + errorSummary : ''}`}`);
+    if (!status.textContent.includes('unavailable')) setStatus('Select competitions and academies, then GO.');
     searchButton.disabled = false;
+    restoreSearch();
   } catch (error) {
     label.textContent = 'COMPETITIONS · UNAVAILABLE'; options.textContent = 'Failed to load IBJJF competitions.';
     setStatus(`Unable to load competition data: ${error.message}`);
