@@ -3,8 +3,26 @@
   "cutoff_exclusive": "2026-07-01",
   "updated_at": null,
   "competitions": [
-    {"id":"3253","name":"Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026","date":"2026-10-24","end_date":"2026-10-25","url":"https://ibjjf.com/events/3253/athletes-list-by-divisions"},
-    {"id":"3254","name":"Boston Fall International Open IBJJF Jiu-Jitsu No-Gi Championship 2026","date":"2026-10-24","end_date":"2026-10-25","url":"https://ibjjf.com/events/3254/athletes-list-by-divisions"},
-    {"id":"3255","name":"Boston Fall Kids International Open IBJJF Jiu-Jitsu Championship 2026","date":"2026-10-25","end_date":"2026-10-25","url":"https://ibjjf.com/events/3255/athletes-list-by-divisions"}
+    {
+      "id": "3253",
+      "name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "end_date": "2026-10-25",
+      "url": "https://ibjjf.com/events/3253/athletes-list-by-academy-teams"
+    },
+    {
+      "id": "3254",
+      "name": "Boston Fall International Open IBJJF Jiu-Jitsu No-Gi Championship 2026",
+      "date": "2026-10-24",
+      "end_date": "2026-10-25",
+      "url": "https://ibjjf.com/events/3254/athletes-list-by-academy-teams"
+    },
+    {
+      "id": "3255",
+      "name": "Boston Fall Kids International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-25",
+      "end_date": "2026-10-25",
+      "url": "https://ibjjf.com/events/3255/athletes-list-by-academy-teams"
+    }
   ]
 }

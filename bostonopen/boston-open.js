@@ -11,7 +11,7 @@ const searchButton = $('athleteSearchButton');
 const chosen = new Set();
 let competitions = [];
 let roster = { athletes: [], loaded_competition_ids: [], errors: {} };
-const normalized = v => String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase();
+const normalized = v => String(v || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
 function setStatus(s) { status.textContent = s; }
 function updateLabel() {
   label.textContent = chosen.size ? `COMPETITIONS · ${chosen.size} SELECTED` : 'COMPETITIONS · SELECT';
@@ -48,25 +48,27 @@ function renderAthletes(items) {
   for (const athlete of items) {
     const row = document.createElement('div'); row.className = 'boston-results-row';
     const primary = document.createElement('span');
-    const a = document.createElement('a'); a.href = `https://ibjjf.com/events/${encodeURIComponent(athlete.competition_id)}/athletes-list-by-divisions`;
+    const a = document.createElement('a'); a.href = athlete.bracket_url || `https://ibjjf.com/events/${encodeURIComponent(athlete.competition_id)}/athletes-list-by-academy-teams`;
     a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = athlete.name; primary.append(a);
     const secondary = document.createElement('small'); secondary.textContent = `${athlete.team || 'Team unavailable'} · ${athlete.competition_name || ''}`; primary.append(secondary);
     row.append(primary);
-    appendCell(row, [athlete.belt,athlete.division].filter(Boolean).join(' · '));
-    appendCell(row, athlete.time || '—'); appendCell(row, athlete.mat || '—'); appendCell(row, athlete.day || athlete.date || '—');
+    appendCell(row, athlete.bracket || athlete.division || '—');
+    appendCell(row, athlete.time || '—'); appendCell(row, athlete.mat || '—'); appendCell(row, athlete.day || '—');
     rows.append(row);
   }
 }
 $('athleteSearchForm').addEventListener('submit', event => {
   event.preventDefault();
   if (!chosen.size) { setStatus('Select at least one Boston competition first.'); setMenu(true); return; }
-  const term = normalized($('athleteQuery').value.trim());
-  const found = (roster.athletes || []).filter(a => chosen.has(String(a.competition_id)) && (!term || normalized(`${a.name} ${a.team}`).includes(term)));
+  const term = normalized($('athleteQuery').value);
+  if (!term) { setStatus('Enter the exact athlete name to search.'); return; }
+  const found = (roster.athletes || []).filter(a => chosen.has(String(a.competition_id)) && term && normalized(a.name) === term);
   found.sort((a,b) => a.name.localeCompare(b.name) || a.competition_id.localeCompare(b.competition_id));
   renderAthletes(found);
   const loaded = new Set((roster.loaded_competition_ids || []).map(String));
   const pending = [...chosen].filter(id => !loaded.has(id));
-  setStatus(`${found.length} matching athlete ${found.length === 1 ? 'entry' : 'entries'}.${pending.length ? ` Athlete lists for ${pending.length} selected competition${pending.length === 1 ? ' are' : 's are'} not yet synced; use the GitHub Actions refresh.` : ''}`);
+  const missing = found.filter(a => !a.mat || !a.time || !a.day).length;
+  setStatus(`${found.length} exact-match athlete ${found.length === 1 ? 'entry' : 'entries'}.${missing ? ` Fight assignments are not yet published or matched for ${missing}.` : ''}${pending.length ? ` ${pending.length} selected roster(s) are not yet synced; run the GitHub Actions refresh.` : ''}`);
   setMenu(false);
 });
 async function initialize() {
