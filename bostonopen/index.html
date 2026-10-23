@@ -13,16 +13,20 @@
   <link rel="stylesheet" href="../assets/css/directory.css" />
   <style>
     /* Only styles specific to the Boston Open page. */
-    .boston-header-row { align-items: flex-end; }
-    .boston-home { display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; color:var(--icon); margin-left:auto; text-decoration:none; }
-    .boston-home svg { width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-    .boston-home:hover { opacity:.65; }
+    /* Preserve the shared page width, but pin the title to the left. */
+    .siteHeaderInner--title.boston-header-row { display:flex; align-items:flex-end; justify-content:space-between; width:100%; }
+    .boston-header-row > .header__title { order:0; flex:0 1 auto; margin:0; text-align:left; }
+    .boston-social { order:1; display:flex; align-items:center; gap:12px; margin-left:auto; padding-bottom:3px; flex:0 0 auto; }
+    .boston-social__link { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; color:var(--icon); text-decoration:none; }
+    .boston-social__link:hover { opacity:.65; }
+    .boston-social__icon { width:20px; height:20px; display:block; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
     .boston-filter-strip { min-height:60px; }
     .boston-content { min-height:55vh; }
     .boston-heading { display:none; } /* Content area intentionally reserved for future sections. */
     @media (max-width:430px) {
-      .boston-home { width:24px; height:24px; }
-      .boston-home svg { width:17px; height:17px; }
+      .boston-social { gap:8px; padding-bottom:0; }
+      .boston-social__link { width:20px; height:20px; }
+      .boston-social__icon { width:17px; height:17px; }
       .boston-filter-strip { min-height:40px; }
     }
   </style>
@@ -37,9 +41,14 @@
       </div>
       <div class="header__inner siteHeaderInner--title boston-header-row">
         <h1 class="header__title">BOSTON OPEN</h1>
-        <a class="boston-home" href="../" aria-label="Back to Events and Index" title="Home">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9"/><path d="M9 21v-8h6v8"/></svg>
-        </a>
+        <div class="boston-social" aria-label="Page links">
+          <a class="boston-social__link" href="../" aria-label="Home" title="Home">
+            <svg class="boston-social__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9"/><path d="M9 21v-8h6v8"/></svg>
+          </a>
+          <a class="boston-social__link" href="https://www.instagram.com/any.jiujitsu/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
+            <svg class="boston-social__icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.5"/></svg>
+          </a>
+        </div>
       </div>
       <div class="stickyFilters">
         <nav class="filters" aria-label="Boston Open page toolbar">
