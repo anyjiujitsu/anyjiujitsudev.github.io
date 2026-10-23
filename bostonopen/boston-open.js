@@ -125,11 +125,11 @@ async function getJson(path) {
   return response.json();
 }
 function appendCell(parent, text, cls = '') { const span = document.createElement('span'); span.className = cls; span.textContent = text || '—'; parent.append(span); }
-// Display IBJJF divisions as belt color + age group, gender, then weight.
+// Display IBJJF divisions with a muted belt-color bar spanning age, gender, and weight.
 function appendBracketCell(parent, bracketText) {
   const text = String(bracketText || '').trim();
   const parts = text.split(/\s*\/\s*/).map(part => part.trim());
-  const colors = { white: '#fff', blue: '#2368c5', purple: '#7b4ab1', brown: '#78503a', black: '#202020', gray: '#888', grey: '#888', yellow: '#efd54f', orange: '#e78a35', green: '#28844b' };
+  const colors = { white: '#e5e3de', blue: '#647e9a', purple: '#877790', brown: '#886f60', black: '#3e403f', gray: '#8d908e', grey: '#8d908e', yellow: '#c0ae7c', orange: '#b68a68', green: '#6f8878' };
   const color = (parts[0] || '').toLowerCase();
   const cell = document.createElement('span');
   cell.className = 'boston-bracket';
@@ -138,23 +138,24 @@ function appendBracketCell(parent, bracketText) {
     parent.append(cell);
     return;
   }
-  const top = document.createElement('span');
-  top.className = 'boston-bracket-top';
-  const dot = document.createElement('span');
-  dot.className = 'boston-belt-dot';
-  dot.style.backgroundColor = colors[color];
-  dot.title = `${parts[0]} belt`;
-  dot.setAttribute('aria-label', `${parts[0]} belt`);
+  const bar = document.createElement('span');
+  bar.className = 'boston-belt-bar';
+  bar.style.backgroundColor = colors[color];
+  bar.title = `${parts[0]} belt`;
+  bar.setAttribute('aria-label', `${parts[0]} belt`);
+  const lines = document.createElement('span');
+  lines.className = 'boston-bracket-text';
   const age = document.createElement('span');
+  age.className = 'boston-bracket-line';
   age.textContent = parts[1] || '—';
-  top.append(dot, age);
   const gender = document.createElement('span');
   gender.className = 'boston-bracket-line';
   gender.textContent = parts[2] || '—';
   const weight = document.createElement('span');
   weight.className = 'boston-bracket-line';
   weight.textContent = parts.slice(3).join(' / ') || '—';
-  cell.append(top, gender, weight);
+  lines.append(age, gender, weight);
+  cell.append(bar, lines);
   parent.append(cell);
 }
 function renderAthletes(items) {
