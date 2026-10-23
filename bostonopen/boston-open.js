@@ -100,12 +100,39 @@ function renderAthletes(items) {
     rows.append(row);
   }
 }
+// Calendar day first, then actual clock time; missing assignments sort last.
+function dayRank(value) {
+  const d = normalized(value);
+  const days = ['sat','sun','mon','tue','wed','thu','fri'];
+  const match = days.findIndex(x => d.startsWith(x));
+  if (match >= 0) return match;
+  const date = d.match(/(?:^|\s)(\d{1,2})\/(\d{1,2})(?:\/\d{2,4})?/);
+  return date ? Number(date[1])*32 + Number(date[2]) : 9999;
+}
+function timeRank(value) {
+  const t = String(value || '').trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!t) return 9999;
+  return (Number(t[1]) % 12 + (t[3].toUpperCase()==='PM' ? 12 : 0))*60 + Number(t[2]);
+}
+$('clearAllButton').addEventListener('click', () => {
+  chosen.clear(); chosenAcademies.clear();
+  updateLabel(); showOptions(); updateAcademies();
+  rows.replaceChildren();
+  const empty = document.createElement('div');
+  empty.className = 'boston-empty'; empty.textContent = 'Choose competitions and academies, then select GO.';
+  rows.append(empty);
+  setStatus('Selections cleared. Choose competitions and academies to search.');
+  setMenu(false); setAcademyMenu(false);
+});
 $('athleteSearchForm').addEventListener('submit', event => {
   event.preventDefault();
   if (!chosen.size) { setStatus('Select at least one Boston competition first.'); setMenu(true); return; }
   if (!chosenAcademies.size) { setStatus('Select at least one academy.'); setAcademyMenu(true); return; }
   const found = (roster.athletes || []).filter(a => chosen.has(String(a.competition_id)) && chosenAcademies.has(normalized(a.team)));
-  found.sort((a,b) => a.name.localeCompare(b.name) || a.competition_id.localeCompare(b.competition_id));
+  found.sort((a,b) => {
+    const da=dayRank(a.day), db=dayRank(b.day);
+    return da-db || timeRank(a.time)-timeRank(b.time) || a.name.localeCompare(b.name);
+  });
   renderAthletes(found);
   const loaded = new Set((roster.loaded_competition_ids || []).map(String));
   const pending = [...chosen].filter(id => !loaded.has(id));
