@@ -9,6 +9,11 @@ const status = $('bostonStatus');
 const rows = $('athleteRows');
 const searchButton = $('athleteSearchButton');
 const chosen = new Set();
+const chosenAcademies = new Set();
+const academyToggle = $('academyToggle');
+const academyMenu = $('academyMenu');
+const academyOptions = $('academyOptions');
+const academyLabel = $('academyLabel');
 let competitions = [];
 let roster = { athletes: [], loaded_competition_ids: [], errors: {} };
 const normalized = v => String(v || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
@@ -23,7 +28,7 @@ function showOptions() {
   for (const comp of competitions) {
     const item = document.createElement('label'); item.className = 'boston-menu-row';
     const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.checked = chosen.has(comp.id);
-    checkbox.addEventListener('change', () => { checkbox.checked ? chosen.add(comp.id) : chosen.delete(comp.id); updateLabel(); });
+    checkbox.addEventListener('change', () => { checkbox.checked ? chosen.add(comp.id) : chosen.delete(comp.id); updateLabel(); updateAcademies(); });
     const details = document.createElement('span');
     const name = document.createElement('span'); name.textContent = comp.name;
     const date = document.createElement('small'); date.textContent = comp.date + (comp.end_date && comp.end_date !== comp.date ? ` – ${comp.end_date}` : '');
@@ -31,11 +36,49 @@ function showOptions() {
     details.append(name,date); item.append(checkbox,details); options.append(item);
   }
 }
-function setMenu(open) { menu.hidden = !open; toggle.setAttribute('aria-expanded', String(open)); }
+function setMenu(open) { menu.hidden = !open; toggle.setAttribute('aria-expanded', String(open)); if(open) setAcademyMenu(false); }
 toggle.addEventListener('click', () => setMenu(menu.hidden));
 document.addEventListener('pointerdown', event => { if (!$('competitionPicker').contains(event.target)) setMenu(false); });
 document.addEventListener('keydown', event => { if (event.key === 'Escape') setMenu(false); });
-$('clearCompetitions').addEventListener('click', () => { chosen.clear(); updateLabel(); showOptions(); });
+$('clearCompetitions').addEventListener('click', () => { chosen.clear(); updateLabel(); showOptions(); updateAcademies(); });
+function eligibleAcademies() {
+  const names = new Map();
+  for (const athlete of roster.athletes || []) {
+    if (!chosen.has(String(athlete.competition_id))) continue;
+    const name = String(athlete.team || '').trim().replace(/\s+/g, ' ');
+    if (name && !names.has(normalized(name))) names.set(normalized(name), name);
+  }
+  return [...names.entries()].sort((a,b) => a[1].localeCompare(b[1]));
+}
+function updateAcademies() {
+  const available = eligibleAcademies();
+  const allowed = new Set(available.map(a=>a[0]));
+  for (const name of chosenAcademies) if (!allowed.has(name)) chosenAcademies.delete(name);
+  academyLabel.textContent = chosenAcademies.size ? `ACADEMIES · ${chosenAcademies.size} SELECTED` :
+    (!chosen.size ? 'ACADEMIES · SELECT COMPETITIONS' : available.length ? 'ACADEMIES · SELECT' : 'ACADEMIES · NO ROSTER');
+  academyToggle.classList.toggle('has-selection', chosenAcademies.size > 0);
+  academyOptions.replaceChildren();
+  if (!available.length) {
+    academyOptions.textContent = chosen.size ? 'No academy data for these competitions yet. Check the roster refresh.' : 'Select competitions first.';
+    return;
+  }
+  for (const [key,name] of available) {
+    const item=document.createElement('label'); item.className='boston-menu-row';
+    const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=chosenAcademies.has(key);
+    cb.addEventListener('change',()=>{ cb.checked ? chosenAcademies.add(key) : chosenAcademies.delete(key); updateAcademyLabel(); });
+    const value=document.createElement('span'); value.textContent=name;
+    item.append(cb,value); academyOptions.append(item);
+  }
+}
+function updateAcademyLabel() {
+  academyLabel.textContent = chosenAcademies.size ? `ACADEMIES · ${chosenAcademies.size} SELECTED` : 'ACADEMIES · SELECT';
+  academyToggle.classList.toggle('has-selection',chosenAcademies.size>0);
+}
+function setAcademyMenu(open) { academyMenu.hidden=!open; academyToggle.setAttribute('aria-expanded',String(open)); if(open) setMenu(false); }
+academyToggle.addEventListener('click',()=>setAcademyMenu(academyMenu.hidden));
+$('clearAcademies').addEventListener('click',()=>{chosenAcademies.clear();updateAcademies();});
+document.addEventListener('pointerdown',e=>{if(!$('academyPicker').contains(e.target))setAcademyMenu(false);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')setAcademyMenu(false);});
 async function getJson(path) {
   const response = await fetch(path, { cache: 'no-store' });
   if (!response.ok) throw new Error(`Could not read ${path} (HTTP ${response.status}).`);
@@ -60,17 +103,16 @@ function renderAthletes(items) {
 $('athleteSearchForm').addEventListener('submit', event => {
   event.preventDefault();
   if (!chosen.size) { setStatus('Select at least one Boston competition first.'); setMenu(true); return; }
-  const term = normalized($('athleteQuery').value);
-  if (!term) { setStatus('Enter an exact athlete or academy name to search.'); return; }
-  const found = (roster.athletes || []).filter(a => chosen.has(String(a.competition_id)) && term && (normalized(a.name) === term || normalized(a.team) === term));
+  if (!chosenAcademies.size) { setStatus('Select at least one academy.'); setAcademyMenu(true); return; }
+  const found = (roster.athletes || []).filter(a => chosen.has(String(a.competition_id)) && chosenAcademies.has(normalized(a.team)));
   found.sort((a,b) => a.name.localeCompare(b.name) || a.competition_id.localeCompare(b.competition_id));
   renderAthletes(found);
   const loaded = new Set((roster.loaded_competition_ids || []).map(String));
   const pending = [...chosen].filter(id => !loaded.has(id));
   const failed = pending.map(id => roster.errors?.[id]).filter(Boolean);
   const missing = found.filter(a => !a.mat || !a.time || !a.day).length;
-  setStatus(`${found.length} athlete ${found.length === 1 ? 'entry' : 'entries'} matching the exact athlete or academy name.${missing ? ` Fight assignments are not yet published or matched for ${missing}.` : ''}${pending.length ? ` ${pending.length} selected roster(s) are not yet synced; run the GitHub Actions refresh.${failed.length ? ' Refresh issue: ' + failed.join(' / ') : ''}` : ''}`);
-  setMenu(false);
+  setStatus(`${found.length} athlete ${found.length === 1 ? 'entry' : 'entries'} from selected academies.${missing ? ` Fight assignments are not yet published or matched for ${missing}.` : ''}${pending.length ? ` ${pending.length} selected roster(s) are not yet synced; run the GitHub Actions refresh.${failed.length ? ' Refresh issue: ' + failed.join(' / ') : ''}` : ''}`);
+  setMenu(false); setAcademyMenu(false);
 });
 async function initialize() {
   searchButton.disabled = true;
@@ -82,9 +124,10 @@ async function initialize() {
     showOptions(); updateLabel();
     try { roster = await getJson('./athletes.json'); }
     catch (error) { roster = { athletes: [], loaded_competition_ids: [] }; setStatus(`Competitions ready, but athlete data is unavailable: ${error.message}`); }
+    updateAcademies();
     const loadedCount = (roster.loaded_competition_ids || []).filter(id => competitions.some(c => c.id === String(id))).length;
     const errorSummary = Object.values(roster.errors || {}).filter(Boolean).slice(0, 2).join(' / ');
-    if (!status.textContent.includes('unavailable')) setStatus(`${competitions.length} Boston competition${competitions.length === 1 ? '' : 's'} after July 1, 2026. ${loadedCount} athlete roster${loadedCount === 1 ? '' : 's'} synced.${loadedCount ? ' Select competitions, then search.' : ` Run the GitHub Actions roster refresh to enable athlete results.${errorSummary ? ' Refresh issue: ' + errorSummary : ''}`}`);
+    if (!status.textContent.includes('unavailable')) setStatus(`${competitions.length} Boston competition${competitions.length === 1 ? '' : 's'} after July 1, 2026. ${loadedCount} athlete roster${loadedCount === 1 ? '' : 's'} synced.${loadedCount ? ' Select competitions and academies, then search.' : ` Run the GitHub Actions roster refresh to enable athlete results.${errorSummary ? ' Refresh issue: ' + errorSummary : ''}`}`);
     searchButton.disabled = false;
   } catch (error) {
     label.textContent = 'COMPETITIONS · UNAVAILABLE'; options.textContent = 'Failed to load IBJJF competitions.';
