@@ -50,6 +50,9 @@
     .boston-results-head > :nth-child(3), .boston-results-row > :nth-child(3) { white-space:nowrap; overflow-wrap:normal; }
     .boston-results-row > span { overflow-wrap:anywhere; align-self:start; }
     .boston-results-row small { display:block; font-size:10px; opacity:.7; margin-top:3px; }
+    .boston-results-row > span:first-child { min-width:0; }
+    .boston-athlete-academy, .boston-athlete-event { display:block; }
+    .boston-athlete-academy { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; overflow-wrap:normal; max-width:100%; }
     /* Structured bracket: flat, muted belt-color bar alongside three text lines. */
     .boston-bracket { display:flex; flex-direction:row; align-items:stretch; gap:9px; min-width:0; }
     .boston-belt-bar { display:block; width:9px; flex:0 0 9px; align-self:stretch; border:0; border-radius:0; box-shadow:none; }
@@ -179,6 +182,6 @@
       }
     })();
   </script>
-  <script type="module" src="./boston-open.js?v=weight-clean-columns-20261023-1"></script>
+  <script type="module" src="./boston-open.js?v=mobile-names-20261023-1"></script>
 </body>
 </html>
