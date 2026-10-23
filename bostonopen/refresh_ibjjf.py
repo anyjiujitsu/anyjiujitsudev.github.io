@@ -43,7 +43,7 @@ def roster_by_academy(soup, comp):
     """IBJJF: academy heading, then Category | Athlete rows."""
     records = []
     team = ''
-    for node in soup.find_all(['h2', 'h3', 'h4', 'h5', 'table']):
+    for node in soup.find_all(['h3', 'table']):
         if node.name != 'table':
             value = clean(node.get_text(' ', strip=True))
             if value and not value.lower().startswith(('total:', 'athletes list', 'search academy')):
@@ -59,7 +59,7 @@ def roster_by_academy(soup, comp):
                 continue
             bracket = clean(cells[category_index].get_text(' ', strip=True))
             name = clean(cells[name_index].get_text(' ', strip=True))
-            if bracket.count('/') < 3 or not name:
+            if bracket.count('/') < 3 or not name or not team:
                 continue
             records.append({'competition_id': str(comp['id']), 'competition_name': comp['name'],
                             'date': comp['date'], 'name': name, 'team': team, 'bracket': bracket,
@@ -181,11 +181,21 @@ def main():
         print(f'Fetching {cid}: {comp["name"]}', flush=True)
         try:
             roster = roster_by_academy(get_soup(comp['url']),comp)
-            schedule = schedule_brackets(get_soup(f'https://www.bjjcompsystem.com/tournaments/{cid}/schedule'))
-            count, unmatched = fill_assignments(roster,schedule,previous_by_key)
-            print(f'  {len(roster)} athletes; {count} explicit fight assignments; {unmatched} unmatched divisions',flush=True)
+            # Successful IBJJF athlete data must never depend on schedule/bracket availability.
             result.extend(roster)
             done.append(cid)
+            print(f'  {len(roster)} athletes collected from IBJJF', flush=True)
+            try:
+                schedule = schedule_brackets(get_soup(f'https://www.bjjcompsystem.com/tournaments/{cid}/schedule'))
+                count, unmatched = fill_assignments(roster, schedule, previous_by_key)
+                print(f'  {count} explicit fight assignments; {unmatched} unmatched divisions', flush=True)
+            except (requests.RequestException, ValueError) as schedule_error:
+                errors[f'{cid}_schedule'] = str(schedule_error)[:250]
+                print(f'  Schedule not available; retaining IBJJF athletes: {schedule_error}', flush=True)
+                for athlete in roster:
+                    old = previous_by_key.get((athlete['competition_id'], athlete['name'], athlete['bracket']))
+                    if old:
+                        athlete.update({k: old.get(k, '') for k in ('time', 'mat', 'day', 'bracket_url', 'time_type')})
         except (requests.RequestException, ValueError) as exc:
             errors[cid] = str(exc)[:250]
             retained = [r for r in old if str(r.get('competition_id')) == cid]

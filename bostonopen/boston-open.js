@@ -61,14 +61,15 @@ $('athleteSearchForm').addEventListener('submit', event => {
   event.preventDefault();
   if (!chosen.size) { setStatus('Select at least one Boston competition first.'); setMenu(true); return; }
   const term = normalized($('athleteQuery').value);
-  if (!term) { setStatus('Enter the exact athlete name to search.'); return; }
-  const found = (roster.athletes || []).filter(a => chosen.has(String(a.competition_id)) && term && normalized(a.name) === term);
+  if (!term) { setStatus('Enter an exact athlete or academy name to search.'); return; }
+  const found = (roster.athletes || []).filter(a => chosen.has(String(a.competition_id)) && term && (normalized(a.name) === term || normalized(a.team) === term));
   found.sort((a,b) => a.name.localeCompare(b.name) || a.competition_id.localeCompare(b.competition_id));
   renderAthletes(found);
   const loaded = new Set((roster.loaded_competition_ids || []).map(String));
   const pending = [...chosen].filter(id => !loaded.has(id));
+  const failed = pending.map(id => roster.errors?.[id]).filter(Boolean);
   const missing = found.filter(a => !a.mat || !a.time || !a.day).length;
-  setStatus(`${found.length} exact-match athlete ${found.length === 1 ? 'entry' : 'entries'}.${missing ? ` Fight assignments are not yet published or matched for ${missing}.` : ''}${pending.length ? ` ${pending.length} selected roster(s) are not yet synced; run the GitHub Actions refresh.` : ''}`);
+  setStatus(`${found.length} athlete ${found.length === 1 ? 'entry' : 'entries'} matching the exact athlete or academy name.${missing ? ` Fight assignments are not yet published or matched for ${missing}.` : ''}${pending.length ? ` ${pending.length} selected roster(s) are not yet synced; run the GitHub Actions refresh.${failed.length ? ' Refresh issue: ' + failed.join(' / ') : ''}` : ''}`);
   setMenu(false);
 });
 async function initialize() {
@@ -82,7 +83,8 @@ async function initialize() {
     try { roster = await getJson('./athletes.json'); }
     catch (error) { roster = { athletes: [], loaded_competition_ids: [] }; setStatus(`Competitions ready, but athlete data is unavailable: ${error.message}`); }
     const loadedCount = (roster.loaded_competition_ids || []).filter(id => competitions.some(c => c.id === String(id))).length;
-    if (!status.textContent.includes('unavailable')) setStatus(`${competitions.length} Boston competition${competitions.length === 1 ? '' : 's'} after July 1, 2026. ${loadedCount} athlete roster${loadedCount === 1 ? '' : 's'} synced.${loadedCount ? ' Select competitions, then search.' : ' Run the GitHub Actions roster refresh to enable athlete results.'}`);
+    const errorSummary = Object.values(roster.errors || {}).filter(Boolean).slice(0, 2).join(' / ');
+    if (!status.textContent.includes('unavailable')) setStatus(`${competitions.length} Boston competition${competitions.length === 1 ? '' : 's'} after July 1, 2026. ${loadedCount} athlete roster${loadedCount === 1 ? '' : 's'} synced.${loadedCount ? ' Select competitions, then search.' : ` Run the GitHub Actions roster refresh to enable athlete results.${errorSummary ? ' Refresh issue: ' + errorSummary : ''}`}`);
     searchButton.disabled = false;
   } catch (error) {
     label.textContent = 'COMPETITIONS · UNAVAILABLE'; options.textContent = 'Failed to load IBJJF competitions.';
