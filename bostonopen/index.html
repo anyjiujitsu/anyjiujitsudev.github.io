@@ -53,6 +53,8 @@
     .boston-clear { background:transparent; color:#fff; border:1px solid #ffffffa8; white-space:nowrap; }
     .boston-clear:hover { background:#ffffff20; }
     @media (max-width:680px) {
+      /* The open academy menu is positioned to the visible phone viewport by the script below. */
+      .boston-gym-menu { position:fixed; left:8px; right:auto; width:calc(100vw - 16px); max-width:none; box-sizing:border-box; }
       .boston-controls { flex-wrap:nowrap; gap:5px; }
       .boston-picker { min-width:0; max-width:none; flex:1 1 42%; }
       .boston-search-form { min-width:0; flex:1 1 58%; gap:5px; }
@@ -134,11 +136,43 @@
         <p class="boston-status" id="bostonStatus" role="status" aria-live="polite">Loading IBJJF Boston competitions…</p>
         <section class="boston-results" id="bostonResults" aria-label="Athlete results">
           <div class="boston-results-head"><span>NAME</span><span>BRACKET</span><span>TIME</span><span>MAT</span><span>DAY</span></div>
-          <div id="athleteRows"><div class="boston-empty">Choose competitions and search to see athletes.</div></div>
+          <div id="athleteRows"><div class="boston-empty"> </div></div>
         </section>
       </div>
     </main>
   </div>
+  <script>
+    // On phones, position the Academies menu inside the *visible* viewport,
+    // not relative to the academy pill or the wider table/page layout.
+    (() => {
+      const toggle = document.getElementById('academyToggle');
+      const menu = document.getElementById('academyMenu');
+      if (!toggle || !menu) return;
+      function positionAcademies() {
+        if (window.innerWidth > 680 || menu.hidden) {
+          menu.style.removeProperty('left');
+          menu.style.removeProperty('right');
+          menu.style.removeProperty('top');
+          menu.style.removeProperty('width');
+          return;
+        }
+        const view = window.visualViewport;
+        const left = view ? view.offsetLeft : 0;
+        const width = view ? view.width : window.innerWidth;
+        menu.style.left = `${left + 8}px`;
+        menu.style.right = 'auto';
+        menu.style.width = `${Math.max(200, width - 16)}px`;
+        menu.style.top = `${toggle.getBoundingClientRect().bottom + 7}px`;
+      }
+      toggle.addEventListener('click', () => requestAnimationFrame(positionAcademies));
+      window.addEventListener('resize', positionAcademies);
+      window.addEventListener('scroll', positionAcademies, {passive:true});
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', positionAcademies);
+        window.visualViewport.addEventListener('scroll', positionAcademies);
+      }
+    })();
+  </script>
   <script type="module" src="./boston-open.js?v=responsive-sort-clear-20261023"></script>
 </body>
 </html>
