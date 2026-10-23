@@ -166,7 +166,18 @@ function renderAthletes(items) {
     const primary = document.createElement('span');
     const a = document.createElement('a'); a.href = athlete.bracket_url || `https://ibjjf.com/events/${encodeURIComponent(athlete.competition_id)}/athletes-list-by-academy-teams`;
     a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = athlete.name; primary.append(a);
-    const secondary = document.createElement('small'); secondary.textContent = `${athlete.team || 'Team unavailable'} · ${athlete.competition_name || ''}`; primary.append(secondary);
+    // Display-only presentation: keep the complete academy name in dropdowns and saved data.
+    const academy = document.createElement('small');
+    academy.className = 'boston-athlete-academy';
+    academy.textContent = athlete.team || 'Team unavailable';
+    academy.title = academy.textContent;
+    const event = document.createElement('small');
+    event.className = 'boston-athlete-event';
+    event.textContent = String(athlete.competition_name || '')
+      .replace(/\b(?:international|jiu[-– ]jitsu|championships?)\b/gi, '')
+      .replace(/\s{2,}/g, ' ').replace(/\s+([.,-])/g, '$1').trim();
+    event.title = athlete.competition_name || '';
+    primary.append(academy, event);
     row.append(primary);
     appendBracketCell(row, athlete.bracket || athlete.division || '—');
     appendCell(row, athlete.time || '—'); appendCell(row, athlete.mat || '—'); appendCell(row, athlete.day || '—');
