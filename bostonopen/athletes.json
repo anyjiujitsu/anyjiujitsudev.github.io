@@ -1,6 +1,6 @@
 {
   "source": "IBJJF and BJJCompSystem",
-  "updated_at": "2026-10-24T22:08:34.695694+00:00",
+  "updated_at": "2026-10-24T22:29:38.436705+00:00",
   "athletes": [
     {
       "competition_id": "3253",
@@ -3719,12 +3719,12 @@
       "name": "Ray Jonnatan Salguero",
       "team": "Alliance",
       "bracket": "Purple / Master 2 / Male / Open Class",
-      "time": "06:09 PM",
+      "time": "06:00 PM",
       "mat": "6",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902216",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -3733,7 +3733,21 @@
       "name": "Mickael Teddy Lutin",
       "team": "Carlson Gracie Team",
       "bracket": "Purple / Master 2 / Male / Open Class",
-      "time": "06:16 PM",
+      "time": "06:13 PM",
+      "mat": "6",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902216",
+      "time_type": "listed fight",
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "Mickael Teddy Lutin",
+      "team": "Carlson Gracie Team",
+      "bracket": "Purple / Master 2 / Male / Open Class",
+      "time": "06:20 PM",
       "mat": "6",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902216",
@@ -3747,12 +3761,26 @@
       "name": "Mark S Dayton",
       "team": "Central Maine Brazilian Jiu-Jitsu",
       "bracket": "Purple / Master 2 / Male / Open Class",
-      "time": "06:02 PM",
+      "time": "06:05 PM",
       "mat": "6",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902216",
       "time_type": "listed fight",
-      "result": ""
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "Mark S Dayton",
+      "team": "Central Maine Brazilian Jiu-Jitsu",
+      "bracket": "Purple / Master 2 / Male / Open Class",
+      "time": "06:13 PM",
+      "mat": "6",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902216",
+      "time_type": "listed fight",
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -3775,12 +3803,12 @@
       "name": "Benjamin Petropoulos",
       "team": "Fenix BJJ Woburn",
       "bracket": "Purple / Master 2 / Male / Open Class",
-      "time": "06:02 PM",
+      "time": "06:05 PM",
       "mat": "6",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902216",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -3817,7 +3845,21 @@
       "name": "Shaundell L. Boyd Simpson",
       "team": "Morselli Jiu-Jitsu Academy",
       "bracket": "Purple / Master 2 / Male / Open Class",
-      "time": "06:09 PM",
+      "time": "06:00 PM",
+      "mat": "6",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902216",
+      "time_type": "listed fight",
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "Shaundell L. Boyd Simpson",
+      "team": "Morselli Jiu-Jitsu Academy",
+      "bracket": "Purple / Master 2 / Male / Open Class",
+      "time": "06:20 PM",
       "mat": "6",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902216",
@@ -4754,7 +4796,7 @@
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902200",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -4782,7 +4824,7 @@
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902200",
       "time_type": "listed fight",
-      "result": ""
+      "result": "WIN"
     },
     {
       "competition_id": "3253",
@@ -7081,7 +7123,21 @@
       "name": "Carl-Hubert Joachim",
       "team": "Banana Jiu-Jitsu",
       "bracket": "Purple / Master 4 / Male / Open Class",
-      "time": "06:09 PM",
+      "time": "06:10 PM",
+      "mat": "1",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902222",
+      "time_type": "listed fight",
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "Carl-Hubert Joachim",
+      "team": "Banana Jiu-Jitsu",
+      "bracket": "Purple / Master 4 / Male / Open Class",
+      "time": "06:20 PM",
       "mat": "1",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902222",
@@ -7095,12 +7151,12 @@
       "name": "Peter Casterline",
       "team": "Gianeis - The Lab Oteri BJJ",
       "bracket": "Purple / Master 4 / Male / Open Class",
-      "time": "06:09 PM",
+      "time": "06:10 PM",
       "mat": "1",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902222",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -7109,12 +7165,12 @@
       "name": "William Joseph Kinsman",
       "team": "Luiz Paulo Jiu-Jitsu USA",
       "bracket": "Purple / Master 4 / Male / Open Class",
-      "time": "06:16 PM",
+      "time": "06:13 PM",
       "mat": "1",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902222",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -7123,7 +7179,21 @@
       "name": "Garland Djuan Eastman",
       "team": "Nova União",
       "bracket": "Purple / Master 4 / Male / Open Class",
-      "time": "06:16 PM",
+      "time": "06:13 PM",
+      "mat": "1",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902222",
+      "time_type": "listed fight",
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "Garland Djuan Eastman",
+      "team": "Nova União",
+      "bracket": "Purple / Master 4 / Male / Open Class",
+      "time": "06:20 PM",
       "mat": "1",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902222",
@@ -7380,19 +7450,6 @@
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902197",
       "time_type": "listed fight",
       "result": "LOSS"
-    },
-    {
-      "competition_id": "3253",
-      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
-      "date": "2026-10-24",
-      "name": "Jonathan Sze Ming Lau",
-      "team": "Brazilian Top Team",
-      "bracket": "Black / Master 3 / Male / Open Class",
-      "time": "",
-      "mat": "",
-      "day": "",
-      "bracket_url": "",
-      "time_type": ""
     },
     {
       "competition_id": "3253",
@@ -11260,12 +11317,12 @@
       "name": "Jeffrey Anglade",
       "team": "Carlson Gracie Team",
       "bracket": "Purple / Master 1 / Male / Open Class",
-      "time": "06:19 PM",
+      "time": "06:06 PM",
       "mat": "7",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902213",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -11288,12 +11345,26 @@
       "name": "Kebert Moise Joseph",
       "team": "GF Team",
       "bracket": "Purple / Master 1 / Male / Open Class",
-      "time": "05:55 PM",
+      "time": "05:59 PM",
       "mat": "7",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902213",
       "time_type": "listed fight",
-      "result": ""
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "Kebert Moise Joseph",
+      "team": "GF Team",
+      "bracket": "Purple / Master 1 / Male / Open Class",
+      "time": "06:14 PM",
+      "mat": "7",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902213",
+      "time_type": "listed fight",
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -11302,12 +11373,26 @@
       "name": "Matthew Edward Cote",
       "team": "Gianeis - The Lab Oteri BJJ",
       "bracket": "Purple / Master 1 / Male / Open Class",
-      "time": "06:03 PM",
+      "time": "06:14 PM",
       "mat": "7",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902213",
       "time_type": "listed fight",
-      "result": ""
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "Matthew Edward Cote",
+      "team": "Gianeis - The Lab Oteri BJJ",
+      "bracket": "Purple / Master 1 / Male / Open Class",
+      "time": "06:17 PM",
+      "mat": "7",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902213",
+      "time_type": "listed fight",
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -11330,7 +11415,21 @@
       "name": "John Michael Semenuk IV",
       "team": "Pedigo Submission Fighting",
       "bracket": "Purple / Master 1 / Male / Open Class",
-      "time": "06:11 PM",
+      "time": "06:17 PM",
+      "mat": "7",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902213",
+      "time_type": "listed fight",
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "John Michael Semenuk IV",
+      "team": "Pedigo Submission Fighting",
+      "bracket": "Purple / Master 1 / Male / Open Class",
+      "time": "06:20 PM",
       "mat": "7",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902213",
@@ -11358,25 +11457,26 @@
       "name": "Eduardo Westphalen",
       "team": "Submit Your Friend Academy",
       "bracket": "Purple / Master 1 / Male / Open Class",
-      "time": "06:19 PM",
+      "time": "06:06 PM",
       "mat": "7",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902213",
       "time_type": "listed fight",
-      "result": ""
+      "result": "WIN"
     },
     {
       "competition_id": "3253",
       "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
       "date": "2026-10-24",
-      "name": "Jason Allen Harper",
-      "team": "Team Forsa",
+      "name": "Eduardo Westphalen",
+      "team": "Submit Your Friend Academy",
       "bracket": "Purple / Master 1 / Male / Open Class",
-      "time": "",
-      "mat": "",
-      "day": "",
-      "bracket_url": "",
-      "time_type": ""
+      "time": "06:20 PM",
+      "mat": "7",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902213",
+      "time_type": "listed fight",
+      "result": ""
     },
     {
       "competition_id": "3253",
@@ -11413,12 +11513,12 @@
       "name": "Justin Ronald Wheeler",
       "team": "Valle Jiu-Jitsu",
       "bracket": "Purple / Master 1 / Male / Open Class",
-      "time": "05:55 PM",
+      "time": "05:59 PM",
       "mat": "7",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902213",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -11760,13 +11860,15 @@
       "competition_id": "3253",
       "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
       "date": "2026-10-24",
-      "name": "Abdullah Al-Sweidi",
+      "name": "Justin Colletti",
       "team": "Carlson Gracie Team",
       "bracket": "Brown / Master 3 / Male / Open Class",
-      "time": "",
-      "mat": "",
-      "day": "",
-      "bracket_url": ""
+      "time": "05:58 PM",
+      "mat": "3",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902220",
+      "time_type": "listed fight",
+      "result": "WIN"
     },
     {
       "competition_id": "3253",
@@ -11775,7 +11877,7 @@
       "name": "Justin Colletti",
       "team": "Carlson Gracie Team",
       "bracket": "Brown / Master 3 / Male / Open Class",
-      "time": "05:58 PM",
+      "time": "06:20 PM",
       "mat": "3",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902220",
@@ -11794,7 +11896,21 @@
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902220",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "Airton Alves Júnior",
+      "team": "Dedeco BJJ",
+      "bracket": "Brown / Master 3 / Male / Open Class",
+      "time": "06:13 PM",
+      "mat": "3",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902220",
+      "time_type": "listed fight",
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -11803,7 +11919,21 @@
       "name": "James Rodger Soffen",
       "team": "Team Link",
       "bracket": "Brown / Master 3 / Male / Open Class",
-      "time": "06:07 PM",
+      "time": "06:13 PM",
+      "mat": "3",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902220",
+      "time_type": "listed fight",
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "James Rodger Soffen",
+      "team": "Team Link",
+      "bracket": "Brown / Master 3 / Male / Open Class",
+      "time": "06:20 PM",
       "mat": "3",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902220",
@@ -12334,7 +12464,7 @@
       "name": "Tollison w. Lewis jr",
       "team": "Central Maine Brazilian Jiu-Jitsu",
       "bracket": "Blue / Master 1 / Male / Open Class",
-      "time": "06:14 PM",
+      "time": "06:34 PM",
       "mat": "4",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902212",
@@ -12348,7 +12478,7 @@
       "name": "Luiz Henrique Ribeiro da Silva",
       "team": "CheckMat",
       "bracket": "Blue / Master 1 / Male / Open Class",
-      "time": "06:28 PM",
+      "time": "06:16 PM",
       "mat": "4",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902212",
@@ -12376,12 +12506,12 @@
       "name": "Anderson Soares da Silva Santos",
       "team": "Cicero Costha Internacional",
       "bracket": "Blue / Master 1 / Male / Open Class",
-      "time": "06:21 PM",
+      "time": "06:07 PM",
       "mat": "4",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902212",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -12390,7 +12520,21 @@
       "name": "Marco Freitas Lima",
       "team": "Cicero Costha Internacional",
       "bracket": "Blue / Master 1 / Male / Open Class",
-      "time": "06:07 PM",
+      "time": "06:01 PM",
+      "mat": "4",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902212",
+      "time_type": "listed fight",
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "Marco Freitas Lima",
+      "team": "Cicero Costha Internacional",
+      "bracket": "Blue / Master 1 / Male / Open Class",
+      "time": "06:16 PM",
       "mat": "4",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902212",
@@ -12423,6 +12567,20 @@
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902212",
       "time_type": "listed fight",
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "Zachary Matthew Vaswani",
+      "team": "Gianeis - The Lab Oteri BJJ",
+      "bracket": "Blue / Master 1 / Male / Open Class",
+      "time": "06:27 PM",
+      "mat": "4",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902212",
+      "time_type": "listed fight",
       "result": ""
     },
     {
@@ -12437,7 +12595,7 @@
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902212",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -12446,7 +12604,21 @@
       "name": "Edilton Da Vitoria",
       "team": "Nova União",
       "bracket": "Blue / Master 1 / Male / Open Class",
-      "time": "06:21 PM",
+      "time": "06:07 PM",
+      "mat": "4",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902212",
+      "time_type": "listed fight",
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "Edilton Da Vitoria",
+      "team": "Nova União",
+      "bracket": "Blue / Master 1 / Male / Open Class",
+      "time": "06:27 PM",
       "mat": "4",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902212",
@@ -12460,12 +12632,12 @@
       "name": "Jeferson J. Silva de Lima",
       "team": "Nova União",
       "bracket": "Blue / Master 1 / Male / Open Class",
-      "time": "06:07 PM",
+      "time": "06:01 PM",
       "mat": "4",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902212",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -12474,7 +12646,7 @@
       "name": "Michael Callahan Cote",
       "team": "Team Link",
       "bracket": "Blue / Master 1 / Male / Open Class",
-      "time": "06:14 PM",
+      "time": "06:34 PM",
       "mat": "4",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902212",
@@ -13096,19 +13268,6 @@
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902199",
       "time_type": "listed fight",
       "result": "LOSS"
-    },
-    {
-      "competition_id": "3253",
-      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
-      "date": "2026-10-24",
-      "name": "John Craton Cameron",
-      "team": "Mavs",
-      "bracket": "Black / Master 5 / Male / Open Class",
-      "time": "",
-      "mat": "",
-      "day": "",
-      "bracket_url": "",
-      "time_type": ""
     },
     {
       "competition_id": "3253",
@@ -14091,12 +14250,12 @@
       "name": "Gerardo Vinicio Jimenez Araya",
       "team": "Cicero Costha Internacional",
       "bracket": "Brown / Master 1 / Male / Open Class",
-      "time": "06:07 PM",
+      "time": "06:01 PM",
       "mat": "5",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902214",
       "time_type": "listed fight",
-      "result": ""
+      "result": "WIN"
     },
     {
       "competition_id": "3253",
@@ -14105,12 +14264,12 @@
       "name": "Chris-Anthony D. Thompson",
       "team": "GF Team",
       "bracket": "Brown / Master 1 / Male / Open Class",
-      "time": "06:07 PM",
+      "time": "06:01 PM",
       "mat": "5",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902214",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -14292,19 +14451,6 @@
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902195",
       "time_type": "listed fight",
       "result": "WIN"
-    },
-    {
-      "competition_id": "3253",
-      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
-      "date": "2026-10-24",
-      "name": "Ricardo Soranço de Andrade Cruz",
-      "team": "Day 1 Jiu-Jitsu",
-      "bracket": "Black / Master 1 / Male / Open Class",
-      "time": "",
-      "mat": "",
-      "day": "",
-      "bracket_url": "",
-      "time_type": ""
     },
     {
       "competition_id": "3253",
@@ -15373,12 +15519,12 @@
       "name": "MIchael S Fletcher",
       "team": "Day 1 Jiu-Jitsu",
       "bracket": "Purple / Master 3 / Male / Open Class",
-      "time": "06:02 PM",
+      "time": "06:03 PM",
       "mat": "1",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902219",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -15415,12 +15561,12 @@
       "name": "Lloyd P. Healy",
       "team": "Fulcrum Jiu-Jitsu Academy",
       "bracket": "Purple / Master 3 / Male / Open Class",
-      "time": "05:55 PM",
+      "time": "05:56 PM",
       "mat": "1",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902219",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -15443,12 +15589,26 @@
       "name": "Cosme Da Silva Lima",
       "team": "Nova União",
       "bracket": "Purple / Master 3 / Male / Open Class",
-      "time": "06:02 PM",
+      "time": "06:03 PM",
       "mat": "1",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902219",
       "time_type": "listed fight",
-      "result": ""
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "Cosme Da Silva Lima",
+      "team": "Nova União",
+      "bracket": "Purple / Master 3 / Male / Open Class",
+      "time": "06:11 PM",
+      "mat": "1",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902219",
+      "time_type": "listed fight",
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -15471,12 +15631,26 @@
       "name": "Eduardo Coelho S. Pereira",
       "team": "Nova União",
       "bracket": "Purple / Master 3 / Male / Open Class",
-      "time": "05:55 PM",
+      "time": "05:56 PM",
       "mat": "1",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902219",
       "time_type": "listed fight",
-      "result": ""
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "Eduardo Coelho S. Pereira",
+      "team": "Nova União",
+      "bracket": "Purple / Master 3 / Male / Open Class",
+      "time": "06:11 PM",
+      "mat": "1",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902219",
+      "time_type": "listed fight",
+      "result": "WIN"
     },
     {
       "competition_id": "3253",
@@ -15834,7 +16008,35 @@
       "name": "Jeremy D Bayless",
       "team": "Day 1 Jiu-Jitsu",
       "bracket": "Brown / Master 2 / Male / Open Class",
-      "time": "06:07 PM",
+      "time": "06:09 PM",
+      "mat": "2",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902217",
+      "time_type": "listed fight",
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "Jeremy D Bayless",
+      "team": "Day 1 Jiu-Jitsu",
+      "bracket": "Brown / Master 2 / Male / Open Class",
+      "time": "06:11 PM",
+      "mat": "2",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902217",
+      "time_type": "listed fight",
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "Jeremy D Bayless",
+      "team": "Day 1 Jiu-Jitsu",
+      "bracket": "Brown / Master 2 / Male / Open Class",
+      "time": "06:27 PM",
       "mat": "2",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902217",
@@ -15853,7 +16055,7 @@
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902217",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -15867,16 +16069,16 @@
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902217",
       "time_type": "listed fight",
-      "result": ""
+      "result": "WIN"
     },
     {
       "competition_id": "3253",
       "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
       "date": "2026-10-24",
-      "name": "Christopher D Frediani",
-      "team": "Team Forsa",
+      "name": "Michael A Mendonca",
+      "team": "Playground Jiu-Jitsu",
       "bracket": "Brown / Master 2 / Male / Open Class",
-      "time": "06:21 PM",
+      "time": "06:19 PM",
       "mat": "2",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902217",
@@ -15887,10 +16089,24 @@
       "competition_id": "3253",
       "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
       "date": "2026-10-24",
+      "name": "Christopher D Frediani",
+      "team": "Team Forsa",
+      "bracket": "Brown / Master 2 / Male / Open Class",
+      "time": "06:11 PM",
+      "mat": "2",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902217",
+      "time_type": "listed fight",
+      "result": "LOSS"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
       "name": "James D. Bruzzese Jr",
       "team": "Team Forsa",
       "bracket": "Brown / Master 2 / Male / Open Class",
-      "time": "06:28 PM",
+      "time": "06:19 PM",
       "mat": "2",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902217",
@@ -15904,12 +16120,12 @@
       "name": "Robert William Vanburen III",
       "team": "Vital Combat Team",
       "bracket": "Brown / Master 2 / Male / Open Class",
-      "time": "06:07 PM",
+      "time": "06:09 PM",
       "mat": "2",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902217",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -15936,7 +16152,21 @@
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902196",
       "time_type": "listed fight",
-      "result": ""
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "Marcos Vinícius da Silva Tinoco",
+      "team": "Day 1 Jiu-Jitsu",
+      "bracket": "Black / Master 2 / Male / Open Class",
+      "time": "06:06 PM",
+      "mat": "8",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902196",
+      "time_type": "listed fight",
+      "result": "WIN"
     },
     {
       "competition_id": "3253",
@@ -15992,7 +16222,7 @@
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902196",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -16015,12 +16245,12 @@
       "name": "Maurício Faleta Fernandes",
       "team": "Nova União",
       "bracket": "Black / Master 2 / Male / Open Class",
-      "time": "06:14 PM",
+      "time": "06:06 PM",
       "mat": "8",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902196",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -16449,12 +16679,12 @@
       "name": "Dennys V Ojeda",
       "team": "Dedeco BJJ",
       "bracket": "Blue / Master 4 / Male / Open Class",
-      "time": "06:07 PM",
+      "time": "06:06 PM",
       "mat": "8",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902221",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -16463,12 +16693,12 @@
       "name": "Franquisnelio G. da Silva",
       "team": "Valle Jiu-Jitsu",
       "bracket": "Blue / Master 4 / Male / Open Class",
-      "time": "06:07 PM",
+      "time": "06:06 PM",
       "mat": "8",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902221",
       "time_type": "listed fight",
-      "result": ""
+      "result": "WIN"
     },
     {
       "competition_id": "3253",
@@ -16524,7 +16754,7 @@
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902224",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -16538,7 +16768,21 @@
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902224",
       "time_type": "listed fight",
-      "result": ""
+      "result": "WIN"
+    },
+    {
+      "competition_id": "3253",
+      "competition_name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "date": "2026-10-24",
+      "name": "Daniel J Sally",
+      "team": "Gianeis - The Lab Oteri BJJ",
+      "bracket": "Blue / Master 5 / Male / Open Class",
+      "time": "06:11 PM",
+      "mat": "5",
+      "day": "Sat",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902224",
+      "time_type": "listed fight",
+      "result": "WIN"
     },
     {
       "competition_id": "3253",
@@ -16561,12 +16805,12 @@
       "name": "Scott Vincent Marano Chambers",
       "team": "Valle Jiu-Jitsu",
       "bracket": "Blue / Master 5 / Male / Open Class",
-      "time": "06:15 PM",
+      "time": "06:11 PM",
       "mat": "5",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902224",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -17887,8 +18131,9 @@
       "time": "",
       "mat": "",
       "day": "",
-      "bracket_url": "",
-      "time_type": ""
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902226",
+      "time_type": "unverified bracket",
+      "result": ""
     },
     {
       "competition_id": "3253",
@@ -18242,12 +18487,12 @@
       "name": "Dilor Mendes Pacheco",
       "team": "Gracie Barra",
       "bracket": "Brown / Master 4 / Male / Open Class",
-      "time": "06:14 PM",
+      "time": "06:05 PM",
       "mat": "3",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902223",
       "time_type": "listed fight",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3253",
@@ -18256,12 +18501,12 @@
       "name": "Rolando Kevin Pam",
       "team": "Vuk / 617 Brazilian Jiu-jitsu",
       "bracket": "Brown / Master 4 / Male / Open Class",
-      "time": "06:14 PM",
+      "time": "06:05 PM",
       "mat": "3",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902223",
       "time_type": "listed fight",
-      "result": ""
+      "result": "WIN"
     },
     {
       "competition_id": "3253",
@@ -19145,8 +19390,9 @@
       "time": "",
       "mat": "",
       "day": "",
-      "bracket_url": "",
-      "time_type": ""
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902201",
+      "time_type": "unverified bracket",
+      "result": ""
     },
     {
       "competition_id": "3253",
@@ -19279,8 +19525,9 @@
       "time": "",
       "mat": "",
       "day": "",
-      "bracket_url": "",
-      "time_type": ""
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902225",
+      "time_type": "unverified bracket",
+      "result": ""
     },
     {
       "competition_id": "3253",
@@ -19396,8 +19643,9 @@
       "time": "",
       "mat": "",
       "day": "",
-      "bracket_url": "",
-      "time_type": ""
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902231",
+      "time_type": "unverified bracket",
+      "result": ""
     },
     {
       "competition_id": "3253",
