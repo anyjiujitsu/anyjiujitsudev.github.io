@@ -396,13 +396,22 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity):
                         expanded.append(row)
                     completed += len(matching)
                 else:
+                    # The current bracket loaded successfully. An athlete missing
+                    # from its confirmed fight cards must not inherit a stale
+                    # assignment from a previous refresh. When valid fights exist
+                    # in the bracket, omit this unmatched entry from the match
+                    # listing entirely (a registration is not a match).
+                    if fights:
+                        print(f'    No current fight for {athlete["name"]!r} in {info["url"]}; dropping stale assignment', flush=True)
+                        continue
+                    # If zero fights were parsed, the upstream page may be
+                    # incomplete/changed. Avoid incorrectly treating a parser
+                    # failure as proof that a match was canceled. Retain the
+                    # registration without a claimed match assignment.
                     row = dict(athlete)
-                    row['time'] = info['division_time']
-                    row['day'] = info['division_day']
                     row['bracket_url'] = info['url']
-                    row['time_type'] = 'estimated division start'
-                    prior = previous_rows_for(previous_by_identity, athlete)
-                    expanded.extend(prior if prior else [row])
+                    row['time_type'] = 'unverified bracket'
+                    expanded.append(row)
         except (requests.RequestException, ValueError) as exc:
             print(f'Bracket unavailable {info["url"]}: {exc}', flush=True)
             for athlete in group:
