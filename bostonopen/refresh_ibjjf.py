@@ -179,13 +179,11 @@ def discover_open_class_links(entries, competition_id, roster):
             continue
         heading = soup.select_one('h1, h2, .tournament-category__title, .tournament-category_bracket-title')
         label = clean(heading.get_text(' ', strip=True) if heading else soup.title.get_text(' ', strip=True) if soup.title else '')
-        if 'open class' not in key(label):
-            continue
         matches = []
         for division in missing:
             belt, age, sex, weight = division
             tokens = key(label)
-            if (weight == 'open class' and
+            if (weight == 'open class' and re.search(rf'(?<!\w){re.escape(weight)}(?!\w)', tokens) and
                 re.search(rf'(?<!\w){re.escape(belt)}(?!\w)', tokens) and
                 re.search(rf'(?<!\w){re.escape(age)}(?!\w)', tokens) and
                 re.search(rf'(?<!\w){re.escape(sex)}(?!\w)', tokens)):
@@ -194,7 +192,7 @@ def discover_open_class_links(entries, competition_id, roster):
             entries[matches[0]] = {'url': url, 'division_time': '', 'division_day': ''}
             missing.remove(matches[0])
     if missing:
-        print(f'  Open Class divisions not discovered for {competition_id}: {sorted(missing)}', flush=True)
+        print(f'  Division links not discovered for {competition_id}: {sorted(missing)}', flush=True)
     return entries
 
 
@@ -358,39 +356,48 @@ def parse_fights(soup):
 
 
 def single_entrant_bye_fight(soup, roster_names):
-    """Recover unscheduled single-entrant FINAL/BYE cards.
+    """Recover an explicitly recorded one-person BYE without time/mat.
 
-    Unlike scheduled fights, a one-person final can have no match header and
-    no official date or mat. Only accept a BYE when exactly ONE identifiable
-    athlete appears in the bracket's match cards, that athlete belongs to
-    the current IBJJF division roster, and BYE is shown in the bracket.
-    A ranking table alone is never sufficient evidence of a BYE.
+    Look in match cards (not rankings), and allow a BYE slot to be plain text
+    instead of a .match-card__competitor-name. No category IDs or names fixed.
     """
-    bracket = soup.select_one('.tournament-category__bracket, .tournament-category_bracket, .tournament-category__brackets')
-    if bracket is None:
-        return None
-    # Names in match cards, not in the ranking table or unrelated page text.
-    names = {
-        key(normalize_competitor_name(node.get_text(' ', strip=True))):
-            normalize_competitor_name(node.get_text(' ', strip=True))
-        for node in bracket.select('.match-card__competitor-name')
-        if key(normalize_competitor_name(node.get_text(' ', strip=True))) not in ('', 'bye')
-        and not is_placeholder_name(node.get_text(' ', strip=True))
-    }
-    if len(names) != 1:
-        return None
-    name_key, name = next(iter(names.items()))
-    if name_key not in {key(n) for n in roster_names}:
-        return None
-    # Scope BYE to the match-card region, never a table or other screen text.
-    cards = bracket.select('.match-card')
-    if not cards or not any(re.search(r'(?<!\w)BYE(?!\w)', c.get_text(' ', strip=True), re.I) for c in cards):
-        return None
-    return {
-        'number': '', 'mat': '', 'time': '', 'day': '', 'date': '',
-        'competitors': [{'name': name, 'loser': False, 'bye': False, 'placeholder': False}],
-        'result_map': {name_key: 'BYE'}
-    }
+    valid = {key(n): n for n in roster_names}
+    # Different bracket versions use singular/plural wrappers; alternatively
+    # match cards may be reachable directly from the main content.
+    containers = soup.select('.tournament-category__bracket, .tournament-category__brackets, .tournament-category_bracket')
+    if not containers:
+        containers = [soup.select_one('main') or soup.body or soup]
+    for container in containers:
+        cards = container.select('.match-card')
+        if not cards:
+            continue
+        named = {}
+        for node in container.select('.match-card__competitor-name'):
+            name = normalize_competitor_name(node.get_text(' ', strip=True))
+            if key(name) in valid:
+                named[key(name)] = name
+        # This fallback is intentionally restricted to a *single* actual
+        # competitor in the bracket. A BYE elsewhere in a larger bracket
+        # does not prove that that person's match was a BYE.
+        if len(named) != 1:
+            continue
+        if not any(re.search(r'(?<!\w)BYE(?!\w)', c.get_text(' ', strip=True), re.I) for c in cards):
+            continue
+        name_key, name = next(iter(named.items()))
+        # Confirm the bracket really has one named competitor, not multiple
+        # people of whom just one happens to be in the searched academy.
+        all_names = {key(normalize_competitor_name(n.get_text(' ', strip=True)))
+                     for n in container.select('.match-card__competitor-name')
+                     if key(n.get_text(' ', strip=True)) != 'bye'}
+        all_names = {n for n in all_names if n and not is_placeholder_name(n)}
+        if all_names != {name_key}:
+            continue
+        return {
+            'number': '', 'mat': '', 'time': '', 'day': '', 'date': '',
+            'competitors': [{'name': name, 'loser': False, 'bye': False, 'placeholder': False}],
+            'result_map': {name_key: 'BYE'}
+        }
+    return None
 
 
 def known_bracket_competitors(soup):
@@ -459,6 +466,7 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity):
     for category, group in by_category.items():
         info = bracket_entries.get(category)
         if not info:
+            print(f'    Missing division link for {category}: {len(group)} registrations', flush=True)
             missed += len(group)
             for athlete in group:
                 prior = previous_rows_for(previous_by_identity, athlete)
@@ -473,6 +481,7 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity):
             bye_fight = single_entrant_bye_fight(bracket_soup, [a['name'] for a in group])
             if bye_fight and not any(fight_contains_athlete(f, bye_fight['competitors'][0]['name']) for f in fights):
                 fights.append(bye_fight)
+                print(f'    Verified unscheduled BYE for {bye_fight["competitors"][0]["name"]} in {info["url"]}', flush=True)
             bracket_names = known_bracket_competitors(bracket_soup)
             print(f'    {info["url"]}: {len(fights)} scheduled or completed fight cards parsed', flush=True)
             for athlete in group:
