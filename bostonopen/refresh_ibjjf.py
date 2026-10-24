@@ -84,7 +84,20 @@ def category_key(parts):
     return tuple(key(re.sub(r'\([^)]*\)', '', x)) for x in parts)
 
 
+def open_class_weight(value):
+    """Normalize IBJJF and BJJCompSystem Open Class wording."""
+    v = key(value).replace('-', ' ')
+    if v in {'open', 'open class', 'absolute', 'absolute class'}:
+        return 'open class'
+    return v
+
+
 def schedule_brackets(soup):
+    """Return schedules by Belt/Age/Sex/Weight, supporting Open Class links.
+
+    Open Class may have three slash-separated parts (no separate weight), or
+    four parts, and its scheduled start time may not be shown in link text.
+    """
     entries = {}
     for anchor in soup.find_all('a', href=True):
         url = urljoin('https://www.bjjcompsystem.com', anchor['href'])
@@ -92,21 +105,45 @@ def schedule_brackets(soup):
             continue
         label = clean(anchor.get_text(' ', strip=True))
         match = re.search(r'(\d{1,2}:\d{2}\s*[AP]M)\s*,?\s*(Sat|Sun|Mon|Tue|Wed|Thu|Fri)\b', label, re.I)
-        if not match:
-            continue
-        category = clean(label[:match.start()]).strip(' *')
+        category = clean(label[:match.start()] if match else label).strip(' *')
         chunks = [clean(v).strip('*') for v in category.split('/')]
-        if len(chunks) != 4:
+        if len(chunks) == 3 and re.search(r'\bopen\s*class\b', category, re.I):
+            age, sex, belt = chunks
+            weight = 'Open Class'
+        elif len(chunks) == 4:
+            age, sex, belt, weight = chunks
+            # The source can include the words Open Class on either side.
+            if re.search(r'\bopen\s*class\b', category, re.I):
+                weight = 'Open Class'
+        else:
             continue
-        age, sex, belt, weight = chunks
-        lookup = category_key((belt, age, sex, weight))
+        lookup = category_key((belt, age, sex, open_class_weight(weight)))
         entries[lookup] = {
             'url': url,
-            'division_time': clean(match.group(1)),
-            'division_day': match.group(2).title()
+            'division_time': clean(match.group(1)) if match else '',
+            'division_day': match.group(2).title() if match else ''
         }
     if not entries:
         raise ValueError('BJJCompSystem schedule contains no linked brackets')
+    return entries
+
+
+def add_verified_open_class_links(entries, competition_id):
+    """Fallback for verified Open Class brackets absent from schedule links.
+
+    Further events are picked up automatically when their category links
+    appear in the schedule; this mapping covers one independently verified link.
+    """
+    verified = {
+        '3253': [('Black', 'Master 1', 'Male', 'Open Class', '2902195')],
+    }
+    for belt, age, sex, weight, category_id in verified.get(str(competition_id), []):
+        lookup = category_key((belt, age, sex, open_class_weight(weight)))
+        entries.setdefault(lookup, {
+            'url': f'https://www.bjjcompsystem.com/tournaments/{competition_id}/categories/{category_id}',
+            'division_time': '',
+            'division_day': ''
+        })
     return entries
 
 
@@ -269,7 +306,7 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity):
         parts = [x.strip() for x in athlete['bracket'].split('/')]
         if len(parts) < 4:
             continue
-        weight = clean(re.sub(r'\([^)]*\)', '', parts[3]))
+        weight = open_class_weight(clean(re.sub(r'\([^)]*\)', '', parts[3])))
         lookup = category_key((parts[0], parts[1], parts[2], weight))
         by_category.setdefault(lookup, []).append(athlete)
 
@@ -344,7 +381,8 @@ def main():
             done.append(cid)
             print(f'  {len(roster)} athletes collected from IBJJF', flush=True)
             try:
-                schedule = schedule_brackets(get_soup(f'https://www.bjjcompsystem.com/tournaments/{cid}/schedule'))
+                schedule = add_verified_open_class_links(
+                    schedule_brackets(get_soup(f'https://www.bjjcompsystem.com/tournaments/{cid}/schedule')), cid)
                 expanded, count, unmatched = fill_assignments(roster, schedule, previous_by_identity)
                 result.extend(expanded)
                 print(f'  {count} explicit fight assignments; {unmatched} unmatched divisions', flush=True)
