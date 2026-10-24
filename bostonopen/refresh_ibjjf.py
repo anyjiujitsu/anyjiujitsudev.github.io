@@ -243,15 +243,20 @@ def parse_fights(soup):
         header_node = block.select_one('.tournament-category__match-header, .tournament-category_match-header')
         header_text = clean(header_node.get_text(' ', strip=True) if header_node else '')
         fields = parse_header_fields(header_text)
-        if not (fields['mat'] and fields['time'] and fields['day']):
-            continue
-
+        # FINAL and BYE cards may have no FIGHT/Mat/Time header. Inspect
+        # participants and outcomes before deciding whether to retain the card.
         competitors = []
         for comp in block.select('.match-card__competitor'):
             name_node = comp.select_one('.match-card__competitor-name')
             if not name_node:
-                continue
-            name = normalize_competitor_name(name_node.get_text(' ', strip=True))
+                # A BYE is often plain text instead of a competitor-name div.
+                raw_text = clean(comp.get_text(' ', strip=True))
+                if re.search(r'\bBYE\b', raw_text, re.I):
+                    name = 'BYE'
+                else:
+                    continue
+            else:
+                name = normalize_competitor_name(name_node.get_text(' ', strip=True))
             if not name:
                 continue
             desc = comp.select_one('.match-card__competitor-description')
@@ -273,9 +278,9 @@ def parse_fights(soup):
         named = [c for c in competitors if c['name']]
         if len(named) == 2:
             a, b = named
-            if a['bye'] and not b['bye']:
+            if a['bye'] and not b['bye'] and not b['placeholder']:
                 result_map[key(b['name'])] = 'BYE'
-            elif b['bye'] and not a['bye']:
+            elif b['bye'] and not a['bye'] and not a['placeholder']:
                 result_map[key(a['name'])] = 'BYE'
             elif a['loser'] ^ b['loser']:
                 loser = a if a['loser'] else b
@@ -285,7 +290,10 @@ def parse_fights(soup):
                 if not winner['placeholder']:
                     result_map[key(winner['name'])] = 'WIN'
 
-        fights.append({**fields, 'competitors': competitors, 'result_map': result_map})
+        # Retain a card only if scheduled or it proves a completed result.
+        # Otherwise an undated placeholder must not become a new match.
+        if (fields['mat'] and fields['time'] and fields['day']) or result_map:
+            fights.append({**fields, 'competitors': competitors, 'result_map': result_map})
 
     if fights:
         return fights
@@ -381,7 +389,7 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity):
 
         try:
             fights = parse_fights(get_soup(info['url']))
-            print(f'    {info["url"]}: {len(fights)} dated/matted fights parsed', flush=True)
+            print(f'    {info["url"]}: {len(fights)} scheduled or completed fight cards parsed', flush=True)
             for athlete in group:
                 matching = sorted([fight for fight in fights if fight_contains_athlete(fight, athlete['name'])], key=fight_sort_key)
                 if matching:
@@ -391,7 +399,8 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity):
                         row['time'] = fight.get('time', '')
                         row['day'] = fight.get('day', '')
                         row['bracket_url'] = info['url']
-                        row['time_type'] = 'listed fight'
+                        row['time_type'] = 'listed fight' if fight.get('time') else 'completed result without published time'
+                        row['fight_number'] = fight.get('number', '')
                         row['result'] = fight.get('result_map', {}).get(key(athlete['name']), '')
                         expanded.append(row)
                     completed += len(matching)
