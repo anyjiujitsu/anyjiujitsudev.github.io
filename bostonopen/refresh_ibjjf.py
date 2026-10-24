@@ -193,41 +193,46 @@ def _competitor_visual_state(node):
 
 
 def fight_results_from_styling(soup, fights, roster_names):
-    """Return {(fight number, athlete normalized name): WIN/LOSS} only for
-    visually resolved two-athlete bouts. Inconclusive fights get no result.
+    """Extract only confirmed fight outcomes from BJJ Competition System cards.
 
-    The bracket site's rendering can change: a missing result is safer than
-    a fabricated win or loss. Styling is read from HTML, not flattened text.
+    BJJCompSystem marks the defeated competitor's *description* span with
+    `match-competitor--loser`; the opponent is the winner only when both
+    competitors are named and exactly one has this marker. A scheduled but
+    unfinished match has no loser marker and must produce no results.
     """
     fight_nums = {f['number'] for f in fights}
-    names = {key(n): n for n in roster_names}
-    header = re.compile(r'^FIGHT\s*#?\s*(\d+)\s*:', re.I)
-    current = None
-    seen = {}
-    container = soup.select_one('main') or soup.body or soup
-    for string in container.strings:
-        value = clean(string)
-        if not value:
-            continue
-        match = header.match(value)
-        if match:
-            number = int(match.group(1))
-            current = number if number in fight_nums else None
-        if current is None:
-            continue
-        candidate = key(re.sub(r'^\d{1,3}\s+', '', value))
-        if candidate not in names:
-            continue
-        state = _competitor_visual_state(string.parent)
-        if state:
-            seen.setdefault(current, {})[candidate] = state
+    names = {key(n) for n in roster_names}
     verified = {}
-    for number, competitors in seen.items():
-        # Both sides must have explicit, opposing styling. A same-name repeat
-        # is ignored, and an unset/missing opponent does not imply a result.
-        if len(competitors) == 2 and set(competitors.values()) == {'WIN', 'LOSS'}:
-            for name, status in competitors.items():
-                verified[(number, name)] = status
+    header = re.compile(r'\bFIGHT\s*#?\s*(\d+)\b', re.I)
+
+    for match in soup.select('.tournament-category__match'):
+        heading = match.select_one('.tournament-category__match-header')
+        match_header = clean(heading.get_text(' ', strip=True)) if heading else ''
+        found = header.search(match_header)
+        if not found:
+            continue
+        number = int(found.group(1))
+        if number not in fight_nums:
+            continue
+        competitors = []
+        for card in match.select('.match-card__competitor'):
+            name_el = card.select_one('.match-card__competitor-name')
+            if name_el is None:
+                continue
+            name = key(name_el.get_text(' ', strip=True))
+            # A later-round placeholder isn't a confirmed athlete.
+            if name not in names:
+                continue
+            desc = card.select_one('.match-card__competitor-description')
+            is_loser = bool(desc and 'match-competitor--loser' in desc.get('class', []))
+            competitors.append((name, is_loser))
+        # Only award a result if both roster athletes are known, distinct,
+        # and exactly one is explicitly flagged as loser by the site.
+        if (len(competitors) == 2 and competitors[0][0] != competitors[1][0]
+                and sum(is_loser for _, is_loser in competitors) == 1):
+            for name, is_loser in competitors:
+                verified[(number, name)] = 'LOSS' if is_loser else 'WIN'
+
     return verified
 
 
