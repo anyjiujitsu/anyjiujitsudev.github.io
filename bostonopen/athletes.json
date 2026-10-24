@@ -1,6 +1,6 @@
 {
   "source": "IBJJF and BJJCompSystem",
-  "updated_at": "2026-10-24T22:49:47.197564+00:00",
+  "updated_at": "2026-10-24T23:09:10.198023+00:00",
   "athletes": [
     {
       "competition_id": "3253",
@@ -15441,12 +15441,12 @@
       "name": "Luiz Henrique Ribeiro da Silva",
       "team": "CheckMat",
       "bracket": "Blue / Master 1 / Male / Open Class",
-      "time": "06:40 PM",
+      "time": "06:43 PM",
       "mat": "4",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902212",
       "time_type": "listed fight",
-      "result": "",
+      "result": "LOSS",
       "fight_number": "76"
     },
     {
@@ -15651,12 +15651,12 @@
       "name": "Edilton Da Vitoria",
       "team": "Nova União",
       "bracket": "Blue / Master 1 / Male / Open Class",
-      "time": "06:40 PM",
+      "time": "06:43 PM",
       "mat": "4",
       "day": "Sat",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3253/categories/2902212",
       "time_type": "listed fight",
-      "result": "",
+      "result": "WIN",
       "fight_number": "76"
     },
     {
