@@ -128,23 +128,81 @@ def schedule_brackets(soup):
     return entries
 
 
-def add_verified_open_class_links(entries, competition_id):
-    """Fallback for verified Open Class brackets absent from schedule links.
+def discover_open_class_links(entries, competition_id, roster):
+    """Discover all Open Class categories needed by this tournament's roster.
 
-    Further events are picked up automatically when their category links
-    appear in the schedule; this mapping covers one independently verified link.
+    No individual athlete, division or category ID is hardcoded. Collect category
+    links from the tournament's published navigation, then verify their category
+    headings before associating them with IBJJF division keys.
     """
-    verified = {
-        '3253': [('Black', 'Master 1', 'Male', 'Open Class', '2902195')],
-    }
-    for belt, age, sex, weight, category_id in verified.get(str(competition_id), []):
-        lookup = category_key((belt, age, sex, open_class_weight(weight)))
-        entries.setdefault(lookup, {
-            'url': f'https://www.bjjcompsystem.com/tournaments/{competition_id}/categories/{category_id}',
-            'division_time': '',
-            'division_day': ''
-        })
+    required = set()
+    for athlete in roster:
+        parts = [clean(x) for x in athlete.get('bracket', '').split('/')]
+        if len(parts) >= 4 and open_class_weight(parts[3]) == 'open class':
+            required.add(category_key((parts[0], parts[1], parts[2], 'open class')))
+    missing = required - entries.keys()
+    if not missing:
+        return entries
+
+    root_url = f'https://www.bjjcompsystem.com/tournaments/{competition_id}'
+    urls = set()
+    # The tournament offers different navigation views. Some Open Class divisions
+    # have no scheduled start and are absent from the schedule list itself.
+    for page in (root_url, root_url + '/categories', root_url + '/divisions', root_url + '/schedule'):
+        try:
+            soup = get_soup(page)
+        except (requests.RequestException, ValueError) as exc:
+            print(f'  Category discovery page unavailable: {page}: {exc}', flush=True)
+            continue
+        # First consume links with a complete division label, avoiding extra page fetches.
+        for lookup, data in schedule_brackets_optional(soup).items():
+            if lookup in missing:
+                entries[lookup] = data
+        missing = required - entries.keys()
+        if not missing:
+            return entries
+        for anchor in soup.find_all('a', href=True):
+            url = urljoin(root_url, anchor['href']).split('?')[0].split('#')[0]
+            if re.fullmatch(rf'https?://(?:www\.)?bjjcompsystem\.com/tournaments/{re.escape(str(competition_id))}/categories/\d+', url):
+                urls.add(url)
+
+    # If category links don't identify the division, inspect the actual heading;
+    # e.g. "Master 1 Male BLACK Open Class". Only collect unambiguous matches.
+    for url in sorted(urls):
+        if not missing:
+            break
+        if url in {data['url'] for data in entries.values()}:
+            continue
+        try:
+            soup = get_soup(url)
+        except (requests.RequestException, ValueError):
+            continue
+        heading = soup.select_one('h1, h2, .tournament-category__title, .tournament-category_bracket-title')
+        label = clean(heading.get_text(' ', strip=True) if heading else soup.title.get_text(' ', strip=True) if soup.title else '')
+        if 'open class' not in key(label):
+            continue
+        matches = []
+        for division in missing:
+            belt, age, sex, weight = division
+            tokens = key(label)
+            if (weight == 'open class' and
+                re.search(rf'(?<!\w){re.escape(belt)}(?!\w)', tokens) and
+                re.search(rf'(?<!\w){re.escape(age)}(?!\w)', tokens) and
+                re.search(rf'(?<!\w){re.escape(sex)}(?!\w)', tokens)):
+                matches.append(division)
+        if len(matches) == 1:
+            entries[matches[0]] = {'url': url, 'division_time': '', 'division_day': ''}
+            missing.remove(matches[0])
+    if missing:
+        print(f'  Open Class divisions not discovered for {competition_id}: {sorted(missing)}', flush=True)
     return entries
+
+
+def schedule_brackets_optional(soup):
+    try:
+        return schedule_brackets(soup)
+    except ValueError:
+        return {}
 
 
 def parse_header_fields(text):
@@ -381,8 +439,8 @@ def main():
             done.append(cid)
             print(f'  {len(roster)} athletes collected from IBJJF', flush=True)
             try:
-                schedule = add_verified_open_class_links(
-                    schedule_brackets(get_soup(f'https://www.bjjcompsystem.com/tournaments/{cid}/schedule')), cid)
+                schedule = discover_open_class_links(
+                    schedule_brackets(get_soup(f'https://www.bjjcompsystem.com/tournaments/{cid}/schedule')), cid, roster)
                 expanded, count, unmatched = fill_assignments(roster, schedule, previous_by_identity)
                 result.extend(expanded)
                 print(f'  {count} explicit fight assignments; {unmatched} unmatched divisions', flush=True)
