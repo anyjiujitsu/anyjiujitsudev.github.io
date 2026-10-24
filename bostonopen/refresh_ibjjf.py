@@ -151,6 +151,86 @@ def fight_contains_athlete(fight, name):
     return False
 
 
+def _competitor_visual_state(node):
+    """Conservative style-based result recognition; never infer from bracket position.
+
+    A result is usable only when explicitly grey/black styling (or semantic
+    winner/loser classes) is present on the competitor text or its near wrapper.
+    """
+    for ancestor_index, tag in enumerate([node] + list(node.parents)[:3]):
+        if not getattr(tag, 'attrs', None):
+            continue
+        classes = ' '.join(tag.get('class', [])).lower()
+        classes = re.sub(r'[^a-z0-9]+', ' ', classes)
+        words = set(classes.split())
+        if {'loser', 'lost', 'defeated'} & words:
+            return 'LOSS'
+        if {'winner', 'won', 'victor'} & words:
+            return 'WIN'
+        style = tag.get('style', '').lower()
+        if 'opacity' in style:
+            match = re.search(r'opacity\s*:\s*(0?\.\d+|1(?:\.0+)?)', style)
+            if match and float(match.group(1)) < .75:
+                return 'LOSS'
+        match = re.search(r'(?:^|;)\s*color\s*:\s*([^;!]+)', style)
+        if match:
+            color = match.group(1).strip().replace(' ', '')
+            if color in ('black','#000','#000000','rgb(0,0,0)','#111','#111111','#222','#222222'):
+                return 'WIN'
+            if color in ('gray','grey','darkgray','darkgrey','lightgray','lightgrey','#777','#777777','#888','#888888','#999','#999999','#aaa','#aaaaaa','#bbb','#bbbbbb','#ccc','#cccccc'):
+                return 'LOSS'
+            rgb = re.fullmatch(r'rgba?\((\d+),(\d+),(\d+)(?:,[^)]*)?\)',color)
+            if rgb:
+                channels = [int(rgb.group(i)) for i in (1,2,3)]
+                if max(channels)-min(channels) <= 12:
+                    if max(channels) <= 45:
+                        return 'WIN'
+                    if 100 <= min(channels) <= 210:
+                        return 'LOSS'
+        # CSS utility classes aren't reliable without stylesheets, so only
+        # recognize explicit unambiguous semantic hints.
+    return None
+
+
+def fight_results_from_styling(soup, fights, roster_names):
+    """Return {(fight number, athlete normalized name): WIN/LOSS} only for
+    visually resolved two-athlete bouts. Inconclusive fights get no result.
+
+    The bracket site's rendering can change: a missing result is safer than
+    a fabricated win or loss. Styling is read from HTML, not flattened text.
+    """
+    fight_nums = {f['number'] for f in fights}
+    names = {key(n): n for n in roster_names}
+    header = re.compile(r'^FIGHT\s*#?\s*(\d+)\s*:', re.I)
+    current = None
+    seen = {}
+    container = soup.select_one('main') or soup.body or soup
+    for string in container.strings:
+        value = clean(string)
+        if not value:
+            continue
+        match = header.match(value)
+        if match:
+            number = int(match.group(1))
+            current = number if number in fight_nums else None
+        if current is None:
+            continue
+        candidate = key(re.sub(r'^\d{1,3}\s+', '', value))
+        if candidate not in names:
+            continue
+        state = _competitor_visual_state(string.parent)
+        if state:
+            seen.setdefault(current, {})[candidate] = state
+    verified = {}
+    for number, competitors in seen.items():
+        # Both sides must have explicit, opposing styling. A same-name repeat
+        # is ignored, and an unset/missing opponent does not imply a result.
+        if len(competitors) == 2 and set(competitors.values()) == {'WIN', 'LOSS'}:
+            for name, status in competitors.items():
+                verified[(number, name)] = status
+    return verified
+
+
 def fill_assignments(athletes, bracket_entries, previous_by_key):
     by_category = {}
     for a in athletes:
@@ -177,7 +257,9 @@ def fill_assignments(athletes, bracket_entries, previous_by_key):
             athlete['bracket_url'] = info['url']
             athlete['time_type'] = 'estimated division start'
         try:
-            fights = parse_fights(get_soup(info['url']))
+            bracket_soup = get_soup(info['url'])
+            fights = parse_fights(bracket_soup)
+            result_states = fight_results_from_styling(bracket_soup, fights, [a['name'] for a in group])
             print(f'    {info["url"]}: {len(fights)} dated/matted fights parsed', flush=True)
             for athlete in group:
                 matching = [f for f in fights if fight_contains_athlete(f, athlete['name'])]
@@ -190,7 +272,8 @@ def fill_assignments(athletes, bracket_entries, previous_by_key):
                     athlete['fights'] = [
                         {'fight_number': f['number'], 'fight_date': f['date'],
                          'mat': f['mat'], 'time': f['time'], 'day': f['day'],
-                         'time_type': 'explicit bracket fight'}
+                         'time_type': 'explicit bracket fight',
+                         'result': result_states.get((f['number'], key(athlete['name'])), '')}
                         for f in ordered
                     ]
                     first = ordered[0]
@@ -223,7 +306,7 @@ def previous_fights(previous_by_key, athlete):
     if isinstance(fights, list) and fights:
         return fights
     if old.get('fight_number') and old.get('mat'):
-        return [{k: old.get(k, '') for k in ('fight_number', 'fight_date', 'mat', 'time', 'day', 'time_type')}]
+        return [{k: old.get(k, '') for k in ('fight_number', 'fight_date', 'mat', 'time', 'day', 'time_type', 'result')}]
     return []
 
 
@@ -253,7 +336,7 @@ def main():
         if identity not in previous_by_key:
             previous_by_key[identity] = dict(a, fights=[])
         if a.get('fight_number'):
-            previous_by_key[identity]['fights'].append({k: a.get(k, '') for k in ('fight_number', 'fight_date', 'mat', 'time', 'day', 'time_type')})
+            previous_by_key[identity]['fights'].append({k: a.get(k, '') for k in ('fight_number', 'fight_date', 'mat', 'time', 'day', 'time_type', 'result')})
         elif a.get('fights'):
             previous_by_key[identity]['fights'].extend(a['fights'])
     result, done, errors = [], [], {}
