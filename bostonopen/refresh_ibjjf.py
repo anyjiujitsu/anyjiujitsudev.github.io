@@ -238,9 +238,9 @@ def normalize_competitor_name(name):
 def parse_fights(soup):
     fights = []
 
-    blocks = soup.select('.tournament-category_match')
+    blocks = soup.select('.tournament-category__match, .tournament-category_match')
     for block in blocks:
-        header_node = block.select_one('.tournament-category_match-header')
+        header_node = block.select_one('.tournament-category__match-header, .tournament-category_match-header')
         header_text = clean(header_node.get_text(' ', strip=True) if header_node else '')
         fields = parse_header_fields(header_text)
         if not (fields['mat'] and fields['time'] and fields['day']):
