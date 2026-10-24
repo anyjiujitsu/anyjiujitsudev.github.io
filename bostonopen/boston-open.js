@@ -168,9 +168,13 @@ function appendBracketCell(parent, bracketText, resultText = '') {
 function renderAthletes(items) {
   rows.replaceChildren();
   if (!items.length) { const blank = document.createElement('div'); blank.className = 'boston-empty'; blank.textContent = 'No athletes matched your search in the available rosters.'; rows.append(blank); return; }
+  const isFinishedMatch = athlete => ['WIN', 'LOSS', 'BYE'].includes(String(athlete.result || '').trim().toUpperCase());
+  const upcoming = items.filter(athlete => !isFinishedMatch(athlete));
+  const finishedItems = items.filter(isFinishedMatch);
+  const ordered = upcoming.concat(finishedItems);
   let finishedSectionStarted = false;
-  for (const athlete of items) {
-    const isFinished = ['WIN', 'LOSS', 'BYE'].includes(String(athlete.result || '').trim().toUpperCase());
+  for (const athlete of ordered) {
+    const isFinished = isFinishedMatch(athlete);
     if (isFinished && !finishedSectionStarted) {
       const divider = document.createElement('div');
       divider.className = 'boston-finished-divider';
@@ -179,8 +183,7 @@ function renderAthletes(items) {
       finishedSectionStarted = true;
     }
     const row = document.createElement('div'); row.className = 'boston-results-row';
-    const finished = ['WIN', 'LOSS', 'BYE'].includes(String(athlete.result || '').trim().toUpperCase());
-    if (finished) row.classList.add('is-finished');
+    if (isFinished) row.classList.add('is-finished');
     const primary = document.createElement('span');
     const a = document.createElement('a'); a.href = athlete.bracket_url || `https://ibjjf.com/events/${encodeURIComponent(athlete.competition_id)}/athletes-list-by-academy-teams`;
     a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = athlete.name; primary.append(a);
