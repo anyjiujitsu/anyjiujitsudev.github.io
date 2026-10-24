@@ -62,15 +62,13 @@
     .boston-clear { background:transparent; color:#fff; border:1px solid #ffffffa8; white-space:nowrap; }
     .boston-clear:hover { background:#ffffff20; }
 
-    .boston-result-pill { display:inline-flex; align-items:center; justify-content:center; min-height:16px; padding:1px 7px; margin-top:4px; border-radius:999px; font-size:9px; font-weight:700; letter-spacing:.08em; line-height:1; background:#ece9e4; color:#5c5c5c; white-space:nowrap; }
-    .boston-result-pill--win { background:#ebe8e1; color:#4f4f4f; }
-    .boston-result-pill--loss { background:#efedeb; color:#6a6a6a; }
-    .boston-result-pill--bye { background:#ece9e4; color:#666; }
+    .boston-result-pill { display:block; margin-top:0; padding:0; border:0; border-radius:0; background:none; font-size:10px; font-weight:700; letter-spacing:.045em; line-height:1.3; color:inherit; white-space:nowrap; }
     .boston-results-row.is-finished { color:#8e8e8e; }
     .boston-results-row.is-finished a { color:#868686; }
     .boston-results-row.is-finished small { color:#979797; opacity:1; }
     .boston-results-row.is-finished .boston-belt-bar { opacity:.55; }
-    .boston-results-row.is-finished .boston-result-pill { background:#ececec; color:#7a7a7a; }
+    .boston-results-row.is-finished .boston-result-pill { background:none; color:inherit; }
+    .boston-finished-divider { border-top:1px solid #9a9a9a80; margin-top:22px; padding:15px 12px 10px; color:var(--muted,#777); font-size:10px; font-weight:700; letter-spacing:.12em; }
 
     @media (max-width:680px) {
       /* The open academy menu is positioned to the visible phone viewport by the script below. */
@@ -193,6 +191,6 @@
       }
     })();
   </script>
-  <script type="module" src="./boston-open.js?v=bye-finished-20261024-1"></script>
+  <script type="module" src="./boston-open.js?v=finished-divider-weightline-20261024-3"></script>
 </body>
 </html>

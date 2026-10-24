@@ -159,7 +159,7 @@ function appendBracketCell(parent, bracketText, resultText = '') {
   if (result) {
     const pill = document.createElement('span');
     pill.className = `boston-result-pill boston-result-pill--${result.toLowerCase()}`;
-    pill.textContent = result;
+    pill.textContent = `-${result}-`;
     lines.append(pill);
   }
   cell.append(bar, lines);
@@ -168,7 +168,16 @@ function appendBracketCell(parent, bracketText, resultText = '') {
 function renderAthletes(items) {
   rows.replaceChildren();
   if (!items.length) { const blank = document.createElement('div'); blank.className = 'boston-empty'; blank.textContent = 'No athletes matched your search in the available rosters.'; rows.append(blank); return; }
+  let finishedSectionStarted = false;
   for (const athlete of items) {
+    const isFinished = ['WIN', 'LOSS', 'BYE'].includes(String(athlete.result || '').trim().toUpperCase());
+    if (isFinished && !finishedSectionStarted) {
+      const divider = document.createElement('div');
+      divider.className = 'boston-finished-divider';
+      divider.textContent = 'FINISHED MATCHES';
+      rows.append(divider);
+      finishedSectionStarted = true;
+    }
     const row = document.createElement('div'); row.className = 'boston-results-row';
     const finished = ['WIN', 'LOSS', 'BYE'].includes(String(athlete.result || '').trim().toUpperCase());
     if (finished) row.classList.add('is-finished');
