@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build static Boston Open athlete and first-fight data from public IBJJF pages.
+"""Build static Boston Open athlete and every explicitly identified fight from public IBJJF pages.
 
 Sources: IBJJF athletes-by-academy, BJJCompSystem schedule and bracket pages.
 No website API keys, no browser-side cross-origin requests. Keep prior data when
@@ -166,7 +166,9 @@ def fill_assignments(athletes, bracket_entries, previous_by_key):
             missed += len(group)
             for athlete in group:
                 old = previous_by_key.get((athlete['competition_id'], athlete['name'], athlete['bracket']))
-                if old: athlete.update({k: old.get(k, '') for k in ('time', 'mat', 'day', 'bracket_url', 'time_type')})
+                if old:
+                    athlete.update({k: old.get(k, '') for k in ('time', 'mat', 'day', 'bracket_url', 'time_type')})
+                    athlete['fights'] = previous_fights(previous_by_key, athlete)
             continue
         # Estimated schedule is useful only for missing first-fight timings.
         for athlete in group:
@@ -180,24 +182,64 @@ def fill_assignments(athletes, bracket_entries, previous_by_key):
             for athlete in group:
                 matching = [f for f in fights if fight_contains_athlete(f, athlete['name'])]
                 if matching:
-                    # Byes can display a name in later fights: use earliest stated fight time.
-                    first = min(matching, key=lambda f: datetime.strptime(f['date'] + ' ' + f['time'], '%m/%d %I:%M %p'))
+                    # Keep ALL explicitly named bouts, including subsequent rounds.
+                    # A 'WINNER OF FIGHT N' placeholder is not sufficient proof
+                    # of who advanced, so never assign those to an athlete.
+                    unique = {(f['number'], f['date']): f for f in matching}
+                    ordered = sorted(unique.values(), key=lambda f: datetime.strptime(f['date'] + ' ' + f['time'], '%m/%d %I:%M %p'))
+                    athlete['fights'] = [
+                        {'fight_number': f['number'], 'fight_date': f['date'],
+                         'mat': f['mat'], 'time': f['time'], 'day': f['day'],
+                         'time_type': 'explicit bracket fight'}
+                        for f in ordered
+                    ]
+                    first = ordered[0]
                     athlete['mat'], athlete['time'], athlete['day'] = first['mat'], first['time'], first['day']
-                    athlete['time_type'] = 'first listed fight'
+                    athlete['time_type'] = 'explicit bracket fight'
                     completed += 1
                 else:
                     old = previous_by_key.get((athlete['competition_id'], athlete['name'], athlete['bracket']))
                     if old and old.get('mat'):
                         athlete.update({k:old.get(k,'') for k in ('mat','time','day','time_type')})
+                        athlete['fights'] = previous_fights(previous_by_key, athlete)
         except (requests.RequestException, ValueError) as exc:
             print(f'Bracket unavailable {info["url"]}: {exc}')
             for athlete in group:
                 old = previous_by_key.get((athlete['competition_id'], athlete['name'], athlete['bracket']))
                 if old and old.get('mat'):
                     athlete.update({k:old.get(k,'') for k in ('mat','time','day','time_type')})
+                    athlete['fights'] = previous_fights(previous_by_key, athlete)
         # A missing mat remains blank (not guessed from other athletes in a division).
     return completed, missed
 
+
+
+def previous_fights(previous_by_key, athlete):
+    """Carry over verified past fights when a bracket is temporarily unreachable."""
+    old = previous_by_key.get((athlete['competition_id'], athlete['name'], athlete['bracket']))
+    if not old:
+        return []
+    fights = old.get('fights')
+    if isinstance(fights, list) and fights:
+        return fights
+    if old.get('fight_number') and old.get('mat'):
+        return [{k: old.get(k, '') for k in ('fight_number', 'fight_date', 'mat', 'time', 'day', 'time_type')}]
+    return []
+
+
+def expand_fight_rows(athletes):
+    """One result row per actual bout; still show unassigned athletes once."""
+    result = []
+    for athlete in athletes:
+        fights = athlete.pop('fights', [])
+        if not fights:
+            result.append(athlete)
+            continue
+        for fight in fights:
+            row = dict(athlete)
+            row.update(fight)
+            result.append(row)
+    return result
 
 def main():
     source = json.loads((ROOT/'competitions.json').read_text())
@@ -205,7 +247,15 @@ def main():
     dest = ROOT/'athletes.json'
     previous = json.loads(dest.read_text()) if dest.exists() else {}
     old = previous.get('athletes', [])
-    previous_by_key = {(str(a.get('competition_id')),a.get('name'),a.get('bracket')):a for a in old}
+    previous_by_key = {}
+    for a in old:
+        identity = (str(a.get('competition_id')), a.get('name'), a.get('bracket'))
+        if identity not in previous_by_key:
+            previous_by_key[identity] = dict(a, fights=[])
+        if a.get('fight_number'):
+            previous_by_key[identity]['fights'].append({k: a.get(k, '') for k in ('fight_number', 'fight_date', 'mat', 'time', 'day', 'time_type')})
+        elif a.get('fights'):
+            previous_by_key[identity]['fights'].extend(a['fights'])
     result, done, errors = [], [], {}
     for comp in competitions:
         cid = str(comp['id'])
@@ -213,7 +263,6 @@ def main():
         try:
             roster = roster_by_academy(get_soup(comp['url']),comp)
             # Successful IBJJF athlete data must never depend on schedule/bracket availability.
-            result.extend(roster)
             done.append(cid)
             print(f'  {len(roster)} athletes collected from IBJJF', flush=True)
             try:
@@ -227,6 +276,8 @@ def main():
                     old = previous_by_key.get((athlete['competition_id'], athlete['name'], athlete['bracket']))
                     if old:
                         athlete.update({k: old.get(k, '') for k in ('time', 'mat', 'day', 'bracket_url', 'time_type')})
+                        athlete['fights'] = previous_fights(previous_by_key, athlete)
+            result.extend(expand_fight_rows(roster))
         except (requests.RequestException, ValueError) as exc:
             errors[cid] = str(exc)[:250]
             retained = [r for r in old if str(r.get('competition_id')) == cid]
