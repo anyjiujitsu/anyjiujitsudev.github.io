@@ -356,6 +356,43 @@ def parse_fights(soup):
     return fights
 
 
+
+def single_entrant_bye_fight(soup, roster_names):
+    """Recover unscheduled single-entrant FINAL/BYE cards.
+
+    Unlike scheduled fights, a one-person final can have no match header and
+    no official date or mat. Only accept a BYE when exactly ONE identifiable
+    athlete appears in the bracket's match cards, that athlete belongs to
+    the current IBJJF division roster, and BYE is shown in the bracket.
+    A ranking table alone is never sufficient evidence of a BYE.
+    """
+    bracket = soup.select_one('.tournament-category__bracket, .tournament-category_bracket, .tournament-category__brackets')
+    if bracket is None:
+        return None
+    # Names in match cards, not in the ranking table or unrelated page text.
+    names = {
+        key(normalize_competitor_name(node.get_text(' ', strip=True))):
+            normalize_competitor_name(node.get_text(' ', strip=True))
+        for node in bracket.select('.match-card__competitor-name')
+        if key(normalize_competitor_name(node.get_text(' ', strip=True))) not in ('', 'bye')
+        and not is_placeholder_name(node.get_text(' ', strip=True))
+    }
+    if len(names) != 1:
+        return None
+    name_key, name = next(iter(names.items()))
+    if name_key not in {key(n) for n in roster_names}:
+        return None
+    # Scope BYE to the match-card region, never a table or other screen text.
+    cards = bracket.select('.match-card')
+    if not cards or not any(re.search(r'(?<!\w)BYE(?!\w)', c.get_text(' ', strip=True), re.I) for c in cards):
+        return None
+    return {
+        'number': '', 'mat': '', 'time': '', 'day': '', 'date': '',
+        'competitors': [{'name': name, 'loser': False, 'bye': False, 'placeholder': False}],
+        'result_map': {name_key: 'BYE'}
+    }
+
+
 def known_bracket_competitors(soup):
     """Find registered competitors on a loaded category page, including ranking.
 
@@ -431,6 +468,11 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity):
         try:
             bracket_soup = get_soup(info['url'])
             fights = parse_fights(bracket_soup)
+            # A sole-entrant FINAL against BYE may have no FIGHT/Mat/Time
+            # heading; recognize it from the bracket card itself.
+            bye_fight = single_entrant_bye_fight(bracket_soup, [a['name'] for a in group])
+            if bye_fight and not any(fight_contains_athlete(f, bye_fight['competitors'][0]['name']) for f in fights):
+                fights.append(bye_fight)
             bracket_names = known_bracket_competitors(bracket_soup)
             print(f'    {info["url"]}: {len(fights)} scheduled or completed fight cards parsed', flush=True)
             for athlete in group:
