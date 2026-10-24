@@ -126,7 +126,7 @@ async function getJson(path) {
 }
 function appendCell(parent, text, cls = '') { const span = document.createElement('span'); span.className = cls; span.textContent = text || '—'; parent.append(span); }
 // Display IBJJF divisions with a muted belt-color bar spanning age, gender, and weight.
-function appendBracketCell(parent, bracketText) {
+function appendBracketCell(parent, bracketText, result = "") {
   const text = String(bracketText || '').trim();
   const parts = text.split(/\s*\/\s*/).map(part => part.trim());
   const colors = { white: '#e5e3de', blue: '#647e9a', purple: '#877790', brown: '#886f60', black: '#3e403f', gray: '#8d908e', grey: '#8d908e', yellow: '#c0ae7c', orange: '#b68a68', green: '#6f8878' };
@@ -155,6 +155,13 @@ function appendBracketCell(parent, bracketText) {
   weight.className = 'boston-bracket-line';
   weight.textContent = (parts.slice(3).join(' / ').replace(/\s*\(\s*[\d.,]+\s*(?:lb|lbs|kg)?\s*\)/gi, '').trim()) || '—';
   lines.append(age, gender, weight);
+  const outcome = String(result || '').toUpperCase();
+  if (outcome === 'WIN' || outcome === 'LOSS') {
+    const pill = document.createElement('span');
+    pill.className = 'boston-result-pill boston-result-' + outcome.toLowerCase();
+    pill.textContent = outcome;
+    lines.append(pill);
+  }
   cell.append(bar, lines);
   parent.append(cell);
 }
@@ -179,7 +186,7 @@ function renderAthletes(items) {
     event.title = athlete.competition_name || '';
     primary.append(academy, event);
     row.append(primary);
-    appendBracketCell(row, athlete.bracket || athlete.division || '—');
+    appendBracketCell(row, athlete.bracket || athlete.division || '—', athlete.result);
     appendCell(row, athlete.time || '—'); appendCell(row, athlete.mat || '—'); appendCell(row, athlete.day || '—');
     rows.append(row);
   }
