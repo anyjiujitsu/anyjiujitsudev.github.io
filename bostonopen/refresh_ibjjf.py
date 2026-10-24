@@ -401,6 +401,12 @@ def previous_rows_for(previous_by_identity, athlete):
     return [dict(r) for r in rows]
 
 
+def verified_match(row):
+    """A result or a complete scheduled fight, not merely an IBJJF registration."""
+    return (str(row.get('result', '')).upper() in {'WIN', 'LOSS', 'BYE'}
+            or all(row.get(field) for field in ('time', 'mat', 'day')))
+
+
 def fill_assignments(athletes, bracket_entries, previous_by_identity):
     by_category = {}
     for athlete in athletes:
@@ -419,7 +425,7 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity):
             missed += len(group)
             for athlete in group:
                 prior = previous_rows_for(previous_by_identity, athlete)
-                expanded.extend(prior if prior else [dict(athlete)])
+                expanded.extend(row for row in prior if verified_match(row))
             continue
 
         try:
@@ -442,46 +448,20 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity):
                         expanded.append(row)
                     completed += len(matching)
                 else:
-                    # The current bracket loaded successfully. An athlete missing
-                    # from its confirmed fight cards must not inherit a stale
-                    # assignment from a previous refresh. When valid fights exist
-                    # in the bracket, omit this unmatched entry from the match
-                    # listing entirely (a registration is not a match).
-                    if fights and key(athlete['name']) not in bracket_names:
-                        print(f'    Absent from current bracket for {athlete["name"]!r} in {info["url"]}; dropping stale entry', flush=True)
-                        continue
+                    # Successfully parsed current brackets are authoritative.
+                    # A registration without a verified fight/result is not a match.
                     if fights:
-                        # Keep only the registration, never an old claimed
-                        # mat/time/result. This happens when the current
-                        # bracket identifies a competitor but does not show
-                        # a presently verifiable scheduled or BYE match.
-                        row = dict(athlete)
-                        row['bracket_url'] = info['url']
-                        row['time_type'] = 'current bracket: no verified assignment'
-                        expanded.append(row)
+                        print(f'    No current match for {athlete["name"]!r} in {info["url"]}; omitting', flush=True)
                         continue
-                    # If zero fights were parsed, the upstream page may be
-                    # incomplete/changed. Avoid incorrectly treating a parser
-                    # failure as proof that a match was canceled. Retain the
-                    # registration without a claimed match assignment.
-                    row = dict(athlete)
-                    row['bracket_url'] = info['url']
-                    row['time_type'] = 'unverified bracket'
-                    expanded.append(row)
+                    # No recognizable fight cards: source may be incomplete.
+                    # Retain only previously verified assignments, never blank rows.
+                    prior = previous_rows_for(previous_by_identity, athlete)
+                    expanded.extend(row for row in prior if verified_match(row))
         except (requests.RequestException, ValueError) as exc:
             print(f'Bracket unavailable {info["url"]}: {exc}', flush=True)
             for athlete in group:
                 prior = previous_rows_for(previous_by_identity, athlete)
-                if prior:
-                    expanded.extend(prior)
-                else:
-                    row = dict(athlete)
-                    row['time'] = info['division_time']
-                    row['day'] = info['division_day']
-                    row['bracket_url'] = info['url']
-                    row['time_type'] = 'estimated division start'
-                    expanded.append(row)
-
+                expanded.extend(row for row in prior if verified_match(row))
     return expanded, completed, missed
 
 
@@ -514,7 +494,7 @@ def main():
                 print(f'  Schedule not available; retaining IBJJF athletes: {schedule_error}', flush=True)
                 for athlete in roster:
                     prior = previous_rows_for(previous_by_identity, athlete)
-                    result.extend(prior if prior else [dict(athlete)])
+                    result.extend(row for row in prior if verified_match(row))
         except (requests.RequestException, ValueError) as exc:
             errors[cid] = str(exc)[:250]
             retained = [row for row in old if str(row.get('competition_id')) == cid]
@@ -523,6 +503,8 @@ def main():
                 done.append(cid)
             print(f'  FAILED: {exc}', flush=True)
 
+    # Final guard: never publish registration-only rows as matches.
+    result = [row for row in result if verified_match(row)]
     dest.write_text(json.dumps({
         'source': 'IBJJF and BJJCompSystem',
         'updated_at': datetime.now(timezone.utc).isoformat(),
