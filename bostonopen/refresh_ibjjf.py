@@ -276,7 +276,14 @@ def parse_fights(soup):
 
         result_map = {}
         named = [c for c in competitors if c['name']]
-        if len(named) == 2:
+        # Some single-competitor finals render BYE as plain text outside a
+        # normal competitor card. Confirm it in this match only, never the
+        # rest of the bracket (which may contain unrelated BYEs).
+        has_bye_text = bool(re.search(r'(?<!\w)BYE(?!\w)', block.get_text(' ', strip=True), re.I))
+        actual = [c for c in named if not c['bye'] and not c['placeholder']]
+        if len(actual) == 1 and has_bye_text and len(named) <= 2:
+            result_map[key(actual[0]['name'])] = 'BYE'
+        elif len(named) == 2:
             a, b = named
             if a['bye'] and not b['bye'] and not b['placeholder']:
                 result_map[key(b['name'])] = 'BYE'
@@ -349,6 +356,34 @@ def parse_fights(soup):
     return fights
 
 
+def known_bracket_competitors(soup):
+    """Find registered competitors on a loaded category page, including ranking.
+
+    Used only as corroboration. An empty/unknown ranking is NOT grounds to
+    delete registrations; valid current match cards are sufficient.
+    """
+    names = set()
+    for node in soup.select('.match-card__competitor-name'):
+        name = normalize_competitor_name(node.get_text(' ', strip=True))
+        if name and not is_placeholder_name(name) and key(name) != 'bye':
+            names.add(key(name))
+    # Ranking table often contains abbreviated names; do not use those
+    # abbreviations to create athlete assignments. They are useful only
+    # when they match exactly.
+    for table in soup.select('table'):
+        headings = key(' '.join(th.get_text(' ', strip=True) for th in table.select('th')))
+        if 'competitor' not in headings and 'ranking' not in headings:
+            continue
+        for tr in table.select('tbody tr'):
+            cells = tr.find_all('td', recursive=False)
+            if not cells:
+                continue
+            name = normalize_competitor_name(cells[0].get_text(' ', strip=True))
+            if name and not is_placeholder_name(name):
+                names.add(key(name))
+    return names
+
+
 def fight_contains_athlete(fight, name):
     target = key(name)
     return any(key(comp.get('name')) == target for comp in fight.get('competitors', []))
@@ -388,7 +423,9 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity):
             continue
 
         try:
-            fights = parse_fights(get_soup(info['url']))
+            bracket_soup = get_soup(info['url'])
+            fights = parse_fights(bracket_soup)
+            bracket_names = known_bracket_competitors(bracket_soup)
             print(f'    {info["url"]}: {len(fights)} scheduled or completed fight cards parsed', flush=True)
             for athlete in group:
                 matching = sorted([fight for fight in fights if fight_contains_athlete(fight, athlete['name'])], key=fight_sort_key)
@@ -410,8 +447,18 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity):
                     # assignment from a previous refresh. When valid fights exist
                     # in the bracket, omit this unmatched entry from the match
                     # listing entirely (a registration is not a match).
+                    if fights and key(athlete['name']) not in bracket_names:
+                        print(f'    Absent from current bracket for {athlete["name"]!r} in {info["url"]}; dropping stale entry', flush=True)
+                        continue
                     if fights:
-                        print(f'    No current fight for {athlete["name"]!r} in {info["url"]}; dropping stale assignment', flush=True)
+                        # Keep only the registration, never an old claimed
+                        # mat/time/result. This happens when the current
+                        # bracket identifies a competitor but does not show
+                        # a presently verifiable scheduled or BYE match.
+                        row = dict(athlete)
+                        row['bracket_url'] = info['url']
+                        row['time_type'] = 'current bracket: no verified assignment'
+                        expanded.append(row)
                         continue
                     # If zero fights were parsed, the upstream page may be
                     # incomplete/changed. Avoid incorrectly treating a parser
