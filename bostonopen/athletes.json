@@ -1,6 +1,6 @@
 {
   "source": "IBJJF and BJJCompSystem",
-  "updated_at": "2026-10-25T16:30:38.301230+00:00",
+  "updated_at": "2026-10-26T18:41:27.985163+00:00",
   "athletes": [
     {
       "competition_id": "3253",
@@ -34733,5 +34733,9 @@
     "3254",
     "3255"
   ],
-  "errors": {}
+  "errors": {
+    "3253": "404 Client Error: Not Found for url: https://ibjjf.com/404",
+    "3254": "404 Client Error: Not Found for url: https://ibjjf.com/404",
+    "3255": "404 Client Error: Not Found for url: https://ibjjf.com/404"
+  }
 }
