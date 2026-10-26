@@ -772,3 +772,15 @@
   box-sizing: border-box;
   min-width: 0;
 }
+
+/* MATCHES configuration overview — uses existing admin card styles. */
+.adminMatchesCurrentCard { margin-bottom:16px; }
+.adminMatchesPreviewTag { float:right; font-size:10px; font-weight:500; letter-spacing:.08em; opacity:.55; }
+.adminMatchesCurrentRow { display:grid; grid-template-columns:140px minmax(0,1fr); gap:14px; padding:11px 0; border-bottom:1px solid #0002; align-items:start; }
+.adminMatchesCurrentRow .adminLabel { padding-top:2px; }
+.adminMatchesCurrentList, .adminMatchesCurrentValue { font-size:13px; line-height:1.5; min-width:0; overflow-wrap:anywhere; }
+.adminMatchesCurrentList > div + div { margin-top:6px; }
+.adminMatchesCurrentActions { display:flex; flex-wrap:wrap; gap:9px; margin-top:18px; }
+.adminMatchesStateButton { min-width:106px; width:auto; font-size:12px; font-weight:700; cursor:pointer; }
+.adminMatchesStateButton:disabled { opacity:.4; cursor:default; }
+@media (max-width:550px) { .adminMatchesCurrentRow { grid-template-columns:92px minmax(0,1fr); gap:10px; } }
