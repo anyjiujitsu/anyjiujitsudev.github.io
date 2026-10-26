@@ -101,30 +101,25 @@ export async function initMatchesPreview(){
       row.append(cb,title);options.append(row);
     }
   }
-  // The admin pager scrolls horizontally, so an absolutely positioned dropdown
-  // inside its page gets clipped vertically. Render the menu on document.body.
-  // Position it relative to the trigger and make its options independently scroll.
+  // Float outside the horizontally scrolling pager to avoid clipped options.
+  // Phones use a viewport-bounded selection sheet with a scrollable list.
   document.body.append(menu);
-  let menuAnchorAbove = false;
+  const mobileMenu = window.matchMedia('(max-width: 760px)');
+  const backdrop = document.createElement('div');
+  backdrop.className = 'adminMatchesBackdrop';
+  backdrop.hidden = true;
+  document.body.append(backdrop);
+  const closeButton = document.createElement('button');
+  closeButton.type = 'button';
+  closeButton.className = 'adminMatchesMobileClose';
+  closeButton.textContent = 'DONE';
+  closeButton.setAttribute('aria-label', 'Close competitions');
+  menu.prepend(closeButton);
+  const visualViewport = window.visualViewport;
   function placeMenu(){
     if(menu.hidden) return;
-    const rect = toggle.getBoundingClientRect();
-    const margin = 12;
-    const viewportHeight = window.innerHeight;
-    const viewportWidth = window.innerWidth;
-    const availableBelow = viewportHeight - rect.bottom - margin - 6;
-    const availableAbove = rect.top - margin - 6;
-    menuAnchorAbove = availableBelow < 275 && availableAbove > availableBelow;
-    const available = Math.max(130, menuAnchorAbove ? availableAbove : availableBelow);
-    const width = Math.min(Math.max(rect.width, 290), viewportWidth - margin * 2);
     menu.style.position = 'fixed';
-    menu.style.zIndex = '10000';
-    menu.style.width = `${width}px`;
-    menu.style.left = `${Math.min(Math.max(margin, rect.left), viewportWidth - width - margin)}px`;
-    menu.style.right = 'auto';
-    menu.style.top = menuAnchorAbove ? 'auto' : `${rect.bottom + 6}px`;
-    menu.style.bottom = menuAnchorAbove ? `${viewportHeight - rect.top + 6}px` : 'auto';
-    menu.style.maxHeight = `${available}px`;
+    menu.style.zIndex = '10001';
     menu.style.display = 'flex';
     menu.style.flexDirection = 'column';
     menu.style.boxSizing = 'border-box';
@@ -132,16 +127,65 @@ export async function initMatchesPreview(){
     options.style.flex = '1 1 auto';
     options.style.maxHeight = 'none';
     options.style.overflowY = 'auto';
+    if(mobileMenu.matches){
+      // visualViewport tracks the usable screen after the iOS keyboard appears.
+      const top = visualViewport ? visualViewport.offsetTop : 0;
+      const height = visualViewport ? visualViewport.height : window.innerHeight;
+      const width = visualViewport ? visualViewport.width : window.innerWidth;
+      const left = visualViewport ? visualViewport.offsetLeft : 0;
+      const margin = 12;
+      menu.style.top = `${top + margin}px`;
+      menu.style.bottom = 'auto';
+      menu.style.left = `${left + margin}px`;
+      menu.style.right = 'auto';
+      menu.style.width = `${Math.max(200,width - 2 * margin)}px`;
+      menu.style.maxHeight = `${Math.max(150,height - 2 * margin)}px`;
+      backdrop.hidden = false;
+    } else {
+      backdrop.hidden = true;
+      const rect = toggle.getBoundingClientRect();
+      const margin = 12;
+      const viewportHeight = window.innerHeight;
+      const viewportWidth = window.innerWidth;
+      const below = viewportHeight - rect.bottom - margin - 6;
+      const above = rect.top - margin - 6;
+      const useAbove = below < 275 && above > below;
+      const available = Math.max(130, useAbove ? above : below);
+      const width = Math.min(Math.max(rect.width,290), viewportWidth - margin * 2);
+      menu.style.width = `${width}px`;
+      menu.style.left = `${Math.min(Math.max(margin,rect.left), viewportWidth - width - margin)}px`;
+      menu.style.right = 'auto';
+      menu.style.top = useAbove ? 'auto' : `${rect.bottom + 6}px`;
+      menu.style.bottom = useAbove ? `${viewportHeight - rect.top + 6}px` : 'auto';
+      menu.style.maxHeight = `${available}px`;
+    }
   }
-  function close(){ menu.hidden = true; menu.style.display = ''; toggle.setAttribute('aria-expanded','false'); }
-  function open(){ menu.hidden = false; toggle.setAttribute('aria-expanded','true'); placeMenu(); filter.focus(); }
+  function close(){
+    menu.hidden = true;
+    menu.style.display = '';
+    backdrop.hidden = true;
+    toggle.setAttribute('aria-expanded','false');
+  }
+  function open(){
+    menu.hidden = false;
+    toggle.setAttribute('aria-expanded','true');
+    placeMenu();
+    // On phones, do not automatically summon the keyboard.
+    if(!mobileMenu.matches)filter.focus();
+  }
   toggle.addEventListener('click',()=>menu.hidden ? open() : close());
-  document.addEventListener('pointerdown',e=>{if(!pick.contains(e.target) && !menu.contains(e.target))close();});
+  closeButton.addEventListener('click',close);
+  backdrop.addEventListener('click',close);
+  document.addEventListener('pointerdown',e=>{if(!pick.contains(e.target) && !menu.contains(e.target) && !backdrop.contains(e.target))close();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
   window.addEventListener('resize',placeMenu);
-  // Close if the pager or outer page scrolls, so the floating menu never drifts.
-  window.addEventListener('scroll',close,{passive:true});
-  document.getElementById('adminPager')?.addEventListener('scroll',close,{passive:true});
+  visualViewport?.addEventListener('resize',placeMenu);
+  visualViewport?.addEventListener('scroll',placeMenu);
+  mobileMenu.addEventListener('change',placeMenu);
+  // Desktop floating menus close on scroll. Mobile sheets remain open while
+  // their own competition list scrolls and while iOS adjusts for the keyboard.
+  window.addEventListener('scroll',()=>{if(!mobileMenu.matches)close();},{passive:true});
+  document.getElementById('adminPager')?.addEventListener('scroll',()=>{if(!mobileMenu.matches)close();},{passive:true});
   filter.addEventListener('input',draw);
   document.getElementById('matchesClearSelections').addEventListener('click',()=>{selected.clear();update();draw();});
   async function loadCatalog(){
