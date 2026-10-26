@@ -292,6 +292,7 @@ def parse_fights(soup):
             classes.extend(comp.get('class', []))
             competitors.append({
                 'name': name,
+                'team': clean((comp.select_one('.match-card__club-name') or comp.select_one('.match-card__competitor-club-name')).get_text(' ', strip=True)) if (comp.select_one('.match-card__club-name') or comp.select_one('.match-card__competitor-club-name')) else '',
                 'loser': 'match-competitor--loser' in classes,
                 'bye': key(name) == 'bye',
                 'placeholder': is_placeholder_name(name)
@@ -544,6 +545,71 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity):
     return expanded, completed, missed
 
 
+def roster_from_brackets(comp):
+    """Recover roster/assignments from BJJCompSystem when IBJJF roster 404s.
+
+    Uses only category links belonging to the selected tournament; an athlete
+    must occur in a verified scheduled fight or confirmed result. No guessing.
+    """
+    cid = str(comp['id'])
+    schedule_url = f'https://www.bjjcompsystem.com/tournaments/{cid}/schedule'
+    schedule = schedule_brackets(get_soup(schedule_url))
+    # Recover unscheduled Open Class links if the competition exposes them.
+    # The discovery helper needs an existing roster to target missing links;
+    # with no roster, use the published schedule only rather than invent IDs.
+    if not schedule:
+        raise ValueError(f'No BJJCompSystem category links for {cid}')
+    rows = []
+    visited = set()
+    checked = 0
+    for division, info in schedule.items():
+        url = info['url']
+        if url in visited:
+            continue
+        visited.add(url)
+        try:
+            soup = get_soup(url)
+            fights = parse_fights(soup)
+            checked += 1
+        except (requests.RequestException, ValueError) as exc:
+            print(f'  Category unavailable {url}: {exc}', flush=True)
+            continue
+        belt, age, sex, weight = division
+        bracket = ' / '.join((belt.title(), age.title(), sex.title(), weight.title()))
+        # Names can repeat in successive rounds: retain each distinct fight.
+        for fight in fights:
+            for competitor in fight['competitors']:
+                name = clean(competitor.get('name'))
+                if competitor.get('bye') or competitor.get('placeholder') or is_placeholder_name(name):
+                    continue
+                result = fight.get('result_map', {}).get(key(name), '')
+                if not (result in ('WIN', 'LOSS', 'BYE') or all(fight.get(k) for k in ('time','mat','day'))):
+                    continue
+                # Academy is attached to each named competitor in bracket markup.
+                team = clean(competitor.get('team'))
+                if not team:
+                    # Do not silently assign an incorrect academy.
+                    continue
+                rows.append({
+                    'competition_id': cid, 'competition_name': comp['name'],
+                    'date': comp.get('date', ''), 'name': name, 'team': team,
+                    'bracket': bracket, 'time': fight.get('time', ''),
+                    'mat': fight.get('mat', ''), 'day': fight.get('day', ''),
+                    'bracket_url': url, 'time_type': 'listed fight' if fight.get('time') else 'completed result without published time',
+                    'fight_number': fight.get('number', ''), 'result': result,
+                })
+    if not rows:
+        raise ValueError(f'No verifiable bracket-derived athlete matches for {cid} from {checked} categories')
+    # Same competitor can appear in several fights; dedupe identical fight rows only.
+    unique = {}
+    for row in rows:
+        identity = (row['competition_id'], key(row['name']), row['bracket'], row['bracket_url'],
+                    row['fight_number'], row['time'], row['mat'], row['result'])
+        unique[identity] = row
+    print(f'  Fallback roster: {len(unique)} verified athlete-fight rows from {checked} categories', flush=True)
+    return list(unique.values())
+
+
 def main():
     source = json.loads(os.environ['OPENS_CANDIDATE_JSON']) if os.environ.get('OPENS_CANDIDATE_JSON') else json.loads((ROOT / 'config.json').read_text())
     # Catalog `url` links point to event OVERVIEW pages (or sometimes stale /404).
@@ -589,12 +655,19 @@ def main():
                     prior = previous_rows_for(previous_by_identity, athlete)
                     result.extend(row for row in prior if verified_match(row))
         except (requests.RequestException, ValueError) as exc:
-            errors[cid] = str(exc)[:250]
-            retained = [] if os.environ.get('OPENS_CANDIDATE_JSON') else [row for row in old if str(row.get('competition_id')) == cid]
-            result.extend(retained)
-            if retained and not os.environ.get('OPENS_CANDIDATE_JSON') and cid in previous.get('loaded_competition_ids', []):
+            print(f'  IBJJF roster unavailable for {cid}: {exc}; trying BJJCompSystem bracket fallback', flush=True)
+            try:
+                recovered = roster_from_brackets(comp)
+                result.extend(recovered)
                 done.append(cid)
-            print(f'  FAILED: {exc}', flush=True)
+                print(f'  Recovered {len(recovered)} match records from bracket pages', flush=True)
+            except (requests.RequestException, ValueError) as fallback_error:
+                errors[cid] = f'IBJJF: {str(exc)[:105]}; bracket fallback: {str(fallback_error)[:105]}'
+                retained = [] if os.environ.get('OPENS_CANDIDATE_JSON') else [row for row in old if str(row.get('competition_id')) == cid]
+                result.extend(retained)
+                if retained and not os.environ.get('OPENS_CANDIDATE_JSON') and cid in previous.get('loaded_competition_ids', []):
+                    done.append(cid)
+                print(f'  FAILED: {errors[cid]}', flush=True)
 
     # Final guard: never publish registration-only rows as matches.
     result = [row for row in result if verified_match(row)]
