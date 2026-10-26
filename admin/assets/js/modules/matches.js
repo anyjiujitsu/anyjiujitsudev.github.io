@@ -128,10 +128,29 @@ export async function initMatchesPreview(){
   }
   try { await loadConfig(); } catch (err) { saveStatus.textContent = `Unable to read active config: ${err.message}`; }
   let active = false;
+  let pollTimer = null;
+  let priorStamp = null;
+  async function waitForCatalog(){
+    let attempt = 0;
+    clearInterval(pollTimer);
+    pollTimer = setInterval(async()=>{
+      if (++attempt > 24){ clearInterval(pollTimer); pollTimer=null; status.textContent='Catalog refresh is taking longer than expected. Check GitHub Actions and click RELOAD LIST.'; return; }
+      try {
+        const response = await fetch(`./matches-competitions.json?t=${Date.now()}`, {cache:'no-store'});
+        if (!response.ok) return;
+        const data = await response.json();
+        if (!Array.isArray(data.competitions) || !data.competitions.length || data.updated_at === priorStamp) return;
+        clearInterval(pollTimer); pollTimer=null;
+        await loadCatalog();
+        status.textContent=`${competitions.length} competitions loaded from IBJJF.`;
+        button.textContent='GET COMPETITIONS'; delete button.dataset.reload;
+      } catch(error) { /* Keep polling while the publish/deployment completes. */ }
+    }, 15000);
+  }
   button.addEventListener('click',async()=>{
     if(active)return;
     if(button.dataset.reload==='true'){
-      try{const data=await loadCatalog();status.textContent=competitions.length?`${competitions.length} competitions loaded.`:'Catalog is still empty; check GitHub Actions logs.';if(competitions.length){button.textContent='GET COMPETITIONS';delete button.dataset.reload;}}
+      try{const data=await loadCatalog();status.textContent=competitions.length?`${competitions.length} competitions loaded.`:'Catalog is still empty; check GitHub Actions logs.';if(competitions.length && data.updated_at !== priorStamp){button.textContent='GET COMPETITIONS';delete button.dataset.reload;clearInterval(pollTimer);}}
       catch(err){status.textContent='Not published yet. Check GitHub Actions; then try RELOAD LIST.';}
       return;
     }
@@ -140,6 +159,8 @@ export async function initMatchesPreview(){
     active=true;button.disabled=true;
     status.textContent='Requesting IBJJF catalog refresh from GitHub Actions…';
     try{
+      const previousResponse=await fetch(`./matches-competitions.json?t=${Date.now()}`,{cache:'no-store'});
+      priorStamp=previousResponse.ok ? (await previousResponse.json()).updated_at || null : null;
       const response = await fetch(`${endpoint}/actions/workflows/${workflow}/dispatches`,{
         method:'POST',headers:{...headers(token),'Content-Type':'application/json'},body:JSON.stringify({ref:branch})
       });
@@ -147,10 +168,9 @@ export async function initMatchesPreview(){
         const message = await response.text();
         throw new Error(`GitHub rejected refresh (HTTP ${response.status}): ${message.slice(0,180)}`);
       }
-      status.textContent='Refresh requested. GitHub Actions is collecting competitions; use RELOAD LIST after it deploys.';
-      button.textContent='RELOAD LIST';
-      // Next click reloads published data, not another workflow run.
-      button.dataset.reload='true';
+      status.textContent='GitHub refresh started. Waiting for the updated IBJJF catalog to publish…';
+      button.textContent='RELOAD LIST'; button.dataset.reload='true';
+      await waitForCatalog();
     }catch(err){status.textContent=err.message;}
     finally{active=false;button.disabled=false;}
   });
