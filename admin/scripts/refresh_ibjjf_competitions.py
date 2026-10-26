@@ -1,99 +1,158 @@
 #!/usr/bin/env python3
-"""Discover IBJJF competition IDs/names from the official calendar.
+"""Discover IBJJF event names and *verified* numeric event IDs.
 
-Use a real browser because IBJJF renders event cards with JavaScript. Never
-publish an empty catalog and never invent event IDs.
+The calendar links to /events/<slug>, while athlete lists / BJJCompSystem
+links on an event detail page expose the numeric ID when available.
+Unresolvable future events are skipped, not assigned invented IDs.
 """
 import asyncio
 import json
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urljoin, urlparse
-
+from urllib.parse import urljoin, urlparse, unquote
 from playwright.async_api import async_playwright
 
 OUTPUT = Path(__file__).resolve().parents[1] / 'matches-competitions.json'
-PAGES = ['https://ibjjf.com/events/calendar', 'https://ibjjf.com/events/results']
-ID_RE = re.compile(r'/events/(\d+)(?:/|$|[?#])')
+BASE = 'https://ibjjf.com'
+LISTINGS = [BASE + '/events/calendar', BASE + '/events', BASE + '/']
+SKIP_SLUGS = {'calendar', 'results', 'upcoming', 'my-first-championship', 'registration', 'ranking'}
+EVENT_ID = re.compile(r'(?:/events/|/tournaments/)(\d+)(?:/|$|[?#])', re.I)
+COMP_KEYWORDS = ('championship', 'open', 'copa', 'campeonato', 'grand prix', 'trials', 'masters')
 
 
-def clean(value):
-    return re.sub(r'\s+', ' ', str(value or '')).strip()
+def clean(text):
+    return re.sub(r'\s+', ' ', str(text or '')).strip()
 
 
-def normalize_item(url, title):
-    match = ID_RE.search(urlparse(url).path + ('?' if '?' in url else ''))
-    title = clean(title)
-    if not match or len(title) < 9 or len(title) > 220:
+def event_slug(url):
+    parsed = urlparse(urljoin(BASE, url))
+    if parsed.netloc not in ('ibjjf.com', 'www.ibjjf.com'):
         return None
-    # Exclude non-competition navigational anchors and generic link names.
-    if title.lower() in {'more info', 'view', 'details', 'register', 'results', 'athletes', 'brackets'}:
+    parts = unquote(parsed.path).strip('/').split('/')
+    if len(parts) != 2 or parts[0] != 'events':
         return None
-    return {'id': match.group(1), 'name': title}
+    slug = parts[1].lower()
+    if slug in SKIP_SLUGS or slug.isdigit() or not re.search(r'[a-z]', slug):
+        return None
+    return slug
 
 
-async def extract_items(page):
-    """Read browser DOM after hydration; use event link's card text as fallback."""
-    return await page.evaluate('''() => {
-      const found = [];
-      for (const a of document.querySelectorAll('a[href]')) {
-        const href = a.href;
-        if (!/\\/events\\/\\d+(?:\\/|[?#]|$)/.test(href)) continue;
-        const card = a.closest('article, li, [class*="event-card"], [class*="EventCard"], [class*="championship"]');
-        const candidates = [
-          a.querySelector('h1,h2,h3,h4,[class*="title"],[class*="name"]')?.textContent,
-          a.getAttribute('aria-label'), a.getAttribute('title'),
-          a.textContent,
-          card?.querySelector('h1,h2,h3,h4,[class*="title"],[class*="name"]')?.textContent
-        ];
-        found.push({href, candidates});
-      }
-      return found;
-    }''')
+def valid_id_from_url(url):
+    match = EVENT_ID.search(url)
+    return match.group(1) if match else None
+
+
+async def discover_list(page, url):
+    candidates = {}
+    try:
+        response = await page.goto(url, wait_until='domcontentloaded', timeout=45000)
+        if response and response.status >= 400:
+            print(f'Listing {url}: HTTP {response.status}', flush=True)
+            return candidates
+        await page.wait_for_timeout(2200)
+        for _ in range(18):
+            links = await page.locator('a[href]').evaluate_all('''nodes => nodes.map(a => ({url:a.href, text:(a.innerText || a.getAttribute('title') || a.getAttribute('aria-label') || '').trim()}))''')
+            for link in links:
+                slug = event_slug(link['url'])
+                if slug:
+                    name = clean(link['text'])
+                    if len(name) < 12 or not any(k in name.lower() for k in COMP_KEYWORDS):
+                        name = clean(slug.replace('-', ' ').title())
+                    if len(name) >= 12:
+                        candidates[slug] = {'url': urljoin(BASE, '/events/' + slug), 'name': name}
+            at_bottom = await page.evaluate('window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 30')
+            if at_bottom:
+                break
+            await page.evaluate('window.scrollBy(0, window.innerHeight * 2)')
+            await page.wait_for_timeout(260)
+        print(f'Listing {url}: {len(candidates)} event detail links', flush=True)
+    except Exception as err:
+        print(f'Listing {url} unavailable: {err}', flush=True)
+    return candidates
+
+
+async def resolve_one(context, slug, record, semaphore):
+    async with semaphore:
+        page = await context.new_page()
+        try:
+            response = await page.goto(record['url'], wait_until='domcontentloaded', timeout=35000)
+            if response and response.status >= 400:
+                return None
+            await page.wait_for_timeout(350)
+            title = clean(await page.title()).replace(' | IBJJF', '').strip()
+            if not title or title.lower() in ('ibjjf', 'calendar'):
+                title = record['name']
+            links = await page.locator('a[href]').evaluate_all('nodes => nodes.map(a => ({href:a.href, text:(a.innerText||"").trim()}))')
+            id_weights = {}
+            for link in links:
+                href = link['href']
+                found = valid_id_from_url(href)
+                if not found:
+                    continue
+                path = urlparse(href).path.lower()
+                # Prefer explicit registration/athlete/schedule links belonging to this event.
+                score = 3 if 'athletes-list' in path else (2 if '/tournaments/' in path else 1)
+                id_weights[found] = max(score, id_weights.get(found, 0))
+            if not id_weights:
+                # Some event pages embed link targets as escaped JSON/hydration data.
+                content = await page.content()
+                patterns = [
+                    r'(?:/events/|\\/events\\/)(\d+)/(?:athletes-list-by-academy-teams|athletes-list-by-divisions)',
+                    r'(?:/tournaments/|\\/tournaments\\/)(\d+)/(?:categories|schedule)'
+                ]
+                for expression in patterns:
+                    for m in re.finditer(expression, content, re.I):
+                        id_weights[m.group(1)] = max(1, id_weights.get(m.group(1), 0))
+            if not id_weights:
+                return None
+            high = max(id_weights.values())
+            winners = [id for id,score in id_weights.items() if score == high]
+            if len(winners) != 1:
+                print(f'Ambiguous event ID for {slug}: {winners}', flush=True)
+                return None
+            event_id = winners[0]
+            if len(title) < 8 or len(title) > 240:
+                title = record['name']
+            return {'id': event_id, 'name': title, 'url': record['url']}
+        except Exception as err:
+            print(f'Cannot resolve {slug}: {err}', flush=True)
+            return None
+        finally:
+            await page.close()
 
 
 async def main():
-    found = {}
     async with async_playwright() as playwright:
         browser = await playwright.chromium.launch(headless=True)
-        page = await browser.new_page(viewport={'width': 1280, 'height': 900}, locale='en-US')
-        for url in PAGES:
-            try:
-                response = await page.goto(url, wait_until='domcontentloaded', timeout=60000)
-                if response and response.status >= 400:
-                    raise RuntimeError(f'HTTP {response.status}')
-                await page.wait_for_timeout(3500)
-                # Some calendar results are lazy-loaded; scroll through the page.
-                previous = -1
-                for _ in range(30):
-                    for item in await extract_items(page):
-                        for candidate in item['candidates']:
-                            entry = normalize_item(item['href'], candidate)
-                            if entry and ('202' in entry['name'] or 'championship' in entry['name'].lower() or 'open' in entry['name'].lower()):
-                                old = found.get(entry['id'])
-                                if old is None or len(entry['name']) > len(old['name']):
-                                    found[entry['id']] = entry
-                                break
-                    await page.evaluate('window.scrollBy(0, window.innerHeight * 2)')
-                    await page.wait_for_timeout(280)
-                    size = await page.evaluate('document.documentElement.scrollHeight')
-                    if size == previous and await page.evaluate('window.scrollY + innerHeight >= document.documentElement.scrollHeight - 20'):
-                        break
-                    previous = size
-                print(f'{url}: {len(found)} unique event IDs found so far', flush=True)
-            except Exception as error:
-                print(f'WARNING: could not read {url}: {error}', flush=True)
+        context = await browser.new_context(viewport={'width': 1360, 'height': 960}, locale='en-US')
+        listing_page = await context.new_page()
+        candidates = {}
+        for listing in LISTINGS:
+            candidates.update(await discover_list(listing_page, listing))
+        await listing_page.close()
+        print(f'Total candidate event pages: {len(candidates)}', flush=True)
+        semaphore = asyncio.Semaphore(4)
+        tasks = [resolve_one(context, slug, record, semaphore) for slug,record in candidates.items()]
+        found = await asyncio.gather(*tasks)
         await browser.close()
-    if not found:
-        raise SystemExit('IBJJF rendered no accessible event ID/name links; existing catalog left unchanged. Check browser logs and calendar markup.')
-    result = {
-        'source': 'IBJJF official event calendar and results',
-        'updated_at': datetime.now(timezone.utc).isoformat(),
-        'competitions': sorted(found.values(), key=lambda e: e['name'].casefold())
-    }
-    OUTPUT.write_text(json.dumps(result, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
-    print(f'Saved {len(found)} verified event IDs to {OUTPUT}', flush=True)
+
+    verified = {}
+    for item in found:
+        if not item:
+            continue
+        old = verified.get(item['id'])
+        if old is None or len(item['name']) > len(old['name']):
+            verified[item['id']] = item
+    print(f'Verified {len(verified)} IDs from {len(candidates)} event pages', flush=True)
+    if not verified:
+        raise SystemExit('No verifiable numeric event IDs. Existing catalog remains unchanged.')
+    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    payload = {'source': 'IBJJF official event listings and detail pages',
+               'updated_at': datetime.now(timezone.utc).isoformat(),
+               'competitions': sorted(verified.values(), key=lambda r: r['name'].casefold())}
+    OUTPUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    print(f'Saved {len(verified)} competitions to {OUTPUT}', flush=True)
 
 
 if __name__ == '__main__':
