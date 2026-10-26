@@ -547,9 +547,10 @@ def main():
     source = json.loads((ROOT / 'config.json').read_text())
     competitions = [dict(c, id=str(c['id']), url=c.get('url') or f"https://ibjjf.com/events/{c['id']}/athletes-list-by-academy-teams", date=c.get('date', '')) for c in source['competitions'] if c.get('id') and c.get('name')]
     dest = ROOT / 'athletes.json'
+    staging = ROOT / '.athletes-staging.json'
     previous = json.loads(dest.read_text()) if dest.exists() else {}
-    if not source.get('enabled', False) or not competitions:
-        print('No active competitions or monitoring is paused; skipping scrape.')
+    if not competitions:
+        print('No competitions configured; skipping scrape.')
         return
     old = previous.get('athletes', [])
     previous_by_identity = defaultdict(list)
@@ -586,16 +587,18 @@ def main():
 
     # Final guard: never publish registration-only rows as matches.
     result = [row for row in result if verified_match(row)]
-    dest.write_text(json.dumps({
+    if len(done) != len(competitions) or errors or not result:
+        raise RuntimeError(f'Incomplete scrape: {len(done)}/{len(competitions)} rosters loaded, {len(result)} verified matches, errors: {errors}. Keeping old published data.')
+    staging.write_text(json.dumps({
         'source': 'IBJJF and BJJCompSystem',
+        'published_competitions': competitions,
         'updated_at': datetime.now(timezone.utc).isoformat(),
         'athletes': result,
         'loaded_competition_ids': done,
         'errors': errors
     }, ensure_ascii=False, indent=2) + '\n')
     print(f'Saved {len(result)} athlete entries, {len(errors)} roster errors')
-    if not done:
-        raise SystemExit('No competition rosters could be loaded; saved prior data where available')
+    staging.replace(dest)
 
 
 if __name__ == '__main__':

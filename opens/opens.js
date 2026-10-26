@@ -254,12 +254,13 @@ async function initialize() {
   searchButton.disabled = true;
   try {
     const source = await getJson('./config.json');
-    competitions = (source.competitions || []).map(c => ({ ...c, id: String(c.id) }))
-      .filter(c => c.id && c.name)
-      .sort((a,b) => a.date.localeCompare(b.date) || a.name.localeCompare(b.name));
-    showOptions(); updateLabel();
     try { roster = await getJson('./athletes.json'); }
-    catch (error) { roster = { athletes: [], loaded_competition_ids: [] }; setStatus(`Competitions ready, but athlete data is unavailable: ${error.message}`); }
+    catch (error) { roster = { athletes: [], loaded_competition_ids: [] }; setStatus(`Athlete data is unavailable: ${error.message}`); }
+    // Only published competition data is exposed; newly saved settings wait for a successful scrape.
+    const legacyPublished = [...new Map((roster.athletes || []).filter(a=>a.competition_id && a.competition_name).map(a=>[String(a.competition_id), {id:String(a.competition_id),name:a.competition_name,date:a.date||''}])).values()];
+    competitions = (roster.published_competitions || legacyPublished).map(c => ({...c,id:String(c.id)}))
+      .filter(c => c.id && c.name).sort((a,b) => String(a.date||'').localeCompare(String(b.date||'')) || a.name.localeCompare(b.name));
+    showOptions(); updateLabel();
     updateAcademies();
     const loadedCount = (roster.loaded_competition_ids || []).filter(id => competitions.some(c => c.id === String(id))).length;
     const errorSummary = Object.values(roster.errors || {}).filter(Boolean).slice(0, 2).join(' / ');
