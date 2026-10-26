@@ -1,13 +1,22 @@
 #!/usr/bin/env python3
 """Run OPENS on a GitHub schedule or with an explicit force dispatch."""
 import json
+import base64
 import os
 import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 ROOT=Path(__file__).resolve().parent
-config=json.loads((ROOT/'config.json').read_text())
+candidate_raw=os.environ.get('OPENS_CANDIDATE_B64','')
+candidate=None
+if candidate_raw:
+    candidate=json.loads(base64.b64decode(candidate_raw,validate=True).decode('utf-8'))
+    if not isinstance(candidate,dict) or not candidate.get('competitions') or int(candidate.get('refresh_minutes',0)) not in (5,10,15,20):
+        raise SystemExit('Invalid candidate configuration')
+    if any(not str(c.get('id','')).isdigit() or not c.get('name') for c in candidate['competitions']):
+        raise SystemExit('Candidate contains an invalid competition')
+config=candidate if candidate is not None else json.loads((ROOT/'config.json').read_text())
 forced=os.environ.get('OPENS_FORCE','').lower() in ('1','true','yes')
 if not config.get('competitions'):
     print('No configured competitions; skipping.'); sys.exit(0)
@@ -27,7 +36,14 @@ if not forced and last and state.get('config_updated_at') == revision:
             print(f'Last successful run {delta:.1f} min ago; next refresh not due.'); sys.exit(0)
     except ValueError: pass
 print(f'Running OPENS match scraper (forced={forced}, competitions={len(config["competitions"])}).',flush=True)
-subprocess.run([sys.executable,str(ROOT/'refresh_ibjjf.py')],check=True)
+env=os.environ.copy()
+if candidate is not None: env['OPENS_CANDIDATE_JSON']=json.dumps(candidate)
+subprocess.run([sys.executable,str(ROOT/'refresh_ibjjf.py')],check=True,env=env)
+if candidate is not None:
+    # Publish candidate only AFTER the scraper has verified and written match data.
+    candidate['updated_at']=datetime.now(timezone.utc).isoformat()
+    (ROOT/'config.json').write_text(json.dumps(candidate,indent=2,ensure_ascii=False)+'\n')
+    revision=candidate['updated_at']
 state['last_attempt_at']=now.isoformat()
 state['last_success_at']=datetime.now(timezone.utc).isoformat()
 state['config_updated_at']=revision

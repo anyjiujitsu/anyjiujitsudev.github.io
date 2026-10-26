@@ -6,6 +6,7 @@ No website API keys, no browser-side cross-origin requests. Keep prior data when
 upstream pages fail. A missing fight assignment is never invented.
 """
 import json
+import os
 import re
 import time
 from collections import defaultdict
@@ -544,7 +545,7 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity):
 
 
 def main():
-    source = json.loads((ROOT / 'config.json').read_text())
+    source = json.loads(os.environ['OPENS_CANDIDATE_JSON']) if os.environ.get('OPENS_CANDIDATE_JSON') else json.loads((ROOT / 'config.json').read_text())
     competitions = [dict(c, id=str(c['id']), url=c.get('url') or f"https://ibjjf.com/events/{c['id']}/athletes-list-by-academy-teams", date=c.get('date', '')) for c in source['competitions'] if c.get('id') and c.get('name')]
     dest = ROOT / 'athletes.json'
     staging = ROOT / '.athletes-staging.json'
@@ -554,7 +555,7 @@ def main():
         return
     old = previous.get('athletes', [])
     previous_by_identity = defaultdict(list)
-    for row in old:
+    for row in (old if not os.environ.get('OPENS_CANDIDATE_JSON') else []):
         previous_by_identity[(str(row.get('competition_id')), row.get('name'), row.get('bracket'))].append(row)
 
     result, done, errors = [], [], {}
@@ -579,14 +580,20 @@ def main():
                     result.extend(row for row in prior if verified_match(row))
         except (requests.RequestException, ValueError) as exc:
             errors[cid] = str(exc)[:250]
-            retained = [row for row in old if str(row.get('competition_id')) == cid]
+            retained = [] if os.environ.get('OPENS_CANDIDATE_JSON') else [row for row in old if str(row.get('competition_id')) == cid]
             result.extend(retained)
-            if retained and cid in previous.get('loaded_competition_ids', []):
+            if retained and not os.environ.get('OPENS_CANDIDATE_JSON') and cid in previous.get('loaded_competition_ids', []):
                 done.append(cid)
             print(f'  FAILED: {exc}', flush=True)
 
     # Final guard: never publish registration-only rows as matches.
     result = [row for row in result if verified_match(row)]
+    if os.environ.get('OPENS_CANDIDATE_JSON'):
+        # Every newly selected competition must have an independently verified fight/result.
+        matched_ids = {str(row.get('competition_id')) for row in result}
+        missing_ids = [str(comp['id']) for comp in competitions if str(comp['id']) not in matched_ids]
+        if missing_ids:
+            raise RuntimeError(f'No verified match data for selected competition IDs: {missing_ids}; active configuration untouched.')
     if len(done) != len(competitions) or errors or not result:
         raise RuntimeError(f'Incomplete scrape: {len(done)}/{len(competitions)} rosters loaded, {len(result)} verified matches, errors: {errors}. Keeping old published data.')
     staging.write_text(json.dumps({
