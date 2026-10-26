@@ -1,11 +1,13 @@
 {
   "enabled": false,
-  "refresh_minutes": 10,
+  "refresh_minutes": 15,
   "competitions": [
     {
-      "id": "3312",
-      "name": "Rome International Open IBJJF Jiu-Jitsu Championship 2026"
+      "id": "3254",
+      "name": "Boston Fall International Open IBJJF Jiu-Jitsu No-Gi Championship 2026",
+      "url": "https://ibjjf.com/events/3254/athletes-list-by-academy-teams",
+      "date": ""
     }
   ],
-  "updated_at": "2026-10-26T19:35:05.136038+00:00"
+  "updated_at": "2026-10-26T20:10:16.598026+00:00"
 }
