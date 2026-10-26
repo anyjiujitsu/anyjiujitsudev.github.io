@@ -546,7 +546,17 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity):
 
 def main():
     source = json.loads(os.environ['OPENS_CANDIDATE_JSON']) if os.environ.get('OPENS_CANDIDATE_JSON') else json.loads((ROOT / 'config.json').read_text())
-    competitions = [dict(c, id=str(c['id']), url=c.get('url') or f"https://ibjjf.com/events/{c['id']}/athletes-list-by-academy-teams", date=c.get('date', '')) for c in source['competitions'] if c.get('id') and c.get('name')]
+    # Catalog `url` links point to event OVERVIEW pages (or sometimes stale /404).
+    # Rosters always live at the numeric event-ID route. Never scrape overview URLs
+    # as roster pages: doing so can either 404 or parse no academy/athlete rows.
+    competitions = [
+        dict(c,
+             id=str(c['id']),
+             url=f"https://ibjjf.com/events/{c['id']}/athletes-list-by-academy-teams",
+             date=c.get('date', ''))
+        for c in source['competitions']
+        if str(c.get('id', '')).isdigit() and c.get('name')
+    ]
     dest = ROOT / 'athletes.json'
     staging = ROOT / '.athletes-staging.json'
     previous = json.loads(dest.read_text()) if dest.exists() else {}
