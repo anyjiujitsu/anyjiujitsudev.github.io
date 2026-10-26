@@ -101,10 +101,47 @@ export async function initMatchesPreview(){
       row.append(cb,title);options.append(row);
     }
   }
-  function close(){menu.hidden=true;toggle.setAttribute('aria-expanded','false');}
-  toggle.addEventListener('click',()=>{menu.hidden=!menu.hidden;toggle.setAttribute('aria-expanded',String(!menu.hidden));if(!menu.hidden)filter.focus();});
-  document.addEventListener('pointerdown',e=>{if(!pick.contains(e.target))close();});
+  // The admin pager scrolls horizontally, so an absolutely positioned dropdown
+  // inside its page gets clipped vertically. Render the menu on document.body.
+  // Position it relative to the trigger and make its options independently scroll.
+  document.body.append(menu);
+  let menuAnchorAbove = false;
+  function placeMenu(){
+    if(menu.hidden) return;
+    const rect = toggle.getBoundingClientRect();
+    const margin = 12;
+    const viewportHeight = window.innerHeight;
+    const viewportWidth = window.innerWidth;
+    const availableBelow = viewportHeight - rect.bottom - margin - 6;
+    const availableAbove = rect.top - margin - 6;
+    menuAnchorAbove = availableBelow < 275 && availableAbove > availableBelow;
+    const available = Math.max(130, menuAnchorAbove ? availableAbove : availableBelow);
+    const width = Math.min(Math.max(rect.width, 290), viewportWidth - margin * 2);
+    menu.style.position = 'fixed';
+    menu.style.zIndex = '10000';
+    menu.style.width = `${width}px`;
+    menu.style.left = `${Math.min(Math.max(margin, rect.left), viewportWidth - width - margin)}px`;
+    menu.style.right = 'auto';
+    menu.style.top = menuAnchorAbove ? 'auto' : `${rect.bottom + 6}px`;
+    menu.style.bottom = menuAnchorAbove ? `${viewportHeight - rect.top + 6}px` : 'auto';
+    menu.style.maxHeight = `${available}px`;
+    menu.style.display = 'flex';
+    menu.style.flexDirection = 'column';
+    menu.style.boxSizing = 'border-box';
+    options.style.minHeight = '0';
+    options.style.flex = '1 1 auto';
+    options.style.maxHeight = 'none';
+    options.style.overflowY = 'auto';
+  }
+  function close(){ menu.hidden = true; menu.style.display = ''; toggle.setAttribute('aria-expanded','false'); }
+  function open(){ menu.hidden = false; toggle.setAttribute('aria-expanded','true'); placeMenu(); filter.focus(); }
+  toggle.addEventListener('click',()=>menu.hidden ? open() : close());
+  document.addEventListener('pointerdown',e=>{if(!pick.contains(e.target) && !menu.contains(e.target))close();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape')close();});
+  window.addEventListener('resize',placeMenu);
+  // Close if the pager or outer page scrolls, so the floating menu never drifts.
+  window.addEventListener('scroll',close,{passive:true});
+  document.getElementById('adminPager')?.addEventListener('scroll',close,{passive:true});
   filter.addEventListener('input',draw);
   document.getElementById('matchesClearSelections').addEventListener('click',()=>{selected.clear();update();draw();});
   async function loadCatalog(){
