@@ -1,96 +1,100 @@
 #!/usr/bin/env python3
-"""Collect the IBJJF championship catalog without city restrictions.
-Fail safely if the site's markup/API changes; never replace valid data with empty.
+"""Discover IBJJF competition IDs/names from the official calendar.
+
+Use a real browser because IBJJF renders event cards with JavaScript. Never
+publish an empty catalog and never invent event IDs.
 """
+import asyncio
 import json
 import re
 from datetime import datetime, timezone
-from html import unescape
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
-import requests
-from bs4 import BeautifulSoup
+from playwright.async_api import async_playwright
 
 OUTPUT = Path(__file__).resolve().parents[1] / 'matches-competitions.json'
-SOURCES = ('https://ibjjf.com/events/calendar', 'https://ibjjf.com/events/upcoming', 'https://ibjjf.com/events/results')
-SESSION = requests.Session()
-SESSION.headers.update({'User-Agent': 'Mozilla/5.0 (compatible; ANY-NE-IBJJF-Catalog/1.0)', 'Accept': 'text/html,application/json'})
+PAGES = ['https://ibjjf.com/events/calendar', 'https://ibjjf.com/events/results']
+ID_RE = re.compile(r'/events/(\d+)(?:/|$|[?#])')
 
 
-def normalize(text):
-    return re.sub(r'\s+', ' ', unescape(str(text or ''))).strip()
+def clean(value):
+    return re.sub(r'\s+', ' ', str(value or '')).strip()
 
 
-def add(catalog, ident, name):
-    ident = str(ident).strip()
-    name = normalize(name)
-    if not ident.isdigit() or len(name) < 7 or len(name) > 220:
-        return
-    if not re.search(r'open|championship|jiu.jitsu|grand slam|pan|world|european|international|kids|pro', name, re.I):
-        return
-    catalog[ident] = {'id': ident, 'name': name}
+def normalize_item(url, title):
+    match = ID_RE.search(urlparse(url).path + ('?' if '?' in url else ''))
+    title = clean(title)
+    if not match or len(title) < 9 or len(title) > 220:
+        return None
+    # Exclude non-competition navigational anchors and generic link names.
+    if title.lower() in {'more info', 'view', 'details', 'register', 'results', 'athletes', 'brackets'}:
+        return None
+    return {'id': match.group(1), 'name': title}
 
 
-def extract_document(html, catalog):
-    soup = BeautifulSoup(html, 'html.parser')
-    # Direct links are the most dependable identifiers.
-    for a in soup.select('a[href]'):
-        href = a.get('href', '')
-        match = re.search(r'/events/(\d+)(?:/|\?|$)', href)
-        if match:
-            add(catalog, match.group(1), a.get_text(' ', strip=True) or a.get('title', ''))
-    # Some IBJJF pages embed event objects in hydrated application JSON.
-    for tag in soup.find_all('script'):
-        body = tag.string or tag.get_text()
-        if not body or len(body) > 12000000:
-            continue
-        if tag.get('type') == 'application/ld+json' or tag.get('id') in ('__NEXT_DATA__', '__NUXT_DATA__'):
+async def extract_items(page):
+    """Read browser DOM after hydration; use event link's card text as fallback."""
+    return await page.evaluate('''() => {
+      const found = [];
+      for (const a of document.querySelectorAll('a[href]')) {
+        const href = a.href;
+        if (!/\\/events\\/\\d+(?:\\/|[?#]|$)/.test(href)) continue;
+        const card = a.closest('article, li, [class*="event-card"], [class*="EventCard"], [class*="championship"]');
+        const candidates = [
+          a.querySelector('h1,h2,h3,h4,[class*="title"],[class*="name"]')?.textContent,
+          a.getAttribute('aria-label'), a.getAttribute('title'),
+          a.textContent,
+          card?.querySelector('h1,h2,h3,h4,[class*="title"],[class*="name"]')?.textContent
+        ];
+        found.push({href, candidates});
+      }
+      return found;
+    }''')
+
+
+async def main():
+    found = {}
+    async with async_playwright() as playwright:
+        browser = await playwright.chromium.launch(headless=True)
+        page = await browser.new_page(viewport={'width': 1280, 'height': 900}, locale='en-US')
+        for url in PAGES:
             try:
-                walk(json.loads(body), catalog)
-            except (ValueError, TypeError):
-                pass
-        # Link and title fields serialized in inline application state.
-        for match in re.finditer(r'(?:\\?/events\\?/|https?://ibjjf\.com/events/)(\d+)', body):
-            ident = match.group(1)
-            nearby = body[max(0, match.start()-500):match.end()+600]
-            candidate = re.search(r'["\\]?(?:name|title)["\\]?\s*:\s*["\\]((?:[^"\\]|\\.){8,210})["\\]', nearby)
-            if candidate:
-                add(catalog, ident, candidate.group(1).replace('\\"','"'))
-
-
-def walk(obj, catalog):
-    if isinstance(obj, dict):
-        ident = obj.get('id') or obj.get('eventId') or obj.get('event_id')
-        title = obj.get('name') or obj.get('title')
-        if ident is not None and title:
-            add(catalog, ident, title)
-        for v in obj.values():
-            if isinstance(v, (dict, list)):
-                walk(v, catalog)
-    elif isinstance(obj, list):
-        for v in obj:
-            walk(v, catalog)
-
-
-def main():
-    catalog = {}
-    issues = []
-    for url in SOURCES:
-        try:
-            response = SESSION.get(url, timeout=40)
-            response.raise_for_status()
-            extract_document(response.text, catalog)
-            print(f'{url}: {len(catalog)} competitions discovered so far', flush=True)
-        except (requests.RequestException, ValueError) as exc:
-            issues.append(f'{url}: {exc}')
-            print(f'WARNING {issues[-1]}', flush=True)
-    if not catalog:
-        raise SystemExit('No competitions with verified IBJJF event IDs discovered. IBJJF may serve this catalog only via JavaScript; existing catalog was not overwritten. ' + '; '.join(issues))
-    result = {'source': 'IBJJF calendar / upcoming / results', 'updated_at': datetime.now(timezone.utc).isoformat(), 'competitions': sorted(catalog.values(), key=lambda c: c['name'].casefold())}
-    OUTPUT.write_text(json.dumps(result, ensure_ascii=False, indent=2)+'\n')
-    print(f'Saved {len(catalog)} competitions to {OUTPUT}')
+                response = await page.goto(url, wait_until='domcontentloaded', timeout=60000)
+                if response and response.status >= 400:
+                    raise RuntimeError(f'HTTP {response.status}')
+                await page.wait_for_timeout(3500)
+                # Some calendar results are lazy-loaded; scroll through the page.
+                previous = -1
+                for _ in range(30):
+                    for item in await extract_items(page):
+                        for candidate in item['candidates']:
+                            entry = normalize_item(item['href'], candidate)
+                            if entry and ('202' in entry['name'] or 'championship' in entry['name'].lower() or 'open' in entry['name'].lower()):
+                                old = found.get(entry['id'])
+                                if old is None or len(entry['name']) > len(old['name']):
+                                    found[entry['id']] = entry
+                                break
+                    await page.evaluate('window.scrollBy(0, window.innerHeight * 2)')
+                    await page.wait_for_timeout(280)
+                    size = await page.evaluate('document.documentElement.scrollHeight')
+                    if size == previous and await page.evaluate('window.scrollY + innerHeight >= document.documentElement.scrollHeight - 20'):
+                        break
+                    previous = size
+                print(f'{url}: {len(found)} unique event IDs found so far', flush=True)
+            except Exception as error:
+                print(f'WARNING: could not read {url}: {error}', flush=True)
+        await browser.close()
+    if not found:
+        raise SystemExit('IBJJF rendered no accessible event ID/name links; existing catalog left unchanged. Check browser logs and calendar markup.')
+    result = {
+        'source': 'IBJJF official event calendar and results',
+        'updated_at': datetime.now(timezone.utc).isoformat(),
+        'competitions': sorted(found.values(), key=lambda e: e['name'].casefold())
+    }
+    OUTPUT.write_text(json.dumps(result, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+    print(f'Saved {len(found)} verified event IDs to {OUTPUT}', flush=True)
 
 
 if __name__ == '__main__':
-    main()
+    asyncio.run(main())
