@@ -1,3 +1,4 @@
+import { initMatchesPreview } from './modules/matches.js';
 // admin.js
 // purpose: admin panel bootstrap only; feature logic lives in modules/*
 
@@ -102,6 +103,7 @@ async function initAdmin(){
 
   const { setTokenStatus, validateAndStoreToken } = initTokenControls();
   initAdminPager();
+  initMatchesPreview();
   initWhereCitySuggestions();
 
   const eventForm = document.getElementById('eventForm');
