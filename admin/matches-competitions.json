@@ -1,4 +1,66 @@
 {
-  "source": "IBJJF competition catalog (not yet refreshed)",
-  "competitions": []
+  "source": "IBJJF official event listings and detail pages",
+  "updated_at": "2026-10-26T17:56:00.010804+00:00",
+  "competitions": [
+    {
+      "id": "3253",
+      "name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "url": "https://ibjjf.com/events/boston-fall-international-open-ibjjf-jiu-jitsu-championship-2026"
+    },
+    {
+      "id": "3254",
+      "name": "Boston Fall International Open IBJJF Jiu-Jitsu No-Gi Championship 2026",
+      "url": "https://ibjjf.com/events/boston-fall-international-open-ibjjf-jiu-jitsu-no-gi-championship-2026"
+    },
+    {
+      "id": "3255",
+      "name": "Boston Fall Kids International Open IBJJF Jiu-Jitsu Championship 2026",
+      "url": "https://ibjjf.com/events/boston-fall-kids-international-open-ibjjf-jiu-jitsu-championship-2026"
+    },
+    {
+      "id": "3409",
+      "name": "European IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/european-ibjjf-jiu-jitsu-championship-2027"
+    },
+    {
+      "id": "3313",
+      "name": "European IBJJF Jiu-Jitsu No-Gi Championship 2026",
+      "url": "https://ibjjf.com/events/european-ibjjf-jiu-jitsu-no-gi-championship-2026"
+    },
+    {
+      "id": "3309",
+      "name": "Orange County Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "url": "https://ibjjf.com/events/orange-county-fall-international-open-ibjjf-jiu-jitsu-championship-2026"
+    },
+    {
+      "id": "3310",
+      "name": "Orange County Fall International Open IBJJF Jiu-Jitsu No-Gi Championship 2026",
+      "url": "https://ibjjf.com/events/orange-county-fall-international-open-ibjjf-jiu-jitsu-no-gi-championship-2026"
+    },
+    {
+      "id": "3311",
+      "name": "Orange County Fall Kids International Open IBJJF Jiu-Jitsu Championship 2026",
+      "url": "https://ibjjf.com/events/orange-county-fall-kids-international-open-ibjjf-jiu-jitsu-championship-2026"
+    },
+    {
+      "id": "3401",
+      "name": "Recife Spring International Open IBJJF Jiu-Jitsu Championship 2026",
+      "url": "https://ibjjf.com/events/recife-spring-international-open-ibjjf-jiu-jitsu-championship-2026"
+    },
+    {
+      "id": "3402",
+      "name": "Recife Spring International Open IBJJF Jiu-Jitsu No-Gi Championship 2026",
+      "url": "https://ibjjf.com/events/recife-spring-international-open-ibjjf-jiu-jitsu-no-gi-championship-2026"
+    },
+    {
+      "id": "3312",
+      "name": "Rome International Open IBJJF Jiu-Jitsu Championship 2026",
+      "url": "https://ibjjf.com/events/rome-international-open-ibjjf-jiu-jitsu-championship-2026"
+    },
+    {
+      "id": "3033",
+      "name": "World IBJJF Jiu-Jitsu No-Gi Championship 2026",
+      "url": "https://ibjjf.com/events/world-ibjjf-jiu-jitsu-no-gi-championship-2026"
+    }
+  ]
 }
