@@ -29,7 +29,7 @@ export async function initMatchesPreview(){
     if (!values.length) currentComps.textContent = 'No competitions configured.';
     else for (const c of values){const item=document.createElement('div');item.textContent=c.name;currentComps.append(item);}
     currentRate.textContent = `${currentConfig.refresh_minutes} min`;
-    currentStatus.textContent = requestPending ? 'UPDATING · INITIAL SCRAPE REQUESTED' : (currentConfig.enabled ? 'RUNNING' : 'PAUSED');
+    currentStatus.textContent = currentConfig.competitions.length ? (currentConfig.enabled ? 'RUNNING' : 'PAUSED') : 'NO ACTIVE MATCHES';
     pauseButton.disabled = !currentConfig.enabled;
     resumeButton.disabled = currentConfig.enabled;
   }
@@ -72,46 +72,82 @@ export async function initMatchesPreview(){
     if(!response.ok)throw new Error(`Cannot save configuration: HTTP ${response.status} ${(await response.text()).slice(0,160)}`);
     currentConfig={...config,updated_at:JSON.parse(payload).updated_at};drawCurrent();
   }
-  async function dispatchInitialScrape() {
+  async function dispatchInitialScrape(candidate) {
     const token = await getToken();
     if (!token) throw new Error('Enter your GitHub token first.');
+    const payload = JSON.stringify(candidate);
+    if (new TextEncoder().encode(payload).length > 50000) throw new Error('Too many selected competitions for one request.');
+    const encoded = btoa(Array.from(new TextEncoder().encode(payload), b=>String.fromCharCode(b)).join(''));
+    const started = new Date().toISOString();
     const response = await fetch(`${endpoint}/actions/workflows/opens-refresh.yml/dispatches`, {
       method: 'POST', headers: {...headers(token), 'Content-Type':'application/json'},
-      body: JSON.stringify({ref:branch, inputs:{force:'true'}})
+      body: JSON.stringify({ref:branch, inputs:{force:'true',candidate:encoded}})
     });
-    if (response.status !== 204) throw new Error(`Saved configuration, but could not start the initial scrape (HTTP ${response.status}): ${(await response.text()).slice(0,180)}`);
+    if (response.status !== 204) throw new Error(`GitHub could not start verification (HTTP ${response.status}): ${(await response.text()).slice(0,180)}`);
+    return {started,token};
+  }
+  async function awaitOutcome(started, token, expected) {
+    const startTime = Date.parse(started);
+    // Poll the GitHub workflow result; only the workflow can commit active settings.
+    const expires = Date.now() + 12*60*1000;
+    let runId = null;
+    while(Date.now() < expires) {
+      await new Promise(resolve => setTimeout(resolve, 7000));
+      const result = await fetch(`${endpoint}/actions/workflows/opens-refresh.yml/runs?event=workflow_dispatch&per_page=15`,{headers:headers(token),cache:'no-store'});
+      if(!result.ok) continue;
+      const runs = (await result.json()).workflow_runs || [];
+      if(!runId){
+        const suitable = runs.filter(r=>Date.parse(r.created_at) >= startTime-20000 && r.head_branch===branch).sort((a,b)=>Date.parse(b.created_at)-Date.parse(a.created_at));
+        if(suitable.length) runId=suitable[0].id;
+      }
+      const run = runs.find(r=>r.id===runId);
+      if (!run || run.status!=='completed') continue;
+      if(run.conclusion !== 'success') {saveStatus.textContent='NO MATCHES AVAILABLE — No changes were made. Check the OPENS workflow log for details.';return;}
+      // GitHub Pages may deploy shortly after the workflow completes.
+      for(let i=0;i<18;i++){
+        try {
+          const response=await fetch(`../opens/config.json?t=${Date.now()}`,{cache:'no-store'});
+          if(response.ok){
+            const cfg=await response.json();
+            if(cfg.updated_at && cfg.updated_at!==currentConfig.updated_at && Number(cfg.refresh_minutes)===Number(expected.refresh_minutes) &&
+              JSON.stringify((cfg.competitions||[]).map(c=>String(c.id)).sort())===JSON.stringify(expected.competitions.map(c=>String(c.id)).sort())){
+              await loadConfig();saveStatus.textContent='ACTIVE — New matches and refresh rate published successfully.';return;
+            }
+          }
+        } catch(e){}
+        await new Promise(resolve=>setTimeout(resolve,5000));
+      }
+      saveStatus.textContent='Scrape succeeded; awaiting GitHub Pages publication. Reload to confirm CURRENT MATCHES.';
+      return;
+    }
+    saveStatus.textContent='Verification is taking longer than expected. CURRENT MATCHES remains unchanged; check GitHub Actions.';
   }
   let saving = false;
-  async function persist(config, message, triggerInitial = false){
-    if (saving) return;
-    saving = true;
-    pauseButton.disabled = true; resumeButton.disabled = true; saveButton.disabled = true;
-    saveStatus.textContent = message;
-    try {
-      await saveConfig(config);
-      if (triggerInitial) {
-        requestPending = true;
-        drawCurrent();
-        try {
-          await dispatchInitialScrape();
-          saveStatus.textContent = 'Settings saved. Initial scrape requested; public data stays unchanged until validated and published.';
-        } catch (error) { saveStatus.textContent = error.message + ' Run OPENS match refresh manually if necessary.'; }
-      } else {
-        saveStatus.textContent = 'Monitoring settings saved to GitHub.';
-      }
-    } catch(error) {saveStatus.textContent = error.message;drawCurrent();}
-    finally {saving=false;saveButton.disabled=false;drawCurrent();}
+  async function saveMonitoringState(enabled){
+    if(saving)return;
+    saving=true;pauseButton.disabled=true;resumeButton.disabled=true;saveButton.disabled=true;
+    try {await saveConfig({...currentConfig,enabled});saveStatus.textContent=enabled?'Monitoring resumed.':'Monitoring paused.';}
+    catch(error){saveStatus.textContent=error.message;}
+    finally{saving=false;saveButton.disabled=false;drawCurrent();}
   }
-  pauseButton.addEventListener('click',()=>persist({...currentConfig,enabled:false},'Pausing monitoring…'));
-  resumeButton.addEventListener('click',()=>persist({...currentConfig,enabled:true},'Resuming monitoring…',true));
-  saveButton.addEventListener('click',()=>{
-    const configured = [...selected].map(id=>competitions.find(c=>c.id===id) || currentConfig.competitions.find(c=>String(c.id)===id)).filter(Boolean);
-    if (!configured.length) {saveStatus.textContent='Select at least one competition before saving.'; return;}
-    if (configured.length !== selected.size) {saveStatus.textContent='One or more selected competitions have no valid catalog entry. Refresh the catalog.';return;}
-    if (configured.some(c=>!/^\d+$/.test(String(c.id)))) {saveStatus.textContent='Competition IDs must be verified numeric IBJJF event IDs.';return;}
-    const rate = Number(refreshRate.value);
-    if (![5,10,15,20].includes(rate)) {saveStatus.textContent='Select a valid refresh rate.';return;}
-    persist({enabled:currentConfig.enabled,refresh_minutes:rate,competitions:configured},'Saving competitions…',true);
+  pauseButton.addEventListener('click',()=>saveMonitoringState(false));
+  resumeButton.addEventListener('click',()=>saveMonitoringState(true));
+  saveButton.addEventListener('click',async()=>{
+    const configured=[...selected].map(id=>competitions.find(c=>String(c.id)===id)||currentConfig.competitions.find(c=>String(c.id)===id)).filter(Boolean);
+    if(!configured.length){saveStatus.textContent='Select at least one competition before saving.';return;}
+    if(configured.length!==selected.size){saveStatus.textContent='One or more selections are missing from the catalog.';return;}
+    if(configured.some(c=>!/^\d+$/.test(String(c.id)))){saveStatus.textContent='Competition IDs must be verified numeric IDs.';return;}
+    const rate=Number(refreshRate.value);
+    if(![5,10,15,20].includes(rate)){saveStatus.textContent='Select a valid refresh rate.';return;}
+    if(saving)return;
+    saving=true;saveButton.disabled=true;
+    saveStatus.textContent='CHECKING — Verifying the new competitions before changing CURRENT MATCHES…';
+    try{
+      const candidate={enabled:currentConfig.enabled,refresh_minutes:rate,competitions:configured};
+      const {started,token}=await dispatchInitialScrape(candidate);
+      await awaitOutcome(started,token,candidate);
+    }catch(error){saveStatus.textContent=`FAILED — No changes were made. ${error.message}`;}
+    finally{saving=false;saveButton.disabled=false;drawCurrent();}
   });
   function update(){
     text.textContent = selected.size ? `${selected.size} COMPETITION${selected.size===1?'':'S'} SELECTED` : 'Select competitions…';
