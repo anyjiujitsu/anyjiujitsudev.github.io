@@ -42,6 +42,7 @@
           <div class="viewToggle__thumb" aria-hidden="true"></div>
           <button class="viewToggle__tab" role="tab" aria-selected="true" data-view="events">EVENTS</button>
           <button class="viewToggle__tab" role="tab" aria-selected="false" data-view="index">INDEX</button>
+          <button class="viewToggle__tab" role="tab" aria-selected="false" data-view="matches">MATCHES</button>
         </div>
       </div>
     </header>
@@ -219,6 +220,38 @@
                 <button class="adminActionBtn" type="submit">Submit</button>
               </div>
             </form>
+          </div>
+        </section>
+
+
+        <!-- MATCHES PAGE — IBJJF catalog refresh only; tournament monitoring is not wired yet. -->
+        <section class="adminPage" data-page="matches" aria-label="Matches configuration">
+          <div class="adminCard">
+            <div class="adminCardHeader">MATCHES</div>
+            <div class="adminForm">
+              <div class="adminGrid">
+                <label class="adminLabel" id="matchesCompetitionsLabel">COMPETITIONS</label>
+                <div class="adminMatchesPicker" id="matchesPicker">
+                  <button class="adminSelect adminMatchesToggle" type="button" id="matchesToggle" aria-labelledby="matchesCompetitionsLabel matchesSelectionText" aria-expanded="false" aria-controls="matchesMenu">
+                    <span id="matchesSelectionText">Select competitions…</span><span aria-hidden="true">▾</span>
+                  </button>
+                  <div class="adminMatchesMenu" id="matchesMenu" hidden>
+                    <input class="adminInput adminMatchesSearch" id="matchesFilter" type="search" placeholder="Search competitions…" aria-label="Filter competition names" autocomplete="off" />
+                    <div class="adminMatchesMenuActions"><span id="matchesCount">Choose competitions</span><button type="button" id="matchesClearSelections">Clear</button></div>
+                    <div class="adminMatchesOptions" id="matchesOptions" role="group" aria-label="Competition options"></div>
+                    <p class="adminMatchesMenuNote">IBJJF competition catalog; refresh using GET COMPETITIONS.</p>
+                  </div>
+                </div>
+                <label class="adminLabel" for="matchesRefreshRate">REFRESH RATE</label>
+                <select class="adminSelect" id="matchesRefreshRate" name="refreshRate">
+                  <option value="5">5 min</option>
+                  <option value="10" selected>10 min</option>
+                  <option value="15">15 min</option>
+                  <option value="20">20 min</option>
+                </select>
+              </div>
+              <div class="adminMatchesFetch"><button type="button" class="adminSelect adminMatchesFetchButton" id="matchesGetCompetitions">GET COMPETITIONS</button><span id="matchesFetchStatus" role="status" aria-live="polite">Use GET COMPETITIONS to retrieve the IBJJF catalog.</span></div><div class="adminMatchesFooter">Competition selections and refresh rate are interface-only for now; they do not alter the public website or match workflow.</div>
+            </div>
           </div>
         </section>
 
