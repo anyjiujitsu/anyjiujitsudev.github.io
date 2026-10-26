@@ -226,6 +226,19 @@
 
         <!-- MATCHES PAGE — IBJJF catalog refresh only; tournament monitoring is not wired yet. -->
         <section class="adminPage" data-page="matches" aria-label="Matches configuration">
+          <div class="adminCard adminMatchesCurrentCard">
+            <div class="adminCardHeader">CURRENT MATCHES <span class="adminMatchesPreviewTag">PREVIEW</span></div>
+            <div class="adminForm">
+              <div class="adminMatchesCurrentRow"><span class="adminLabel">COMPETITIONS</span><div id="matchesCurrentComps" class="adminMatchesCurrentList">No competitions selected yet.</div></div>
+              <div class="adminMatchesCurrentRow"><span class="adminLabel">REFRESH RATE</span><div id="matchesCurrentRate" class="adminMatchesCurrentValue">10 min</div></div>
+              <div class="adminMatchesCurrentRow"><span class="adminLabel">STATUS</span><div class="adminMatchesCurrentValue" id="matchesCurrentStatus" aria-live="polite">READY (PREVIEW)</div></div>
+              <div class="adminMatchesCurrentActions">
+                <button type="button" class="adminSelect adminMatchesStateButton" id="matchesPause">PAUSE</button>
+                <button type="button" class="adminSelect adminMatchesStateButton" id="matchesResume">RESUME</button>
+              </div>
+              <p class="adminMatchesFooter">Preview only. PAUSE and RESUME do not control GitHub Actions yet.</p>
+            </div>
+          </div>
           <div class="adminCard">
             <div class="adminCardHeader">MATCHES</div>
             <div class="adminForm">
@@ -261,7 +274,7 @@
 
   </div>
 
-  <script type="module" src="assets/js/admin.js?v=matches3-20261025"></script>
+  <script type="module" src="assets/js/admin.js?v=matches-current-20261026-1"></script>
 
   <script>
     (function(){
