@@ -797,3 +797,48 @@ body > .adminMatchesMenu .adminMatchesSearch {flex:none;}
 body > .adminMatchesMenu .adminMatchesOptions {overscroll-behavior:contain;}
 body > .adminMatchesMenu .adminMatchesOption {padding:12px 4px;}
 body > .adminMatchesMenu[hidden] {display:none !important;}
+
+/* Phone-only COMPS selection sheet. Desktop floating dropdown is unchanged. */
+.adminMatchesBackdrop[hidden] { display:none !important; }
+.adminMatchesBackdrop { position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,.23); }
+.adminMatchesMobileClose { display:none; }
+@media (max-width:760px) {
+  body > .adminMatchesMenu {
+    padding:14px 14px 10px;
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 16px 42px rgba(0,0,0,.25);
+  }
+  body > .adminMatchesMenu .adminMatchesMobileClose {
+    display:block;
+    align-self:flex-end;
+    flex:none;
+    border:0;
+    border-radius:20px;
+    padding:8px 15px;
+    margin-bottom:10px;
+    background:var(--green,#214d33);
+    color:#fff;
+    font:700 12px/1.2 inherit;
+    cursor:pointer;
+  }
+  body > .adminMatchesMenu .adminMatchesSearch {
+    flex:none;
+    font-size:16px !important; /* avoid Safari zoom-on-focus */
+    min-height:43px;
+  }
+  body > .adminMatchesMenu .adminMatchesMenuActions { flex:none; }
+  body > .adminMatchesMenu .adminMatchesOptions {
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  body > .adminMatchesMenu .adminMatchesOption {
+    padding:12px 4px;
+    font-size:13px;
+    overflow-wrap:anywhere;
+  }
+  body > .adminMatchesMenu .adminMatchesOption input { margin-top:2px; }
+  body > .adminMatchesMenu .adminMatchesMenuNote { flex:none; }
+}
