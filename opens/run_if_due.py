@@ -40,7 +40,19 @@ env=os.environ.copy()
 if candidate is not None: env['OPENS_CANDIDATE_JSON']=json.dumps(candidate)
 subprocess.run([sys.executable,str(ROOT/'refresh_ibjjf.py')],check=True,env=env)
 if candidate is not None:
-    # Publish candidate only AFTER the scraper has verified and written match data.
+    # Publish only the verified subset; rejected tournaments must never become
+    # active or enter automatic refresh. The scraper writes this after validation.
+    accepted_file = ROOT / '.accepted-competitions.json'
+    if not accepted_file.exists():
+        raise SystemExit('Scraper did not provide verified competition selection; keeping existing configuration.')
+    accepted = json.loads(accepted_file.read_text())
+    ids = {str(c['id']) for c in candidate['competitions']}
+    successful = accepted.get('competitions', [])
+    if not successful or any(str(c.get('id')) not in ids for c in successful):
+        raise SystemExit('Invalid successful competition list; keeping existing configuration.')
+    candidate['competitions'] = successful
+    print(f'Activating {len(successful)} verified competition(s); excluded {len(accepted.get("excluded_competitions", []))}.', flush=True)
+    accepted_file.unlink()
     candidate['updated_at']=datetime.now(timezone.utc).isoformat()
     (ROOT/'config.json').write_text(json.dumps(candidate,indent=2,ensure_ascii=False)+'\n')
     revision=candidate['updated_at']

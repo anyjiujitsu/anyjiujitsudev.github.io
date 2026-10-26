@@ -598,14 +598,34 @@ def main():
 
     # Final guard: never publish registration-only rows as matches.
     result = [row for row in result if verified_match(row)]
-    if os.environ.get('OPENS_CANDIDATE_JSON'):
-        # Every newly selected competition must have an independently verified fight/result.
+    is_candidate = bool(os.environ.get('OPENS_CANDIDATE_JSON'))
+    if is_candidate:
+        # A proposed replacement succeeds when AT LEAST ONE selected competition
+        # yields independently verified match rows. Failed/empty selections never
+        # enter the new active configuration or the public dataset.
         matched_ids = {str(row.get('competition_id')) for row in result}
-        missing_ids = [str(comp['id']) for comp in competitions if str(comp['id']) not in matched_ids]
-        if missing_ids:
-            raise RuntimeError(f'No verified match data for selected competition IDs: {missing_ids}; active configuration untouched.')
-    if len(done) != len(competitions) or errors or not result:
-        raise RuntimeError(f'Incomplete scrape: {len(done)}/{len(competitions)} rosters loaded, {len(result)} verified matches, errors: {errors}. Keeping old published data.')
+        accepted = [comp for comp in competitions if str(comp['id']) in matched_ids]
+        rejected = [comp for comp in competitions if str(comp['id']) not in matched_ids]
+        if not accepted:
+            raise RuntimeError('No selected competitions produced verified match data; active configuration untouched.')
+        print(f'Candidate result: {len(accepted)} accepted, {len(rejected)} excluded.', flush=True)
+        for comp in rejected:
+            cid = str(comp['id'])
+            print(f'  EXCLUDED {cid}: {comp["name"]} — {errors.get(cid) or errors.get(cid+"_schedule") or "no verified matches"}', flush=True)
+        # This file is only staged; run_if_due publishes configuration AFTER
+        # a successful scrape and only for IDs present here.
+        (ROOT / '.accepted-competitions.json').write_text(json.dumps({
+            'competitions': accepted,
+            'excluded_competitions': [{'id': str(c['id']), 'name': c['name']} for c in rejected]
+        }, ensure_ascii=False, indent=2) + '\n')
+        competitions = accepted
+        done = [cid for cid in done if cid in matched_ids]
+        result = [row for row in result if str(row.get('competition_id')) in matched_ids]
+    else:
+        # Normal scheduled updates remain conservative: don't replace the
+        # currently published snapshot with a partial refresh.
+        if len(done) != len(competitions) or errors or not result:
+            raise RuntimeError(f'Incomplete scrape: {len(done)}/{len(competitions)} rosters loaded, {len(result)} verified matches, errors: {errors}. Keeping old published data.')
     staging.write_text(json.dumps({
         'source': 'IBJJF and BJJCompSystem',
         'published_competitions': competitions,
