@@ -762,3 +762,13 @@
 
 /* GET COMPETITIONS is the first control in the MATCHES view. */
 .adminPage[data-page="matches"] .adminMatchesFetch { margin:0 0 18px; }
+
+/* One animation source: the pager's scroll position drives the toggle exactly. */
+#adminViewToggle .viewToggle__thumb {
+  transition: none !important;
+  will-change: transform;
+}
+#adminPager > .adminPage {
+  box-sizing: border-box;
+  min-width: 0;
+}
