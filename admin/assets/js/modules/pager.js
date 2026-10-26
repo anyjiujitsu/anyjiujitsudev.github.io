@@ -7,7 +7,7 @@ export function initAdminPager() {
 
   const tabs = [...toggle.querySelectorAll('.viewToggle__tab')];
   const thumb = toggle.querySelector('.viewToggle__thumb');
-  const headings = { events: 'EVENTS – ADD NEW', index: 'INDEX – ADD NEW', matches: 'MATCHES' };
+  const headings = { events: 'EVENTS', index: 'INDEX', matches: 'MATCHES' };
   let frame = 0;
   let animation = 0;
   let restoreSnap = '';
