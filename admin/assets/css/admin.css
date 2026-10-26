@@ -784,3 +784,16 @@
 .adminMatchesStateButton { min-width:106px; width:auto; font-size:12px; font-weight:700; cursor:pointer; }
 .adminMatchesStateButton:disabled { opacity:.4; cursor:default; }
 @media (max-width:550px) { .adminMatchesCurrentRow { grid-template-columns:92px minmax(0,1fr); gap:10px; } }
+
+/* MATCHES competitions menu: floating panel outside the scrolling admin pager. */
+body > .adminMatchesMenu {
+  background:var(--table-field-column-color, #f5f5f5);
+  border:1px solid #0002;
+  border-radius:12px;
+  box-shadow:0 12px 30px #0002;
+  padding:12px;
+}
+body > .adminMatchesMenu .adminMatchesSearch {flex:none;}
+body > .adminMatchesMenu .adminMatchesOptions {overscroll-behavior:contain;}
+body > .adminMatchesMenu .adminMatchesOption {padding:12px 4px;}
+body > .adminMatchesMenu[hidden] {display:none !important;}
