@@ -1,0 +1,41 @@
+name: OPENS match refresh
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Run an immediate scrape even if paused or not due'
+        required: false
+        type: boolean
+        default: false
+  schedule:
+    - cron: '3-59/5 * * * *'
+permissions:
+  contents: write
+concurrency:
+  group: opens-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - run: python -m pip install requests beautifulsoup4
+      - name: Refresh OPENS if due
+        env:
+          OPENS_FORCE: ${{ github.event.inputs.force || 'false' }}
+        run: python opens/run_if_due.py
+      - name: Publish validated data
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add opens/athletes.json opens/refresh-state.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Refresh OPENS match data'
+            git pull --rebase origin main
+            git push origin main
+          fi
