@@ -14,6 +14,27 @@ export async function initMatchesPreview(){
   const button = document.getElementById('matchesGetCompetitions');
   const status = document.getElementById('matchesFetchStatus');
   const selected = new Set();
+  const refreshRate = document.getElementById('matchesRefreshRate');
+  const currentComps = document.getElementById('matchesCurrentComps');
+  const currentRate = document.getElementById('matchesCurrentRate');
+  const currentStatus = document.getElementById('matchesCurrentStatus');
+  const pauseButton = document.getElementById('matchesPause');
+  const resumeButton = document.getElementById('matchesResume');
+  let paused = false;
+  function drawCurrent(){
+    if(!currentComps)return;
+    currentComps.replaceChildren();
+    const names = competitions.filter(c=>selected.has(c.id)).map(c=>c.name);
+    if (!names.length) currentComps.textContent='No competitions selected yet.';
+    else for (const name of names){const entry=document.createElement('div');entry.textContent=name;currentComps.append(entry);}
+    currentRate.textContent=`${refreshRate.value} min`;
+    currentStatus.textContent=paused ? 'PAUSED (PREVIEW)' : 'READY (PREVIEW)';
+    pauseButton.disabled=paused;
+    resumeButton.disabled=!paused;
+  }
+  pauseButton.addEventListener('click',()=>{paused=true;drawCurrent();});
+  resumeButton.addEventListener('click',()=>{paused=false;drawCurrent();});
+  refreshRate.addEventListener('change',drawCurrent);
   let competitions = [];
   const owner = CUSTOMIZATION.adminGitHubOwner;
   const repo = CUSTOMIZATION.adminGitHubRepo;
@@ -24,6 +45,7 @@ export async function initMatchesPreview(){
   function update(){
     text.textContent = selected.size ? `${selected.size} COMPETITION${selected.size===1?'':'S'} SELECTED` : 'Select competitions…';
     count.textContent = `${selected.size} selected · ${competitions.length} available`;
+    drawCurrent();
   }
   function draw(){
     options.replaceChildren();
@@ -63,6 +85,7 @@ export async function initMatchesPreview(){
     const fallbackKey = `admin_github_token_${String(owner).toLowerCase().replace(/[^a-z0-9]+/g,'_')}_${String(repo).toLowerCase().replace(/[^a-z0-9]+/g,'_')}`;
     return localStorage.getItem(explicit || fallbackKey) || localStorage.getItem('anyjj_admin_github_token') || '';
   }
+  drawCurrent();
   let active = false;
   button.addEventListener('click',async()=>{
     if(active)return;
