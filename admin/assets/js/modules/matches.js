@@ -21,6 +21,7 @@ export async function initMatchesPreview(){
   const pauseButton = document.getElementById('matchesPause');
   const resumeButton = document.getElementById('matchesResume');
   let currentConfig = {enabled:false,refresh_minutes:10,competitions:[]};
+  let requestPending = false;
   let competitions = [];
   function drawCurrent(){
     currentComps.replaceChildren();
@@ -28,7 +29,7 @@ export async function initMatchesPreview(){
     if (!values.length) currentComps.textContent = 'No competitions configured.';
     else for (const c of values){const item=document.createElement('div');item.textContent=c.name;currentComps.append(item);}
     currentRate.textContent = `${currentConfig.refresh_minutes} min`;
-    currentStatus.textContent = currentConfig.enabled ? 'RUNNING' : 'PAUSED';
+    currentStatus.textContent = requestPending ? 'UPDATING · INITIAL SCRAPE REQUESTED' : (currentConfig.enabled ? 'RUNNING' : 'PAUSED');
     pauseButton.disabled = !currentConfig.enabled;
     resumeButton.disabled = currentConfig.enabled;
   }
@@ -48,8 +49,10 @@ export async function initMatchesPreview(){
     currentConfig = {
       enabled: Boolean(config.enabled),
       refresh_minutes: [5,10,15,20].includes(Number(config.refresh_minutes)) ? Number(config.refresh_minutes) : 10,
-      competitions: Array.isArray(config.competitions) ? config.competitions : []
+      competitions: Array.isArray(config.competitions) ? config.competitions : [],
+      updated_at: config.updated_at || null
     };
+    requestPending = false;
     selected.clear();
     currentConfig.competitions.forEach(c => selected.add(String(c.id)));
     refreshRate.value = String(currentConfig.refresh_minutes);
@@ -67,22 +70,48 @@ export async function initMatchesPreview(){
     const encoded = btoa(Array.from(new TextEncoder().encode(payload), b=>String.fromCharCode(b)).join(''));
     const response = await fetch(url,{method:'PUT',headers:{...headers(token),'Content-Type':'application/json'},body:JSON.stringify({message:'Update OPENS match monitoring',content:encoded,sha:file.sha,branch})});
     if(!response.ok)throw new Error(`Cannot save configuration: HTTP ${response.status} ${(await response.text()).slice(0,160)}`);
-    currentConfig={...config};drawCurrent();
+    currentConfig={...config,updated_at:JSON.parse(payload).updated_at};drawCurrent();
+  }
+  async function dispatchInitialScrape() {
+    const token = await getToken();
+    if (!token) throw new Error('Enter your GitHub token first.');
+    const response = await fetch(`${endpoint}/actions/workflows/opens-refresh.yml/dispatches`, {
+      method: 'POST', headers: {...headers(token), 'Content-Type':'application/json'},
+      body: JSON.stringify({ref:branch, inputs:{force:'true'}})
+    });
+    if (response.status !== 204) throw new Error(`Saved configuration, but could not start the initial scrape (HTTP ${response.status}): ${(await response.text()).slice(0,180)}`);
   }
   let saving = false;
-  async function persist(config, message){
-    if(saving)return;
-    saving=true;pauseButton.disabled=true;resumeButton.disabled=true;saveButton.disabled=true;
-    saveStatus.textContent=message;
-    try{await saveConfig(config);saveStatus.textContent='Saved to GitHub; takes effect after deployment.';}
-    catch(err){saveStatus.textContent=err.message;drawCurrent();}
-    finally{saving=false;saveButton.disabled=false;}
+  async function persist(config, message, triggerInitial = false){
+    if (saving) return;
+    saving = true;
+    pauseButton.disabled = true; resumeButton.disabled = true; saveButton.disabled = true;
+    saveStatus.textContent = message;
+    try {
+      await saveConfig(config);
+      if (triggerInitial) {
+        requestPending = true;
+        drawCurrent();
+        try {
+          await dispatchInitialScrape();
+          saveStatus.textContent = 'Settings saved. Initial scrape requested; public data stays unchanged until validated and published.';
+        } catch (error) { saveStatus.textContent = error.message + ' Run OPENS match refresh manually if necessary.'; }
+      } else {
+        saveStatus.textContent = 'Monitoring settings saved to GitHub.';
+      }
+    } catch(error) {saveStatus.textContent = error.message;drawCurrent();}
+    finally {saving=false;saveButton.disabled=false;drawCurrent();}
   }
   pauseButton.addEventListener('click',()=>persist({...currentConfig,enabled:false},'Pausing monitoring…'));
-  resumeButton.addEventListener('click',()=>persist({...currentConfig,enabled:true},'Resuming monitoring…'));
+  resumeButton.addEventListener('click',()=>persist({...currentConfig,enabled:true},'Resuming monitoring…',true));
   saveButton.addEventListener('click',()=>{
     const configured = [...selected].map(id=>competitions.find(c=>c.id===id) || currentConfig.competitions.find(c=>String(c.id)===id)).filter(Boolean);
-    persist({enabled:currentConfig.enabled,refresh_minutes:Number(refreshRate.value),competitions:configured},'Saving competitions…');
+    if (!configured.length) {saveStatus.textContent='Select at least one competition before saving.'; return;}
+    if (configured.length !== selected.size) {saveStatus.textContent='One or more selected competitions have no valid catalog entry. Refresh the catalog.';return;}
+    if (configured.some(c=>!/^\d+$/.test(String(c.id)))) {saveStatus.textContent='Competition IDs must be verified numeric IBJJF event IDs.';return;}
+    const rate = Number(refreshRate.value);
+    if (![5,10,15,20].includes(rate)) {saveStatus.textContent='Select a valid refresh rate.';return;}
+    persist({enabled:currentConfig.enabled,refresh_minutes:rate,competitions:configured},'Saving competitions…',true);
   });
   function update(){
     text.textContent = selected.size ? `${selected.size} COMPETITION${selected.size===1?'':'S'} SELECTED` : 'Select competitions…';
