@@ -229,8 +229,9 @@
           <div class="adminCard">
             <div class="adminCardHeader">MATCHES</div>
             <div class="adminForm">
+              <div class="adminMatchesFetch"><button type="button" class="adminSelect adminMatchesFetchButton" id="matchesGetCompetitions">GET COMPETITIONS</button><span id="matchesFetchStatus" role="status" aria-live="polite">Use GET COMPETITIONS to retrieve the IBJJF catalog.</span></div>
               <div class="adminGrid">
-                <label class="adminLabel" id="matchesCompetitionsLabel">COMPETITIONS</label>
+                <label class="adminLabel" id="matchesCompetitionsLabel">COMPS</label>
                 <div class="adminMatchesPicker" id="matchesPicker">
                   <button class="adminSelect adminMatchesToggle" type="button" id="matchesToggle" aria-labelledby="matchesCompetitionsLabel matchesSelectionText" aria-expanded="false" aria-controls="matchesMenu">
                     <span id="matchesSelectionText">Select competitions…</span><span aria-hidden="true">▾</span>
@@ -250,7 +251,7 @@
                   <option value="20">20 min</option>
                 </select>
               </div>
-              <div class="adminMatchesFetch"><button type="button" class="adminSelect adminMatchesFetchButton" id="matchesGetCompetitions">GET COMPETITIONS</button><span id="matchesFetchStatus" role="status" aria-live="polite">Use GET COMPETITIONS to retrieve the IBJJF catalog.</span></div><div class="adminMatchesFooter">Competition selections and refresh rate are interface-only for now; they do not alter the public website or match workflow.</div>
+              <div class="adminMatchesFooter">Competition selections and refresh rate are interface-only for now; they do not alter the public website or match workflow.</div>
             </div>
           </div>
         </section>
@@ -260,7 +261,7 @@
 
   </div>
 
-  <script type="module" src="assets/js/admin.js"></script>
+  <script type="module" src="assets/js/admin.js?v=matches3-20261025"></script>
 
   <script>
     (function(){
