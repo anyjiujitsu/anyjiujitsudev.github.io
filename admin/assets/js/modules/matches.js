@@ -20,32 +20,73 @@ export async function initMatchesPreview(){
   const currentStatus = document.getElementById('matchesCurrentStatus');
   const pauseButton = document.getElementById('matchesPause');
   const resumeButton = document.getElementById('matchesResume');
-  let paused = false;
-  function drawCurrent(){
-    if(!currentComps)return;
-    currentComps.replaceChildren();
-    const names = competitions.filter(c=>selected.has(c.id)).map(c=>c.name);
-    if (!names.length) currentComps.textContent='No competitions selected yet.';
-    else for (const name of names){const entry=document.createElement('div');entry.textContent=name;currentComps.append(entry);}
-    currentRate.textContent=`${refreshRate.value} min`;
-    currentStatus.textContent=paused ? 'PAUSED (PREVIEW)' : 'READY (PREVIEW)';
-    pauseButton.disabled=paused;
-    resumeButton.disabled=!paused;
-  }
-  pauseButton.addEventListener('click',()=>{paused=true;drawCurrent();});
-  resumeButton.addEventListener('click',()=>{paused=false;drawCurrent();});
-  refreshRate.addEventListener('change',drawCurrent);
+  let currentConfig = {enabled:false,refresh_minutes:10,competitions:[]};
   let competitions = [];
+  function drawCurrent(){
+    currentComps.replaceChildren();
+    const values = currentConfig.competitions || [];
+    if (!values.length) currentComps.textContent = 'No competitions configured.';
+    else for (const c of values){const item=document.createElement('div');item.textContent=c.name;currentComps.append(item);}
+    currentRate.textContent = `${currentConfig.refresh_minutes} min`;
+    currentStatus.textContent = currentConfig.enabled ? 'RUNNING' : 'PAUSED';
+    pauseButton.disabled = !currentConfig.enabled;
+    resumeButton.disabled = currentConfig.enabled;
+  }
+
   const owner = CUSTOMIZATION.adminGitHubOwner;
   const repo = CUSTOMIZATION.adminGitHubRepo;
   const branch = CUSTOMIZATION.adminGitHubBranch || 'main';
   const workflow = 'ibjjf-competition-catalog.yml';
   const endpoint = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
   const headers = token => ({'Accept':'application/vnd.github+json','Authorization':`Bearer ${token}`,'X-GitHub-Api-Version':'2022-11-28'});
+  const saveStatus = document.getElementById('matchesSaveStatus');
+  const saveButton = document.getElementById('matchesSave');
+  async function loadConfig(){
+    const response = await fetch(`../opens/config.json?t=${Date.now()}`, {cache:'no-store'});
+    if (!response.ok) throw new Error(`Configuration unavailable: HTTP ${response.status}`);
+    const config = await response.json();
+    currentConfig = {
+      enabled: Boolean(config.enabled),
+      refresh_minutes: [5,10,15,20].includes(Number(config.refresh_minutes)) ? Number(config.refresh_minutes) : 10,
+      competitions: Array.isArray(config.competitions) ? config.competitions : []
+    };
+    selected.clear();
+    currentConfig.competitions.forEach(c => selected.add(String(c.id)));
+    refreshRate.value = String(currentConfig.refresh_minutes);
+    drawCurrent();
+  }
+  // Compare-and-swap using the latest GitHub SHA avoids overwriting unrelated changes.
+  async function saveConfig(config){
+    const token = await getToken();
+    if (!token) throw new Error('Enter your GitHub token first.');
+    const url = `${endpoint}/contents/opens/config.json`;
+    const read = await fetch(`${url}?ref=${encodeURIComponent(branch)}`, {headers:headers(token),cache:'no-store'});
+    if (!read.ok) throw new Error(`Cannot read config from GitHub: HTTP ${read.status}`);
+    const file = await read.json();
+    const payload = JSON.stringify({...config, updated_at:new Date().toISOString()},null,2)+'\n';
+    const encoded = btoa(Array.from(new TextEncoder().encode(payload), b=>String.fromCharCode(b)).join(''));
+    const response = await fetch(url,{method:'PUT',headers:{...headers(token),'Content-Type':'application/json'},body:JSON.stringify({message:'Update OPENS match monitoring',content:encoded,sha:file.sha,branch})});
+    if(!response.ok)throw new Error(`Cannot save configuration: HTTP ${response.status} ${(await response.text()).slice(0,160)}`);
+    currentConfig={...config};drawCurrent();
+  }
+  let saving = false;
+  async function persist(config, message){
+    if(saving)return;
+    saving=true;pauseButton.disabled=true;resumeButton.disabled=true;saveButton.disabled=true;
+    saveStatus.textContent=message;
+    try{await saveConfig(config);saveStatus.textContent='Saved to GitHub; takes effect after deployment.';}
+    catch(err){saveStatus.textContent=err.message;drawCurrent();}
+    finally{saving=false;saveButton.disabled=false;}
+  }
+  pauseButton.addEventListener('click',()=>persist({...currentConfig,enabled:false},'Pausing monitoring…'));
+  resumeButton.addEventListener('click',()=>persist({...currentConfig,enabled:true},'Resuming monitoring…'));
+  saveButton.addEventListener('click',()=>{
+    const configured = [...selected].map(id=>competitions.find(c=>c.id===id) || currentConfig.competitions.find(c=>String(c.id)===id)).filter(Boolean);
+    persist({enabled:currentConfig.enabled,refresh_minutes:Number(refreshRate.value),competitions:configured},'Saving competitions…');
+  });
   function update(){
     text.textContent = selected.size ? `${selected.size} COMPETITION${selected.size===1?'':'S'} SELECTED` : 'Select competitions…';
     count.textContent = `${selected.size} selected · ${competitions.length} available`;
-    drawCurrent();
   }
   function draw(){
     options.replaceChildren();
@@ -73,7 +114,7 @@ export async function initMatchesPreview(){
     if(!Array.isArray(data.competitions))throw new Error('Invalid competition catalog');
     competitions = data.competitions.filter(c=>c.id && c.name).map(c=>({id:String(c.id),name:String(c.name)}));
     const valid = new Set(competitions.map(c=>c.id));
-    for (const id of selected) if(!valid.has(id))selected.delete(id);
+    // Keep selected configured IDs even if the catalog has not been refreshed.
     draw();update();
     return data;
   }
@@ -85,7 +126,7 @@ export async function initMatchesPreview(){
     const fallbackKey = `admin_github_token_${String(owner).toLowerCase().replace(/[^a-z0-9]+/g,'_')}_${String(repo).toLowerCase().replace(/[^a-z0-9]+/g,'_')}`;
     return localStorage.getItem(explicit || fallbackKey) || localStorage.getItem('anyjj_admin_github_token') || '';
   }
-  drawCurrent();
+  try { await loadConfig(); } catch (err) { saveStatus.textContent = `Unable to read active config: ${err.message}`; }
   let active = false;
   button.addEventListener('click',async()=>{
     if(active)return;
@@ -117,4 +158,5 @@ export async function initMatchesPreview(){
     const data=await loadCatalog();
     status.textContent = competitions.length ? `${competitions.length} IBJJF competitions loaded${data.updated_at ? ' · updated '+new Date(data.updated_at).toLocaleString() : ''}.` : 'No catalog loaded yet. Click GET COMPETITIONS.';
   }catch(err){status.textContent='Catalog not loaded yet. Click GET COMPETITIONS.';options.textContent='No catalog yet.';}
+  drawCurrent();
 }
