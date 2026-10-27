@@ -30,8 +30,8 @@ export async function initMatchesPreview(){
     else for (const c of values){const item=document.createElement('div');item.textContent=c.name;currentComps.append(item);}
     currentRate.textContent = `${currentConfig.refresh_minutes} min`;
     currentStatus.textContent = currentConfig.competitions.length ? (currentConfig.enabled ? 'RUNNING' : 'PAUSED') : 'NO ACTIVE MATCHES';
-    pauseButton.disabled = !currentConfig.enabled;
-    resumeButton.disabled = currentConfig.enabled;
+    pauseButton.disabled = !currentConfig.competitions.length || !currentConfig.enabled;
+    resumeButton.disabled = !currentConfig.competitions.length || currentConfig.enabled;
   }
 
   const owner = CUSTOMIZATION.adminGitHubOwner;
@@ -110,8 +110,8 @@ export async function initMatchesPreview(){
           if(response.ok){
             const cfg=await response.json();
             if(cfg.updated_at && cfg.updated_at!==currentConfig.updated_at && Number(cfg.refresh_minutes)===Number(expected.refresh_minutes) &&
-              JSON.stringify((cfg.competitions||[]).map(c=>String(c.id)).sort())===JSON.stringify(expected.competitions.map(c=>String(c.id)).sort())){
-              await loadConfig();saveStatus.textContent='ACTIVE — New matches and refresh rate published successfully.';return;
+              (cfg.competitions||[]).length>0 && (cfg.competitions||[]).every(c=>expected.competitions.some(e=>String(e.id)===String(c.id)))){
+              await loadConfig();saveStatus.textContent=(cfg.competitions.length===expected.competitions.length?'ACTIVE — New matches published; scheduled monitoring is running.':'ACTIVE — Available competitions published; unsuccessful selections excluded. Scheduled monitoring is running.');return;
             }
           }
         } catch(e){}
@@ -124,11 +124,32 @@ export async function initMatchesPreview(){
   }
   let saving = false;
   async function saveMonitoringState(enabled){
-    if(saving)return;
+    if(saving || !currentConfig.competitions.length)return;
     saving=true;pauseButton.disabled=true;resumeButton.disabled=true;saveButton.disabled=true;
-    try {await saveConfig({...currentConfig,enabled});saveStatus.textContent=enabled?'Monitoring resumed.':'Monitoring paused.';}
-    catch(error){saveStatus.textContent=error.message;}
-    finally{saving=false;saveButton.disabled=false;drawCurrent();}
+    try {
+      // Only change the monitoring switch; never clear selected competitions or saved results.
+      await saveConfig({...currentConfig,enabled});
+      if (!enabled) {
+        saveStatus.textContent='PAUSED — Existing matches remain published. Future scheduled scrapes are skipped.';
+      } else {
+        // RESUME also launches an immediate run using the existing active configuration.
+        // No candidate input: this does not replace the selected competitions.
+        try {
+          const token=await getToken();
+          if(!token)throw new Error('GitHub token missing.');
+          const response=await fetch(`${endpoint}/actions/workflows/opens-refresh.yml/dispatches`,{
+            method:'POST',headers:{...headers(token),'Content-Type':'application/json'},
+            body:JSON.stringify({ref:branch,inputs:{force:'true'}})
+          });
+          if(response.status!==204)throw new Error(`HTTP ${response.status}: ${(await response.text()).slice(0,180)}`);
+          saveStatus.textContent='RUNNING — Monitoring resumed; an immediate scrape was requested.';
+        } catch(error) {
+          saveStatus.textContent=`RUNNING — Monitoring resumed, but the immediate scrape could not start (${error.message}). Scheduled checks remain enabled.`;
+        }
+      }
+    } catch(error) {
+      saveStatus.textContent=`FAILED — Monitoring status was not changed. ${error.message}`;
+    } finally {saving=false;saveButton.disabled=false;drawCurrent();}
   }
   pauseButton.addEventListener('click',()=>saveMonitoringState(false));
   resumeButton.addEventListener('click',()=>saveMonitoringState(true));
@@ -143,7 +164,7 @@ export async function initMatchesPreview(){
     saving=true;saveButton.disabled=true;
     saveStatus.textContent='CHECKING — Verifying the new competitions before changing CURRENT MATCHES…';
     try{
-      const candidate={enabled:currentConfig.enabled,refresh_minutes:rate,competitions:configured};
+      const candidate={enabled:true,refresh_minutes:rate,competitions:configured};
       const {started,token}=await dispatchInitialScrape(candidate);
       await awaitOutcome(started,token,candidate);
     }catch(error){saveStatus.textContent=`FAILED — No changes were made. ${error.message}`;}
