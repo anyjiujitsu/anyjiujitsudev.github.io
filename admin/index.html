@@ -227,7 +227,7 @@
         <!-- MATCHES PAGE — IBJJF catalog refresh only; tournament monitoring is not wired yet. -->
         <section class="adminPage" data-page="matches" aria-label="Matches configuration">
           <div class="adminCard adminMatchesCurrentCard">
-            <div class="adminCardHeader">CURRENT MATCHES</div>
+            <div class="adminCardHeader">ACTIVE COMPS</div>
             <div class="adminForm">
               <div class="adminMatchesCurrentRow"><span class="adminLabel">COMP</span><div id="matchesCurrentComps" class="adminMatchesCurrentList">No competitions selected yet.</div></div>
               <div class="adminMatchesCurrentRow"><span class="adminLabel">REFRESH RATE</span><div id="matchesCurrentRate" class="adminMatchesCurrentValue">10 min</div></div>
@@ -240,9 +240,9 @@
             </div>
           </div>
           <div class="adminCard">
-            <div class="adminCardHeader">MATCHES</div>
+            <div class="adminCardHeader">IMPORT COMPS</div>
             <div class="adminForm">
-              <div class="adminMatchesFetch"><button type="button" class="adminSelect adminMatchesFetchButton" id="matchesGetCompetitions">GET COMPETITIONS</button><span id="matchesFetchStatus" role="status" aria-live="polite">Use GET COMPETITIONS to retrieve the IBJJF catalog.</span></div>
+              <div class="adminMatchesFetch"><button type="button" class="adminSelect adminMatchesFetchButton" id="matchesGetCompetitions">REFRESH COMPS</button><span id="matchesFetchStatus" role="status" aria-live="polite">Use REFRESH COMPS to retrieve the IBJJF catalog.</span></div>
               <div class="adminGrid">
                 <label class="adminLabel" id="matchesCompetitionsLabel">COMPS</label>
                 <div class="adminMatchesPicker" id="matchesPicker">
@@ -253,7 +253,7 @@
                     <input class="adminInput adminMatchesSearch" id="matchesFilter" type="search" placeholder="Search competitions…" aria-label="Filter competition names" autocomplete="off" />
                     <div class="adminMatchesMenuActions"><span id="matchesCount">Choose competitions</span><button type="button" id="matchesClearSelections">Clear</button></div>
                     <div class="adminMatchesOptions" id="matchesOptions" role="group" aria-label="Competition options"></div>
-                    <p class="adminMatchesMenuNote">IBJJF competition catalog; refresh using GET COMPETITIONS.</p>
+                    <p class="adminMatchesMenuNote">IBJJF competition catalog; refresh using REFRESH COMPS.</p>
                   </div>
                 </div>
                 <label class="adminLabel" for="matchesRefreshRate">REFRESH RATE</label>
@@ -264,7 +264,7 @@
                   <option value="20">20 min</option>
                 </select>
               </div>
-              <div class="adminMatchesFooter"><button type="button" class="adminSelect adminMatchesStateButton" id="matchesSave">SAVE MATCHES</button> <span id="matchesSaveStatus" role="status" aria-live="polite"></span></div>
+              <div class="adminMatchesFooter"><button type="button" class="adminSelect adminMatchesStateButton" id="matchesSave">GET MATCHES</button> <span id="matchesSaveStatus" role="status" aria-live="polite"></span></div>
             </div>
           </div>
         </section>
