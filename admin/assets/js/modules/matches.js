@@ -289,14 +289,14 @@ export async function initMatchesPreview(){
         clearInterval(pollTimer); pollTimer=null;
         await loadCatalog();
         status.textContent=`${competitions.length} competitions loaded from IBJJF.`;
-        button.textContent='GET COMPETITIONS'; delete button.dataset.reload;
+        button.textContent='REFRESH COMPS'; delete button.dataset.reload;
       } catch(error) { /* Keep polling while the publish/deployment completes. */ }
     }, 15000);
   }
   button.addEventListener('click',async()=>{
     if(active)return;
     if(button.dataset.reload==='true'){
-      try{const data=await loadCatalog();status.textContent=competitions.length?`${competitions.length} competitions loaded.`:'Catalog is still empty; check GitHub Actions logs.';if(competitions.length && data.updated_at !== priorStamp){button.textContent='GET COMPETITIONS';delete button.dataset.reload;clearInterval(pollTimer);}}
+      try{const data=await loadCatalog();status.textContent=competitions.length?`${competitions.length} competitions loaded.`:'Catalog is still empty; check GitHub Actions logs.';if(competitions.length && data.updated_at !== priorStamp){button.textContent='REFRESH COMPS';delete button.dataset.reload;clearInterval(pollTimer);}}
       catch(err){status.textContent='Not published yet. Check GitHub Actions; then try RELOAD LIST.';}
       return;
     }
@@ -322,7 +322,7 @@ export async function initMatchesPreview(){
   });
   try{
     const data=await loadCatalog();
-    status.textContent = competitions.length ? `${competitions.length} IBJJF competitions loaded${data.updated_at ? ' · updated '+new Date(data.updated_at).toLocaleString() : ''}.` : 'No catalog loaded yet. Click GET COMPETITIONS.';
-  }catch(err){status.textContent='Catalog not loaded yet. Click GET COMPETITIONS.';options.textContent='No catalog yet.';}
+    status.textContent = competitions.length ? `${competitions.length} IBJJF competitions loaded${data.updated_at ? ' · updated '+new Date(data.updated_at).toLocaleString() : ''}.` : 'No catalog loaded yet. Click REFRESH COMPS.';
+  }catch(err){status.textContent='Catalog not loaded yet. Click REFRESH COMPS.';options.textContent='No catalog yet.';}
   drawCurrent();
 }
