@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build static Boston Open athlete and fight data from public IBJJF pages.
+"""Build static OPENS athlete and fight data from public IBJJF pages.
 
 Sources: IBJJF athletes-by-academy, BJJCompSystem schedule and bracket pages.
 No website API keys, no browser-side cross-origin requests. Keep prior data when
@@ -545,6 +545,52 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity):
     return expanded, completed, missed
 
 
+
+def bracket_division_key(soup):
+    """Read division identity from the bracket itself, including unscheduled OC/BYE."""
+    header = soup.select_one('.tournament-category__title, .tournament-category__header, .tournament-category_bracket-title')
+    if header is None:
+        header = soup.select_one('h1, h2')
+    text = clean(header.get_text(' ', strip=True)) if header else ''
+    if not text:
+        # Short breadcrumb codes such as MA4/F/BLU/OC can be used if heading absent.
+        link = soup.select_one('a[href*="/categories/"]')
+        text = clean(link.get_text(' ', strip=True)) if link else ''
+    words = key(text).replace('-', ' ')
+    age_match = re.search(r'\b(master\s*\d+|adult|juvenile\s*\d*|juvenile|teen\s*\d*|kids?)\b', words)
+    sex_match = re.search(r'\b(female|male)\b', words)
+    belt_match = re.search(r'\b(white|blue|purple|brown|black|gray|grey|yellow|orange|green)\b', words)
+    if not (age_match and sex_match and belt_match):
+        return None
+    if re.search(r'\b(open\s*class|absolute)\b', words):
+        weight = 'open class'
+    else:
+        weights = ['super heavy', 'ultra heavy', 'medium heavy', 'light feather', 'rooster',
+                   'feather', 'middle', 'medium', 'heavy', 'light', 'open']
+        weight = next((w for w in weights if re.search(r'(?<!\w)' + re.escape(w) + r'(?!\w)', words)), None)
+    if not weight:
+        return None
+    return category_key((belt_match.group(), clean(age_match.group()), sex_match.group(), weight))
+
+
+def all_published_brackets(competition_id, schedule):
+    """Find category URLs from published category listings, not only dated fights."""
+    entries = dict(schedule)
+    urls = {v['url'] for v in entries.values()}
+    root = f'https://www.bjjcompsystem.com/tournaments/{competition_id}'
+    for suffix in ('/categories?gender_id=1', '/categories?gender_id=2', '/categories', '/schedule'):
+        try:
+            soup = get_soup(root + suffix)
+        except (requests.RequestException, ValueError) as exc:
+            print(f'  Category listing unavailable {suffix}: {exc}', flush=True)
+            continue
+        for a in soup.select('a[href]'):
+            url = urljoin(root, a['href']).split('?')[0].split('#')[0]
+            if re.fullmatch(rf'https?://(?:www\.)?bjjcompsystem\.com/tournaments/{re.escape(str(competition_id))}/categories/\d+', url, re.I):
+                urls.add(url)
+    print(f'  Discovered {len(urls)} linked category URLs ({len(schedule)} from schedule)', flush=True)
+    return sorted(urls)
+
 def roster_from_brackets(comp):
     """Recover roster/assignments from BJJCompSystem when IBJJF roster 404s.
 
@@ -553,17 +599,17 @@ def roster_from_brackets(comp):
     """
     cid = str(comp['id'])
     schedule_url = f'https://www.bjjcompsystem.com/tournaments/{cid}/schedule'
-    schedule = schedule_brackets(get_soup(schedule_url))
-    # Recover unscheduled Open Class links if the competition exposes them.
-    # The discovery helper needs an existing roster to target missing links;
-    # with no roster, use the published schedule only rather than invent IDs.
-    if not schedule:
-        raise ValueError(f'No BJJCompSystem category links for {cid}')
+    schedule = schedule_brackets_optional(get_soup(schedule_url))
+    # Scheduled links alone omit brackets with no fight time (notably BYEs/OC).
+    # Inspect all linked divisions on category listings as well.
+    category_urls = all_published_brackets(cid, schedule)
+    if not category_urls:
+        raise ValueError(f'No published category links for {cid}')
+    schedule_by_url = {v['url']: (k, v) for k, v in schedule.items()}
     rows = []
     visited = set()
     checked = 0
-    for division, info in schedule.items():
-        url = info['url']
+    for url in category_urls:
         if url in visited:
             continue
         visited.add(url)
@@ -574,6 +620,27 @@ def roster_from_brackets(comp):
         except (requests.RequestException, ValueError) as exc:
             print(f'  Category unavailable {url}: {exc}', flush=True)
             continue
+        division = bracket_division_key(soup)
+        if division is None and url in schedule_by_url:
+            division = schedule_by_url[url][0]
+        if division is None:
+            print(f'  Division identity not recognized: {url}', flush=True)
+            continue
+        # If the card is an unscheduled one-entrant final against BYE, keep it.
+        # Match-card markup can still give us the competitor name and academy.
+        if not any(f.get('result_map') for f in fights):
+            names = [clean(n.get_text(' ', strip=True)) for n in soup.select('.match-card__competitor-name')]
+            bye = single_entrant_bye_fight(soup, names)
+            if bye:
+                # Attach the academy from the same bracket card; never guess.
+                for node in soup.select('.match-card__competitor'):
+                    nm = node.select_one('.match-card__competitor-name')
+                    if nm and key(normalize_competitor_name(nm.get_text(' ', strip=True))) == next(iter(bye['result_map'])):
+                        team_node = node.select_one('.match-card__club-name, .match-card__competitor-club-name')
+                        if team_node:
+                            bye['competitors'][0]['team'] = clean(team_node.get_text(' ', strip=True))
+                        break
+                fights.append(bye)
         belt, age, sex, weight = division
         bracket = ' / '.join((belt.title(), age.title(), sex.title(), weight.title()))
         # Names can repeat in successive rounds: retain each distinct fight.
