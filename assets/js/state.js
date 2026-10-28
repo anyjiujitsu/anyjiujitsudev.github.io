@@ -49,7 +49,7 @@ export const state = {
 export function setView(v){
   // section: view
   // purpose: switch between "events" and "index" (default to events if unknown)
-  state.view = (v === "index") ? "index" : "events";
+  state.view = (v === "comps") ? "comps" : (v === "index") ? "index" : "events";
 }
 
 export function setIndexQuery(q){
