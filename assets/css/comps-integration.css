@@ -15,7 +15,7 @@
 @media (min-width: 641px) {
   .header__inner.siteHeaderInner--title > .headerSocial {
     position: absolute;
-    top: -23px;
+    top: -11px;
     right: var(--pagePad);
     transform: none;
     gap: 11px;
