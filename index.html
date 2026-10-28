@@ -11,6 +11,8 @@
   <link rel="stylesheet" href="assets/css/pills.css?v=20260129-302">
   <link rel="stylesheet" href="assets/css/components.css?v=20260212-902" />
   <link rel="stylesheet" href="assets/css/directory.css?v=20260210-809" />
+<link rel="stylesheet" href="opens/embedded.css" />
+  <link rel="stylesheet" href="assets/css/comps-integration.css" />
 <!-- IMPORTANT: repo references main.js (no sequence) -->
   <script type="module" src="assets/js/main.js?v=20260427-eventszip-directapply"></script>
 </head>
@@ -69,6 +71,7 @@
         <div class="viewToggle" id="viewToggle" role="tablist" aria-label="View toggle">
           <button class="viewToggle__tab" id="tabEvents" role="tab" aria-selected="true" type="button">Events</button>
           <button class="viewToggle__tab" id="tabIndex" role="tab" aria-selected="false" type="button">Index</button>
+          <button class="viewToggle__tab" id="tabComps" role="tab" aria-selected="false" type="button">Comps</button>
           <div class="viewToggle__thumb" aria-hidden="true"></div>
         </div>
       </div>
@@ -296,6 +299,30 @@
 
             </div>
           </nav>
+      <nav class="filters" id="compsFilters" aria-label="COMPS filters" hidden>
+          <div class="filters__inner boston-filter-strip">
+            <div class="boston-controls">
+              <div class="boston-picker" id="competitionPicker">
+                <button class="boston-pill" id="competitionToggle" type="button" aria-expanded="false" aria-controls="competitionMenu"><span class="boston-pill-label" id="competitionLabel">COMPETITIONS · LOADING</span><span class="boston-dot" aria-hidden="true"></span><span aria-hidden="true">▾</span></button>
+                <div class="boston-menu" id="competitionMenu" hidden>
+                  <div class="boston-menu-actions"><strong>IBJJF selected competitions</strong><button type="button" id="clearCompetitions">Clear</button></div>
+                  <div id="competitionOptions">Loading competitions…</div>
+                </div>
+              </div>
+              <form class="boston-search-form" id="athleteSearchForm">
+                <div class="boston-picker boston-gym-picker" id="academyPicker">
+                  <button class="boston-pill" id="academyToggle" type="button" aria-expanded="false" aria-controls="academyMenu"><span class="boston-pill-label" id="academyLabel">ACADEMIES · SELECT COMPETITIONS</span><span class="boston-dot" aria-hidden="true"></span><span aria-hidden="true">▾</span></button>
+                  <div class="boston-menu boston-gym-menu" id="academyMenu" hidden>
+                    <div class="boston-menu-actions"><strong>ACADEMIES IN SELECTED COMPETITIONS</strong><button type="button" id="clearAcademies">Clear</button></div>
+                    <div id="academyOptions">Select a competition first.</div>
+                  </div>
+                </div>
+                <button type="submit" class="boston-submit" id="athleteSearchButton">GO</button>
+                <button type="button" class="boston-submit boston-clear" id="clearAllButton">CLEAR</button>
+              </form>
+            </div>
+          </div>
+        </nav>
     </div>
 
 </header>
@@ -321,6 +348,18 @@
           </main>
         </div>
 
+        <!-- VIEW C: COMPS (THIRD) -->
+        <div class="viewPanel" id="viewComps" aria-label="COMPS">
+          <main class="content boston-content" aria-label="OPENS">
+      <div class="content__inner" id="bostonOpenRoot">
+        <p class="boston-status" id="bostonStatus" role="status" aria-live="polite">Loading IBJJF selected competitions…</p>
+        <section class="boston-results" id="bostonResults" aria-label="Athlete results">
+          <div class="boston-results-head"><span>NAME</span><span>BRACKET</span><span>TIME</span><span>MAT</span><span>DAY</span></div>
+          <div id="athleteRows"><div class="boston-empty"> </div></div>
+        </section>
+      </div>
+    </main>
+        </div>
       </div>
     </div>
 
