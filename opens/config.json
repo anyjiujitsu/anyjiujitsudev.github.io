@@ -3,17 +3,11 @@
   "refresh_minutes": 15,
   "competitions": [
     {
-      "id": "3254",
-      "name": "Boston Fall International Open IBJJF Jiu-Jitsu No-Gi Championship 2026",
-      "url": "https://ibjjf.com/events/3254/athletes-list-by-academy-teams",
-      "date": ""
-    },
-    {
-      "id": "3312",
-      "name": "Rome International Open IBJJF Jiu-Jitsu Championship 2026",
-      "url": "https://ibjjf.com/events/3312/athletes-list-by-academy-teams",
+      "id": "3313",
+      "name": "European IBJJF Jiu-Jitsu No-Gi Championship 2026",
+      "url": "https://ibjjf.com/events/3313/athletes-list-by-academy-teams",
       "date": ""
     }
   ],
-  "updated_at": "2026-10-28T15:24:44.466483+00:00"
+  "updated_at": "2026-10-28T15:31:42.257285+00:00"
 }
