@@ -13,10 +13,12 @@
 /* Desktop: dock the three header links above the wider COMPS slider.
    Do not change the established mobile placement or the slider itself. */
 @media (min-width: 641px) {
-  .siteHeaderInner--title .headerSocial {
-    top: -13px;
+  .header__inner.siteHeaderInner--title > .headerSocial {
+    position: absolute;
+    top: -23px;
     right: var(--pagePad);
     transform: none;
     gap: 11px;
+    z-index: 6;
   }
 }
