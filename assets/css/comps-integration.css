@@ -1,0 +1,11 @@
+/* Three-way navigation only: OPENS layout remains in opens/embedded.css. */
+.viewSlider { width:300%; }
+.viewPanel { width:33.333333333%; min-width:33.333333333%; }
+.viewToggle__thumb { width:calc(33.333333333% - 6px); transform:translateX(calc(var(--viewProgress,0) * 100%)); }
+@media(max-width:680px) { .viewToggle__thumb { width:calc(33.333333333% - 3px); } }
+@media(max-width:430px) { .viewToggle__thumb { width:calc(33.333333333% - 2px); } }
+#compsFilters[hidden] { display:none !important; }
+#compsFilters .filters__inner { overflow:visible; }
+#viewComps { min-width:0; }
+#viewComps .content { min-width:0; }
+#viewComps .boston-results { min-width:0; }
