@@ -1,0 +1,91 @@
+
+    /* Only styles specific to the OPENS page. */
+    /* Preserve the shared page width, but pin the title to the left. */
+    .siteHeaderInner--title.boston-header-row { display:flex; align-items:flex-end; justify-content:space-between; width:100%; }
+    .boston-header-row > .header__title { order:0; flex:0 1 auto; margin:0; text-align:left; }
+    .boston-social { order:1; display:flex; align-items:center; gap:12px; margin-left:auto; padding-bottom:3px; flex:0 0 auto; }
+    .boston-social__link { display:inline-flex; align-items:center; justify-content:center; width:24px; height:24px; color:var(--icon); text-decoration:none; }
+    .boston-social__link:hover { opacity:.65; }
+    .boston-social__icon { width:20px; height:20px; display:block; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+    .boston-filter-strip { min-height:60px; }
+    .boston-content { min-height:55vh; }
+    .boston-controls { display:flex; align-items:center; gap:9px; width:100%; flex-wrap:wrap; }
+    .boston-picker { position:relative; min-width:225px; max-width:380px; flex:1 1 260px; }
+    .boston-pill, .boston-search, .boston-submit { font:inherit; border:0; border-radius:22px; min-height:36px; }
+    .boston-pill { width:100%; text-align:left; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:7px 14px; background:#fff; color:#202821; cursor:pointer; }
+    .boston-pill-label { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .boston-pill .boston-dot { width:8px; height:8px; flex:none; border-radius:50%; background:var(--green); display:none; }
+    .boston-pill.has-selection .boston-dot { display:block; }
+    .boston-menu { position:absolute; left:0; top:calc(100% + 7px); z-index:120; width:min(450px,90vw); max-height:330px; overflow:auto; background:var(--bg); border:1px solid #bbb; border-radius:10px; box-shadow:0 12px 26px #0003; color:#222; padding:8px; }
+    .boston-menu[hidden] { display:none; }
+    .boston-menu-row { display:flex; gap:10px; align-items:flex-start; padding:10px 7px; cursor:pointer; border-bottom:1px solid #0001; font-size:13px; }
+    .boston-menu-row input { width:16px; height:16px; accent-color:var(--green); flex:none; }
+    .boston-menu-actions { display:flex; justify-content:space-between; padding:5px 8px 9px; }
+    .boston-menu-actions button { border:0; background:none; cursor:pointer; font:inherit; text-decoration:underline; }
+    .boston-search-form { display:flex; align-items:center; gap:8px; flex:2 1 320px; min-width:220px; }
+    .boston-search { box-sizing:border-box; width:100%; padding:7px 14px; background:#fff; color:#222; min-width:0; font-size:14px; }
+    .boston-gym-picker { max-width:none; }
+    .boston-gym-menu { width:min(480px,90vw); }
+    .boston-submit { background:#fff; color:#222; cursor:pointer; padding:7px 18px; font-size:13px; font-weight:700; }
+    .boston-submit:disabled { opacity:.55; cursor:wait; }
+    .boston-status { min-height:20px; font-size:13px; color:var(--muted, #777); margin:12px 0; }
+    .boston-results { width:100%; margin-top:12px; }
+    .boston-results-head, .boston-results-row { display:grid; grid-template-columns:minmax(0,2.15fr) minmax(0,2.15fr) minmax(76px,1.05fr) minmax(0,.55fr) minmax(0,.55fr); gap:10px; align-items:start; }
+    .boston-results-head { font-size:10px; font-weight:700; letter-spacing:.08em; padding:12px; border-bottom:2px solid #8887; }
+    .boston-results-row { align-items:start; padding:14px 12px; border-bottom:1px solid #8885; font-size:13px; }
+    .boston-results-row a { color:inherit; text-decoration:underline; text-underline-offset:2px; }
+    .boston-results-head > :nth-child(3), .boston-results-row > :nth-child(3) { white-space:nowrap; overflow-wrap:normal; }
+    .boston-results-row > span { overflow-wrap:anywhere; align-self:start; }
+    .boston-results-row small { display:block; font-size:10px; opacity:.7; margin-top:3px; }
+    .boston-results-row > span:first-child { min-width:0; }
+    .boston-athlete-academy, .boston-athlete-event { display:block; }
+    .boston-athlete-academy { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; overflow-wrap:normal; max-width:100%; }
+    /* Structured bracket: flat, muted belt-color bar alongside three text lines. */
+    .boston-bracket { display:flex; flex-direction:row; align-items:stretch; gap:9px; min-width:0; }
+    .boston-belt-bar { display:block; width:9px; flex:0 0 9px; align-self:stretch; border:0; border-radius:0; box-shadow:none; }
+    .boston-bracket-text { display:flex; flex-direction:column; align-items:flex-start; gap:2px; min-width:0; }
+    .boston-bracket-line { display:block; }
+    .boston-empty { padding:30px 12px; color:var(--muted,#666); font-size:13px; }
+    .boston-clear { background:transparent; color:#fff; border:1px solid #ffffffa8; white-space:nowrap; }
+    .boston-clear:hover { background:#ffffff20; }
+
+    .boston-result-pill { display:block; margin-top:0; padding:0; border:0; border-radius:0; background:none; font-size:10px; font-weight:700; letter-spacing:.045em; line-height:1.3; color:inherit; white-space:nowrap; }
+    .boston-results-row.is-finished { color:#8e8e8e; }
+    .boston-results-row.is-finished a { color:#868686; }
+    .boston-results-row.is-finished small { color:#979797; opacity:1; }
+    .boston-results-row.is-finished .boston-belt-bar { opacity:.55; }
+    .boston-results-row.is-finished .boston-result-pill { background:none; color:inherit; }
+    .boston-finished-divider { border-top:1px solid #9a9a9a80; margin-top:22px; padding:15px 12px 10px; color:var(--muted,#777); font-size:10px; font-weight:700; letter-spacing:.12em; }
+
+    @media (max-width:680px) {
+      /* The open academy menu is positioned to the visible phone viewport by the script below. */
+      .boston-gym-menu { position:fixed; left:8px; right:auto; width:calc(100vw - 16px); max-width:none; box-sizing:border-box; }
+      .boston-controls { flex-wrap:nowrap; gap:5px; }
+      .boston-picker { min-width:0; max-width:none; flex:1 1 42%; }
+      .boston-search-form { min-width:0; flex:1 1 58%; gap:5px; }
+      .boston-gym-picker { min-width:0; flex:1 1 auto; }
+      .boston-pill { min-height:30px; border-radius:18px; padding:5px 7px; gap:4px; font-size:clamp(8px,1.9vw,11px); }
+      .boston-pill .boston-dot { width:6px; height:6px; }
+      .boston-submit { min-height:30px; border-radius:18px; padding:5px 9px; font-size:clamp(9px,2vw,11px); }
+      .boston-results-head, .boston-results-row { grid-template-columns:minmax(0,2fr) minmax(0,2fr) minmax(62px,1.12fr) minmax(0,.45fr) minmax(0,.5fr); gap:5px; font-size:11px; padding-left:4px; padding-right:4px; }
+      .boston-results-head { font-size:9px; }
+      .boston-results-row small { font-size:9px; }
+    }
+    @media (max-width:430px) {
+      .boston-controls, .boston-search-form { gap:4px; }
+      .boston-pill { padding:5px 5px; font-size:8px; }
+      .boston-submit { padding:5px 7px; font-size:9px; }
+      .boston-filter-strip { min-height:40px; }
+    }
+    @media (max-width:350px) {
+      .boston-pill { font-size:7px; }
+      .boston-submit { padding:5px; font-size:8px; }
+    }
+
+    @media (max-width:430px) {
+      .boston-social { gap:8px; padding-bottom:0; }
+      .boston-social__link { width:20px; height:20px; }
+      .boston-social__icon { width:17px; height:17px; }
+      .boston-filter-strip { min-height:40px; }
+    }
+  

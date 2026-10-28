@@ -253,8 +253,8 @@ $('athleteSearchForm').addEventListener('submit', event => {
 async function initialize() {
   searchButton.disabled = true;
   try {
-    const source = await getJson('./config.json');
-    try { roster = await getJson('./athletes.json'); }
+    const source = await getJson(new URL('./config.json', import.meta.url).href);
+    try { roster = await getJson(new URL('./athletes.json', import.meta.url).href); }
     catch (error) { roster = { athletes: [], loaded_competition_ids: [] }; setStatus(`Athlete data is unavailable: ${error.message}`); }
     // Only published competition data is exposed; newly saved settings wait for a successful scrape.
     const legacyPublished = [...new Map((roster.athletes || []).filter(a=>a.competition_id && a.competition_name).map(a=>[String(a.competition_id), {id:String(a.competition_id),name:a.competition_name,date:a.date||''}])).values()];
