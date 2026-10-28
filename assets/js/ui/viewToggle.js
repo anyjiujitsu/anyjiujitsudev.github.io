@@ -8,7 +8,7 @@ import { refreshEventsPillDots } from "./pills.js?v=20260210-911";
 const VIEW_LOCKED = false;
 
 let viewShellW = 0;
-let lastViewTitleMode = null; // null | "events" | "index"
+let lastViewTitleMode = null; // null | "events" | "index" | "comps"
 let currentP = 0;             // source of truth for current progress
 
 function setTransition(ms){
@@ -24,7 +24,7 @@ function getViewShellW($){
 }
 
 function applyProgressVars($, p){
-  const clamped = Math.max(0, Math.min(1, p));
+  const clamped = Math.max(0, Math.min(2, p));
   currentP = clamped;
 
   document.body.style.setProperty("--viewProgress", String(clamped));
@@ -35,11 +35,11 @@ function applyProgressVars($, p){
 function applyProgress($, p){
   const clamped = applyProgressVars($, p);
 
-  const mode = (clamped >= 0.5) ? "index" : "events";
+  const mode = clamped >= 1.5 ? "comps" : (clamped >= 0.5 ? "index" : "events");
   if(mode !== lastViewTitleMode){
     lastViewTitleMode = mode;
     const viewTitle = $("viewTitle");
-    if(viewTitle) viewTitle.textContent = (mode === "index") ? "FIND TRAINING" : "EVENTS";
+    if(viewTitle) viewTitle.textContent = (mode === "comps") ? "COMPS" : (mode === "index" ? "FIND TRAINING" : "EVENTS");
   }
   return clamped;
 }
@@ -86,19 +86,49 @@ export function setActiveEventsQuery(val, setters){
 
 export function setViewUI(view, { $, onIndexViewOpen } = {}){
   setView(view);
+  if(view === "comps" && !window.__compsModuleStarted){
+    window.__compsModuleStarted = true;
+    const academyToggle = document.getElementById("academyToggle");
+    const academyMenu = document.getElementById("academyMenu");
+    if(academyToggle && academyMenu && !academyToggle.dataset.embeddedPositionWired){
+      academyToggle.dataset.embeddedPositionWired = "true";
+      const position = () => {
+        if(window.innerWidth > 680 || academyMenu.hidden) return;
+        const vp = window.visualViewport;
+        academyMenu.style.left = `${(vp?.offsetLeft || 0) + 8}px`;
+        academyMenu.style.right = "auto";
+        academyMenu.style.width = `${Math.max(200, (vp?.width || window.innerWidth) - 16)}px`;
+        academyMenu.style.top = `${academyToggle.getBoundingClientRect().bottom + 7}px`;
+      };
+      academyToggle.addEventListener("click", () => requestAnimationFrame(position));
+      window.addEventListener("resize", position);
+      window.addEventListener("scroll", position, {passive:true});
+      window.visualViewport?.addEventListener("resize", position);
+      window.visualViewport?.addEventListener("scroll", position);
+    }
+    import("../../../opens/opens.js").catch(error => {
+      window.__compsModuleStarted = false;
+      const status = document.getElementById("bostonStatus");
+      if(status) status.textContent = `Could not load COMPS: ${error.message}`;
+      console.error(error);
+    });
+  }
 
+  $("tabComps")?.setAttribute("aria-selected", view === "comps" ? "true" : "false");
   $("tabEvents")?.setAttribute("aria-selected", view === "events" ? "true" : "false");
   $("tabIndex")?.setAttribute("aria-selected", view === "index" ? "true" : "false");
 
   const evFilters = document.getElementById("eventsFilters");
   const idxFilters = document.getElementById("filters");
-  if(evFilters) evFilters.hidden = false;
+  if(evFilters) evFilters.hidden = view === "comps";
+  const compsFilters = document.getElementById("compsFilters");
+  if(compsFilters) compsFilters.hidden = view !== "comps";
   if(idxFilters) idxFilters.hidden = true;
 
   const title = $("viewTitle");
-  if(title) title.textContent = (view === "events") ? "EVENTS" : "FIND TRAINING";
+  if(title) title.textContent = (view === "events") ? "EVENTS" : (view === "comps" ? "COMPS" : "FIND TRAINING");
 
-  setSharedPillLabels(view);
+  if(view !== "comps") setSharedPillLabels(view);
 
   const evIn = $("eventsSearchInput");
   if(evIn){
@@ -116,13 +146,14 @@ export function setViewUI(view, { $, onIndexViewOpen } = {}){
   document.title = CUSTOMIZATION.siteHeaderName || "UNDEFINED";
 
   setTransition(260);
-  refreshEventsPillDots({ $, activeEventsState });
-  applyProgress($, view === "index" ? 1 : 0);
+  if(view !== "comps") refreshEventsPillDots({ $, activeEventsState });
+  applyProgress($, view === "comps" ? 2 : (view === "index" ? 1 : 0));
 }
 
 export function wireViewToggle({ $, onIndexViewOpen } = {}){
   const tabEvents = $("tabEvents");
   const tabIndex  = $("tabIndex");
+  const tabComps = $("tabComps");
   const viewToggle = $("viewToggle");
   const viewShell  = $("viewShell");
 
@@ -142,6 +173,7 @@ export function wireViewToggle({ $, onIndexViewOpen } = {}){
 
   tabEvents?.addEventListener("click", () => setViewUI("events", { $, onIndexViewOpen }));
   tabIndex?.addEventListener("click", () => setViewUI("index", { $, onIndexViewOpen }));
+  tabComps?.addEventListener("click", () => setViewUI("comps", { $, onIndexViewOpen }));
 
   if(viewToggle){
     let dragging = false;
@@ -168,10 +200,10 @@ export function wireViewToggle({ $, onIndexViewOpen } = {}){
       const rect = viewToggle.getBoundingClientRect();
       const padding = 4;
       const trackW = rect.width - padding * 2;
-      const thumbW = trackW / 2;
+      const thumbW = trackW / 3;
       const travel = trackW - thumbW;
       const x = e.clientX - rect.left - padding;
-      applyProgress($, (x - thumbW / 2) / travel);
+      applyProgress($, 2 * (x - thumbW / 2) / travel);
     });
 
     const endDrag = (e) => {
@@ -186,14 +218,14 @@ export function wireViewToggle({ $, onIndexViewOpen } = {}){
       if(!wasMoved){
         const rect = viewToggle.getBoundingClientRect();
         const x = e && typeof e.clientX === "number" ? e.clientX : (rect.left + rect.width / 2);
-        const isRightHalf = x >= (rect.left + rect.width / 2);
+        const third = Math.max(0, Math.min(2, Math.floor(3 * (x - rect.left) / rect.width)));
         setTransition(260);
-        setViewUI(isRightHalf ? "index" : "events", { $, onIndexViewOpen });
+        setViewUI(["events", "index", "comps"][third], { $, onIndexViewOpen });
         return;
       }
 
       setTransition(260);
-      setViewUI((currentP || 0) >= 0.5 ? "index" : "events", { $, onIndexViewOpen });
+      setViewUI(["events", "index", "comps"][Math.round(currentP || 0)], { $, onIndexViewOpen });
     };
 
     viewToggle.addEventListener("pointerup", endDrag);
@@ -286,16 +318,13 @@ export function wireViewToggle({ $, onIndexViewOpen } = {}){
       const FLICK_V = 0.45;
       const EDGE_T  = 0.35;
 
+      let destination;
       if(Math.abs(vx) > FLICK_V){
-        setViewUI(vx < 0 ? "index" : "events", { $, onIndexViewOpen });
-        return;
-      }
-
-      if(startP >= 0.5){
-        setViewUI(p <= (1 - EDGE_T) ? "events" : "index", { $, onIndexViewOpen });
+        destination = Math.max(0, Math.min(2, Math.round(startP) + (vx < 0 ? 1 : -1)));
       } else {
-        setViewUI(p >= EDGE_T ? "index" : "events", { $, onIndexViewOpen });
+        destination = Math.max(0, Math.min(2, Math.round(p)));
       }
+      setViewUI(["events", "index", "comps"][destination], { $, onIndexViewOpen });
     }, { passive: true });
   }
 }
