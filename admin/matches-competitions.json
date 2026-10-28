@@ -1,26 +1,26 @@
 {
   "source": "IBJJF official event listings and detail pages",
-  "updated_at": "2026-10-26T19:25:10.990894+00:00",
+  "updated_at": "2026-10-28T15:22:14.461140+00:00",
   "competitions": [
-    {
-      "id": "3253",
-      "name": "Boston Fall International Open IBJJF Jiu-Jitsu Championship 2026",
-      "url": "https://ibjjf.com/events/boston-fall-international-open-ibjjf-jiu-jitsu-championship-2026"
-    },
-    {
-      "id": "3254",
-      "name": "Boston Fall International Open IBJJF Jiu-Jitsu No-Gi Championship 2026",
-      "url": "https://ibjjf.com/events/boston-fall-international-open-ibjjf-jiu-jitsu-no-gi-championship-2026"
-    },
-    {
-      "id": "3255",
-      "name": "Boston Fall Kids International Open IBJJF Jiu-Jitsu Championship 2026",
-      "url": "https://ibjjf.com/events/boston-fall-kids-international-open-ibjjf-jiu-jitsu-championship-2026"
-    },
     {
       "id": "3386",
       "name": "Brasília International Open IBJJF Jiu-Jitsu Championship 2026",
       "url": "https://ibjjf.com/events/brasilia-international-open-ibjjf-jiu-jitsu-championship-2026"
+    },
+    {
+      "id": "3387",
+      "name": "Brasília International Open IBJJF Jiu-Jitsu No-Gi Championship 2026",
+      "url": "https://ibjjf.com/events/brasilia-international-open-ibjjf-jiu-jitsu-no-gi-championship-2026"
+    },
+    {
+      "id": "3388",
+      "name": "Brasília Kids International Open IBJJF Jiu-Jitsu Championship 2026",
+      "url": "https://ibjjf.com/events/brasilia-kids-international-open-ibjjf-jiu-jitsu-championship-2026"
+    },
+    {
+      "id": "3389",
+      "name": "Brasília Kids International Open IBJJF Jiu-Jitsu No-Gi Championship 2026",
+      "url": "https://ibjjf.com/events/brasilia-kids-international-open-ibjjf-jiu-jitsu-no-gi-championship-2026"
     },
     {
       "id": "3409",
