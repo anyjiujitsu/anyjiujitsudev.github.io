@@ -13,7 +13,8 @@ let currentP = 0;             // source of truth for current progress
 
 
 function setTransition(ms){
-  document.body.style.setProperty("--viewTransition", ms + "ms");
+  // Keep transition invalidation inside the navigation control.
+  document.getElementById("viewToggle")?.style.setProperty("--viewTransition", ms + "ms");
 }
 
 function setViewShellW(w){
@@ -28,7 +29,10 @@ function applyProgressVars($, p){
   const clamped = Math.max(0, Math.min(2, p));
   currentP = clamped;
 
-  document.body.style.setProperty("--viewProgress", String(clamped));
+  // Changing this on body invalidates styles across every match row.
+  // The thumb is the only consumer, so scope it to the tiny nav subtree.
+  const toggle = $("viewToggle");
+  if(toggle) toggle.style.setProperty("--viewProgress", String(clamped));
   // Native scroll-snap owns the panel position; only the tab thumb follows progress.
   return clamped;
 }
@@ -274,7 +278,6 @@ export function wireViewToggle({ $, onIndexViewOpen } = {}){
     function sync(){
       framePending = false;
       const p = progress();
-      setTransition(0);
       applyProgressVars($, p);
       const index = Math.max(0, Math.min(2, Math.round(p)));
       if(lastCommittedView !== views[index] || state.view !== views[index]){
@@ -300,6 +303,7 @@ export function wireViewToggle({ $, onIndexViewOpen } = {}){
       viewShell.scrollTo({left:index * viewShell.clientWidth, behavior:"instant"});
       scheduleSync();
     }, {passive:true});
+    setTransition(0);
     scheduleSync();
   }
 }
