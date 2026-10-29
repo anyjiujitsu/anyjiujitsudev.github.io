@@ -10,7 +10,7 @@ const VIEW_LOCKED = false;
 let viewShellW = 0;
 let lastViewTitleMode = null; // null | "events" | "index" | "comps"
 let currentP = 0;             // source of truth for current progress
-let nativeTabNavigation = false;
+
 
 function setTransition(ms){
   document.body.style.setProperty("--viewTransition", ms + "ms");
@@ -149,10 +149,10 @@ export function setViewUI(view, { $, onIndexViewOpen, fromNativeScroll = false }
 
   document.title = CUSTOMIZATION.siteHeaderName || "UNDEFINED";
 
-  setTransition(260);
+  setTransition(0); // Native scroll progress moves the thumb; never animate it independently.
   if(view !== "comps") refreshEventsPillDots({ $, activeEventsState });
   const destination = view === "comps" ? 2 : (view === "index" ? 1 : 0);
-  if(!fromNativeScroll && !nativeTabNavigation) applyProgress($, destination);
+  // Progress always follows viewShell.scrollLeft; do not jump the thumb ahead.
   if(!fromNativeScroll){
     const shell = $("viewShell");
     if(shell){
@@ -195,146 +195,111 @@ export function wireViewToggle({ $, onIndexViewOpen } = {}){
     return;
   }
 
-  tabEvents?.addEventListener("click", () => setViewUI("events", { $, onIndexViewOpen }));
-  tabIndex?.addEventListener("click", () => setViewUI("index", { $, onIndexViewOpen }));
-  tabComps?.addEventListener("click", () => setViewUI("comps", { $, onIndexViewOpen }));
+  // A single route for tab clicks. The thumb only follows the physical scroll.
+  const views = ["events", "index", "comps"];
+  const tabs = [tabEvents, tabIndex, tabComps];
+  let suppressClick = false;
+  let suppressTimer = 0;
+  function goTo(index){
+    index = Math.max(0, Math.min(2, index));
+    if(viewShell){
+      const target = index * viewShell.clientWidth;
+      if(Math.abs(viewShell.scrollLeft - target) > 1){
+        viewShell.scrollTo({left:target, behavior:"smooth"});
+      }else if(state.view !== views[index]){
+        setViewUI(views[index], { $, onIndexViewOpen, fromNativeScroll:true });
+      }
+    } else {
+      setViewUI(views[index], { $, onIndexViewOpen });
+    }
+  }
+  for(const [index, tab] of tabs.entries()){
+    tab?.addEventListener("click", e => {
+      if(suppressClick){ e.preventDefault(); return; }
+      goTo(index);
+    });
+  }
 
-  if(viewToggle){
-    let dragging = false;
-    let pointerId = null;
-    let downX = 0;
-    let moved = false;
-
-    viewToggle.addEventListener("pointerdown", (e) => {
-      dragging = true;
-      moved = false;
-      downX = e.clientX;
+  // Dragging the top selector also moves the *real native scroller*.
+  // Do not move a simulated thumb separately from the pages.
+  if(viewToggle && viewShell){
+    let downX = 0, pointerId = null, dragging = false, startScrollLeft = 0;
+    let previousSnap = "";
+    viewToggle.addEventListener("pointerdown", e => {
+      if(e.button !== 0) return;
       pointerId = e.pointerId;
-      viewToggle.setPointerCapture(pointerId);
-    });
-
-    viewToggle.addEventListener("pointermove", (e) => {
-      if(!dragging || e.pointerId !== pointerId) return;
-      if(!moved){
-        if(Math.abs(e.clientX - downX) < 6) return;
-        moved = true;
-        setTransition(0);
-      }
-
-      const rect = viewToggle.getBoundingClientRect();
-      const padding = 4;
-      const trackW = rect.width - padding * 2;
-      const thumbW = trackW / 3;
-      const travel = trackW - thumbW;
-      const x = e.clientX - rect.left - padding;
-      applyProgressVars($, 2 * (x - thumbW / 2) / travel);
-    });
-
-    const endDrag = (e) => {
-      if(!dragging) return;
-      if(e && pointerId != null && e.pointerId !== pointerId) return;
-
+      downX = e.clientX;
+      startScrollLeft = viewShell.scrollLeft;
       dragging = false;
-      const wasMoved = moved;
-      moved = false;
-      pointerId = null;
-
-      if(!wasMoved){
-        const rect = viewToggle.getBoundingClientRect();
-        const x = e && typeof e.clientX === "number" ? e.clientX : (rect.left + rect.width / 2);
-        const third = Math.max(0, Math.min(2, Math.floor(3 * (x - rect.left) / rect.width)));
-        setTransition(260);
-        setViewUI(["events", "index", "comps"][third], { $, onIndexViewOpen });
-        return;
+    });
+    viewToggle.addEventListener("pointermove", e => {
+      if(e.pointerId !== pointerId) return;
+      const dx = e.clientX - downX;
+      if(!dragging){
+        if(Math.abs(dx) < 7) return;
+        dragging = true;
+        previousSnap = viewShell.style.scrollSnapType;
+        viewShell.style.scrollSnapType = "none";
+        try { viewToggle.setPointerCapture(pointerId); } catch(_) {}
       }
-
-      setTransition(260);
-      setViewUI(["events", "index", "comps"][Math.round(currentP || 0)], { $, onIndexViewOpen });
+      const thumbRange = Math.max(1, viewToggle.getBoundingClientRect().width * (2/3));
+      const progressDx = (dx / thumbRange) * 2;
+      viewShell.scrollLeft = Math.max(0, Math.min(2 * viewShell.clientWidth,
+        startScrollLeft + progressDx * viewShell.clientWidth));
+    });
+    const finishDrag = e => {
+      if(e?.pointerId !== pointerId) return;
+      pointerId = null;
+      if(!dragging) return;
+      dragging = false;
+      viewShell.style.scrollSnapType = previousSnap;
+      // Synthetic click from releasing a drag must not launch a second navigation.
+      suppressClick = true;
+      clearTimeout(suppressTimer);
+      suppressTimer = setTimeout(() => { suppressClick = false; }, 100);
+      const index = Math.max(0, Math.min(2, Math.round(viewShell.scrollLeft / Math.max(1,viewShell.clientWidth))));
+      goTo(index);
     };
-
-    viewToggle.addEventListener("pointerup", endDrag);
-    viewToggle.addEventListener("pointercancel", endDrag);
-    viewToggle.addEventListener("lostpointercapture", endDrag);
+    viewToggle.addEventListener("pointerup", finishDrag);
+    viewToggle.addEventListener("pointercancel", finishDrag);
+    viewToggle.addEventListener("lostpointercapture", finishDrag);
   }
 
   if(viewShell){
-    const views = ["events", "index", "comps"];
     let settleTimer = 0;
     let framePending = false;
-    let lastScrollLeft = 0;
-    let programmaticDestination = -1;
-    let pointerDownInShell = false;
-
-    const shellProgress = () => Math.max(0, Math.min(2,
+    let lastCommittedView = state.view;
+    const progress = () => Math.max(0, Math.min(2,
       viewShell.scrollLeft / Math.max(1, viewShell.clientWidth)));
-
-    // The browser moves the pages. Follow its position with the tab thumb,
-    // but update the header/filter state as soon as the new page takes over.
-    function syncDuringScroll(){
+    function sync(){
       framePending = false;
-      const progress = shellProgress();
-      setTransition(0); // The thumb must not animate behind the native scroller.
-      applyProgressVars($, progress);
-      const index = Math.max(0, Math.min(2, Math.round(progress)));
-      if(programmaticDestination < 0 && state.view !== views[index]){
-        // Do NOT snap the thumb to an integer while the finger is still moving.
+      const p = progress();
+      setTransition(0);
+      applyProgressVars($, p);
+      const index = Math.max(0, Math.min(2, Math.round(p)));
+      if(lastCommittedView !== views[index] || state.view !== views[index]){
+        lastCommittedView = views[index];
         setViewUI(views[index], { $, onIndexViewOpen, fromNativeScroll:true });
       }
     }
-
-    function scheduleSync(){
-      if(!framePending){
-        framePending = true;
-        requestAnimationFrame(syncDuringScroll);
-      }
-    }
-
-    function finishScroll(){
+    const scheduleSync = () => {
+      if(!framePending){ framePending = true; requestAnimationFrame(sync); }
+    };
+    const finishScroll = () => {
       clearTimeout(settleTimer);
-      programmaticDestination = -1;
-      nativeTabNavigation = false;
-      const index = Math.max(0, Math.min(2, Math.round(shellProgress())));
-      if(state.view !== views[index]){
-        setViewUI(views[index], { $, onIndexViewOpen, fromNativeScroll:true });
-      }
-      // Use exact physical scroll progress rather than forcing a thumb jump.
-      applyProgressVars($, shellProgress());
-      setTransition(260);
-    }
-
+      scheduleSync();
+    };
     viewShell.addEventListener("scroll", () => {
-      lastScrollLeft = viewShell.scrollLeft;
       scheduleSync();
       clearTimeout(settleTimer);
-      // Safari versions without scrollend still need a reliable settle signal.
-      settleTimer = setTimeout(finishScroll, 180);
-    }, { passive:true });
-    if("onscrollend" in viewShell){
-      viewShell.addEventListener("scrollend", finishScroll, { passive:true });
-    }
-
-    // Clicking a tab owns its destination until smooth scrolling finishes.
-    // Native finger swipes can interrupt that programmatic navigation.
-    for(const [index, tab] of [tabEvents, tabIndex, tabComps].entries()){
-      tab?.addEventListener("click", () => {
-        programmaticDestination = index;
-        nativeTabNavigation = true;
-        setTransition(0);
-      }, { capture:true });
-    }
-    viewShell.addEventListener("touchstart", () => {
-      programmaticDestination = -1;
-      nativeTabNavigation = false;
-      pointerDownInShell = true;
+      settleTimer = setTimeout(finishScroll, 150);
     }, {passive:true});
-    viewShell.addEventListener("touchend", () => { pointerDownInShell = false; }, {passive:true});
-    viewShell.addEventListener("pointerdown", e => {
-      if(e.pointerType === "mouse" || e.pointerType === "pen") programmaticDestination = -1;
-    }, {passive:true});
+    if("onscrollend" in viewShell) viewShell.addEventListener("scrollend", finishScroll, {passive:true});
     window.addEventListener("resize", () => {
-      const index = state.view === "comps" ? 2 : (state.view === "index" ? 1 : 0);
+      const index = Math.max(0, views.indexOf(state.view));
       viewShell.scrollTo({left:index * viewShell.clientWidth, behavior:"instant"});
-      applyProgressVars($, index);
+      scheduleSync();
     }, {passive:true});
+    scheduleSync();
   }
 }
