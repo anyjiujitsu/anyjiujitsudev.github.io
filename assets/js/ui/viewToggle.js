@@ -28,7 +28,7 @@ function applyProgressVars($, p){
   currentP = clamped;
 
   document.body.style.setProperty("--viewProgress", String(clamped));
-  document.body.style.setProperty("--viewOffsetPx", (-getViewShellW($) * clamped) + "px");
+  // Native scroll-snap owns the panel position; only the tab thumb follows progress.
   return clamped;
 }
 
@@ -84,7 +84,7 @@ export function setActiveEventsQuery(val, setters){
   else setters.setEventsQuery(val);
 }
 
-export function setViewUI(view, { $, onIndexViewOpen, transitionMs = 260 } = {}){
+export function setViewUI(view, { $, onIndexViewOpen, fromNativeScroll = false } = {}){
   const previousView = state.view;
   setView(view);
   if(view === "comps" && !window.__compsModuleStarted){
@@ -148,9 +148,20 @@ export function setViewUI(view, { $, onIndexViewOpen, transitionMs = 260 } = {})
 
   document.title = CUSTOMIZATION.siteHeaderName || "UNDEFINED";
 
-  setTransition(transitionMs);
+  setTransition(260);
   if(view !== "comps") refreshEventsPillDots({ $, activeEventsState });
-  applyProgress($, view === "comps" ? 2 : (view === "index" ? 1 : 0));
+  const destination = view === "comps" ? 2 : (view === "index" ? 1 : 0);
+  applyProgress($, destination);
+  if(!fromNativeScroll){
+    const shell = $("viewShell");
+    if(shell){
+      const target = destination * shell.clientWidth;
+      if(Math.abs(shell.scrollLeft - target) > 1){
+        // The browser animates button-triggered navigation; touch swipes remain native.
+        shell.scrollTo({ left: target, behavior: "smooth" });
+      }
+    }
+  }
 
   // Reset only the destination list. Keep the fixed header and filter bar
   // completely outside scrolling, so switching cannot repaint the page shell.
@@ -215,7 +226,7 @@ export function wireViewToggle({ $, onIndexViewOpen } = {}){
       const thumbW = trackW / 3;
       const travel = trackW - thumbW;
       const x = e.clientX - rect.left - padding;
-      applyProgress($, 2 * (x - thumbW / 2) / travel);
+      applyProgressVars($, 2 * (x - thumbW / 2) / travel);
     });
 
     const endDrag = (e) => {
@@ -246,89 +257,47 @@ export function wireViewToggle({ $, onIndexViewOpen } = {}){
   }
 
   if(viewShell){
-    let startX = 0, startY = 0, startP = 0;
-    let shellW = 1;
-    let lastX = 0, lastT = 0, velocityX = 0;
-    let lockedAxis = "";
-    let swipeActive = false;
+    const views = ["events", "index", "comps"];
+    let settleTimer = 0;
+    let ignoreScrollCommitUntil = 0;
+    let wasTracking = false;
 
-    // Direct tracking: while touching, the slider moves with the finger.
-    // No perpetual animation loop or interpolated lag during the gesture.
-    viewShell.addEventListener("touchstart", (e) => {
-      if(e.touches.length !== 1) return;
-      startX = lastX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-      startP = currentP;
-      shellW = Math.max(1, viewShell.clientWidth);
-      setViewShellW(shellW);
-      lastT = performance.now();
-      velocityX = 0;
-      lockedAxis = "";
-      swipeActive = false;
-    }, { passive:true });
-
-    viewShell.addEventListener("touchmove", (e) => {
-      if(e.touches.length !== 1) return;
-      const x = e.touches[0].clientX;
-      const y = e.touches[0].clientY;
-      const dx = x - startX;
-      const dy = y - startY;
-
-      if(!lockedAxis){
-        if(Math.abs(dx) < 9 && Math.abs(dy) < 9) return;
-        // Prefer vertical scrolling for diagonal gestures.
-        lockedAxis = Math.abs(dx) > Math.abs(dy) * 1.2 ? "x" : "y";
+    // Scroll snapping (including touch inertia) is performed by Safari/Chrome.
+    // JS updates only the tab thumb and, after settling, the active view UI.
+    const track = () => {
+      const width = Math.max(1, viewShell.clientWidth);
+      const progress = Math.max(0, Math.min(2, viewShell.scrollLeft / width));
+      applyProgressVars($, progress);
+      clearTimeout(settleTimer);
+      settleTimer = setTimeout(commit, 130);
+    };
+    const commit = () => {
+      if(performance.now() < ignoreScrollCommitUntil) return;
+      const width = Math.max(1, viewShell.clientWidth);
+      const index = Math.max(0, Math.min(2, Math.round(viewShell.scrollLeft / width)));
+      const desired = views[index];
+      if(state.view !== desired){
+        setViewUI(desired, { $, onIndexViewOpen, fromNativeScroll: true });
       }
-      if(lockedAxis !== "x") return;
-      if(!swipeActive){
-        swipeActive = true;
-        setTransition(0);
-      }
-      e.preventDefault();
+      applyProgressVars($, index);
+    };
 
-      const now = performance.now();
-      const dt = now - lastT;
-      if(dt > 0 && dt < 120){
-        const instantaneous = (x - lastX) / dt;
-        velocityX = 0.65 * instantaneous + 0.35 * velocityX;
-      }
-      lastX = x;
-      lastT = now;
-
-      applyProgressVars($, startP - dx / shellW);
-    }, { passive:false });
-
-    function finishSwipe(cancelled){
-      if(!swipeActive){
-        lockedAxis = "";
-        return; // Vertical scrolling must not trigger a view transition.
-      }
-      swipeActive = false;
-      lockedAxis = "";
-
-      const distance = currentP - startP;
-      // A held finger is not a flick, even if its last movement was fast.
-      if(performance.now() - lastT > 90) velocityX = 0;
-      const flick = !cancelled && Math.abs(velocityX) >= 0.45;
-      let destination;
-      if(flick){
-        destination = Math.round(startP) + (velocityX < 0 ? 1 : -1);
-      } else if(Math.abs(distance) >= 0.28){
-        destination = Math.round(startP) + (distance > 0 ? 1 : -1);
-      } else {
-        destination = Math.round(startP);
-      }
-      destination = Math.max(0, Math.min(2, destination));
-
-      const remaining = Math.abs(destination - currentP);
-      const duration = Math.max(130, Math.min(260,
-        Math.round(175 + remaining * 85 - (flick ? Math.min(65, Math.abs(velocityX) * 35) : 0))));
-      setViewUI(["events", "index", "comps"][destination], {
-        $, onIndexViewOpen, transitionMs: duration
-      });
+    viewShell.addEventListener("scroll", track, { passive:true });
+    if("onscrollend" in viewShell){
+      viewShell.addEventListener("scrollend", commit, { passive:true });
     }
-
-    viewShell.addEventListener("touchend", () => finishSwipe(false), { passive:true });
-    viewShell.addEventListener("touchcancel", () => finishSwipe(true), { passive:true });
+    // Prevent a pending snap callback from immediately reverting a clicked tab.
+    for(const tab of [tabEvents, tabIndex, tabComps]){
+      tab?.addEventListener("click", () => {
+        ignoreScrollCommitUntil = performance.now() + 180;
+      }, { capture:true });
+    }
+    viewShell.addEventListener("touchstart", () => { wasTracking = true; }, {passive:true});
+    viewShell.addEventListener("touchend", () => { wasTracking = false; }, {passive:true});
+    window.addEventListener("resize", () => {
+      const index = state.view === "comps" ? 2 : (state.view === "index" ? 1 : 0);
+      viewShell.scrollTo({left:index * viewShell.clientWidth, behavior:"instant"});
+      applyProgressVars($, index);
+    }, {passive:true});
   }
 }
