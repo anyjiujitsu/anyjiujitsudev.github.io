@@ -1,5 +1,5 @@
 {
-  "enabled": false,
+  "enabled": true,
   "refresh_minutes": 15,
   "competitions": [
     {
@@ -15,5 +15,5 @@
       "date": ""
     }
   ],
-  "updated_at": "2026-10-29T13:40:57.182Z"
+  "updated_at": "2026-10-29T14:19:21.548867+00:00"
 }
