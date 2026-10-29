@@ -142,6 +142,8 @@ export function setViewUI(view, { $, onIndexViewOpen } = {}){
   const idxStatus = $("status");
   if(evStatus) evStatus.hidden = (view !== "events");
   if(idxStatus) idxStatus.hidden = (view !== "index");
+  const compsStatus = $("compsActiveStatus");
+  if(compsStatus) compsStatus.hidden = (view !== "comps");
 
   document.title = CUSTOMIZATION.siteHeaderName || "UNDEFINED";
 
