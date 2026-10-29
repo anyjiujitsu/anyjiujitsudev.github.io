@@ -9,6 +9,8 @@ import json
 import os
 import re
 import time
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -18,9 +20,55 @@ import requests
 from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parent
-SESSION = requests.Session()
-SESSION.headers.update({'User-Agent': 'Mozilla/5.0 (compatible; AnyNE-BostonOpen/1.0)', 'Accept': 'text/html'})
-DELAY = 0.8
+# Concurrent downloads are bounded to avoid overwhelming upstream providers.
+WORKERS = max(1, min(3, int(os.environ.get('OPENS_FETCH_WORKERS', '3'))))
+REQUEST_SPACING = 0.35  # Minimum spacing between starts across all workers.
+_tls = threading.local()
+_cache = {}
+_cache_lock = threading.Lock()
+_cache_inflight = {}
+_start_lock = threading.Lock()
+_next_start = 0.0
+_stats_lock = threading.Lock()
+_stats = {'network_requests': 0, 'cache_hits': 0, 'fetch_seconds': 0.0}
+
+
+def _session():
+    if not hasattr(_tls, 'session'):
+        session = requests.Session()
+        session.headers.update({'User-Agent': 'Mozilla/5.0 (compatible; AnyNE-BostonOpen/1.0)',
+                                'Accept': 'text/html'})
+        _tls.session = session
+    return _tls.session
+
+
+def _fetch_html(url):
+    global _next_start
+    # Only one worker schedules a network request at any given instant.
+    with _start_lock:
+        now = time.monotonic()
+        delay = max(0.0, _next_start - now)
+        if delay:
+            time.sleep(delay)
+        _next_start = time.monotonic() + REQUEST_SPACING
+    start = time.monotonic()
+    response = _session().get(url, timeout=30)
+    response.raise_for_status()
+    if not response.text.strip():
+        raise ValueError('Empty upstream page')
+    with _stats_lock:
+        _stats['network_requests'] += 1
+        _stats['fetch_seconds'] += time.monotonic() - start
+    return response.text
+
+
+def timing_report(start):
+    with _stats_lock:
+        stats = dict(_stats)
+    print(f"  Fetch metrics: {stats['network_requests']} HTTP requests, "
+          f"{stats['cache_hits']} cache hits, "
+          f"{stats['fetch_seconds']:.1f}s aggregate HTTP time, "
+          f"{time.monotonic() - start:.1f}s elapsed, {WORKERS} workers", flush=True)
 
 
 def clean(value):
@@ -32,12 +80,39 @@ def key(value):
 
 
 def get_soup(url):
-    time.sleep(DELAY)
-    response = SESSION.get(url, timeout=30)
-    response.raise_for_status()
-    if not response.text.strip():
-        raise ValueError('Empty upstream page')
-    return BeautifulSoup(response.text, 'html.parser')
+    # Cache HTML (not BeautifulSoup) so each consumer gets an independent tree.
+    # In-flight coordination avoids downloading the same URL twice concurrently.
+    with _cache_lock:
+        if url in _cache:
+            with _stats_lock:
+                _stats['cache_hits'] += 1
+            return BeautifulSoup(_cache[url], 'html.parser')
+        if url in _cache_inflight:
+            event = _cache_inflight[url]
+            owner = False
+        else:
+            event = threading.Event()
+            _cache_inflight[url] = event
+            owner = True
+    if not owner:
+        event.wait()
+        with _cache_lock:
+            cached = _cache.get(url)
+        if cached is not None:
+            with _stats_lock:
+                _stats['cache_hits'] += 1
+            return BeautifulSoup(cached, 'html.parser')
+        # A failed request is not cached; retry it once in this caller.
+        return get_soup(url)
+    try:
+        html = _fetch_html(url)
+        with _cache_lock:
+            _cache[url] = html
+    finally:
+        with _cache_lock:
+            _cache_inflight.pop(url, None)
+            event.set()
+    return BeautifulSoup(html, 'html.parser')
 
 
 def roster_by_academy(soup, comp):
@@ -128,6 +203,13 @@ def schedule_brackets(soup):
     return entries
 
 
+def _fetch_bracket(url):
+    try:
+        return get_soup(url)
+    except (requests.RequestException, ValueError) as exc:
+        return exc
+
+
 def discover_open_class_links(entries, competition_id, roster):
     """Discover missing BJJCompSystem categories without hardcoded category IDs.
 
@@ -183,11 +265,14 @@ def discover_open_class_links(entries, competition_id, roster):
     print(f'  {len(urls)} unique candidate bracket URLs for {competition_id}; '
           f'{len(missing)} divisions still unlinked', flush=True)
     visited = set(v['url'] for v in entries.values())
-    for url in sorted(urls - visited):
+    with ThreadPoolExecutor(max_workers=WORKERS) as pool:
+      for url, fetched in zip(sorted(urls - visited), pool.map(_fetch_bracket, sorted(urls - visited))):
         if not missing:
             break
         try:
-            soup = get_soup(url)
+            if isinstance(fetched, Exception):
+                raise fetched
+            soup = fetched
         except (requests.RequestException, ValueError) as exc:
             print(f'  Bracket discovery unavailable: {url}: {exc}', flush=True)
             continue
@@ -609,12 +694,15 @@ def roster_from_brackets(comp):
     rows = []
     visited = set()
     checked = 0
-    for url in category_urls:
+    with ThreadPoolExecutor(max_workers=WORKERS) as pool:
+      for url, fetched in zip(category_urls, pool.map(_fetch_bracket, category_urls)):
         if url in visited:
             continue
         visited.add(url)
         try:
-            soup = get_soup(url)
+            if isinstance(fetched, Exception):
+                raise fetched
+            soup = fetched
             fights = parse_fights(soup)
             checked += 1
         except (requests.RequestException, ValueError) as exc:
@@ -779,4 +867,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    _run_start = time.monotonic()
+    try:
+        main()
+    finally:
+        timing_report(_run_start)
