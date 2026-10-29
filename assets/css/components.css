@@ -394,7 +394,7 @@ input[type="search"]{ font-size:16px; }
     justify-content: center;
     line-height: 1;
     position: relative;
-    top: -4px;
+    top: -6px;
   }
   .pill--search .pill__input{
     font-size: 16px; /* retain iOS focus-zoom protection */
@@ -404,6 +404,17 @@ input[type="search"]{ font-size:16px; }
     transform: scale(0.76);
     transform-origin: left center;
     box-sizing: border-box;
+    position: relative;
+    top: -4px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  .pill--search .pill__clear{
+    position: relative;
+    top: -4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   /* Counter + groups */
