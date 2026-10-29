@@ -84,12 +84,17 @@ export function setActiveEventsQuery(val, setters){
   else setters.setEventsQuery(val);
 }
 
-export function setViewUI(view, { $, onIndexViewOpen } = {}){
+export function setViewUI(view, { $, onIndexViewOpen, scrollSettled = false } = {}){
   const previousView = state.view;
-  // Settle the document scroll position before changing the active panel.
-  // Otherwise the horizontal transition can start at the old vertical offset,
-  // exposing a blank intermediate frame on long-to-short view switches.
-  if(previousView !== view){
+  // Allow the browser to finish the vertical reset in its own paint before
+  // changing the visible panel or updating the sticky header/filter contents.
+  // This also prevents tall-to-short view transitions from exposing blank frames.
+  if(!scrollSettled && previousView !== view && window.scrollY > 0){
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    requestAnimationFrame(() => setViewUI(view, { $, onIndexViewOpen, scrollSettled: true }));
+    return;
+  }
+  if(previousView !== view && window.scrollY > 0){
     window.scrollTo({ top: 0, left: 0, behavior: "instant" });
   }
   setView(view);
