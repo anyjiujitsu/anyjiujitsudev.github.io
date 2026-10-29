@@ -200,3 +200,18 @@
   border: 0 !important;
 }
 #viewComps .boston-results { margin-top: 0; }
+
+/* Integrated COMPS list alignment — mirror the GYMS group-heading position.
+   Keep the five-column headings on their existing grid and preserve standalone OPENS. */
+#viewComps .boston-results-head {
+  padding-top: 6px;
+  padding-bottom: 0;
+}
+#viewComps .boston-results-head > :first-child {
+  transform: translateX(-12px);
+}
+@media (max-width: 680px) {
+  #viewComps .boston-results-head > :first-child {
+    transform: translateX(-4px);
+  }
+}
