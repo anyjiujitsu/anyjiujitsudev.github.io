@@ -12,7 +12,7 @@ export function wireSearch({ $, state, setIndexQuery, setIndexEventsQuery, setAc
   });
 
   evIn?.addEventListener("input", (e)=>{
-    setActiveEventsQuery(e.target.value);
+    setActiveEventsQuery(e.target.value.trim().toUpperCase() === "UPCOMING COMPS" ? "2026, COMP" : e.target.value);
     render();
   });
 
@@ -116,7 +116,7 @@ export function wireSearchSuggestions({
 
     const val = btn.getAttribute("data-value") || "";
     input.value = val;
-    setActiveEventsQuery(val);
+    setActiveEventsQuery(val === "UPCOMING COMPS" ? "2026, COMP" : val);
     input.dispatchEvent(new Event("input", { bubbles: true }));
     close();
     input.blur();
