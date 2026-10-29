@@ -35,3 +35,26 @@ html, body { height:100%; overflow:hidden; }
   overscroll-behavior-y:contain;
   overflow-anchor:none;
 }
+
+/* DEV experiment: native horizontal touch scrolling with page snapping. */
+#viewShell.viewShell {
+  overflow-x:auto;
+  overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  overscroll-behavior-x:contain;
+  touch-action:pan-x pan-y;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+#viewShell.viewShell::-webkit-scrollbar { display:none; }
+#viewShell .viewSlider {
+  transform:none !important;
+  transition:none !important;
+  will-change:auto;
+}
+#viewShell .viewPanel {
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
+  flex:0 0 33.333333333%;
+  touch-action:pan-x pan-y;
+}
