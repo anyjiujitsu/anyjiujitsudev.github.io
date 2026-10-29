@@ -22,3 +22,15 @@
     z-index: 6;
   }
 }
+
+/* Keep the fixed-looking site chrome in separate compositor layers during
+   large scroll resets and horizontal view transitions (especially iOS Safari).
+   Does not change positions, dimensions, colors, or touch behavior. */
+.header,
+#eventsFilters,
+#compsFilters {
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
