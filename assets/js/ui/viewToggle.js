@@ -84,37 +84,8 @@ export function setActiveEventsQuery(val, setters){
   else setters.setEventsQuery(val);
 }
 
-// Reset the document position in the same task as the view update.
-// Do not defer the view change to requestAnimationFrame: that creates an
-// observable intermediate frame with the old panel at the new scroll position.
-function resetViewScroll(){
-  if(window.scrollY <= 0 && document.documentElement.scrollTop <= 0 && document.body.scrollTop <= 0) return;
-  const root = document.documentElement;
-  const body = document.body;
-  const rootBehavior = root.style.getPropertyValue("scroll-behavior");
-  const rootPriority = root.style.getPropertyPriority("scroll-behavior");
-  const bodyBehavior = body.style.getPropertyValue("scroll-behavior");
-  const bodyPriority = body.style.getPropertyPriority("scroll-behavior");
-  const anchor = root.style.getPropertyValue("overflow-anchor");
-  const anchorPriority = root.style.getPropertyPriority("overflow-anchor");
-  try {
-    root.style.setProperty("scroll-behavior", "auto", "important");
-    body.style.setProperty("scroll-behavior", "auto", "important");
-    root.style.setProperty("overflow-anchor", "none", "important");
-    window.scrollTo(0, 0);
-  } finally {
-    if(rootBehavior) root.style.setProperty("scroll-behavior", rootBehavior, rootPriority);
-    else root.style.removeProperty("scroll-behavior");
-    if(bodyBehavior) body.style.setProperty("scroll-behavior", bodyBehavior, bodyPriority);
-    else body.style.removeProperty("scroll-behavior");
-    if(anchor) root.style.setProperty("overflow-anchor", anchor, anchorPriority);
-    else root.style.removeProperty("overflow-anchor");
-  }
-}
-
 export function setViewUI(view, { $, onIndexViewOpen } = {}){
   const previousView = state.view;
-  if(previousView !== view) resetViewScroll();
   setView(view);
   if(view === "comps" && !window.__compsModuleStarted){
     window.__compsModuleStarted = true;
@@ -180,6 +151,14 @@ export function setViewUI(view, { $, onIndexViewOpen } = {}){
   setTransition(260);
   if(view !== "comps") refreshEventsPillDots({ $, activeEventsState });
   applyProgress($, view === "comps" ? 2 : (view === "index" ? 1 : 0));
+
+  // Reset only the destination list. Keep the fixed header and filter bar
+  // completely outside scrolling, so switching cannot repaint the page shell.
+  if(previousView !== state.view){
+    const panelId = view === "comps" ? "viewComps" : (view === "index" ? "viewIndex" : "viewEvents");
+    const panel = $(panelId);
+    if(panel) panel.scrollTop = 0;
+  }
 
 }
 
