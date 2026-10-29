@@ -129,15 +129,7 @@
 
 /* Integrated COMPS match list: same cardbody treatment as EVENTS and GYMS.
    Intentionally scoped to the integrated third view; standalone /opens/ retains its styling. */
-#viewComps .boston-results-head {
-  font-size: var(--groupLabelFont);
-  font-weight: 800;
-  letter-spacing: .22em;
-  color: rgba(0,0,0,.45);
-  text-transform: uppercase;
-  border-bottom: 0;
-  padding: 12px 12px 9px;
-}
+
 #viewComps .boston-match-card {
   overflow: hidden;
   border-radius: var(--radius);
@@ -181,9 +173,6 @@
   #viewComps .boston-match-card--active .boston-results-row::before {
     width: calc((100% - 20px) * 2 / 6.07 + 4px);
   }
-  #viewComps .boston-results-head {
-    font-size: var(--groupLabelFont);
-  }
 }
 
 /* Integrated COMPS: align the result headers with the EVENTS/GYMS list start.
@@ -201,26 +190,48 @@
 }
 #viewComps .boston-results { margin-top: 0; }
 
-/* Integrated COMPS list alignment — mirror the GYMS group-heading position.
-   Keep the five-column headings on their existing grid and preserve standalone OPENS. */
+/* Integrated COMPS: use the same group-to-card geometry as EVENTS/GYMS.
+   One authoritative rule set replaces the former incremental offset patches.
+   Standalone /opens/ and all other views remain unchanged. */
+#viewComps .boston-results {
+  margin-top: 14px;
+}
 #viewComps .boston-results-head {
-  padding-top: 14px;
-  padding-bottom: 0;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 14px 0 8px;
+  line-height: normal;
+  font-size: var(--groupLabelFont);
+  font-weight: 800;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: rgba(0,0,0,.45);
+  border: 0;
 }
-#viewComps .boston-results-head > :first-child {
-  transform: translateX(-12px);
-}
-@media (max-width: 680px) {
-  #viewComps .boston-results-head > :first-child {
-    transform: translateX(-4px);
+#viewComps .boston-results-head > :first-child { transform: none; }
+#viewComps #athleteRows > .boston-match-card:first-child { margin-top: 0; }
+
+/* Match the existing mobile cardbody density, not the standalone OPENS sizes. */
+@media (max-width: 430px) {
+  #viewComps .boston-results { margin-top: 6px; }
+  #viewComps .boston-results-head {
+    margin: 8px 0 5px;
+    letter-spacing: .16em;
+    font-size: var(--groupLabelFont);
+  }
+  #viewComps .boston-match-card { border-radius: var(--radius); box-shadow: 0 7px 14px var(--shadow); }
+  #viewComps .boston-match-card .boston-results-row {
+    padding: 6px 8px;
+    gap: 6px;
+    font-size: var(--rowFont);
+    grid-template-columns: minmax(0,2fr) minmax(0,2fr) minmax(62px,1.12fr) minmax(0,.45fr) minmax(0,.5fr);
+  }
+  #viewComps .boston-results-row small { font-size: calc(var(--rowFont) - 2px); }
+  #viewComps .boston-results-head {
+    grid-template-columns: minmax(0,2fr) minmax(0,2fr) minmax(62px,1.12fr) minmax(0,.45fr) minmax(0,.5fr);
+    gap: 6px;
+  }
+  #viewComps .boston-match-card--active .boston-results-row::before {
+    width: calc((100% - 24px) * 2 / 6.07 + 8px);
   }
 }
-
-/* Align COMPS with GYMS: trim 10px above the column labels and 8px
-   between the heading row and first card; keep both in normal flow. */
-#viewComps #athleteRows > .boston-match-card:first-child {
-  margin-top: 6px;
-}
-
-/* Keep the five-column heading in normal flow; never overlap it with the card. */
-#viewComps .boston-results-head { position: relative; z-index: 1; }
