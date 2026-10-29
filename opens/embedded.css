@@ -204,7 +204,7 @@
 /* Integrated COMPS list alignment — mirror the GYMS group-heading position.
    Keep the five-column headings on their existing grid and preserve standalone OPENS. */
 #viewComps .boston-results-head {
-  padding-top: 6px;
+  padding-top: 24px;
   padding-bottom: 0;
 }
 #viewComps .boston-results-head > :first-child {
@@ -221,5 +221,8 @@
    native grid box adds extra height before the first card. Match the card's
    starting edge without moving the heading or touching standalone OPENS. */
 #viewComps #athleteRows > .boston-match-card:first-child {
-  margin-top: -8px;
+  margin-top: 14px;
 }
+
+/* Keep the five-column heading in normal flow; never overlap it with the card. */
+#viewComps .boston-results-head { position: relative; z-index: 1; }
