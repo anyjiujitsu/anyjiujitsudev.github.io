@@ -10,6 +10,7 @@ const VIEW_LOCKED = false;
 let viewShellW = 0;
 let lastViewTitleMode = null; // null | "events" | "index" | "comps"
 let currentP = 0;             // source of truth for current progress
+let nativeTabNavigation = false;
 
 function setTransition(ms){
   document.body.style.setProperty("--viewTransition", ms + "ms");
@@ -151,7 +152,7 @@ export function setViewUI(view, { $, onIndexViewOpen, fromNativeScroll = false }
   setTransition(260);
   if(view !== "comps") refreshEventsPillDots({ $, activeEventsState });
   const destination = view === "comps" ? 2 : (view === "index" ? 1 : 0);
-  applyProgress($, destination);
+  if(!fromNativeScroll && !nativeTabNavigation) applyProgress($, destination);
   if(!fromNativeScroll){
     const shell = $("viewShell");
     if(shell){
@@ -259,41 +260,77 @@ export function wireViewToggle({ $, onIndexViewOpen } = {}){
   if(viewShell){
     const views = ["events", "index", "comps"];
     let settleTimer = 0;
-    let ignoreScrollCommitUntil = 0;
-    let wasTracking = false;
+    let framePending = false;
+    let lastScrollLeft = 0;
+    let programmaticDestination = -1;
+    let pointerDownInShell = false;
 
-    // Scroll snapping (including touch inertia) is performed by Safari/Chrome.
-    // JS updates only the tab thumb and, after settling, the active view UI.
-    const track = () => {
-      const width = Math.max(1, viewShell.clientWidth);
-      const progress = Math.max(0, Math.min(2, viewShell.scrollLeft / width));
+    const shellProgress = () => Math.max(0, Math.min(2,
+      viewShell.scrollLeft / Math.max(1, viewShell.clientWidth)));
+
+    // The browser moves the pages. Follow its position with the tab thumb,
+    // but update the header/filter state as soon as the new page takes over.
+    function syncDuringScroll(){
+      framePending = false;
+      const progress = shellProgress();
+      setTransition(0); // The thumb must not animate behind the native scroller.
       applyProgressVars($, progress);
-      clearTimeout(settleTimer);
-      settleTimer = setTimeout(commit, 130);
-    };
-    const commit = () => {
-      if(performance.now() < ignoreScrollCommitUntil) return;
-      const width = Math.max(1, viewShell.clientWidth);
-      const index = Math.max(0, Math.min(2, Math.round(viewShell.scrollLeft / width)));
-      const desired = views[index];
-      if(state.view !== desired){
-        setViewUI(desired, { $, onIndexViewOpen, fromNativeScroll: true });
+      const index = Math.max(0, Math.min(2, Math.round(progress)));
+      if(programmaticDestination < 0 && state.view !== views[index]){
+        // Do NOT snap the thumb to an integer while the finger is still moving.
+        setViewUI(views[index], { $, onIndexViewOpen, fromNativeScroll:true });
       }
-      applyProgressVars($, index);
-    };
-
-    viewShell.addEventListener("scroll", track, { passive:true });
-    if("onscrollend" in viewShell){
-      viewShell.addEventListener("scrollend", commit, { passive:true });
     }
-    // Prevent a pending snap callback from immediately reverting a clicked tab.
-    for(const tab of [tabEvents, tabIndex, tabComps]){
+
+    function scheduleSync(){
+      if(!framePending){
+        framePending = true;
+        requestAnimationFrame(syncDuringScroll);
+      }
+    }
+
+    function finishScroll(){
+      clearTimeout(settleTimer);
+      programmaticDestination = -1;
+      nativeTabNavigation = false;
+      const index = Math.max(0, Math.min(2, Math.round(shellProgress())));
+      if(state.view !== views[index]){
+        setViewUI(views[index], { $, onIndexViewOpen, fromNativeScroll:true });
+      }
+      // Use exact physical scroll progress rather than forcing a thumb jump.
+      applyProgressVars($, shellProgress());
+      setTransition(260);
+    }
+
+    viewShell.addEventListener("scroll", () => {
+      lastScrollLeft = viewShell.scrollLeft;
+      scheduleSync();
+      clearTimeout(settleTimer);
+      // Safari versions without scrollend still need a reliable settle signal.
+      settleTimer = setTimeout(finishScroll, 180);
+    }, { passive:true });
+    if("onscrollend" in viewShell){
+      viewShell.addEventListener("scrollend", finishScroll, { passive:true });
+    }
+
+    // Clicking a tab owns its destination until smooth scrolling finishes.
+    // Native finger swipes can interrupt that programmatic navigation.
+    for(const [index, tab] of [tabEvents, tabIndex, tabComps].entries()){
       tab?.addEventListener("click", () => {
-        ignoreScrollCommitUntil = performance.now() + 180;
+        programmaticDestination = index;
+        nativeTabNavigation = true;
+        setTransition(0);
       }, { capture:true });
     }
-    viewShell.addEventListener("touchstart", () => { wasTracking = true; }, {passive:true});
-    viewShell.addEventListener("touchend", () => { wasTracking = false; }, {passive:true});
+    viewShell.addEventListener("touchstart", () => {
+      programmaticDestination = -1;
+      nativeTabNavigation = false;
+      pointerDownInShell = true;
+    }, {passive:true});
+    viewShell.addEventListener("touchend", () => { pointerDownInShell = false; }, {passive:true});
+    viewShell.addEventListener("pointerdown", e => {
+      if(e.pointerType === "mouse" || e.pointerType === "pen") programmaticDestination = -1;
+    }, {passive:true});
     window.addEventListener("resize", () => {
       const index = state.view === "comps" ? 2 : (state.view === "index" ? 1 : 0);
       viewShell.scrollTo({left:index * viewShell.clientWidth, behavior:"instant"});
