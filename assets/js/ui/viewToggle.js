@@ -86,6 +86,12 @@ export function setActiveEventsQuery(val, setters){
 
 export function setViewUI(view, { $, onIndexViewOpen } = {}){
   const previousView = state.view;
+  // Settle the document scroll position before changing the active panel.
+  // Otherwise the horizontal transition can start at the old vertical offset,
+  // exposing a blank intermediate frame on long-to-short view switches.
+  if(previousView !== view){
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  }
   setView(view);
   if(view === "comps" && !window.__compsModuleStarted){
     window.__compsModuleStarted = true;
@@ -152,12 +158,6 @@ export function setViewUI(view, { $, onIndexViewOpen } = {}){
   if(view !== "comps") refreshEventsPillDots({ $, activeEventsState });
   applyProgress($, view === "comps" ? 2 : (view === "index" ? 1 : 0));
 
-  // All three views share the document scroll position. On a real view change,
-  // start at the top so a short list is never entered at a previous view's depth.
-  // Keep the scroll position when reselecting the current tab.
-  if(previousView !== state.view){
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-  }
 }
 
 export function wireViewToggle({ $, onIndexViewOpen } = {}){
