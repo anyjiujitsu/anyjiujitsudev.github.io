@@ -172,6 +172,11 @@ function renderAthletes(items) {
   const upcoming = items.filter(athlete => !isFinishedMatch(athlete));
   const finishedItems = items.filter(isFinishedMatch);
   const ordered = upcoming.concat(finishedItems);
+  // Separate the active and finished match cardbodies without changing row content.
+  const activeCard = document.createElement('div');
+  activeCard.className = 'boston-match-card boston-match-card--active';
+  if (upcoming.length) rows.append(activeCard);
+  let finishedCard = null;
   let finishedSectionStarted = false;
   for (const athlete of ordered) {
     const isFinished = isFinishedMatch(athlete);
@@ -180,6 +185,9 @@ function renderAthletes(items) {
       divider.className = 'boston-finished-divider';
       divider.textContent = 'FINISHED MATCHES';
       rows.append(divider);
+      finishedCard = document.createElement('div');
+      finishedCard.className = 'boston-match-card boston-match-card--finished';
+      rows.append(finishedCard);
       finishedSectionStarted = true;
     }
     const row = document.createElement('div'); row.className = 'boston-results-row';
@@ -202,7 +210,7 @@ function renderAthletes(items) {
     row.append(primary);
     appendBracketCell(row, athlete.bracket || athlete.division || '—', athlete.result || '');
     appendCell(row, athlete.time || '—'); appendCell(row, athlete.mat || '—'); appendCell(row, athlete.day || '—');
-    rows.append(row);
+    (isFinished ? finishedCard : activeCard).append(row);
   }
 }
 // Calendar day first, then actual clock time; missing assignments sort last.
