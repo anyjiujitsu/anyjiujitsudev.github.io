@@ -235,3 +235,47 @@
     width: calc((100% - 24px) * 2 / 6.07 + 8px);
   }
 }
+
+/* Integrated COMPS: give the athlete name more width by trimming unused
+   BRACKET space. Keep the five column edges identical in heading and card. */
+#viewComps .boston-results-head,
+#viewComps .boston-match-card .boston-results-row {
+  grid-template-columns: minmax(0,2.5fr) minmax(0,1.8fr) minmax(76px,1.05fr) minmax(0,.55fr) minmax(0,.55fr);
+  gap: 10px;
+}
+#viewComps .boston-results-head {
+  padding-inline: 12px;
+  text-align: left;
+}
+#viewComps .boston-results-head > * {
+  text-align: left;
+  justify-self: start;
+  min-width: 0;
+}
+/* Row inner width excludes 24px horizontal padding and four 10px gaps.
+   Add half the first gap so the cream reaches the midpoint between cells. */
+#viewComps .boston-match-card--active .boston-results-row::before {
+  width: calc(12px + (100% - 64px) * 2.5 / 6.45 + 5px);
+}
+@media (max-width: 680px) {
+  #viewComps .boston-results-head,
+  #viewComps .boston-match-card .boston-results-row {
+    grid-template-columns: minmax(0,2.4fr) minmax(0,1.6fr) minmax(62px,1.12fr) minmax(0,.45fr) minmax(0,.5fr);
+    gap: 5px;
+  }
+  #viewComps .boston-results-head { padding-inline: 4px; }
+  #viewComps .boston-match-card--active .boston-results-row::before {
+    width: calc(4px + (100% - 28px) * 2.4 / 6.07 + 2.5px);
+  }
+}
+@media (max-width: 430px) {
+  #viewComps .boston-results-head,
+  #viewComps .boston-match-card .boston-results-row {
+    grid-template-columns: minmax(0,2.4fr) minmax(0,1.6fr) minmax(62px,1.12fr) minmax(0,.45fr) minmax(0,.5fr);
+    gap: 6px;
+  }
+  #viewComps .boston-results-head { padding-inline: 8px; }
+  #viewComps .boston-match-card--active .boston-results-row::before {
+    width: calc(8px + (100% - 40px) * 2.4 / 6.07 + 3px);
+  }
+}
