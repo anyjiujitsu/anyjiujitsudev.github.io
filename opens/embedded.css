@@ -125,3 +125,63 @@
     padding-right: 7px;
   }
 }
+
+
+/* Integrated COMPS match list: same cardbody treatment as EVENTS and GYMS.
+   Intentionally scoped to the integrated third view; standalone /opens/ retains its styling. */
+#viewComps .boston-results-head {
+  font-size: var(--groupLabelFont);
+  font-weight: 800;
+  letter-spacing: .22em;
+  color: rgba(0,0,0,.45);
+  text-transform: uppercase;
+  border-bottom: 0;
+  padding: 12px 12px 9px;
+}
+#viewComps .boston-match-card {
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: var(--row);
+  box-shadow: 0 10px 22px var(--shadow);
+}
+#viewComps .boston-match-card .boston-results-row {
+  box-sizing: border-box;
+  border-bottom: 0;
+  border-top: 1px solid rgba(0,0,0,.06);
+  background: var(--row);
+  position: relative;
+}
+#viewComps .boston-match-card .boston-results-row:first-child { border-top: 0; }
+/* A full-height cream NAME cell, without tinting the bracket or time columns. */
+#viewComps .boston-match-card--active .boston-results-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: calc((100% - 40px) * 2.15 / 6.45 + 12px);
+  background: var(--beige);
+  pointer-events: none;
+}
+#viewComps .boston-match-card .boston-results-row > * {
+  position: relative;
+  z-index: 1;
+}
+#viewComps .boston-match-card--finished .boston-results-row::before { content: none; }
+#viewComps .boston-finished-divider {
+  border-top: 0;
+  margin-top: 20px;
+  padding: 12px 12px 9px;
+  font-size: var(--groupLabelFont);
+  letter-spacing: .22em;
+  font-weight: 800;
+  color: rgba(0,0,0,.45);
+}
+@media (max-width: 680px) {
+  #viewComps .boston-match-card--active .boston-results-row::before {
+    width: calc((100% - 20px) * 2 / 6.07 + 4px);
+  }
+  #viewComps .boston-results-head {
+    font-size: var(--groupLabelFont);
+  }
+}
