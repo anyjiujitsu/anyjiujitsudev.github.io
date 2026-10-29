@@ -7,6 +7,13 @@ const options = $('competitionOptions');
 const label = $('competitionLabel');
 const status = $('bostonStatus');
 const rows = $('athleteRows');
+// Optional shared-site header label. The standalone OPENS page has no such element.
+const activeCountLabel = $('compsActiveStatus');
+function updateActiveCount(items) {
+  if (!activeCountLabel) return;
+  const count = items.filter(a => !['WIN', 'LOSS', 'BYE'].includes(String(a.result || '').trim().toUpperCase())).length;
+  activeCountLabel.textContent = `${count} active ${count === 1 ? 'match' : 'matches'}`;
+}
 const searchButton = $('athleteSearchButton');
 const chosen = new Set();
 const chosenAcademies = new Set();
@@ -166,6 +173,7 @@ function appendBracketCell(parent, bracketText, resultText = '') {
   parent.append(cell);
 }
 function renderAthletes(items) {
+  updateActiveCount(items);
   rows.replaceChildren();
   if (!items.length) { const blank = document.createElement('div'); blank.className = 'boston-empty'; blank.textContent = 'No athletes matched your search in the available rosters.'; rows.append(blank); return; }
   const isFinishedMatch = athlete => ['WIN', 'LOSS', 'BYE'].includes(String(athlete.result || '').trim().toUpperCase());
@@ -232,6 +240,7 @@ $('clearAllButton').addEventListener('click', () => {
   chosen.clear(); chosenAcademies.clear();
   updateLabel(); showOptions(); updateAcademies();
   rows.replaceChildren();
+  updateActiveCount([]);
   const empty = document.createElement('div');
   empty.className = 'boston-empty'; empty.textContent = ' ';
   rows.append(empty);
