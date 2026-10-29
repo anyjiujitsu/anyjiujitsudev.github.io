@@ -279,3 +279,41 @@
     width: calc(8px + (100% - 40px) * 2.4 / 6.07 + 3px);
   }
 }
+
+/* Integrated COMPS filter parity with EVENTS and INDEX.
+   Visual styling only; preserve existing sizing, controls and standalone /opens/. */
+#compsFilters .boston-pill {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.10);
+  border-radius: var(--radiusPill);
+  color: rgba(0, 0, 0, 0.55);
+  font-family: 'Fixture', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-synthesis: none;
+  font-stretch: normal;
+  font-variation-settings: 'wdth' 100, 'wght' 500;
+  font-size: var(--pillFont);
+  font-weight: 600;
+  line-height: 1;
+}
+#compsFilters .boston-pill-label {
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+}
+#compsFilters .boston-pill > [aria-hidden="true"]:last-child {
+  color: rgba(0,0,0,.55);
+  font-size: 10px;
+  font-weight: 600;
+}
+#compsFilters .boston-submit:not(.boston-clear) {
+  background: rgba(255,255,255,.95);
+  border: 1px solid rgba(0,0,0,.12);
+  box-shadow: 0 8px 16px rgba(0,0,0,.10);
+  border-radius: var(--radiusPill);
+  font-family: 'Fixture', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-synthesis: none;
+  font-size: var(--pillFont);
+  font-weight: 600;
+  color: rgba(0,0,0,.55);
+}
