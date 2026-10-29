@@ -386,6 +386,16 @@ input[type="search"]{ font-size:16px; }
     grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
   }
+  /* Align the emoji magnifier to the text baseline in the grid.
+     Its color-glyph bounds extend below the line box on iOS Safari. */
+  .pill--search .pill__icon{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    position: relative;
+    top: -4px;
+  }
   .pill--search .pill__input{
     font-size: 16px; /* retain iOS focus-zoom protection */
     min-width: 0;
