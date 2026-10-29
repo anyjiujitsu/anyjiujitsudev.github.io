@@ -84,19 +84,37 @@ export function setActiveEventsQuery(val, setters){
   else setters.setEventsQuery(val);
 }
 
-export function setViewUI(view, { $, onIndexViewOpen, scrollSettled = false } = {}){
+// Reset the document position in the same task as the view update.
+// Do not defer the view change to requestAnimationFrame: that creates an
+// observable intermediate frame with the old panel at the new scroll position.
+function resetViewScroll(){
+  if(window.scrollY <= 0 && document.documentElement.scrollTop <= 0 && document.body.scrollTop <= 0) return;
+  const root = document.documentElement;
+  const body = document.body;
+  const rootBehavior = root.style.getPropertyValue("scroll-behavior");
+  const rootPriority = root.style.getPropertyPriority("scroll-behavior");
+  const bodyBehavior = body.style.getPropertyValue("scroll-behavior");
+  const bodyPriority = body.style.getPropertyPriority("scroll-behavior");
+  const anchor = root.style.getPropertyValue("overflow-anchor");
+  const anchorPriority = root.style.getPropertyPriority("overflow-anchor");
+  try {
+    root.style.setProperty("scroll-behavior", "auto", "important");
+    body.style.setProperty("scroll-behavior", "auto", "important");
+    root.style.setProperty("overflow-anchor", "none", "important");
+    window.scrollTo(0, 0);
+  } finally {
+    if(rootBehavior) root.style.setProperty("scroll-behavior", rootBehavior, rootPriority);
+    else root.style.removeProperty("scroll-behavior");
+    if(bodyBehavior) body.style.setProperty("scroll-behavior", bodyBehavior, bodyPriority);
+    else body.style.removeProperty("scroll-behavior");
+    if(anchor) root.style.setProperty("overflow-anchor", anchor, anchorPriority);
+    else root.style.removeProperty("overflow-anchor");
+  }
+}
+
+export function setViewUI(view, { $, onIndexViewOpen } = {}){
   const previousView = state.view;
-  // Allow the browser to finish the vertical reset in its own paint before
-  // changing the visible panel or updating the sticky header/filter contents.
-  // This also prevents tall-to-short view transitions from exposing blank frames.
-  if(!scrollSettled && previousView !== view && window.scrollY > 0){
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-    requestAnimationFrame(() => setViewUI(view, { $, onIndexViewOpen, scrollSettled: true }));
-    return;
-  }
-  if(previousView !== view && window.scrollY > 0){
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
-  }
+  if(previousView !== view) resetViewScroll();
   setView(view);
   if(view === "comps" && !window.__compsModuleStarted){
     window.__compsModuleStarted = true;
