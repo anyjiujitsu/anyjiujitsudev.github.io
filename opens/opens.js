@@ -13,6 +13,11 @@ function updateActiveCount(items) {
   if (!activeCountLabel) return;
   const count = items.filter(a => !['WIN', 'LOSS', 'BYE'].includes(String(a.result || '').trim().toUpperCase())).length;
   activeCountLabel.textContent = `${count} active ${count === 1 ? 'match' : 'matches'}`;
+  // The counter belongs to the COMPS view. Do not depend on view-toggle
+  // timing to reveal it after the module has rendered its results.
+  if (document.getElementById('tabComps')?.getAttribute('aria-selected') === 'true') {
+    activeCountLabel.hidden = false;
+  }
 }
 const searchButton = $('athleteSearchButton');
 const chosen = new Set();
@@ -289,4 +294,5 @@ async function initialize() {
     setStatus(`Unable to load competition data: ${error.message}`);
   }
 }
+updateActiveCount([]);
 initialize();
