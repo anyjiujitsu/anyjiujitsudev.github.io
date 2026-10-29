@@ -378,16 +378,22 @@ input[type="search"]{ font-size:16px; }
   .pill__caret{ font-size: 8px; }
   .pill__dot{ margin-left: 1px; }
 
-  /* Search input: prevent iOS zoom while visually smaller */
-  .pill__input{
-    /* Keep the input at its actual flex width: transforming it to 76%
-       creates an invisible unused area and early horizontal text scrolling
-       in iOS Safari. 16px also prevents focus zoom. */
-    font-size: 16px;
-    transform: none;
-    transform-origin: initial;
-    width: auto;
+  /* Search: preserve the compact glyph size while allocating the full
+     visible text track. Grid prevents flexbox shrinking the transformed input
+     based on its unscaled width (the original premature clipping bug). */
+  .pill--search{
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+  }
+  .pill--search .pill__input{
+    font-size: 16px; /* retain iOS focus-zoom protection */
     min-width: 0;
+    width: calc(100% / 0.76);
+    max-width: none;
+    transform: scale(0.76);
+    transform-origin: left center;
+    box-sizing: border-box;
   }
 
   /* Counter + groups */
