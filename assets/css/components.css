@@ -380,10 +380,14 @@ input[type="search"]{ font-size:16px; }
 
   /* Search input: prevent iOS zoom while visually smaller */
   .pill__input{
+    /* Keep the input at its actual flex width: transforming it to 76%
+       creates an invisible unused area and early horizontal text scrolling
+       in iOS Safari. 16px also prevents focus zoom. */
     font-size: 16px;
-    transform: scale(0.76);
-    transform-origin: left center;
-    width: 132%;
+    transform: none;
+    transform-origin: initial;
+    width: auto;
+    min-width: 0;
   }
 
   /* Counter + groups */
