@@ -216,9 +216,10 @@
   }
 }
 
-/* Align COMPS cardbody top with the EVENTS/GYMS cardbody top.
-   The column headings stay at their current height; only the space below
-   them changes. Applies to the integrated COMPS view only. */
+/* The shared GYMS group heading sits directly above its cardbody.
+   The COMPS grid heading already aligns vertically with that heading, but its
+   native grid box adds extra height before the first card. Match the card's
+   starting edge without moving the heading or touching standalone OPENS. */
 #viewComps #athleteRows > .boston-match-card:first-child {
-  margin-top: 18px;
+  margin-top: -8px;
 }
