@@ -215,3 +215,10 @@
     transform: translateX(-4px);
   }
 }
+
+/* Align COMPS cardbody top with the EVENTS/GYMS cardbody top.
+   The column headings stay at their current height; only the space below
+   them changes. Applies to the integrated COMPS view only. */
+#viewComps #athleteRows > .boston-match-card:first-child {
+  margin-top: 18px;
+}
