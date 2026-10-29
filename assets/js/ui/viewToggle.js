@@ -84,7 +84,7 @@ export function setActiveEventsQuery(val, setters){
   else setters.setEventsQuery(val);
 }
 
-export function setViewUI(view, { $, onIndexViewOpen } = {}){
+export function setViewUI(view, { $, onIndexViewOpen, transitionMs = 260 } = {}){
   const previousView = state.view;
   setView(view);
   if(view === "comps" && !window.__compsModuleStarted){
@@ -148,7 +148,7 @@ export function setViewUI(view, { $, onIndexViewOpen } = {}){
 
   document.title = CUSTOMIZATION.siteHeaderName || "UNDEFINED";
 
-  setTransition(260);
+  setTransition(transitionMs);
   if(view !== "comps") refreshEventsPillDots({ $, activeEventsState });
   applyProgress($, view === "comps" ? 2 : (view === "index" ? 1 : 0));
 
@@ -247,48 +247,25 @@ export function wireViewToggle({ $, onIndexViewOpen } = {}){
 
   if(viewShell){
     let startX = 0, startY = 0, startP = 0;
-    let shellW = 0;
-    let lastX = 0, lastT = 0, vx = 0;
+    let shellW = 1;
+    let lastX = 0, lastT = 0, velocityX = 0;
     let lockedAxis = "";
     let swipeActive = false;
-    let rafLoop = 0;
-    let targetP = null;
 
-    function startSwipeLoop(){
-      if(rafLoop) return;
-      const SWIPE_BLEND = 0.88;
-      let p = currentP || startP || 0;
-      const tick = () => {
-        rafLoop = requestAnimationFrame(tick);
-        if(targetP === null) return;
-        p = p + (targetP - p) * SWIPE_BLEND;
-        applyProgressVars($, p);
-      };
-      rafLoop = requestAnimationFrame(tick);
-    }
-
-    function stopSwipeLoop(){
-      if(rafLoop){
-        cancelAnimationFrame(rafLoop);
-        rafLoop = 0;
-      }
-    }
-
+    // Direct tracking: while touching, the slider moves with the finger.
+    // No perpetual animation loop or interpolated lag during the gesture.
     viewShell.addEventListener("touchstart", (e) => {
       if(e.touches.length !== 1) return;
-      startX = e.touches[0].clientX;
+      startX = lastX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
-      startP = currentP || 0;
-      shellW = Math.max(1, viewShell.clientWidth || 1);
+      startP = currentP;
+      shellW = Math.max(1, viewShell.clientWidth);
       setViewShellW(shellW);
-      lastX = startX;
       lastT = performance.now();
-      vx = 0;
+      velocityX = 0;
       lockedAxis = "";
       swipeActive = false;
-      stopSwipeLoop();
-      targetP = null;
-    }, { passive: true });
+    }, { passive:true });
 
     viewShell.addEventListener("touchmove", (e) => {
       if(e.touches.length !== 1) return;
@@ -298,45 +275,60 @@ export function wireViewToggle({ $, onIndexViewOpen } = {}){
       const dy = y - startY;
 
       if(!lockedAxis){
-        if(Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
-        lockedAxis = (Math.abs(dx) >= Math.abs(dy)) ? "x" : "y";
+        if(Math.abs(dx) < 9 && Math.abs(dy) < 9) return;
+        // Prefer vertical scrolling for diagonal gestures.
+        lockedAxis = Math.abs(dx) > Math.abs(dy) * 1.2 ? "x" : "y";
       }
-      if(lockedAxis === "y") return;
-
+      if(lockedAxis !== "x") return;
       if(!swipeActive){
         swipeActive = true;
         setTransition(0);
-        targetP = startP;
-        startSwipeLoop();
       }
-
       e.preventDefault();
 
       const now = performance.now();
-      const dt = Math.max(1, now - lastT);
-      vx = (x - lastX) / dt;
+      const dt = now - lastT;
+      if(dt > 0 && dt < 120){
+        const instantaneous = (x - lastX) / dt;
+        velocityX = 0.65 * instantaneous + 0.35 * velocityX;
+      }
       lastX = x;
       lastT = now;
 
-      targetP = startP + (-dx / (shellW || 1));
-    }, { passive: false });
+      applyProgressVars($, startP - dx / shellW);
+    }, { passive:false });
 
-    viewShell.addEventListener("touchend", () => {
-      setTransition(220);
-      stopSwipeLoop();
-      if(targetP !== null) applyProgress($, targetP);
-
-      const p = currentP || 0;
-      const FLICK_V = 0.45;
-      const EDGE_T  = 0.35;
-
-      let destination;
-      if(Math.abs(vx) > FLICK_V){
-        destination = Math.max(0, Math.min(2, Math.round(startP) + (vx < 0 ? 1 : -1)));
-      } else {
-        destination = Math.max(0, Math.min(2, Math.round(p)));
+    function finishSwipe(cancelled){
+      if(!swipeActive){
+        lockedAxis = "";
+        return; // Vertical scrolling must not trigger a view transition.
       }
-      setViewUI(["events", "index", "comps"][destination], { $, onIndexViewOpen });
-    }, { passive: true });
+      swipeActive = false;
+      lockedAxis = "";
+
+      const distance = currentP - startP;
+      // A held finger is not a flick, even if its last movement was fast.
+      if(performance.now() - lastT > 90) velocityX = 0;
+      const flick = !cancelled && Math.abs(velocityX) >= 0.45;
+      let destination;
+      if(flick){
+        destination = Math.round(startP) + (velocityX < 0 ? 1 : -1);
+      } else if(Math.abs(distance) >= 0.28){
+        destination = Math.round(startP) + (distance > 0 ? 1 : -1);
+      } else {
+        destination = Math.round(startP);
+      }
+      destination = Math.max(0, Math.min(2, destination));
+
+      const remaining = Math.abs(destination - currentP);
+      const duration = Math.max(130, Math.min(260,
+        Math.round(175 + remaining * 85 - (flick ? Math.min(65, Math.abs(velocityX) * 35) : 0))));
+      setViewUI(["events", "index", "comps"][destination], {
+        $, onIndexViewOpen, transitionMs: duration
+      });
+    }
+
+    viewShell.addEventListener("touchend", () => finishSwipe(false), { passive:true });
+    viewShell.addEventListener("touchcancel", () => finishSwipe(true), { passive:true });
   }
 }
