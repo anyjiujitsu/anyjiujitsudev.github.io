@@ -17,3 +17,43 @@
 .flyer-header-links a:focus-visible{outline:2px solid var(--green);outline-offset:4px;border-radius:4px}
 @media(max-width:760px){.flyer-header-inner{min-height:0;padding:10px 12px 8px}.flyer-header-brand .beta{display:none}}
 @media(max-width:430px){.flyer-header-inner{padding:9px 8px 7px}.flyer-header-links{gap:9px;margin-bottom:1px}.flyer-header-links a{width:21px;height:21px}.flyer-header-links svg{width:18px;height:18px}.flyer-logo{overflow:visible}.flyer-logo img{height:calc(var(--anyLogoH,12px)*1.22);transform:translateY(calc(var(--anyLogoH,12px)*-.2))}}
+
+
+/* V2: match main-site header geometry; /flyers/ only */
+.flyer-header-inner{
+  max-width:var(--maxW,900px);
+  min-height:0;
+  padding:10px var(--pagePad,14px) 6px;
+  align-items:flex-end;
+  position:relative;
+}
+.flyer-header-brand{gap:0;justify-content:flex-end}
+.flyer-logo{
+  height:var(--anyLogoH,22px);
+  margin:0 0 var(--anyLogoMB,4px);
+  overflow:visible;
+}
+.flyer-logo img{
+  height:var(--anyLogoH,22px);
+  width:auto;
+  transform:none;
+}
+.flyer-header-brand h1{
+  font-size:var(--titleSize,58px);
+  line-height:.9;
+}
+.flyer-header-links{
+  align-self:flex-start;
+  margin:0;
+  gap:11px;
+}
+@media(max-width:760px){
+  .flyer-header-inner{padding:10px var(--pagePad,14px) 6px}
+}
+@media(max-width:430px){
+  .flyer-header-inner{padding:10px var(--pagePad,3px) 6px}
+  .flyer-header-links{gap:9px;margin:0}
+  .flyer-header-links a{width:21px;height:21px}
+  .flyer-header-links svg{width:18px;height:18px}
+  .flyer-logo img{height:var(--anyLogoH,12px);transform:none}
+}
