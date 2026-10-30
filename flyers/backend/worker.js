@@ -9,14 +9,13 @@ const STYLE_PROMPTS = {
 export default {async fetch(request,env){
  const origin=request.headers.get('Origin')||'';
  const allowed=env.ALLOWED_ORIGIN||'https://anyjiujitsu.github.io';
- const headers={'Access-Control-Allow-Origin':allowed,'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'Content-Type,X-Flyers-Access','Vary':'Origin','Cache-Control':'no-store','Content-Type':'application/json'};
+ const headers={'Access-Control-Allow-Origin':allowed,'Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'Content-Type','Vary':'Origin','Cache-Control':'no-store','Content-Type':'application/json'};
  const reply=(data,status=200)=>new Response(JSON.stringify(data),{status,headers});
  if(origin!==allowed)return reply({error:'Origin not authorized'},403);
  if(request.method==='OPTIONS')return new Response(null,{status:204,headers});
  const path=new URL(request.url).pathname;
  if(path!=='/generate'||request.method!=='POST')return reply({error:'Not found'},404);
- if(!env.OPENAI_API_KEY||!env.FLYERS_ACCESS_CODE)return reply({error:'Worker secrets not configured'},503);
- if(request.headers.get('X-Flyers-Access')!==env.FLYERS_ACCESS_CODE)return reply({error:'Invalid private DEV access code'},401);
+ if(!env.OPENAI_API_KEY)return reply({error:'OpenAI API key not configured in Worker secrets'},503);
  const size=Number(request.headers.get('content-length')||'0');if(size>2000)return reply({error:'Request too large'},413);
  let body;try{body=await request.json()}catch{return reply({error:'Invalid JSON'},400)}
  if(!body||!Object.prototype.hasOwnProperty.call(STYLE_PROMPTS,body.style))return reply({error:'Unknown style'},400);

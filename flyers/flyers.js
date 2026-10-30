@@ -27,16 +27,14 @@ function clearAiArtwork(){aiArtwork=null;if(aiArtworkURL){URL.revokeObjectURL(ai
 $('clearAi').addEventListener('click',()=>{clearAiArtwork();$('aiStatus').textContent='AI artwork cleared. Local design restored.';render()});
 $('aiGenerate').addEventListener('click',async()=>{
  const endpoint=(window.ANY_FLYERS_AI&&window.ANY_FLYERS_AI.endpoint||'').trim();
- const access=$('aiCode').value.trim();
  if(!endpoint){$('aiStatus').textContent='AI not configured: enter your deployed Worker URL in flyers/config.js (never put an API key there).';return}
  if(!/^https:\/\//i.test(endpoint)){$('aiStatus').textContent='The Worker endpoint must use HTTPS.';return}
- if(!access){$('aiStatus').textContent='Enter the private DEV access code assigned to your Worker.';return}
  const btn=$('aiGenerate');btn.disabled=true;btn.textContent='GENERATING ARTWORK…';
  $('aiStatus').textContent='Requesting a new AI-designed background. The photo and event text remain local.';
  try{
   const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),110000);
   let response;
-  try{response=await fetch(endpoint.replace(/\/$/,'')+'/generate',{method:'POST',headers:{'Content-Type':'application/json','X-Flyers-Access':access},body:JSON.stringify({style:choose(),variation:variant%5}),signal:controller.signal})}finally{clearTimeout(timeout)}
+  try{response=await fetch(endpoint.replace(/\/$/,'')+'/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({style:choose(),variation:variant%5}),signal:controller.signal})}finally{clearTimeout(timeout)}
   const result=await response.json();if(!response.ok)throw new Error(result.error||'Request failed');
   if(!result.image||!/^data:image\/(png|jpeg|webp);base64,/.test(result.image))throw new Error('The server did not return a supported image');
   const img=new Image();await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=result.image});
