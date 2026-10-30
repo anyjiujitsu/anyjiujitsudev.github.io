@@ -1,6 +1,22 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>FLYERS | ANY N.E. GRAPPLING</title><link rel="stylesheet" href="../assets/css/tokens.css"><link rel="stylesheet" href="../assets/css/base.css"><link rel="stylesheet" href="./flyers.css"></head>
-<body><header class="top"><div class="top-inner"><div class="brand"><div class="eyebrow">(ANY)</div><h1>FLYERS</h1><span class="beta">DESIGN LAB · DEV</span></div><a class="home" href="../index.html" aria-label="Back to ANY site">⌂ HOME</a></div></header>
+<body><header class="top" aria-label="Flyer generator header">
+  <div class="flyer-header-inner">
+    <div class="flyer-header-brand">
+      <a class="flyer-logo" href="../index.html" aria-label="ANY N.E. Grappling homepage"><img src="../logo.png" alt="ANY" /></a>
+      <h1>FLYERS</h1>
+      <span class="beta">DESIGN LAB · DEV</span>
+    </div>
+    <nav class="flyer-header-links" aria-label="Site links">
+      <a href="../index.html" aria-label="Home" title="Home">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9"/><path d="M9 21v-8h6v8"/></svg>
+      </a>
+      <a href="https://www.instagram.com/any.jiujitsu/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" title="Instagram">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="2.5" y="2.5" width="19" height="19" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".5"/></svg>
+      </a>
+    </nav>
+  </div>
+</header>
 <div class="greenbar"><div class="bar-inner"><span>CREATE A FLYER</span><span class="bar-note">5 STYLES · LIVE PREVIEW · PNG EXPORT</span></div></div>
 <main class="workspace"><section class="controls" aria-label="Flyer editor"><div class="panel"><h2>01 <span>PHOTO</span></h2><label class="upload" for="photo"><span class="upload-icon">＋</span><span id="photoLabel">CHOOSE A SUBJECT PHOTO</span><small>JPG, PNG or WEBP · Private to this browser</small></label><input id="photo" type="file" accept="image/*" hidden><div class="photo-actions"><button type="button" id="removeBg" class="pill" disabled>REMOVE BACKGROUND <span class="mini">BETA</span></button><button type="button" class="pill secondary" id="resetPhoto">CLEAR PHOTO</button></div><p class="hint" id="photoStatus">Transparent PNG subjects work best. Background removal is optional and downloads an external browser-based model on first use.</p></div>
 <div class="panel"><h2>02 <span>EVENT DETAILS</span></h2><div class="fields"><label class="wide">EVENT / FLYER TITLE<input id="eventName" maxlength="75" value="OPEN MAT" placeholder="OPEN MAT"></label><label class="wide">HOST / ACADEMY<input id="hostName" maxlength="75" value="ANY N.E. GRAPPLING" placeholder="Academy or organizer"></label><label>DATE<input id="eventDate" type="date"></label><label>TIME<input id="eventTime" type="time" value="11:00"></label><label>PRICE<input id="price" maxlength="24" value="FREE" placeholder="FREE / $25"></label><label>LOCATION<input id="location" maxlength="70" value="NEW ENGLAND" placeholder="City / venue"></label><label class="wide">EXTRA INFORMATION<input id="details" maxlength="100" placeholder="ALL ARE WELCOME" value="ALL ARE WELCOME"></label></div></div>
