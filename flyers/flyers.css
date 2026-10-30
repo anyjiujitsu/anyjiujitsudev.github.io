@@ -57,3 +57,10 @@
   .flyer-header-links svg{width:18px;height:18px}
   .flyer-logo img{height:var(--anyLogoH,12px);transform:none}
 }
+
+/* Optional AI generation controls (flyers module only) */
+.ai-actions{display:grid;gap:10px;margin-top:13px;padding-top:14px;border-top:1px solid rgba(35,76,49,.18)}
+.ai-access{display:grid;gap:7px;color:#59645b;font-size:11px;font-weight:900;letter-spacing:.11em}
+.ai-access input{box-sizing:border-box;width:100%;min-height:44px;border:1px solid #d0d4ce;border-radius:10px;background:#fff;color:#1e3025;padding:11px 13px;font:inherit;letter-spacing:normal;font-size:15px}
+#aiGenerate:disabled{opacity:.55;cursor:wait}
+#aiStatus{margin:0;line-height:1.55;overflow-wrap:anywhere}
