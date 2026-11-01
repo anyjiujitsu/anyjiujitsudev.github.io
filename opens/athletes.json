@@ -14,7 +14,7 @@
       "date": ""
     }
   ],
-  "updated_at": "2026-11-01T01:54:35.453907+00:00",
+  "updated_at": "2026-11-01T08:34:36.392749+00:00",
   "athletes": [
     {
       "competition_id": "3312",
@@ -93938,13 +93938,13 @@
       "name": "Carlos Oreste Cruz Jimenez",
       "team": "Amazing Serpente Jiu-Jitsu",
       "bracket": "Black / Master 3 / Male / Middle (79.50kg)",
-      "time": "09:30 AM",
+      "time": "09:37 AM",
       "mat": "8",
       "day": "Sun",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3313/categories/2933469",
       "time_type": "listed fight",
       "result": "",
-      "fight_number": "1"
+      "fight_number": "2"
     },
     {
       "competition_id": "3313",
@@ -93983,13 +93983,13 @@
       "name": "Wim Louis Deputter",
       "team": "Brasa CTA",
       "bracket": "Black / Master 3 / Male / Middle (79.50kg)",
-      "time": "09:37 AM",
+      "time": "09:30 AM",
       "mat": "8",
       "day": "Sun",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3313/categories/2933469",
       "time_type": "listed fight",
       "result": "",
-      "fight_number": "2"
+      "fight_number": "1"
     },
     {
       "competition_id": "3313",
@@ -93998,13 +93998,13 @@
       "name": "Enrico Chiri",
       "team": "Budo Clan",
       "bracket": "Black / Master 3 / Male / Middle (79.50kg)",
-      "time": "09:30 AM",
+      "time": "09:37 AM",
       "mat": "8",
       "day": "Sun",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3313/categories/2933469",
       "time_type": "listed fight",
       "result": "",
-      "fight_number": "1"
+      "fight_number": "2"
     },
     {
       "competition_id": "3313",
@@ -94118,8 +94118,23 @@
       "name": "David Rodríguez Darner",
       "team": "Esporte Dez / Instituto Calasans Camargo",
       "bracket": "Black / Master 3 / Male / Middle (79.50kg)",
-      "time": "09:30 AM",
+      "time": "09:44 AM",
       "mat": "9",
+      "day": "Sun",
+      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3313/categories/2933469",
+      "time_type": "listed fight",
+      "result": "",
+      "fight_number": "3"
+    },
+    {
+      "competition_id": "3313",
+      "competition_name": "European IBJJF Jiu-Jitsu No-Gi Championship 2026",
+      "date": "",
+      "name": "Jacob Williams Mackenzie",
+      "team": "GF Team",
+      "bracket": "Black / Master 3 / Male / Middle (79.50kg)",
+      "time": "09:30 AM",
+      "mat": "8",
       "day": "Sun",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3313/categories/2933469",
       "time_type": "listed fight",
@@ -94130,31 +94145,16 @@
       "competition_id": "3313",
       "competition_name": "European IBJJF Jiu-Jitsu No-Gi Championship 2026",
       "date": "",
-      "name": "Jacob Williams Mackenzie",
-      "team": "GF Team",
-      "bracket": "Black / Master 3 / Male / Middle (79.50kg)",
-      "time": "09:37 AM",
-      "mat": "8",
-      "day": "Sun",
-      "bracket_url": "https://www.bjjcompsystem.com/tournaments/3313/categories/2933469",
-      "time_type": "listed fight",
-      "result": "",
-      "fight_number": "2"
-    },
-    {
-      "competition_id": "3313",
-      "competition_name": "European IBJJF Jiu-Jitsu No-Gi Championship 2026",
-      "date": "",
       "name": "Davinder Singh Cheema",
       "team": "Inglorious Grapplers",
       "bracket": "Black / Master 3 / Male / Middle (79.50kg)",
-      "time": "09:44 AM",
+      "time": "09:30 AM",
       "mat": "9",
       "day": "Sun",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3313/categories/2933469",
       "time_type": "listed fight",
       "result": "",
-      "fight_number": "3"
+      "fight_number": "1"
     },
     {
       "competition_id": "3313",
@@ -94223,13 +94223,13 @@
       "name": "Andreas Achniotis Perales",
       "team": "Palestra Jiu-Jitsu",
       "bracket": "Black / Master 3 / Male / Middle (79.50kg)",
-      "time": "09:44 AM",
+      "time": "09:30 AM",
       "mat": "9",
       "day": "Sun",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3313/categories/2933469",
       "time_type": "listed fight",
       "result": "",
-      "fight_number": "3"
+      "fight_number": "1"
     },
     {
       "competition_id": "3313",
@@ -94253,13 +94253,13 @@
       "name": "James Robert Coggs",
       "team": "Rio Grappling Club",
       "bracket": "Black / Master 3 / Male / Middle (79.50kg)",
-      "time": "09:30 AM",
+      "time": "09:44 AM",
       "mat": "9",
       "day": "Sun",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3313/categories/2933469",
       "time_type": "listed fight",
       "result": "",
-      "fight_number": "1"
+      "fight_number": "3"
     },
     {
       "competition_id": "3313",
