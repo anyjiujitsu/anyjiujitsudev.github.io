@@ -14,7 +14,7 @@
       "date": ""
     }
   ],
-  "updated_at": "2026-11-03T10:01:12.721124+00:00",
+  "updated_at": "2026-11-03T17:46:47.456380+00:00",
   "athletes": [
     {
       "competition_id": "3312",
@@ -120644,7 +120644,7 @@
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3313/categories/2933795",
       "time_type": "listed fight",
       "fight_number": "85",
-      "result": ""
+      "result": "WIN"
     },
     {
       "competition_id": "3313",
@@ -120659,7 +120659,7 @@
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3313/categories/2933795",
       "time_type": "listed fight",
       "fight_number": "85",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3313",
@@ -133244,7 +133244,7 @@
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3313/categories/2933859",
       "time_type": "listed fight",
       "fight_number": "84",
-      "result": ""
+      "result": "LOSS"
     },
     {
       "competition_id": "3313",
@@ -133259,7 +133259,7 @@
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3313/categories/2933859",
       "time_type": "listed fight",
       "fight_number": "84",
-      "result": ""
+      "result": "WIN"
     },
     {
       "competition_id": "3313",
