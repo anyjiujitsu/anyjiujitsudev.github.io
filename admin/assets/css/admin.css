@@ -733,7 +733,7 @@
 }
 
 /* MATCHES admin page — fully scoped, leaves Events and Index unchanged. */
-#adminViewToggle .viewToggle__thumb { width:calc((100% - 24px) / 3); transform:translateX(var(--thumbX, 0px)); }
+#adminViewToggle .viewToggle__thumb { width:calc(33.333333333% - 6px); transform:translateX(var(--thumbX, 0px)); }
 #adminViewToggle .viewToggle__tab { flex:1 1 0; text-align:center; }
 .adminMatchesPicker { position:relative; min-width:0; }
 .adminMatchesToggle { width:100%; display:flex; justify-content:space-between; align-items:center; gap:12px; text-align:left; cursor:pointer; }
@@ -751,7 +751,7 @@
 .adminMatchesFooter { margin-top:18px; }
 @media(max-width:760px){
  #adminViewToggle { max-width:100%; }
- #adminViewToggle .viewToggle__tab { padding:8px 9px; font-size:9px; }
+ #adminViewToggle .viewToggle__thumb { width:calc(33.333333333% - 3px); }
  .adminMatchesMenu { min-width:0; }
 }
 
@@ -841,4 +841,9 @@ body > .adminMatchesMenu[hidden] {display:none !important;}
   }
   body > .adminMatchesMenu .adminMatchesOption input { margin-top:2px; }
   body > .adminMatchesMenu .adminMatchesMenuNote { flex:none; }
+}
+
+/* Admin three-way slider: match the production site’s responsive thumb width. */
+@media (max-width:430px) {
+  #adminViewToggle .viewToggle__thumb { width:calc(33.333333333% - 2px); }
 }
