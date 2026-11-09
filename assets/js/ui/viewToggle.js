@@ -112,7 +112,7 @@ export function setViewUI(view, { $, onIndexViewOpen, fromNativeScroll = false }
       window.visualViewport?.addEventListener("resize", position);
       window.visualViewport?.addEventListener("scroll", position);
     }
-    import("../../../opens/opens.js?v=academy-search-1").catch(error => {
+    import("../../../opens/opens.js?v=academy-live-results-1").catch(error => {
       window.__compsModuleStarted = false;
       const status = document.getElementById("bostonStatus");
       if(status) status.textContent = `Could not load COMPS: ${error.message}`;
