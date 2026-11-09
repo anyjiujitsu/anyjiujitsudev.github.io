@@ -88,7 +88,7 @@ function restoreSearch() {
 }
 function setStatus(s) { status.textContent = s; }
 function updateLabel() {
-  label.textContent = chosen.size ? `COMPETITIONS · ${chosen.size} SELECTED` : 'COMPETITIONS · SELECT';
+  label.textContent = chosen.size ? `COMPS · ${chosen.size}` : 'COMPS';
   toggle.classList.toggle('has-selection', chosen.size > 0);
 }
 function showOptions() {
@@ -159,12 +159,10 @@ function updateAcademies() {
   const allowed = new Set(available.map(([key]) => key));
   for (const name of chosenAcademies) if (!allowed.has(name)) chosenAcademies.delete(name);
   updateAcademyLabel();
-  academyLabel.textContent = chosenAcademies.size ? `ACADEMIES · ${chosenAcademies.size} SELECTED` :
-    (!chosen.size ? 'ACADEMIES · SELECT' : available.length ? 'ACADEMIES · SELECT' : 'ACADEMIES · NO ROSTER');
   renderAcademyOptions(available);
 }
 function updateAcademyLabel() {
-  academyLabel.textContent = chosenAcademies.size ? `ACADEMIES · ${chosenAcademies.size} SELECTED` : 'ACADEMIES · SELECT';
+  academyLabel.textContent = chosenAcademies.size ? `ACADEMIES · ${chosenAcademies.size}` : 'ACADEMIES';
   academyToggle.classList.toggle('has-selection', chosenAcademies.size > 0);
 }
 function syncAcademySearchClear() {
@@ -293,7 +291,7 @@ function renderAthleteOptions(available = eligibleAthletes()) {
   athleteOptions.append(fragment);
 }
 function updateAthleteLabel() {
-  athleteLabel.textContent = chosenAthletes.size ? `ATHLETES · ${chosenAthletes.size} SELECTED` : 'ATHLETES · SELECT';
+  athleteLabel.textContent = chosenAthletes.size ? `ATHLETES · ${chosenAthletes.size}` : 'ATHLETES';
   athleteToggle.classList.toggle('has-selection', chosenAthletes.size > 0);
 }
 function updateAthletes() {
@@ -301,10 +299,6 @@ function updateAthletes() {
   const allowed = new Set(available.map(([key]) => key));
   for (const key of chosenAthletes) if (!allowed.has(key)) chosenAthletes.delete(key);
   updateAthleteLabel();
-  if (!chosen.size || !available.length) {
-    athleteLabel.textContent = chosenAthletes.size ? `ATHLETES · ${chosenAthletes.size} SELECTED` :
-      (!chosen.size ? 'ATHLETES · SELECT' : 'ATHLETES · NO ROSTER');
-  }
   renderAthleteOptions(available);
 }
 function syncAthleteSearchClear() {
@@ -532,7 +526,7 @@ async function initialize() {
     }
     if (readSavedSearch()) restoreSearch();
   } catch (error) {
-    label.textContent = 'COMPETITIONS · UNAVAILABLE'; options.textContent = 'Failed to load IBJJF competitions.';
+    label.textContent = 'COMPS'; options.textContent = 'Failed to load IBJJF competitions.';
     setStatus(`Unable to load competition data: ${error.message}`);
   }
 }
