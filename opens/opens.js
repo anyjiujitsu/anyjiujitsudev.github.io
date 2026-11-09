@@ -19,7 +19,6 @@ function updateActiveCount(items) {
     activeCountLabel.hidden = false;
   }
 }
-const searchButton = $('athleteSearchButton');
 const chosen = new Set();
 const chosenAcademies = new Set();
 const academyToggle = $('academyToggle');
@@ -71,9 +70,7 @@ function restoreSearch() {
     if (availableAcademies.has(normalized(key))) chosenAcademies.add(normalized(key));
   }
   updateAcademies();
-  if (chosen.size && chosenAcademies.size) {
-    $('athleteSearchForm').requestSubmit();
-  }
+  applySearch({ persist: false });
 }
 function setStatus(s) { status.textContent = s; }
 function updateLabel() {
@@ -86,7 +83,7 @@ function showOptions() {
   for (const comp of competitions) {
     const item = document.createElement('label'); item.className = 'boston-menu-row';
     const checkbox = document.createElement('input'); checkbox.type = 'checkbox'; checkbox.checked = chosen.has(comp.id);
-    checkbox.addEventListener('change', () => { checkbox.checked ? chosen.add(comp.id) : chosen.delete(comp.id); updateLabel(); updateAcademies(); });
+    checkbox.addEventListener('change', () => { checkbox.checked ? chosen.add(comp.id) : chosen.delete(comp.id); updateLabel(); updateAcademies(); applySearch(); });
     const details = document.createElement('span');
     const name = document.createElement('span'); name.textContent = comp.name;
     const date = document.createElement('small'); date.textContent = comp.date + (comp.end_date && comp.end_date !== comp.date ? ` – ${comp.end_date}` : '');
@@ -98,7 +95,7 @@ function setMenu(open) { menu.hidden = !open; toggle.setAttribute('aria-expanded
 toggle.addEventListener('click', () => setMenu(menu.hidden));
 document.addEventListener('pointerdown', event => { if (!$('competitionPicker').contains(event.target)) setMenu(false); });
 document.addEventListener('keydown', event => { if (event.key === 'Escape') setMenu(false); });
-$('clearCompetitions').addEventListener('click', () => { chosen.clear(); updateLabel(); showOptions(); updateAcademies(); });
+$('clearCompetitions').addEventListener('click', () => { chosen.clear(); updateLabel(); showOptions(); updateAcademies(); applySearch(); });
 function eligibleAcademies() {
   const names = new Map();
   for (const athlete of roster.athletes || []) {
@@ -134,6 +131,8 @@ function renderAcademyOptions(available = eligibleAcademies()) {
       cb.checked ? chosenAcademies.add(key) : chosenAcademies.delete(key);
       updateAcademyLabel();
       renderAcademyOptions(available);
+      // Change the displayed matches immediately, without closing the picker.
+      applySearch();
     });
     const value = document.createElement('span');
     value.textContent = name;
@@ -179,7 +178,7 @@ function setAcademyMenu(open) {
   }
 }
 academyToggle.addEventListener('click', () => setAcademyMenu(academyMenu.hidden));
-$('clearAcademies').addEventListener('click', () => { chosenAcademies.clear(); updateAcademies(); });
+$('clearAcademies').addEventListener('click', () => { chosenAcademies.clear(); updateAcademies(); applySearch(); });
 academySearchInput.addEventListener('input', () => {
   syncAcademySearchClear();
   renderAcademyOptions();
@@ -187,7 +186,7 @@ academySearchInput.addEventListener('input', () => {
   requestAnimationFrame(fitAcademyMenu);
 });
 academySearchInput.addEventListener('keydown', e => {
-  // The input is inside the GO form: Return should search choices, not submit results.
+  // Return filters academy choices only; it doesn't navigate or change selections.
   if (e.key === 'Enter') e.preventDefault();
 });
 academySearchClear.addEventListener('click', () => {
@@ -322,13 +321,22 @@ $('clearAllButton').addEventListener('click', () => {
   const empty = document.createElement('div');
   empty.className = 'boston-empty'; empty.textContent = ' ';
   rows.append(empty);
-  setStatus('Selections cleared. Choose competitions and academies to search.');
+  setStatus('Selections cleared. Choose competitions and academies to display matches.');
   setMenu(false); setAcademyMenu(false);
 });
 function applySearch({ persist = true } = {}) {
-  if (!chosen.size) { setStatus('Select at least one competition first.'); setMenu(true); return; }
-  if (!chosenAcademies.size) { setStatus('Select at least one academy.'); setAcademyMenu(true); return; }
   if (persist) saveSearch();
+  if (!chosen.size || !chosenAcademies.size) {
+    hasRenderedSearch = false;
+    rows.replaceChildren();
+    updateActiveCount([]);
+    const empty = document.createElement('div');
+    empty.className = 'boston-empty';
+    empty.textContent = ' ';
+    rows.append(empty);
+    setStatus(chosen.size ? 'Select an academy to display matches.' : 'Select a competition, then choose academies.');
+    return;
+  }
   hasRenderedSearch = true;
   const found = (roster.athletes || []).filter(a => chosen.has(String(a.competition_id)) && chosenAcademies.has(normalized(a.team)));
   found.sort((a,b) => {
@@ -343,14 +351,10 @@ function applySearch({ persist = true } = {}) {
   const failed = pending.map(id => roster.errors?.[id]).filter(Boolean);
   const missing = found.filter(a => !a.mat || !a.time || !a.day).length;
   setStatus(`${found.length} athlete ${found.length === 1 ? 'entry' : 'entries'} from selected academies.${missing ? ` Fight assignments are not yet published or matched for ${missing}.` : ''}${pending.length ? ` ${pending.length} selected roster(s) are not yet synced; run the GitHub Actions refresh.${failed.length ? ' Refresh issue: ' + failed.join(' / ') : ''}` : ''}`);
-  setMenu(false); setAcademyMenu(false);
+  // Keep dropdowns open when a checkbox changes, so several gyms can be added quickly.
 }
-$('athleteSearchForm').addEventListener('submit', event => {
-  event.preventDefault();
-  applySearch();
-});
+$('athleteSearchForm').addEventListener('submit', event => event.preventDefault());
 async function initialize() {
-  searchButton.disabled = true;
   try {
     const source = await getJson(new URL('./config.json', import.meta.url).href);
     try { roster = await getJson(new URL('./athletes.json', import.meta.url).href);
@@ -364,9 +368,10 @@ async function initialize() {
     updateAcademies();
     const loadedCount = (roster.loaded_competition_ids || []).filter(id => competitions.some(c => c.id === String(id))).length;
     const errorSummary = Object.values(roster.errors || {}).filter(Boolean).slice(0, 2).join(' / ');
-    if (!status.textContent.includes('unavailable')) setStatus('Select competitions and academies, then GO.');
-    searchButton.disabled = false;
-    restoreSearch();
+    if (!status.textContent.includes('unavailable')) {
+      setStatus('Select a competition, then choose academies. Matches update automatically.');
+    }
+    if (readSavedSearch()) restoreSearch();
   } catch (error) {
     label.textContent = 'COMPETITIONS · UNAVAILABLE'; options.textContent = 'Failed to load IBJJF competitions.';
     setStatus(`Unable to load competition data: ${error.message}`);
@@ -396,7 +401,7 @@ async function checkPublishedRoster() {
       .filter(c => c.id && c.name)
       .sort((a,b) => String(a.date || '').localeCompare(String(b.date || '')) || a.name.localeCompare(b.name));
     showOptions(); updateLabel(); updateAcademies();
-    if (hasRenderedSearch && chosen.size && chosenAcademies.size) {
+    if (hasRenderedSearch || chosen.size || chosenAcademies.size) {
       // Keep the user's position in the independent COMPS scroll container.
       const scrollNodes = [];
       for (let node = rows.parentElement; node; node = node.parentElement) {
@@ -407,6 +412,7 @@ async function checkPublishedRoster() {
       const pageScrollX = window.scrollX;
       const pageScrollY = window.scrollY;
       applySearch({ persist: false });
+      saveSearch(); // Drop saved academy IDs that are no longer in the published roster.
       requestAnimationFrame(() => {
         for (const [node, top, left] of scrollNodes) {
           node.scrollTop = top;
