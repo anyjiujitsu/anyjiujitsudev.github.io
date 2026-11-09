@@ -37,6 +37,10 @@
     .boston-menu-actions button { border:0; background:none; cursor:pointer; font:inherit; text-decoration:underline; }
     .boston-search-form { display:flex; align-items:center; gap:8px; flex:2 1 320px; min-width:220px; }
     .boston-search { box-sizing:border-box; width:100%; padding:7px 14px; background:#fff; color:#222; min-width:0; font-size:14px; }
+    /* Two searchable pickers share the row without forcing desktop overflow. */
+    .boston-controls > #competitionPicker { min-width:0; }
+    .boston-search-form { min-width:0; }
+    .boston-search-form > .boston-gym-picker { min-width:0; flex:1 1 0; }
     .boston-gym-picker { max-width:none; }
     .boston-gym-menu { width:min(480px,90vw); }
     /* Academies picker: search stays visible while the list scrolls. */
@@ -45,7 +49,10 @@
     .boston-academy-search:focus { border-color:var(--green); box-shadow:0 0 0 2px rgba(39,86,60,.13); }
     .boston-academy-search-clear { flex:0 0 28px; height:28px; border:0; border-radius:50%; background:#e7ece7; color:#202821; font:inherit; font-size:20px; line-height:1; cursor:pointer; }
     .boston-academy-search-clear[hidden] { display:none; }
-    #academyOptions .boston-menu-row.is-selected { background:rgba(39,86,60,.09); }
+    #academyOptions .boston-menu-row.is-selected, #athleteOptions .boston-menu-row.is-selected { background:rgba(39,86,60,.09); }
+    .boston-option-team { display:block; font-size:11px; margin-top:3px; opacity:.68; }
+    .boston-options-hint { padding:12px 9px; font-size:12px; opacity:.75; }
+    .boston-options-more { display:block; width:100%; border:0; border-radius:5px; padding:13px 9px; color:var(--green); background:rgba(39,86,60,.07); cursor:pointer; font:inherit; font-size:13px; text-align:center; }
     .boston-submit { background:#fff; color:#222; cursor:pointer; padding:7px 18px; font-size:13px; font-weight:700; }
     .boston-submit:disabled { opacity:.55; cursor:wait; }
     .boston-status { min-height:20px; font-size:13px; color:var(--muted, #777); margin:12px 0; }
@@ -78,12 +85,13 @@
     .boston-finished-divider { border-top:1px solid #9a9a9a80; margin-top:22px; padding:15px 12px 10px; color:var(--muted,#777); font-size:10px; font-weight:700; letter-spacing:.12em; }
 
     @media (max-width:680px) {
-      /* The open academy menu is positioned to the visible phone viewport by the script below. */
+      /* The open academy/athlete menu is positioned to the visible phone viewport by the script below. */
       .boston-gym-menu { position:fixed; left:8px; right:auto; width:calc(100vw - 16px); max-width:none; box-sizing:border-box; }
       .boston-controls { flex-wrap:nowrap; gap:5px; }
-      .boston-picker { min-width:0; max-width:none; flex:1 1 42%; }
-      .boston-search-form { min-width:0; flex:1 1 58%; gap:5px; }
-      .boston-gym-picker { min-width:0; flex:1 1 auto; }
+      .boston-controls > #competitionPicker { min-width:0; max-width:none; flex:0 1 29%; }
+      .boston-search-form { min-width:0; flex:1 1 71%; gap:5px; }
+      .boston-search-form > .boston-gym-picker { min-width:0; max-width:none; flex:1 1 0; }
+      .boston-search-form > #clearAllButton { flex:0 0 auto; }
       .boston-pill { min-height:30px; border-radius:18px; padding:5px 7px; gap:4px; font-size:clamp(8px,1.9vw,11px); }
       .boston-pill .boston-dot { width:6px; height:6px; }
       .boston-submit { min-height:30px; border-radius:18px; padding:5px 9px; font-size:clamp(9px,2vw,11px); }
@@ -152,6 +160,17 @@
                     <div id="academyOptions">Select a competition first.</div>
                   </div>
                 </div>
+                <div class="boston-picker boston-gym-picker boston-athlete-picker" id="athletePicker">
+                  <button class="boston-pill" id="athleteToggle" type="button" aria-expanded="false" aria-controls="athleteMenu"><span class="boston-pill-label" id="athleteLabel">ATHLETES · SELECT</span><span class="boston-dot" aria-hidden="true"></span><span aria-hidden="true">▾</span></button>
+                  <div class="boston-menu boston-gym-menu" id="athleteMenu" hidden>
+                    <div class="boston-menu-actions"><strong>ATHLETES IN SELECTED COMPETITIONS</strong><button type="button" id="clearAthletes">Clear</button></div>
+                    <div class="boston-academy-search-wrap">
+                      <input id="athleteSearchInput" class="boston-academy-search" type="search" placeholder="Search athletes…" aria-label="Search athletes" aria-controls="athleteOptions" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" />
+                      <button id="athleteSearchClear" class="boston-academy-search-clear" type="button" aria-label="Clear athlete search text" hidden>×</button>
+                    </div>
+                    <div id="athleteOptions">Select a competition first.</div>
+                  </div>
+                </div>
                 <button type="button" class="boston-submit boston-clear" id="clearAllButton">CLEAR</button>
               </form>
             </div>
@@ -170,37 +189,33 @@
     </main>
   </div>
   <script>
-    // On phones, position the Academies menu inside the *visible* viewport,
-    // not relative to the academy pill or the wider table/page layout.
+    // On phones, position Academies and Athletes within the visible viewport.
     (() => {
-      const toggle = document.getElementById('academyToggle');
-      const menu = document.getElementById('academyMenu');
-      if (!toggle || !menu) return;
-      function positionAcademies() {
-        if (window.innerWidth > 680 || menu.hidden) {
-          menu.style.removeProperty('left');
-          menu.style.removeProperty('right');
-          menu.style.removeProperty('top');
-          menu.style.removeProperty('width');
-          return;
+      for (const prefix of ['academy', 'athlete']) {
+        const toggle = document.getElementById(`${prefix}Toggle`);
+        const menu = document.getElementById(`${prefix}Menu`);
+        if (!toggle || !menu) continue;
+        function positionMenu() {
+          if (window.innerWidth > 680 || menu.hidden) {
+            for (const field of ['left', 'right', 'top', 'width']) menu.style.removeProperty(field);
+            return;
+          }
+          const view = window.visualViewport;
+          const left = view ? view.offsetLeft : 0;
+          const width = view ? view.width : window.innerWidth;
+          menu.style.left = `${left + 8}px`;
+          menu.style.right = 'auto';
+          menu.style.width = `${Math.max(200, width - 16)}px`;
+          menu.style.top = `${toggle.getBoundingClientRect().bottom + 7}px`;
         }
-        const view = window.visualViewport;
-        const left = view ? view.offsetLeft : 0;
-        const width = view ? view.width : window.innerWidth;
-        menu.style.left = `${left + 8}px`;
-        menu.style.right = 'auto';
-        menu.style.width = `${Math.max(200, width - 16)}px`;
-        menu.style.top = `${toggle.getBoundingClientRect().bottom + 7}px`;
-      }
-      toggle.addEventListener('click', () => requestAnimationFrame(positionAcademies));
-      window.addEventListener('resize', positionAcademies);
-      window.addEventListener('scroll', positionAcademies, {passive:true});
-      if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', positionAcademies);
-        window.visualViewport.addEventListener('scroll', positionAcademies);
+        toggle.addEventListener('click', () => requestAnimationFrame(positionMenu));
+        window.addEventListener('resize', positionMenu);
+        window.addEventListener('scroll', positionMenu, {passive:true});
+        window.visualViewport?.addEventListener('resize', positionMenu);
+        window.visualViewport?.addEventListener('scroll', positionMenu);
       }
     })();
   </script>
-  <script type="module" src="./opens.js?v=academy-live-results-1"></script>
+  <script type="module" src="./opens.js?v=athlete-live-results-1"></script>
 </body>
 </html>

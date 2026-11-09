@@ -28,10 +28,10 @@
   <link rel="stylesheet" href="assets/css/pills.css?v=20260129-302">
   <link rel="stylesheet" href="assets/css/components.css?v=20260212-902" />
   <link rel="stylesheet" href="assets/css/directory.css?v=20260210-809" />
-<link rel="stylesheet" href="opens/embedded.css?v=academy-search-1" />
+<link rel="stylesheet" href="opens/embedded.css?v=athlete-search-1" />
   <link rel="stylesheet" href="assets/css/comps-integration.css" />
 <!-- IMPORTANT: repo references main.js (no sequence) -->
-  <script type="module" src="assets/js/main.js?v=academy-live-results-1"></script>
+  <script type="module" src="assets/js/main.js?v=athlete-live-results-1"></script>
 </head>
 
 <body>
@@ -356,6 +356,17 @@
                       <button id="academySearchClear" class="boston-academy-search-clear" type="button" aria-label="Clear academy search text" hidden>×</button>
                     </div>
                     <div id="academyOptions">Select a competition first.</div>
+                  </div>
+                </div>
+                <div class="boston-picker boston-gym-picker boston-athlete-picker" id="athletePicker">
+                  <button class="boston-pill" id="athleteToggle" type="button" aria-expanded="false" aria-controls="athleteMenu"><span class="boston-pill-label" id="athleteLabel">ATHLETES · SELECT</span><span class="boston-dot" aria-hidden="true"></span><span aria-hidden="true">▾</span></button>
+                  <div class="boston-menu boston-gym-menu" id="athleteMenu" hidden>
+                    <div class="boston-menu-actions"><strong>ATHLETES IN SELECTED COMPETITIONS</strong><button type="button" id="clearAthletes">Clear</button></div>
+                    <div class="boston-academy-search-wrap">
+                      <input id="athleteSearchInput" class="boston-academy-search" type="search" placeholder="Search athletes…" aria-label="Search athletes" aria-controls="athleteOptions" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" />
+                      <button id="athleteSearchClear" class="boston-academy-search-clear" type="button" aria-label="Clear athlete search text" hidden>×</button>
+                    </div>
+                    <div id="athleteOptions">Select a competition first.</div>
                   </div>
                 </div>
                 <button type="button" class="boston-submit boston-clear" id="clearAllButton">CLEAR</button>
