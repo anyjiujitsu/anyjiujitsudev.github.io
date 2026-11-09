@@ -26,6 +26,8 @@ const academyToggle = $('academyToggle');
 const academyMenu = $('academyMenu');
 const academyOptions = $('academyOptions');
 const academyLabel = $('academyLabel');
+const academySearchInput = $('academySearchInput');
+const academySearchClear = $('academySearchClear');
 let competitions = [];
 let roster = { athletes: [], loaded_competition_ids: [], errors: {} };
 let hasRenderedSearch = false;
@@ -106,35 +108,99 @@ function eligibleAcademies() {
   }
   return [...names.entries()].sort((a,b) => a[1].localeCompare(b[1]));
 }
-function updateAcademies() {
-  const available = eligibleAcademies();
-  const allowed = new Set(available.map(a=>a[0]));
-  for (const name of chosenAcademies) if (!allowed.has(name)) chosenAcademies.delete(name);
-  academyLabel.textContent = chosenAcademies.size ? `ACADEMIES · ${chosenAcademies.size} SELECTED` :
-    (!chosen.size ? 'ACADEMIES · SELECT' : available.length ? 'ACADEMIES · SELECT' : 'ACADEMIES · NO ROSTER');
-  academyToggle.classList.toggle('has-selection', chosenAcademies.size > 0);
+// Filtering only changes the visible choices; selected academy keys remain intact.
+// With an empty search, selected gyms always appear first, alphabetically.
+function renderAcademyOptions(available = eligibleAcademies()) {
+  const query = normalized(academySearchInput.value);
+  const visible = available.filter(([, name]) => normalized(name).includes(query))
+    .sort((a, b) => Number(chosenAcademies.has(b[0])) - Number(chosenAcademies.has(a[0])) || a[1].localeCompare(b[1]));
   academyOptions.replaceChildren();
   if (!available.length) {
     academyOptions.textContent = chosen.size ? 'No academy data for these competitions yet. Check the roster refresh.' : 'Select competitions first.';
     return;
   }
-  for (const [key,name] of available) {
-    const item=document.createElement('label'); item.className='boston-menu-row';
-    const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=chosenAcademies.has(key);
-    cb.addEventListener('change',()=>{ cb.checked ? chosenAcademies.add(key) : chosenAcademies.delete(key); updateAcademyLabel(); });
-    const value=document.createElement('span'); value.textContent=name;
-    item.append(cb,value); academyOptions.append(item);
+  if (!visible.length) {
+    academyOptions.textContent = 'No academies match your search.';
+    return;
   }
+  for (const [key, name] of visible) {
+    const item = document.createElement('label');
+    item.className = 'boston-menu-row';
+    item.classList.toggle('is-selected', chosenAcademies.has(key));
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = chosenAcademies.has(key);
+    cb.addEventListener('change', () => {
+      cb.checked ? chosenAcademies.add(key) : chosenAcademies.delete(key);
+      updateAcademyLabel();
+      renderAcademyOptions(available);
+    });
+    const value = document.createElement('span');
+    value.textContent = name;
+    item.append(cb, value);
+    academyOptions.append(item);
+  }
+}
+function updateAcademies() {
+  const available = eligibleAcademies();
+  const allowed = new Set(available.map(([key]) => key));
+  for (const name of chosenAcademies) if (!allowed.has(name)) chosenAcademies.delete(name);
+  updateAcademyLabel();
+  academyLabel.textContent = chosenAcademies.size ? `ACADEMIES · ${chosenAcademies.size} SELECTED` :
+    (!chosen.size ? 'ACADEMIES · SELECT' : available.length ? 'ACADEMIES · SELECT' : 'ACADEMIES · NO ROSTER');
+  renderAcademyOptions(available);
 }
 function updateAcademyLabel() {
   academyLabel.textContent = chosenAcademies.size ? `ACADEMIES · ${chosenAcademies.size} SELECTED` : 'ACADEMIES · SELECT';
-  academyToggle.classList.toggle('has-selection',chosenAcademies.size>0);
+  academyToggle.classList.toggle('has-selection', chosenAcademies.size > 0);
 }
-function setAcademyMenu(open) { academyMenu.hidden=!open; academyToggle.setAttribute('aria-expanded',String(open)); if(open) setMenu(false); }
-academyToggle.addEventListener('click',()=>setAcademyMenu(academyMenu.hidden));
-$('clearAcademies').addEventListener('click',()=>{chosenAcademies.clear();updateAcademies();});
-document.addEventListener('pointerdown',e=>{if(!$('academyPicker').contains(e.target))setAcademyMenu(false);});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')setAcademyMenu(false);});
+function syncAcademySearchClear() {
+  academySearchClear.hidden = !academySearchInput.value;
+}
+function fitAcademyMenu() {
+  if (academyMenu.hidden) return;
+  const vp = window.visualViewport;
+  const visibleBottom = vp ? vp.offsetTop + vp.height : window.innerHeight;
+  const availableSpace = visibleBottom - academyMenu.getBoundingClientRect().top - 8;
+  academyMenu.style.maxHeight = `${Math.min(330, Math.max(95, availableSpace))}px`;
+}
+function setAcademyMenu(open) {
+  academyMenu.hidden = !open;
+  academyToggle.setAttribute('aria-expanded', String(open));
+  if (open) {
+    setMenu(false);
+    requestAnimationFrame(fitAcademyMenu);
+    // Avoid unexpectedly opening the iOS keyboard while switching slides.
+    if (window.matchMedia?.('(hover: hover) and (pointer: fine)').matches) {
+      academySearchInput.focus({ preventScroll: true });
+    }
+  } else {
+    academyMenu.style.removeProperty('max-height');
+  }
+}
+academyToggle.addEventListener('click', () => setAcademyMenu(academyMenu.hidden));
+$('clearAcademies').addEventListener('click', () => { chosenAcademies.clear(); updateAcademies(); });
+academySearchInput.addEventListener('input', () => {
+  syncAcademySearchClear();
+  renderAcademyOptions();
+  academyMenu.scrollTop = 0;
+  requestAnimationFrame(fitAcademyMenu);
+});
+academySearchInput.addEventListener('keydown', e => {
+  // The input is inside the GO form: Return should search choices, not submit results.
+  if (e.key === 'Enter') e.preventDefault();
+});
+academySearchClear.addEventListener('click', () => {
+  academySearchInput.value = '';
+  syncAcademySearchClear();
+  renderAcademyOptions();
+  academyMenu.scrollTop = 0;
+  academySearchInput.focus({ preventScroll: true });
+});
+window.visualViewport?.addEventListener('resize', () => requestAnimationFrame(fitAcademyMenu));
+window.visualViewport?.addEventListener('scroll', () => requestAnimationFrame(fitAcademyMenu));
+document.addEventListener('pointerdown', e => { if (!$('academyPicker').contains(e.target)) setAcademyMenu(false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') setAcademyMenu(false); });
 async function getJson(path) {
   const response = await fetch(path, { cache: 'no-store' });
   if (!response.ok) throw new Error(`Could not read ${path} (HTTP ${response.status}).`);
@@ -248,6 +314,8 @@ $('clearAllButton').addEventListener('click', () => {
   forgetSearch();
   hasRenderedSearch = false;
   chosen.clear(); chosenAcademies.clear();
+  academySearchInput.value = '';
+  syncAcademySearchClear();
   updateLabel(); showOptions(); updateAcademies();
   rows.replaceChildren();
   updateActiveCount([]);

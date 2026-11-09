@@ -39,6 +39,13 @@
     .boston-search { box-sizing:border-box; width:100%; padding:7px 14px; background:#fff; color:#222; min-width:0; font-size:14px; }
     .boston-gym-picker { max-width:none; }
     .boston-gym-menu { width:min(480px,90vw); }
+    /* Academies picker: search stays visible while the list scrolls. */
+    .boston-academy-search-wrap { position:sticky; top:0; z-index:2; display:flex; align-items:center; gap:6px; padding:6px 5px 9px; background:var(--bg); }
+    .boston-academy-search { box-sizing:border-box; width:100%; min-width:0; height:36px; padding:7px 12px; border:1px solid #aeb8ad; border-radius:18px; outline:none; background:#fff; color:#202821; font:inherit; font-size:16px; }
+    .boston-academy-search:focus { border-color:var(--green); box-shadow:0 0 0 2px rgba(39,86,60,.13); }
+    .boston-academy-search-clear { flex:0 0 28px; height:28px; border:0; border-radius:50%; background:#e7ece7; color:#202821; font:inherit; font-size:20px; line-height:1; cursor:pointer; }
+    .boston-academy-search-clear[hidden] { display:none; }
+    #academyOptions .boston-menu-row.is-selected { background:rgba(39,86,60,.09); }
     .boston-submit { background:#fff; color:#222; cursor:pointer; padding:7px 18px; font-size:13px; font-weight:700; }
     .boston-submit:disabled { opacity:.55; cursor:wait; }
     .boston-status { min-height:20px; font-size:13px; color:var(--muted, #777); margin:12px 0; }
@@ -138,6 +145,10 @@
                   <button class="boston-pill" id="academyToggle" type="button" aria-expanded="false" aria-controls="academyMenu"><span class="boston-pill-label" id="academyLabel">ACADEMIES · SELECT COMPETITIONS</span><span class="boston-dot" aria-hidden="true"></span><span aria-hidden="true">▾</span></button>
                   <div class="boston-menu boston-gym-menu" id="academyMenu" hidden>
                     <div class="boston-menu-actions"><strong>ACADEMIES IN SELECTED COMPETITIONS</strong><button type="button" id="clearAcademies">Clear</button></div>
+                    <div class="boston-academy-search-wrap">
+                      <input id="academySearchInput" class="boston-academy-search" type="search" placeholder="Search academies…" aria-label="Search academies" aria-controls="academyOptions" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" />
+                      <button id="academySearchClear" class="boston-academy-search-clear" type="button" aria-label="Clear academy search text" hidden>×</button>
+                    </div>
                     <div id="academyOptions">Select a competition first.</div>
                   </div>
                 </div>
@@ -191,6 +202,6 @@
       }
     })();
   </script>
-  <script type="module" src="./opens.js?v=opens-1"></script>
+  <script type="module" src="./opens.js?v=academy-search-1"></script>
 </body>
 </html>
