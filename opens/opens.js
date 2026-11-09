@@ -28,6 +28,10 @@ const academyOptions = $('academyOptions');
 const academyLabel = $('academyLabel');
 let competitions = [];
 let roster = { athletes: [], loaded_competition_ids: [], errors: {} };
+let hasRenderedSearch = false;
+let rosterFingerprint = '';
+let refreshInFlight = false;
+const ROSTER_POLL_MS = 120000; // Check the published dataset every two minutes.
 const normalized = v => String(v || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
 const SAVED_SEARCH_KEY = 'opens:last-search:v1';
 function saveSearch() {
@@ -229,7 +233,7 @@ function renderAthletes(items) {
 // Calendar day first, then actual clock time; missing assignments sort last.
 function dayRank(value) {
   const d = normalized(value);
-  const days = ['sat','sun','mon','tue','wed','thu','fri'];
+  const days = ['mon','tue','wed','thu','fri','sat','sun'];
   const match = days.findIndex(x => d.startsWith(x));
   if (match >= 0) return match;
   const date = d.match(/(?:^|\s)(\d{1,2})\/(\d{1,2})(?:\/\d{2,4})?/);
@@ -242,6 +246,7 @@ function timeRank(value) {
 }
 $('clearAllButton').addEventListener('click', () => {
   forgetSearch();
+  hasRenderedSearch = false;
   chosen.clear(); chosenAcademies.clear();
   updateLabel(); showOptions(); updateAcademies();
   rows.replaceChildren();
@@ -252,11 +257,11 @@ $('clearAllButton').addEventListener('click', () => {
   setStatus('Selections cleared. Choose competitions and academies to search.');
   setMenu(false); setAcademyMenu(false);
 });
-$('athleteSearchForm').addEventListener('submit', event => {
-  event.preventDefault();
+function applySearch({ persist = true } = {}) {
   if (!chosen.size) { setStatus('Select at least one competition first.'); setMenu(true); return; }
   if (!chosenAcademies.size) { setStatus('Select at least one academy.'); setAcademyMenu(true); return; }
-  saveSearch();
+  if (persist) saveSearch();
+  hasRenderedSearch = true;
   const found = (roster.athletes || []).filter(a => chosen.has(String(a.competition_id)) && chosenAcademies.has(normalized(a.team)));
   found.sort((a,b) => {
     const fa = ['WIN','LOSS','BYE'].includes(String(a.result || '').trim().toUpperCase()) ? 1 : 0;
@@ -271,12 +276,17 @@ $('athleteSearchForm').addEventListener('submit', event => {
   const missing = found.filter(a => !a.mat || !a.time || !a.day).length;
   setStatus(`${found.length} athlete ${found.length === 1 ? 'entry' : 'entries'} from selected academies.${missing ? ` Fight assignments are not yet published or matched for ${missing}.` : ''}${pending.length ? ` ${pending.length} selected roster(s) are not yet synced; run the GitHub Actions refresh.${failed.length ? ' Refresh issue: ' + failed.join(' / ') : ''}` : ''}`);
   setMenu(false); setAcademyMenu(false);
+}
+$('athleteSearchForm').addEventListener('submit', event => {
+  event.preventDefault();
+  applySearch();
 });
 async function initialize() {
   searchButton.disabled = true;
   try {
     const source = await getJson(new URL('./config.json', import.meta.url).href);
-    try { roster = await getJson(new URL('./athletes.json', import.meta.url).href); }
+    try { roster = await getJson(new URL('./athletes.json', import.meta.url).href);
+      rosterFingerprint = JSON.stringify([roster.athletes, roster.published_competitions, roster.loaded_competition_ids, roster.errors]); }
     catch (error) { roster = { athletes: [], loaded_competition_ids: [] }; setStatus(`Athlete data is unavailable: ${error.message}`); }
     // Only published competition data is exposed; newly saved settings wait for a successful scrape.
     const legacyPublished = [...new Map((roster.athletes || []).filter(a=>a.competition_id && a.competition_name).map(a=>[String(a.competition_id), {id:String(a.competition_id),name:a.competition_name,date:a.date||''}])).values()];
@@ -296,3 +306,56 @@ async function initialize() {
 }
 updateActiveCount([]);
 initialize();
+
+// Background GitHub Actions updates athletes.json; a long-lived browser tab must
+// reload that published snapshot independently of the Python scrape interval.
+// This never triggers a scrape, changes admin settings, or edits saved selections.
+async function checkPublishedRoster() {
+  if (refreshInFlight || document.visibilityState === 'hidden') return;
+  refreshInFlight = true;
+  try {
+    const next = await getJson(new URL('./athletes.json', import.meta.url).href);
+    if (!Array.isArray(next.athletes)) throw new Error('Invalid athlete dataset');
+    // updated_at changes on every successful scrape, even if no match changed.
+    // Compare actual published data to avoid flickering the list unnecessarily.
+    const nextFingerprint = JSON.stringify([next.athletes, next.published_competitions, next.loaded_competition_ids, next.errors]);
+    if (nextFingerprint === rosterFingerprint) return;
+    roster = next;
+    rosterFingerprint = nextFingerprint;
+    const legacyPublished = [...new Map((roster.athletes || []).filter(a => a.competition_id && a.competition_name)
+      .map(a => [String(a.competition_id), { id: String(a.competition_id), name: a.competition_name, date: a.date || '' }])).values()];
+    competitions = (roster.published_competitions || legacyPublished).map(c => ({ ...c, id: String(c.id) }))
+      .filter(c => c.id && c.name)
+      .sort((a,b) => String(a.date || '').localeCompare(String(b.date || '')) || a.name.localeCompare(b.name));
+    showOptions(); updateLabel(); updateAcademies();
+    if (hasRenderedSearch && chosen.size && chosenAcademies.size) {
+      // Keep the user's position in the independent COMPS scroll container.
+      const scrollNodes = [];
+      for (let node = rows.parentElement; node; node = node.parentElement) {
+        if (node.scrollHeight > node.clientHeight && node.clientHeight > 0) {
+          scrollNodes.push([node, node.scrollTop, node.scrollLeft]);
+        }
+      }
+      const pageScrollX = window.scrollX;
+      const pageScrollY = window.scrollY;
+      applySearch({ persist: false });
+      requestAnimationFrame(() => {
+        for (const [node, top, left] of scrollNodes) {
+          node.scrollTop = top;
+          node.scrollLeft = left;
+        }
+        window.scrollTo(pageScrollX, pageScrollY);
+      });
+    }
+  } catch (error) {
+    // Keep the last good dataset and existing results during network failures.
+    console.warn('COMPS published roster refresh unavailable:', error);
+  } finally {
+    refreshInFlight = false;
+  }
+}
+setInterval(checkPublishedRoster, ROSTER_POLL_MS);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') checkPublishedRoster();
+});
+window.addEventListener('focus', checkPublishedRoster);
