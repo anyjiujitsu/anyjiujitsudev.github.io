@@ -31,7 +31,12 @@
     .boston-gym-picker { max-width:none; }
     .boston-gym-menu { width:min(480px,90vw); }
     /* Academies picker: search stays visible while the list scrolls. */
-    .boston-academy-search-wrap { position:sticky; top:0; z-index:2; display:flex; align-items:center; gap:6px; padding:6px 5px 9px; background:var(--bg); }
+    .boston-academy-search-wrap { display:flex; align-items:center; gap:6px; padding:6px 5px 9px; background:var(--bg); flex:0 0 auto; }
+    /* Keep headings and search fields fixed. Only the checkbox list scrolls.
+       This prevents list text bleeding above the search field on iOS Safari. */
+    .boston-gym-menu:not([hidden]) { display:flex; flex-direction:column; overflow:hidden; }
+    .boston-gym-menu > .boston-menu-actions { flex:0 0 auto; }
+    #academyOptions, #athleteOptions { flex:1 1 auto; min-height:0; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
     .boston-academy-search { box-sizing:border-box; width:100%; min-width:0; height:36px; padding:7px 12px; border:1px solid #aeb8ad; border-radius:18px; outline:none; background:#fff; color:#202821; font:inherit; font-size:16px; }
     .boston-academy-search:focus { border-color:var(--green); box-shadow:0 0 0 2px rgba(39,86,60,.13); }
     .boston-academy-search-clear { flex:0 0 28px; height:28px; border:0; border-radius:50%; background:#e7ece7; color:#202821; font:inherit; font-size:20px; line-height:1; cursor:pointer; }

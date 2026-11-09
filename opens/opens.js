@@ -195,7 +195,7 @@ $('clearAcademies').addEventListener('click', () => { chosenAcademies.clear(); u
 academySearchInput.addEventListener('input', () => {
   syncAcademySearchClear();
   renderAcademyOptions();
-  academyMenu.scrollTop = 0;
+  academyOptions.scrollTop = 0;
   requestAnimationFrame(fitAcademyMenu);
 });
 academySearchInput.addEventListener('keydown', e => {
@@ -206,7 +206,7 @@ academySearchClear.addEventListener('click', () => {
   academySearchInput.value = '';
   syncAcademySearchClear();
   renderAcademyOptions();
-  academyMenu.scrollTop = 0;
+  academyOptions.scrollTop = 0;
   academySearchInput.focus({ preventScroll: true });
 });
 window.visualViewport?.addEventListener('resize', () => requestAnimationFrame(fitAcademyMenu));
@@ -281,10 +281,10 @@ function renderAthleteOptions(available = eligibleAthletes()) {
     more.className = 'boston-options-more';
     more.textContent = `Show more athletes (${maxRows} of ${matching.length})`;
     more.addEventListener('click', () => {
-      const previousScroll = athleteMenu.scrollTop;
+      const previousScroll = athleteOptions.scrollTop;
       athleteVisibleLimit += 150;
       renderAthleteOptions(available);
-      athleteMenu.scrollTop = previousScroll;
+      athleteOptions.scrollTop = previousScroll;
     });
     fragment.append(more);
   }
@@ -331,7 +331,7 @@ athleteSearchInput.addEventListener('input', () => {
   athleteVisibleLimit = 150;
   syncAthleteSearchClear();
   renderAthleteOptions();
-  athleteMenu.scrollTop = 0;
+  athleteOptions.scrollTop = 0;
   requestAnimationFrame(fitAthleteMenu);
 });
 athleteSearchInput.addEventListener('keydown', e => {
@@ -342,7 +342,7 @@ athleteSearchClear.addEventListener('click', () => {
   athleteSearchInput.value = '';
   syncAthleteSearchClear();
   renderAthleteOptions();
-  athleteMenu.scrollTop = 0;
+  athleteOptions.scrollTop = 0;
   athleteSearchInput.focus({ preventScroll: true });
 });
 window.visualViewport?.addEventListener('resize', () => requestAnimationFrame(fitAthleteMenu));
