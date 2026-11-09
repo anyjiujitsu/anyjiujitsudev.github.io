@@ -94,25 +94,26 @@ export function setViewUI(view, { $, onIndexViewOpen, fromNativeScroll = false }
   setView(view);
   if(view === "comps" && !window.__compsModuleStarted){
     window.__compsModuleStarted = true;
-    const academyToggle = document.getElementById("academyToggle");
-    const academyMenu = document.getElementById("academyMenu");
-    if(academyToggle && academyMenu && !academyToggle.dataset.embeddedPositionWired){
-      academyToggle.dataset.embeddedPositionWired = "true";
+    for (const prefix of ["academy", "athlete"]) {
+      const pickerToggle = document.getElementById(`${prefix}Toggle`);
+      const pickerMenu = document.getElementById(`${prefix}Menu`);
+      if (!pickerToggle || !pickerMenu || pickerToggle.dataset.embeddedPositionWired) continue;
+      pickerToggle.dataset.embeddedPositionWired = "true";
       const position = () => {
-        if(window.innerWidth > 680 || academyMenu.hidden) return;
+        if (window.innerWidth > 680 || pickerMenu.hidden) return;
         const vp = window.visualViewport;
-        academyMenu.style.left = `${(vp?.offsetLeft || 0) + 8}px`;
-        academyMenu.style.right = "auto";
-        academyMenu.style.width = `${Math.max(200, (vp?.width || window.innerWidth) - 16)}px`;
-        academyMenu.style.top = `${academyToggle.getBoundingClientRect().bottom + 7}px`;
+        pickerMenu.style.left = `${(vp?.offsetLeft || 0) + 8}px`;
+        pickerMenu.style.right = "auto";
+        pickerMenu.style.width = `${Math.max(200, (vp?.width || window.innerWidth) - 16)}px`;
+        pickerMenu.style.top = `${pickerToggle.getBoundingClientRect().bottom + 7}px`;
       };
-      academyToggle.addEventListener("click", () => requestAnimationFrame(position));
+      pickerToggle.addEventListener("click", () => requestAnimationFrame(position));
       window.addEventListener("resize", position);
       window.addEventListener("scroll", position, {passive:true});
       window.visualViewport?.addEventListener("resize", position);
       window.visualViewport?.addEventListener("scroll", position);
     }
-    import("../../../opens/opens.js?v=academy-live-results-1").catch(error => {
+    import("../../../opens/opens.js?v=athlete-live-results-1").catch(error => {
       window.__compsModuleStarted = false;
       const status = document.getElementById("bostonStatus");
       if(status) status.textContent = `Could not load COMPS: ${error.message}`;
