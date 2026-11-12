@@ -359,7 +359,7 @@ function appendCell(parent, text, cls = '') { const span = document.createElemen
 function appendBracketCell(parent, bracketText, resultText = '') {
   const text = String(bracketText || '').trim();
   const parts = text.split(/\s*\/\s*/).map(part => part.trim());
-  const colors = { white: '#e5e3de', blue: '#647e9a', purple: '#877790', brown: '#886f60', black: '#3e403f', gray: '#8d908e', grey: '#8d908e', yellow: '#c0ae7c', orange: '#b68a68', green: '#6f8878' };
+  const colors = { white: '#dfd8c9', blue: '#647e9a', purple: '#877790', brown: '#886f60', black: '#3e403f', gray: '#8d908e', grey: '#8d908e', yellow: '#c0ae7c', orange: '#b68a68', green: '#6f8878' };
   const color = (parts[0] || '').toLowerCase();
   const cell = document.createElement('span');
   cell.className = 'boston-bracket';
