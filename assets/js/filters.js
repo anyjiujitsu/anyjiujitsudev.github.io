@@ -67,16 +67,17 @@ function extractNewEventsToken(q){
 function weekendDatesForCurrentWeek(){
   const now = new Date();
   const mon = startOfWeekMonday(now);
+  const fri = new Date(mon); fri.setDate(mon.getDate() + 4);
   const sat = new Date(mon); sat.setDate(mon.getDate() + 5);
   const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
-  return { sat, sun };
+  return { fri, sat, sun };
 }
 
 function isRowThisWeekend(row){
   const d = row?._date || parseEventDate(row?.DATE);
   if(!d) return false;
-  const { sat, sun } = weekendDatesForCurrentWeek();
-  return sameYMD(d, sat) || sameYMD(d, sun);
+  const { fri, sat, sun } = weekendDatesForCurrentWeek();
+  return sameYMD(d, fri) ||sameYMD(d, sat) || sameYMD(d, sun);
 }
 
 
@@ -84,16 +85,17 @@ function isRowThisWeekend(row){
 function weekendDatesForNextWeek(){
   const now = new Date();
   const mon = startOfWeekMonday(now);
+  const fri = new Date(mon); fri.setDate(mon.getDate() + 11);
   const sat = new Date(mon); sat.setDate(mon.getDate() + 12);
   const sun = new Date(mon); sun.setDate(mon.getDate() + 13);
-  return { sat, sun };
+  return { fri, sat, sun };
 }
 
 function isRowNextWeekend(row){
   const d = row?._date || parseEventDate(row?.DATE);
   if(!d) return false;
-  const { sat, sun } = weekendDatesForNextWeek();
-  return sameYMD(d, sat) || sameYMD(d, sun);
+  const { fri, sat, sun } = weekendDatesForNextWeek();
+  return sameYMD(d, fri) || sameYMD(d, sat) || sameYMD(d, sun);
 }
 
 function extractNextWeekendToken(q){
