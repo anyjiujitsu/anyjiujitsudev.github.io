@@ -305,7 +305,7 @@
 @media (min-width: 351px) and (max-width: 430px) {
   #viewComps .boston-results-head,
   #viewComps .boston-match-card .boston-results-row {
-    grid-template-columns: minmax(0,2.4fr) minmax(0,1.77fr) minmax(62px,1.12fr) minmax(0,.45fr) minmax(0,.33fr);
+    grid-template-columns: minmax(0,2.4fr) minmax(0,1.74fr) minmax(62px,1.12fr) minmax(0,.45fr) minmax(0,.36fr);
   }
 }
 
