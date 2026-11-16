@@ -19,6 +19,8 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 
+from match_timing import enrich_competitions, scheduled_at
+
 ROOT = Path(__file__).resolve().parent
 # Concurrent downloads are bounded to avoid overwhelming upstream providers.
 WORKERS = max(1, min(3, int(os.environ.get('OPENS_FETCH_WORKERS', '3'))))
@@ -329,7 +331,7 @@ def parse_header_fields(text):
     mat_match = re.search(r'\bMat\s*(?:#|No\.?\s*)?(\d+)\b', text, re.I)
     if mat_match:
         mat = mat_match.group(1)
-    when = re.search(r'\b(Sat(?:urday)?|Sun(?:day)?|Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?)\s+(\d{1,2}/\d{1,2})(?:/\d{2,4})?\s+(?:at\s+)?(\d{1,2}:\d{2}\s*[AP]M)\b', text, re.I)
+    when = re.search(r'\b(Sat(?:urday)?|Sun(?:day)?|Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?)\s+(\d{1,2}/\d{1,2}(?:/\d{2,4})?)\s+(?:at\s+)?(\d{1,2}:\d{2}\s*[AP]M)\b', text, re.I)
     if when:
         day = when.group(1)[:3].title()
         date = when.group(2)
@@ -940,7 +942,7 @@ def parse_fights(soup):
     lines = [v for v in lines if v]
     header = re.compile(r'^FIGHT\s*#?\s*(\d+)\s*:?\s*(.*)$', re.I)
     mat_re = re.compile(r'\bMat\s*(?:#|No\.?\s*)?(\d+)\b', re.I)
-    when = re.compile(r'\b(Sat(?:urday)?|Sun(?:day)?|Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?)\s+(\d{1,2}/\d{1,2})(?:/\d{2,4})?\s+(?:at\s+)?(\d{1,2}:\d{2}\s*[AP]M)\b', re.I)
+    when = re.compile(r'\b(Sat(?:urday)?|Sun(?:day)?|Mon(?:day)?|Tue(?:sday)?|Wed(?:nesday)?|Thu(?:rsday)?|Fri(?:day)?)\s+(\d{1,2}/\d{1,2}(?:/\d{2,4})?)\s+(?:at\s+)?(\d{1,2}:\d{2}\s*[AP]M)\b', re.I)
     current = None
     fallback_fights = []
     for line in lines:
@@ -1083,7 +1085,7 @@ def verified_match(row):
             or all(row.get(field) for field in ('time', 'mat', 'day')))
 
 
-def fill_assignments(athletes, bracket_entries, previous_by_identity):
+def fill_assignments(athletes, bracket_entries, previous_by_identity, competition):
     by_category = {}
     for athlete in athletes:
         parts = [x.strip() for x in athlete['bracket'].split('/')]
@@ -1129,6 +1131,9 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity):
                         row['time_type'] = 'listed fight' if fight.get('time') else 'completed result without published time'
                         row['fight_number'] = fight.get('number', '')
                         row['result'] = fight.get('result_map', {}).get(key(athlete['name']), '')
+                        start = scheduled_at(fight, competition)
+                        if start:
+                            row['scheduled_at'] = start
                         expanded.append(row)
                     completed += len(matching)
                 else:
@@ -1265,14 +1270,18 @@ def roster_from_brackets(comp):
                 if not team:
                     # Do not silently assign an incorrect academy.
                     continue
-                rows.append({
+                row = {
                     'competition_id': cid, 'competition_name': comp['name'],
                     'date': comp.get('date', ''), 'name': name, 'team': team,
                     'bracket': bracket, 'time': fight.get('time', ''),
                     'mat': fight.get('mat', ''), 'day': fight.get('day', ''),
                     'bracket_url': url, 'time_type': 'listed fight' if fight.get('time') else 'completed result without published time',
                     'fight_number': fight.get('number', ''), 'result': result,
-                })
+                }
+                start = scheduled_at(fight, comp)
+                if start:
+                    row['scheduled_at'] = start
+                rows.append(row)
     if not rows:
         raise ValueError(f'No verifiable bracket-derived athlete matches for {cid} from {checked} categories')
     # Same competitor can appear in several fights; dedupe identical fight rows only.
@@ -1304,6 +1313,7 @@ def main():
     if not competitions:
         print('No competitions configured; skipping scrape.')
         return
+    enrich_competitions(competitions, previous, get_soup)
     old = previous.get('athletes', [])
     previous_by_identity = defaultdict(list)
     for row in (old if not os.environ.get('OPENS_CANDIDATE_JSON') else []):
@@ -1320,7 +1330,7 @@ def main():
             try:
                 schedule = discover_open_class_links(
                     schedule_brackets(get_soup(f'https://www.bjjcompsystem.com/tournaments/{cid}/schedule')), cid, roster)
-                expanded, count, unmatched = fill_assignments(roster, schedule, previous_by_identity)
+                expanded, count, unmatched = fill_assignments(roster, schedule, previous_by_identity, comp)
                 result.extend(expanded)
                 print(f'  {count} explicit fight assignments; {unmatched} unmatched divisions', flush=True)
             except (requests.RequestException, ValueError) as schedule_error:

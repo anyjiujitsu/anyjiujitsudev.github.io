@@ -395,6 +395,70 @@ function appendBracketCell(parent, bracketText, resultText = '') {
   cell.append(bar, lines);
   parent.append(cell);
 }
+const COUNTDOWN_WINDOW_MS = 3 * 60 * 60 * 1000;
+const CHECK_IN_WINDOW_MS = 25 * 60 * 1000;
+
+function matchCountdown(start, now) {
+  const remaining = start - now;
+  if (remaining <= 0) return { state: 'passed', label: 'Time passed', fill: 100 };
+  if (remaining > COUNTDOWN_WINDOW_MS) return { state: 'later', label: '', fill: 8 };
+  const minutes = Math.ceil(remaining / 60000);
+  const hours = Math.floor(minutes / 60);
+  const label = hours
+    ? `In ${hours}h${minutes % 60 ? ` ${minutes % 60}m` : ''}`
+    : `In ${minutes} min`;
+  return {
+    state: remaining <= CHECK_IN_WINDOW_MS ? 'check-in' : 'upcoming',
+    label,
+    fill: Math.round(8 + 92 * (1 - remaining / COUNTDOWN_WINDOW_MS)),
+  };
+}
+
+function updateMatchCountdowns() {
+  if (document.visibilityState === 'hidden') return;
+  const now = Date.now();
+  for (const meter of rows.querySelectorAll('.boston-countdown')) {
+    const { state, label, fill } = matchCountdown(Number(meter.dataset.start), now);
+    const stateChanged = meter.dataset.state !== state;
+    if (stateChanged) meter.dataset.state = state;
+    const caption = meter.firstElementChild;
+    if (caption.textContent !== label || stateChanged) {
+      caption.textContent = label;
+      caption.hidden = !label;
+    }
+    const width = `${fill}%`;
+    if (meter.style.getPropertyValue('--countdown-fill') !== width) {
+      meter.style.setProperty('--countdown-fill', width);
+    }
+  }
+}
+
+function appendMatchTime(row, match, isFinished) {
+  const cell = document.createElement('span');
+  const time = document.createElement('span');
+  time.className = 'boston-match-time';
+  time.textContent = match.time || '—';
+  cell.append(time);
+  row.append(cell);
+
+  if (isFinished || !match.time || typeof match.scheduled_at !== 'string') return;
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(match.scheduled_at)) return;
+  const start = Date.parse(match.scheduled_at);
+  if (!Number.isFinite(start)) return;
+
+  const meter = document.createElement('span');
+  meter.className = 'boston-countdown';
+  meter.dataset.start = String(start);
+  const caption = document.createElement('span');
+  caption.className = 'boston-countdown__label';
+  caption.hidden = true;
+  const track = document.createElement('span');
+  track.className = 'boston-countdown__track';
+  track.setAttribute('aria-hidden', 'true');
+  meter.append(caption, track);
+  time.append(meter);
+}
+
 function renderAthletes(items) {
   updateActiveCount(items);
   rows.replaceChildren();
@@ -440,9 +504,11 @@ function renderAthletes(items) {
     primary.append(academy, event);
     row.append(primary);
     appendBracketCell(row, athlete.bracket || athlete.division || '—', athlete.result || '');
-    appendCell(row, athlete.time || '—'); appendCell(row, athlete.mat || '—'); appendCell(row, athlete.day || '—');
+    appendMatchTime(row, athlete, isFinished);
+    appendCell(row, athlete.mat || '—'); appendCell(row, athlete.day || '—');
     (isFinished ? finishedCard : activeCard).append(row);
   }
+  updateMatchCountdowns();
 }
 // Calendar day first, then actual clock time; missing assignments sort last.
 function dayRank(value) {
@@ -582,7 +648,11 @@ async function checkPublishedRoster() {
   }
 }
 setInterval(checkPublishedRoster, ROSTER_POLL_MS);
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') checkPublishedRoster();
-});
-window.addEventListener('focus', checkPublishedRoster);
+setInterval(updateMatchCountdowns, 1000);
+function refreshVisibleMatches() {
+  if (document.visibilityState === 'hidden') return;
+  updateMatchCountdowns();
+  checkPublishedRoster();
+}
+document.addEventListener('visibilitychange', refreshVisibleMatches);
+window.addEventListener('focus', refreshVisibleMatches);
