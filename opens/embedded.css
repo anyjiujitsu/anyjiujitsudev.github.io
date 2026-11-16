@@ -301,6 +301,13 @@
     width: calc(8px + (100% - 40px) * 2.4 / 6.07 + 3px);
   }
 }
+/* Give BRACKET more room at phone widths that can spare the DAY inset. */
+@media (min-width: 351px) and (max-width: 430px) {
+  #viewComps .boston-results-head,
+  #viewComps .boston-match-card .boston-results-row {
+    grid-template-columns: minmax(0,2.4fr) minmax(0,1.77fr) minmax(62px,1.12fr) minmax(0,.45fr) minmax(0,.33fr);
+  }
+}
 
 /* Integrated COMPS filter parity with EVENTS and INDEX.
    Visual styling only; preserve existing sizing, controls and standalone /opens/. */
