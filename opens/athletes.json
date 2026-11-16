@@ -41,13 +41,14 @@
       "name": "Joonhyuk Jang",
       "team": "Dominant Jiu-Jitsu",
       "bracket": "Black / Adult / Male / Rooster",
-      "time": "10:12 AM",
+      "time": "02:26 PM",
       "mat": "1",
-      "day": "Sat",
+      "day": "Mon",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3364/categories/2958629",
       "time_type": "listed fight",
       "fight_number": "4",
-      "result": ""
+      "result": "",
+      "scheduled_at": "2026-11-16T19:26:00Z"
     },
     {
       "competition_id": "3364",
@@ -56,13 +57,14 @@
       "name": "Kauan Souza dos Santos",
       "team": "Campeão United Jiu-Jitsu",
       "bracket": "Black / Adult / Male / Rooster",
-      "time": "10:12 AM",
+      "time": "02:26 PM",
       "mat": "1",
-      "day": "Sat",
+      "day": "Mon",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3364/categories/2958629",
       "time_type": "listed fight",
       "fight_number": "4",
-      "result": ""
+      "result": "",
+      "scheduled_at": "2026-11-16T19:26:00Z"
     },
     {
       "competition_id": "3364",
@@ -86,13 +88,14 @@
       "name": "Cory Michael Walker",
       "team": "Lloyd Irvin Martial Arts",
       "bracket": "Black / Adult / Male / Rooster",
-      "time": "10:08 AM",
+      "time": "01:54 PM",
       "mat": "1",
-      "day": "Sat",
+      "day": "Mon",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3364/categories/2958629",
       "time_type": "listed fight",
       "fight_number": "2",
-      "result": ""
+      "result": "",
+      "scheduled_at": "2026-11-16T18:54:00Z"
     },
     {
       "competition_id": "3364",
@@ -15371,13 +15374,14 @@
       "name": "Shawn Monroe Henderson",
       "team": "A-Force Brazilian Jiu-Jitsu",
       "bracket": "Blue / Master 5 / Male / Medium Heavy",
-      "time": "03:32 PM",
+      "time": "04:47 PM",
       "mat": "4",
-      "day": "Sat",
+      "day": "Mon",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3364/categories/2959076",
       "time_type": "listed fight",
       "fight_number": "50",
-      "result": "WIN"
+      "result": "",
+      "scheduled_at": "2026-11-16T21:47:00Z"
     },
     {
       "competition_id": "3364",
@@ -20981,13 +20985,14 @@
       "name": "Eva Marie Bill",
       "team": "ZR Team California",
       "bracket": "Blue / Master 2 / Female / Open Class",
-      "time": "07:13 PM",
+      "time": "08:02 AM",
       "mat": "2",
-      "day": "Sat",
+      "day": "Tue",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3364/categories/2959368",
       "time_type": "listed fight",
       "fight_number": "83",
-      "result": "WIN"
+      "result": "",
+      "scheduled_at": "2026-11-17T13:02:00Z"
     },
     {
       "competition_id": "3364",
