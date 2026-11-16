@@ -400,7 +400,7 @@ const CHECK_IN_WINDOW_MS = 25 * 60 * 1000;
 
 function matchCountdown(start, now) {
   const remaining = start - now;
-  if (remaining <= 0) return { state: 'passed', label: 'Time passed', fill: 100 };
+  if (remaining <= 0) return { state: 'passed', label: '', fill: 100 };
   if (remaining > COUNTDOWN_WINDOW_MS) return { state: 'later', label: '', fill: 8 };
   const minutes = Math.ceil(remaining / 60000);
   const hours = Math.floor(minutes / 60);
