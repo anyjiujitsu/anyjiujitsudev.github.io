@@ -726,8 +726,84 @@ def audit_advancement_markup(soup, fights, url):
                         print(f'    EDGE AUDIT NEXT from={num} to={downstream} person={nm!r} attrs={str(attrs)[:500]}', flush=True)
 
 
+def _walkover_feeder(fights_by_number, number, reference):
+    """Resolve a slot's fight reference only when it identifies one card."""
+    mat = parse_header_fields(reference)['mat']
+    matches = fights_by_number.get(number, [])
+    if mat:
+        matches = [(fight, block) for fight, block in matches if fight['mat'] == mat]
+    return matches[0] if len(matches) == 1 else (None, None)
+
+
+def _double_no_show(fight, block):
+    losses = fight['result_map']
+    if len(losses) != 2 or any(result != 'LOSS' for result in losses.values()):
+        return False
+    slots = block.select('.match-card__competitor')
+    return len(slots) == 2 and all(
+        slot.select_one('.match-card__competitor-name')
+        and slot.select_one('.match-card__disqualification.no-show')
+        for slot in slots
+    )
+
+
+def _single_eliminated_feeder(feeder, block, final, fights_by_number):
+    """Check the only named entrant and verify that the other slot cannot advance."""
+    slots = block.select('.match-card__competitor')
+    named = [slot for slot in slots if slot.select_one('.match-card__competitor-name')]
+    people = [c for c in feeder['competitors'] if not c['placeholder'] and not c['bye']]
+    if len(slots) > 2 or len(named) != 1 or len(people) != 1:
+        return False
+    person = people[0]
+    if feeder['result_map'].get(key(person['name'])) == 'WIN':
+        return False
+    if not (person['loser'] or named[0].select_one('.match-card__disqualification')):
+        return False
+    if len(slots) == 1:
+        return True
+
+    other = next(slot for slot in slots if slot is not named[0])
+    child = other.select_one('.match-card__child-where')
+    reference = clean(child.get_text(' ', strip=True) if child else other.get_text(' ', strip=True))
+    if key(reference) in ('', '-', 'bye'):
+        # A blank with an undisplayed feeder reference is still unresolved.
+        return _explicit_source_fight(other) is None
+
+    winner_number = _fight_source_reference(reference)
+    loser_reference = re.fullmatch(
+        r'(?:Defeated|Loser)\s+of\s+Fight\s*#?\s*(\d+)(?:\s*,\s*Mat\s*#?\s*\d+)?',
+        reference, re.I
+    )
+    if winner_number is None and not loser_reference:
+        return False
+    number = winner_number if winner_number is not None else int(loser_reference.group(1))
+    source, source_block = _walkover_feeder(fights_by_number, number, reference)
+    if source is None or source is feeder or source is final:
+        return False
+    if winner_number is not None:
+        return _double_no_show(source, source_block)
+
+    # A loss normally supplies an entrant to a "Defeated of" slot. Only a
+    # disqualification rules that athlete out of this feeder.
+    results = source['result_map']
+    source_slots = source_block.select('.match-card__competitor')
+    if len(source_slots) != 2 or len(results) != 2:
+        return False
+    for slot in source_slots:
+        name_node = slot.select_one('.match-card__competitor-name')
+        if name_node is None:
+            return False
+        name = normalize_competitor_name(name_node.get_text(' ', strip=True))
+        result = results.get(key(name))
+        if result == 'WIN':
+            continue
+        if result != 'LOSS' or not slot.select_one('.match-card__disqualification'):
+            return False
+    return 'LOSS' in results.values()
+
+
 def infer_final_walkovers(evidence_records):
-    """Resolve scheduled finals whose explicitly linked feeder had two no-shows."""
+    """Resolve scheduled finals when the linked feeder cannot supply an opponent."""
     fights_by_number = defaultdict(list)
     for fight, block, _ in evidence_records:
         if fight['number']:
@@ -749,27 +825,17 @@ def infer_final_walkovers(evidence_records):
         if not opponent['placeholder']:
             continue
         feeder_number = _fight_source_reference(opponent['name'])
-        feeder_mat = parse_header_fields(opponent['name'])['mat']
-        feeders = fights_by_number.get(feeder_number, [])
-        if feeder_mat:
-            feeders = [(fight, block) for fight, block in feeders if fight['mat'] == feeder_mat]
-        if len(feeders) != 1:
+        feeder, feeder_block = _walkover_feeder(fights_by_number, feeder_number, opponent['name'])
+        if feeder is None or feeder is final:
             continue
-
-        feeder, feeder_block = feeders[0]
-        losses = feeder['result_map']
-        if len(losses) != 2 or any(result != 'LOSS' for result in losses.values()):
-            continue
-        # Check the explicit no-show marker on each actual feeder slot.
-        slots = feeder_block.select('.match-card__competitor')
-        if len(slots) != 2 or not all(
-            slot.select_one('.match-card__competitor-name')
-            and slot.select_one('.match-card__disqualification.no-show')
-            for slot in slots
-        ):
+        if _double_no_show(feeder, feeder_block):
+            result_source = 'double-no-show-feeder'
+        elif _single_eliminated_feeder(feeder, feeder_block, final, fights_by_number):
+            result_source = 'single-eliminated-feeder'
+        else:
             continue
         final['result_map'][key(finalist['name'])] = 'WIN'
-        final['result_source'] = 'double-no-show-feeder'
+        final['result_source'] = result_source
 
 
 def parse_fights(soup):
