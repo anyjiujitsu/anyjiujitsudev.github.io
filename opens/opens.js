@@ -355,45 +355,6 @@ async function getJson(path) {
   return response.json();
 }
 function appendCell(parent, text, cls = '') { const span = document.createElement('span'); span.className = cls; span.textContent = text || '—'; parent.append(span); }
-function shortDayLabel(value) {
-  const key = normalized(value).replace(/[^a-z]/g, '');
-  const map = {
-    mo: 'MO', mon: 'MO', monday: 'MO',
-    tu: 'TU', tue: 'TU', tues: 'TU', tuesday: 'TU',
-    we: 'WE', wed: 'WE', weds: 'WE', wednesday: 'WE',
-    th: 'TH', thu: 'TH', thur: 'TH', thurs: 'TH', thursday: 'TH',
-    fr: 'FR', fri: 'FR', friday: 'FR',
-    sa: 'SA', sat: 'SA', saturday: 'SA',
-    su: 'SU', sun: 'SU', sunday: 'SU',
-  };
-  if (map[key]) return map[key];
-  const letters = String(value || '').replace(/[^A-Za-z]/g, '').toUpperCase();
-  return letters ? letters.slice(0, 2) : '—';
-}
-function appendDayCell(parent, text) {
-  const cell = document.createElement('span');
-  cell.className = 'boston-day-cell';
-  const full = String(text || '').trim();
-  const label = shortDayLabel(full);
-  if (!full || full === '—' || label === '—') {
-    cell.textContent = '—';
-    parent.append(cell);
-    return;
-  }
-  const badge = document.createElement('span');
-  badge.className = 'boston-day-badge';
-  badge.title = full;
-  badge.setAttribute('aria-label', full);
-  const tabs = document.createElement('span');
-  tabs.className = 'boston-day-badge__tabs';
-  tabs.setAttribute('aria-hidden', 'true');
-  const textNode = document.createElement('span');
-  textNode.className = 'boston-day-badge__text';
-  textNode.textContent = label;
-  badge.append(tabs, textNode);
-  cell.append(badge);
-  parent.append(cell);
-}
 // Display IBJJF divisions with a muted belt-color bar spanning age, gender, and weight.
 function appendBracketCell(parent, bracketText, resultText = '') {
   const text = String(bracketText || '').trim();
@@ -544,7 +505,7 @@ function renderAthletes(items) {
     row.append(primary);
     appendBracketCell(row, athlete.bracket || athlete.division || '—', athlete.result || '');
     appendMatchTime(row, athlete, isFinished);
-    appendCell(row, athlete.mat || '—'); appendDayCell(row, athlete.day || '—');
+    appendCell(row, athlete.mat || '—'); appendCell(row, athlete.day || '—');
     (isFinished ? finishedCard : activeCard).append(row);
   }
   updateMatchCountdowns();

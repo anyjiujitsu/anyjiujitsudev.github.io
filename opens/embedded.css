@@ -348,7 +348,7 @@
 }
 
 
-/* Integrated COMPS typography parity + calendar day badge */
+/* Integrated COMPS typography parity. */
 @media (max-width: 520px) {
   #viewComps {
     --rowFont: 8px;
@@ -362,68 +362,4 @@
 #viewComps .boston-match-time,
 #viewComps .boston-match-card .boston-results-row > :nth-child(4) {
   font-weight: 800;
-}
-
-#viewComps .boston-day-cell {
-  display: inline-flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  min-width: 0;
-}
-
-#viewComps .boston-day-badge {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.45em;
-  height: 2.45em;
-  min-width: 22px;
-  border-radius: .48em;
-  background: color-mix(in srgb, var(--row) 72%, white 28%);
-  box-shadow: inset 0 0 0 1px rgba(0,0,0,.10);
-  overflow: hidden;
-  line-height: 1;
-}
-
-#viewComps .boston-day-badge::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: .72em;
-  height: .72em;
-  background: linear-gradient(135deg, rgba(0,0,0,.08) 0 50%, transparent 50% 100%);
-}
-
-#viewComps .boston-day-badge__tabs {
-  position: absolute;
-  inset: 0 0 auto;
-  height: .82em;
-  background: color-mix(in srgb, var(--icon) 22%, #b9bfbb 78%);
-}
-
-#viewComps .boston-day-badge__tabs::before,
-#viewComps .boston-day-badge__tabs::after {
-  content: '';
-  position: absolute;
-  top: -.23em;
-  width: .34em;
-  height: .48em;
-  border-radius: .18em;
-  background: color-mix(in srgb, var(--icon) 55%, black 45%);
-}
-
-#viewComps .boston-day-badge__tabs::before { left: .43em; }
-#viewComps .boston-day-badge__tabs::after { right: .43em; }
-
-#viewComps .boston-day-badge__text {
-  position: relative;
-  z-index: 1;
-  display: block;
-  padding-top: .36em;
-  font-size: inherit;
-  font-weight: 800;
-  letter-spacing: -.03em;
-  text-transform: uppercase;
 }
