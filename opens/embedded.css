@@ -231,26 +231,7 @@
 #viewComps .boston-results-head > :first-child { transform: none; }
 #viewComps #athleteRows > .boston-match-card:first-child { margin-top: 0; }
 
-#viewComps .boston-results-row > :first-child > a,
-#viewComps .boston-results-row .boston-match-time,
-#viewComps .boston-results-row > :nth-child(4) {
-  font-weight: 700;
-}
-#viewComps .boston-results-row .boston-countdown__label {
-  font-weight: 400;
-}
-
-/* Match the GYMS cardbody type size at the same mobile breakpoint. */
-@media (max-width: 520px) {
-  #viewComps .boston-match-card .boston-results-row {
-    font-size: 8px;
-  }
-  #viewComps .boston-results-row small {
-    font-size: inherit;
-  }
-}
-
-/* Compact card spacing for narrow phones. */
+/* Match the existing mobile cardbody density, not the standalone OPENS sizes. */
 @media (max-width: 430px) {
   #viewComps .boston-results { margin-top: 6px; }
   #viewComps .boston-results-head {
@@ -262,8 +243,10 @@
   #viewComps .boston-match-card .boston-results-row {
     padding: 6px 8px;
     gap: 6px;
+    font-size: var(--rowFont);
     grid-template-columns: minmax(0,2fr) minmax(0,2fr) minmax(62px,1.12fr) minmax(0,.45fr) minmax(0,.5fr);
   }
+  #viewComps .boston-results-row small { font-size: calc(var(--rowFont) - 2px); }
   #viewComps .boston-results-head {
     grid-template-columns: minmax(0,2fr) minmax(0,2fr) minmax(62px,1.12fr) minmax(0,.45fr) minmax(0,.5fr);
     gap: 6px;
@@ -280,42 +263,8 @@
   grid-template-columns: minmax(0,2.5fr) minmax(0,2.01fr) minmax(76px,1.05fr) minmax(0,.55fr) minmax(0,.34fr);
   gap: 10px;
 }
-/* Reuse the card icon gray and keep the calendar artwork out of the grid sizing. */
 #viewComps .boston-match-card .boston-results-row > :last-child {
-  --day-calendar-header: color-mix(in srgb, var(--muted) 65%, var(--row));
-  --day-calendar-tab: color-mix(in srgb, var(--muted) 95%, var(--row));
-  --day-calendar-paper: color-mix(in srgb, #fff 75%, var(--row));
-  --day-calendar-fold: color-mix(in srgb, var(--muted) 30%, var(--row));
-  justify-self: start;
   white-space: nowrap;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-#viewComps .boston-match-card .boston-results-row > :last-child::before,
-#viewComps .boston-match-card .boston-results-row > :last-child::after {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-}
-#viewComps .boston-match-card .boston-results-row > :last-child::before {
-  inset: -4px -2px -2px;
-  z-index: -1;
-  border-radius: 2px;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 3px), calc(100% - 3px) 100%, 0 100%);
-  background:
-    linear-gradient(135deg, var(--day-calendar-fold) 50%, transparent 50%) right bottom / 3px 3px no-repeat,
-    linear-gradient(to bottom, var(--day-calendar-header) 4px, var(--day-calendar-paper) 4px);
-}
-#viewComps .boston-match-card .boston-results-row > :last-child::after {
-  inset: -6px 18% auto;
-  height: 5px;
-  background:
-    radial-gradient(ellipse closest-side, var(--day-calendar-tab) 80%, transparent 100%) left center / 2px 5px no-repeat,
-    radial-gradient(ellipse closest-side, var(--day-calendar-tab) 80%, transparent 100%) right center / 2px 5px no-repeat;
-}
-#viewComps .boston-match-card .boston-results-row.is-finished > :last-child::before,
-#viewComps .boston-match-card .boston-results-row.is-finished > :last-child::after {
-  opacity: .55;
 }
 #viewComps .boston-results-head {
   padding-inline: 12px;
@@ -396,4 +345,85 @@
   font-size: var(--pillFont);
   font-weight: 600;
   color: rgba(0,0,0,.55);
+}
+
+
+/* Integrated COMPS typography parity + calendar day badge */
+@media (max-width: 520px) {
+  #viewComps {
+    --rowFont: 8px;
+  }
+  #viewComps .boston-match-card .boston-results-row {
+    font-size: var(--rowFont);
+  }
+}
+
+#viewComps .boston-match-card .boston-results-row > :first-child > a,
+#viewComps .boston-match-time,
+#viewComps .boston-match-card .boston-results-row > :nth-child(4) {
+  font-weight: 800;
+}
+
+#viewComps .boston-day-cell {
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-width: 0;
+}
+
+#viewComps .boston-day-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.45em;
+  height: 2.45em;
+  min-width: 22px;
+  border-radius: .48em;
+  background: color-mix(in srgb, var(--row) 72%, white 28%);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.10);
+  overflow: hidden;
+  line-height: 1;
+}
+
+#viewComps .boston-day-badge::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: .72em;
+  height: .72em;
+  background: linear-gradient(135deg, rgba(0,0,0,.08) 0 50%, transparent 50% 100%);
+}
+
+#viewComps .boston-day-badge__tabs {
+  position: absolute;
+  inset: 0 0 auto;
+  height: .82em;
+  background: color-mix(in srgb, var(--icon) 22%, #b9bfbb 78%);
+}
+
+#viewComps .boston-day-badge__tabs::before,
+#viewComps .boston-day-badge__tabs::after {
+  content: '';
+  position: absolute;
+  top: -.23em;
+  width: .34em;
+  height: .48em;
+  border-radius: .18em;
+  background: color-mix(in srgb, var(--icon) 55%, black 45%);
+}
+
+#viewComps .boston-day-badge__tabs::before { left: .43em; }
+#viewComps .boston-day-badge__tabs::after { right: .43em; }
+
+#viewComps .boston-day-badge__text {
+  position: relative;
+  z-index: 1;
+  display: block;
+  padding-top: .36em;
+  font-size: inherit;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  text-transform: uppercase;
 }
