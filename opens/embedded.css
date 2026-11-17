@@ -280,28 +280,42 @@
   grid-template-columns: minmax(0,2.5fr) minmax(0,2.01fr) minmax(76px,1.05fr) minmax(0,.55fr) minmax(0,.34fr);
   gap: 10px;
 }
-/* Draw the day calendar around the existing text without resizing the grid. */
+/* Reuse the card icon gray and keep the calendar artwork out of the grid sizing. */
 #viewComps .boston-match-card .boston-results-row > :last-child {
+  --day-calendar-header: color-mix(in srgb, var(--muted) 65%, var(--row));
+  --day-calendar-tab: color-mix(in srgb, var(--muted) 95%, var(--row));
+  --day-calendar-paper: color-mix(in srgb, #fff 75%, var(--row));
+  --day-calendar-fold: color-mix(in srgb, var(--muted) 30%, var(--row));
   justify-self: start;
   white-space: nowrap;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 #viewComps .boston-match-card .boston-results-row > :last-child::before,
 #viewComps .boston-match-card .boston-results-row > :last-child::after {
   content: "";
   position: absolute;
   pointer-events: none;
-  opacity: .55;
 }
 #viewComps .boston-match-card .boston-results-row > :last-child::before {
-  inset: -2px -2px -1px;
-  border: 1px solid currentColor;
+  inset: -4px -2px -2px;
+  z-index: -1;
   border-radius: 2px;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 3px), calc(100% - 3px) 100%, 0 100%);
+  background:
+    linear-gradient(135deg, var(--day-calendar-fold) 50%, transparent 50%) right bottom / 3px 3px no-repeat,
+    linear-gradient(to bottom, var(--day-calendar-header) 4px, var(--day-calendar-paper) 4px);
 }
 #viewComps .boston-match-card .boston-results-row > :last-child::after {
-  top: -3px;
-  inset-inline: 23%;
-  height: 3px;
-  border-inline: 1px solid currentColor;
+  inset: -6px 18% auto;
+  height: 5px;
+  background:
+    radial-gradient(ellipse closest-side, var(--day-calendar-tab) 80%, transparent 100%) left center / 2px 5px no-repeat,
+    radial-gradient(ellipse closest-side, var(--day-calendar-tab) 80%, transparent 100%) right center / 2px 5px no-repeat;
+}
+#viewComps .boston-match-card .boston-results-row.is-finished > :last-child::before,
+#viewComps .boston-match-card .boston-results-row.is-finished > :last-child::after {
+  opacity: .55;
 }
 #viewComps .boston-results-head {
   padding-inline: 12px;
