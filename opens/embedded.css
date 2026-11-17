@@ -383,12 +383,15 @@
 }
 
 
-/* Shift TIME and MAT 3px left as one unit, preserving the DAY alignment. */
+/* Maintain TIME exactly where it is; bring MAT 3px further left.
+   The DAY column and grid geometry are untouched. */
 #viewComps .boston-results-head > :nth-child(3),
-#viewComps .boston-results-head > :nth-child(4),
-#viewComps .boston-match-card .boston-results-row > :nth-child(3),
-#viewComps .boston-match-card .boston-results-row > :nth-child(4) {
+#viewComps .boston-match-card .boston-results-row > :nth-child(3) {
   transform: translateX(-3px);
+}
+#viewComps .boston-results-head > :nth-child(4),
+#viewComps .boston-match-card .boston-results-row > :nth-child(4) {
+  transform: translateX(-6px);
 }
 
 

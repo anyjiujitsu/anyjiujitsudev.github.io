@@ -447,7 +447,12 @@ function appendMatchTime(row, match, isFinished) {
   const cell = document.createElement('span');
   const time = document.createElement('span');
   time.className = 'boston-match-time';
-  time.textContent = match.time || '—';
+  // In integrated COMPS only, show 01:00 PM as 1:00 PM.
+  // Keep the roster's original time and scheduled_at untouched for sorting and countdown.
+  const rawTime = match.time || '—';
+  time.textContent = document.getElementById('viewComps')?.contains(rows)
+    ? String(rawTime).replace(/^0(?=[1-9]:)/, '')
+    : rawTime;
   cell.append(time);
   row.append(cell);
 
