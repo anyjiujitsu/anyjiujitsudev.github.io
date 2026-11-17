@@ -231,7 +231,17 @@
 #viewComps .boston-results-head > :first-child { transform: none; }
 #viewComps #athleteRows > .boston-match-card:first-child { margin-top: 0; }
 
-/* Match the existing mobile cardbody density, not the standalone OPENS sizes. */
+/* Match the GYMS cardbody type size at the same mobile breakpoint. */
+@media (max-width: 520px) {
+  #viewComps .boston-match-card .boston-results-row {
+    font-size: 8px;
+  }
+  #viewComps .boston-results-row small {
+    font-size: inherit;
+  }
+}
+
+/* Compact card spacing for narrow phones. */
 @media (max-width: 430px) {
   #viewComps .boston-results { margin-top: 6px; }
   #viewComps .boston-results-head {
@@ -243,10 +253,8 @@
   #viewComps .boston-match-card .boston-results-row {
     padding: 6px 8px;
     gap: 6px;
-    font-size: var(--rowFont);
     grid-template-columns: minmax(0,2fr) minmax(0,2fr) minmax(62px,1.12fr) minmax(0,.45fr) minmax(0,.5fr);
   }
-  #viewComps .boston-results-row small { font-size: calc(var(--rowFont) - 2px); }
   #viewComps .boston-results-head {
     grid-template-columns: minmax(0,2fr) minmax(0,2fr) minmax(62px,1.12fr) minmax(0,.45fr) minmax(0,.5fr);
     gap: 6px;
