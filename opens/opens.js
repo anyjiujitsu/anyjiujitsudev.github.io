@@ -389,7 +389,17 @@ function appendBracketCell(parent, bracketText, resultText = '') {
   if (result) {
     const pill = document.createElement('span');
     pill.className = `boston-result-pill boston-result-pill--${result.toLowerCase()}`;
-    pill.textContent = `-${result}-`;
+    // Only the integrated COMPS card uses compact W/L/B tiles.
+    // Preserve the underlying result and standalone OPENS presentation.
+    const compactResult = { WIN: 'W', LOSS: 'L', BYE: 'B' }[result];
+    if (compactResult && document.getElementById('viewComps')?.contains(rows)) {
+      pill.classList.add('boston-result-pill--tile');
+      pill.textContent = compactResult;
+      pill.setAttribute('aria-label', result);
+      pill.title = result;
+    } else {
+      pill.textContent = `-${result}-`;
+    }
     lines.append(pill);
   }
   cell.append(bar, lines);
