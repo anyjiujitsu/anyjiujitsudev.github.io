@@ -280,8 +280,28 @@
   grid-template-columns: minmax(0,2.5fr) minmax(0,2.01fr) minmax(76px,1.05fr) minmax(0,.55fr) minmax(0,.34fr);
   gap: 10px;
 }
+/* Draw the day calendar around the existing text without resizing the grid. */
 #viewComps .boston-match-card .boston-results-row > :last-child {
+  justify-self: start;
   white-space: nowrap;
+}
+#viewComps .boston-match-card .boston-results-row > :last-child::before,
+#viewComps .boston-match-card .boston-results-row > :last-child::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  opacity: .55;
+}
+#viewComps .boston-match-card .boston-results-row > :last-child::before {
+  inset: -2px -2px -1px;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+}
+#viewComps .boston-match-card .boston-results-row > :last-child::after {
+  top: -3px;
+  inset-inline: 23%;
+  height: 3px;
+  border-inline: 1px solid currentColor;
 }
 #viewComps .boston-results-head {
   padding-inline: 12px;
