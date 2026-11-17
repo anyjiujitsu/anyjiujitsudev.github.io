@@ -231,6 +231,15 @@
 #viewComps .boston-results-head > :first-child { transform: none; }
 #viewComps #athleteRows > .boston-match-card:first-child { margin-top: 0; }
 
+#viewComps .boston-results-row > :first-child > a,
+#viewComps .boston-results-row .boston-match-time,
+#viewComps .boston-results-row > :nth-child(4) {
+  font-weight: 700;
+}
+#viewComps .boston-results-row .boston-countdown__label {
+  font-weight: 400;
+}
+
 /* Match the GYMS cardbody type size at the same mobile breakpoint. */
 @media (max-width: 520px) {
   #viewComps .boston-match-card .boston-results-row {
