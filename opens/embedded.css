@@ -348,7 +348,7 @@
 }
 
 
-/* Integrated COMPS typography parity. */
+/* Integrated COMPS typography/tile refinements */
 @media (max-width: 520px) {
   #viewComps {
     --rowFont: 8px;
@@ -359,7 +359,25 @@
 }
 
 #viewComps .boston-match-card .boston-results-row > :first-child > a,
-#viewComps .boston-match-time,
 #viewComps .boston-match-card .boston-results-row > :nth-child(4) {
   font-weight: 800;
+}
+
+#viewComps .boston-match-time {
+  font-weight: 400;
+}
+
+#viewComps .boston-match-card .boston-results-row > :nth-child(4) {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.7em;
+  min-height: 1.6em;
+  padding: .12em .42em;
+  margin-top: 1px;
+  border-radius: .42em;
+  background: color-mix(in srgb, var(--row) 78%, #b5b8b5 22%);
+  box-shadow: 0 1px 2px rgba(0,0,0,.10), inset 0 0 0 1px rgba(0,0,0,.06);
+  line-height: 1;
 }
