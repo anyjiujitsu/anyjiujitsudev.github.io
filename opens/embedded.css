@@ -383,7 +383,7 @@
 }
 
 
-/* Maintain TIME exactly where it is; bring MAT 3px further left.
+/* Keep TIME and DAY fixed; MAT moved an additional 2px left (8px total).
    The DAY column and grid geometry are untouched. */
 #viewComps .boston-results-head > :nth-child(3),
 #viewComps .boston-match-card .boston-results-row > :nth-child(3) {
@@ -391,7 +391,7 @@
 }
 #viewComps .boston-results-head > :nth-child(4),
 #viewComps .boston-match-card .boston-results-row > :nth-child(4) {
-  transform: translateX(-6px);
+  transform: translateX(-8px);
 }
 
 
