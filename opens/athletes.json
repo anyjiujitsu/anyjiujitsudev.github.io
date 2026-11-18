@@ -239,13 +239,14 @@
       "name": "Rafael Venegas",
       "team": "Zenith BJJ",
       "bracket": "Blue / Adult / Male / Light Feather",
-      "time": "11:38 AM",
+      "time": "2:26 PM",
       "mat": "4",
-      "day": "Sat",
+      "day": "Wed",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3364/categories/2958631",
       "time_type": "listed fight",
       "fight_number": "16",
-      "result": "LOSS"
+      "result": ""
+     
     },
     {
       "competition_id": "3364",
@@ -404,13 +405,14 @@
       "name": "Riccardo Marano",
       "team": "Telari",
       "bracket": "Purple / Adult / Male / Light Feather",
-      "time": "12:05 PM",
+      "time": "2:26 PM",
       "mat": "3",
-      "day": "Sat",
+      "day": "Wed",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3364/categories/2958632",
       "time_type": "listed fight",
       "fight_number": "23",
-      "result": "LOSS"
+      "result": ""
+      "scheduled_at": "2026-11-18T19:26:00Z"
     },
     {
       "competition_id": "3364",
@@ -839,13 +841,14 @@
       "name": "Amishai Weismark",
       "team": "American Top Team BJJ",
       "bracket": "White / Adult / Male / Feather",
-      "time": "12:16 PM",
+      "time": "2:26 PM",
       "mat": "2",
-      "day": "Sun",
+      "day": "Wed",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3364/categories/2958635",
       "time_type": "listed fight",
       "fight_number": "9",
-      "result": "WIN"
+      "result": ""
+      "scheduled_at": "2026-11-18T19:26:00Z"
     },
     {
       "competition_id": "3364",
