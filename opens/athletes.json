@@ -41,14 +41,14 @@
       "name": "Joonhyuk Jang",
       "team": "Dominant Jiu-Jitsu",
       "bracket": "Black / Adult / Male / Rooster",
-      "time": "09:26 AM",
+      "time": "02:30 PM",
       "mat": "1",
       "day": "Wed",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3364/categories/2958629",
       "time_type": "listed fight",
       "fight_number": "4",
       "result": "",
-      "scheduled_at": "2026-11-18T14:26:00Z"
+      "scheduled_at": "2026-11-18T19:30:00Z"
     },
     {
       "competition_id": "3364",
@@ -57,14 +57,14 @@
       "name": "Kauan Souza dos Santos",
       "team": "Campeão United Jiu-Jitsu",
       "bracket": "Black / Adult / Male / Rooster",
-      "time": "02:26 PM",
+      "time": "06:54 PM",
       "mat": "1",
       "day": "Wed",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3364/categories/2958629",
       "time_type": "listed fight",
       "fight_number": "4",
       "result": "",
-      "scheduled_at": "2026-11-18T17:26:00Z"
+      "scheduled_at": "2026-11-18T23:54:00Z"
     },
     {
       "competition_id": "3364",
@@ -88,14 +88,14 @@
       "name": "Cory Michael Walker",
       "team": "Lloyd Irvin Martial Arts",
       "bracket": "Black / Adult / Male / Rooster",
-      "time": "09:54 AM",
+      "time": "06:54 PM",
       "mat": "1",
       "day": "Wed",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3364/categories/2958629",
       "time_type": "listed fight",
       "fight_number": "2",
       "result": "",
-      "scheduled_at": "2026-11-18T14:54:00Z"
+      "scheduled_at": "2026-11-18T23:54:00Z"
     },
     {
       "competition_id": "3364",
@@ -239,14 +239,14 @@
       "name": "Rafael Venegas",
       "team": "Zenith BJJ",
       "bracket": "Blue / Adult / Male / Light Feather",
-      "time": "2:26 PM",
+      "time": "2:05 PM",
       "mat": "4",
       "day": "Wed",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3364/categories/2958631",
       "time_type": "listed fight",
       "fight_number": "16",
-      "result": ""
-     
+      "result": "",
+      "scheduled_at": "2026-11-18T19:05:00Z"
     },
     {
       "competition_id": "3364",
@@ -15377,14 +15377,14 @@
       "name": "Shawn Monroe Henderson",
       "team": "A-Force Brazilian Jiu-Jitsu",
       "bracket": "Blue / Master 5 / Male / Medium Heavy",
-      "time": "09:47 AM",
+      "time": "3:54 PM",
       "mat": "4",
       "day": "Wed",
       "bracket_url": "https://www.bjjcompsystem.com/tournaments/3364/categories/2959076",
       "time_type": "listed fight",
       "fight_number": "50",
       "result": "",
-      "scheduled_at": "2026-11-18T14:47:00Z"
+      "scheduled_at": "2026-11-18T20:54:00Z"
     },
     {
       "competition_id": "3364",
