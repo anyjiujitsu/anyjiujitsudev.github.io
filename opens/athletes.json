@@ -29858,15 +29858,12 @@
       "time_type": "listed fight",
       "fight_number": "4",
       "result": "WIN"
-    },
-    {
-      "competition_id": "3366",
-      "competition_name": "Atlanta Fall Kids International Open IBJJF Jiu-Jitsu Championship 2026",
-      "date": "",
-      "name": "Avery Madison Kent",
-      "team": "All American MMA",
-      "bracket": "Grey / Pee-Wee 3 / Female / Light Feather",
-      "time": "09:52 AM",
-      "mat": "2",
-      "day": "Sun",
-      "bracket_url": "https://www.bjjcompsyst
+    }
+  ],
+  "loaded_competition_ids": [
+    "3364",
+    "3365",
+    "3366"
+  ],
+  "errors": {}
+} 
