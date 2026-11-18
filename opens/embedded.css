@@ -418,3 +418,8 @@
   letter-spacing: 0;
   white-space: nowrap;
 }
+
+#viewComps .boston-results-row .boston-athlete-academy,
+#viewComps .boston-results-row .boston-athlete-event {
+  font-size: inherit;
+}
