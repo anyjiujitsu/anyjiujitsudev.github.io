@@ -290,7 +290,7 @@ Comp,IBJJF Boston Spring Open (NO GI),,Boston,Massachusetts,Sunday,05/10/2026,,,
 Comp,Grappling Industries,,Milford,New Hampshire,Saturday,05/23/2026,,,,,,,42.818645,-71.673354,
 Kids Event,Black Fly Kids Northeast Comp,,Rangeley,Maine,Sunday,06/21/2026,,,,,,,44.969379,-70.724751,
 Comp,Grappling Industries,,Boston,Massachusetts,Saturday,07/11/2026,,,,,,,42.338551,-71.018253,
-Comp,New Breed Jiu Jitsu,,Newtown,Connecticut,Saturday,07/18/2026,,,,,,,41.399503,-73.293982,
+Comp,New Breed Jiu Jitsu,,Newtown,Connecticut,Saturday,07/25/2026,,,,,,,41.399503,-73.293982,
 Seminar,Defensive Edge Camp,,Sturbridge,Massachusetts,Friday,08/07/2026,,,,,,,42.108429,-72.078690,
 Seminar,Defensive Edge Camp,,Sturbridge,Massachusetts,Saturday,08/08/2026,,,,,,,42.108429,-72.078690,
 Seminar,Defensive Edge Camp,,Sturbridge,Massachusetts,Sunday,08/09/2026,,,,,,,42.108429,-72.078690,
@@ -318,7 +318,7 @@ Women's Only,Women’s Only Open Mat,Team Forsa,Woburn,Massachusetts,Sunday,3/8/
 Seminar,Andre “Dedeco” Almeida,Team Flo,Tyngsboro,Massachusetts,Saturday,3/28/2026,80,100,,y,y,,42.667762,-71.428820,02/08/2026
 Grand Opening,Atlas Grand Re-Opening,Atlas JiuJitsu,Waltham,Massachusetts,Monday,2/9/2026,,,,,,,42.388921,-71.242268,02/08/2026
 Comp,Flow Sub Only - Spring Open,,Rockland,Maine,Sunday,3/29/2026,,,,,,,44.123883,-69.130452,02/09/2026
-Comp,Flow Sub Only - Summer Open,,Rockland,Maine,Saturday,6/13/2026,,,,,,,44.123883,-69.130452,02/09/2026
+Comp,Flow Sub Only *RESCHDLD,,Rockland,Maine,Saturday,6/13/2026,,,,,,,44.123883,-69.130452,02/09/2026
 Open Mat,Valentine’s Day Open Mat,Pajama Strangle Time,Providence,Rhode Island,Saturday,2/14/2026,,,,,,,41.823056,-71.418784,02/10/2026
 Open House,Friday Open House,Daniel Gracie Academy,Hanover,Massachusetts,Friday,2/20/2026,,,,,,,42.122956,-70.856310,02/11/2026
 Women's Only,Fernanda Araujo - Self Defense,Defensive Edge MMA,Wakefield,Massachusetts,Wednesday,2/25/2026,,,,,,,42.504361,-71.064061,02/11/2026
@@ -368,7 +368,7 @@ Workshop,Adaptive Jiu Jitsu,Gracie Sports,Fairfield,Connecticut,Saturday,3/7/202
 Women's Only,Women’s Only Class + Defense,RedZone Jiu Jitsu,Monroe,Connecticut,Saturday,3/7/2026,,,,,,,41.339236,-73.222828,03/05/2026
 Seminar,Murilo Bustamante,BTT Boston,Everett,Massachusetts,Sunday,3/8/2026,,,,,,,42.408430,-71.053663,03/05/2026
 Seminar,Julio Migliorini,Gracie Sports,Fairfield,Connecticut,Saturday,3/7/2026,,,,,,,41.175940,-73.272046,03/05/2026
-Comp (Invite),Imperium Delerium - Rock ‘n Roll,Imperium Martial Arts,North Reading,Massachusetts,Saturday,5/23/2026,,,,,,,42.578401,-71.084448,03/06/2026
+Comp (Invite),Imperium Open,Imperium Martial Arts,North Reading,Massachusetts,Saturday,5/23/2026,,,,,,,42.578401,-71.084448,03/06/2026
 Workshop,NP - Shoulder and Elbow Resilience,Underdog MMA,West Hartford,Connecticut,Saturday,3/21/2026,20,20,,,,y,41.766568,-72.754944,03/06/2026
 Seminar,Anderson Silverio: Blue/Purple Passing,Team Forsa,Woburn,Massachusetts,Saturday,4/4/2026,35,50,,,,,42.488703,-71.154383,03/06/2026
 Seminar,14th Anniv. + Roberto Maia,Mass BJJ,Arlington,Massachusetts,Saturday,4/4/2026,60,120,,y,,,42.418722,-71.163912,03/06/2026
@@ -388,7 +388,7 @@ Self Defense,Women’s Only Self Defense,Flow With The Go Jiu Jitsu,Seabrook,New
 Seminar,Robson Barros,Daniel Gracie Academy,Hyannis,Massachusetts,Saturday,3/28/2026,70,70,,,,y,41.661478,-70.356951,03/13/2026
 Kids Event,Wallace Castro Team,Cruvinel Brothers,Monroe,Connecticut,Thursday,3/20/2026,,,,,,,41.339236,-73.222828,03/13/2026
 Seminar,Royce Gracie,Royce Gracie Academy,Glastonbury,Connecticut,Monday,5/4/2026,,,,,,,41.691883,-72.552173,03/14/2026
-Seminar,Marcelo Siqueira,Off Your Back Academy,Salem,New Hampshire,Sunday,5/10/2026,,,,,,,42.788267,-71.221725,03/15/2026
+Seminar,Marcelo Siqueira,Off Your Back Academy,Salem,New Hampshire,Sunday,6/14/2026,,,,,,,42.788267,-71.221725,03/15/2026
 Seminar,Jake Smith,Umass Amherst,Amherst,Massachusetts,Saturday,3/28/2026,,,,,,,42.363534,-72.507291,03/15/2026
 Comp,United Grappling,,Boston,Massachusetts,Sunday,03/29/2026,,,,,,,42.338551,-71.018253,03/15/2026
 Seminar,Jay Hanley,Dark Arts Jiu Jitsu,Brentwood,New Hampshire,Saturday,3/21/2026,,,,,,,42.983723,-71.053998,03/15/2026
@@ -417,12 +417,9 @@ Open Mat,Club Underdog,Underdog MMA,West Hartford,Connecticut,Friday,4/24/2026,2
 Women's Only,Women’s Open Mat,Fenix BJJ,Woburn,Massachusetts,Saturday,4/11/2026,,,,,,,42.488703,-71.154383,03/31/2026
 Seminar,Cleopas Ncube,Florian Martial Arts,Brookline,Massachusetts,Saturday,4/4/2026,25,25,,,,,42.323853,-71.142003,04/01/2026
 Seminar,Juliano “Banana” Coutinho,Daniel Gracie Academy,Northborough,Massachusetts,Saturday,4/25/2026,,,,,,Y,42.323342,-71.646236,04/02/2026
-Workshop,Erich Muniz Training Camp,Brazilian Top Team,Boston,Massachusetts,Tuesday,8/28/2026,,,,,,,42.338551,-71.018253,04/02/2026
-Workshop,Erich Muniz Training Camp,Brazilian Top Team,Boston,Massachusetts,Wednesday,8/29/2026,,,,,,,42.338551,-71.018253,04/02/2026
-Workshop,Erich Muniz Training Camp,Brazilian Top Team,Boston,Massachusetts,Thursday,8/30/2026,,,,,,,42.338551,-71.018253,04/02/2026
 Women's Only,Ladies Open Mat,Team Flo,Tyngsboro,Massachusetts,Tuesday,5/5/2026,,,,,,,42.667762,-71.428820,04/02/2026
 Open Mat,Tribute to Master Marcio Memorial,Gracie Sports HQ,Norwalk,Connecticut,Saturday,4/4/2026,,,,,,,41.092739,-73.419796,04/03/2026
-Seminar,Tom DeBlass,Flow BJJ,Rockland,Maine,Sunday,7/12/2026,100,125,,,Y,,44.123883,-69.130452,04/03/2026
+Seminar,Tom DeBlass,Flow BJJ,Rockland,Maine,Saturday,7/25/2026,100,125,,,Y,,44.123883,-69.130452,04/03/2026
 Women's Only,TrueStrength - Advanced Open Mat,Dandelion BJJ,West Haven,Connecticut,Sunday,6/7/2026,,,,,,,41.272121,-72.967497,04/03/2026
 Women's Only,TrueStrength - All Level Open Mat,Endure BJJ,Shelton,Connecticut,Sunday,7/12/2026,,,,,,,41.304577,-73.139215,04/03/2026
 Women's Only,Mat Sisters - Women’s Open Mat,Team Lawton Martial Arts,Farmingdale,Maine,Friday,4/17/2026,,,,,,,44.260548,-69.827805,04/04/2026
@@ -437,7 +434,7 @@ Seminar,Pete ‘The Greek’ Letsos,UFC Gym,Boston,Massachusetts,Sunday,4/19/202
 Women's Only,Women’s Open Mat,Bazzani Martial Arts,Nashua,New Hampshire,Saturday,4/25/2026,,,,,,,42.749074,-71.490544,04/09/2026
 Women's Only,Chokes for Chicks,Pajama Strangle Time,Providence,Rhode Island,Sunday,4/12/2026,,,,,,,41.823056,-71.418784,04/11/2026
 Seminar,Shawn Melanson,Team Link NH,Hooksett,New Hampshire,Saturday,5/16/2026,,,,,,,43.081242,-71.446616,04/12/2026
-Seminar,Greg Souders,CT Submission Grappling,Bridgeport,Connecticut,Saturday,7/25/2026,,,,,,,41.187393,-73.195757,04/13/2026
+Seminar,Greg Souders,CT Submission Grappling,Bridgeport,Connecticut,Sunday,7/26/2026,,,,,,,41.187393,-73.195757,04/13/2026
 Seminar,Shawn Melanson,Black Bear BJJ,Augusta,Maine,Saturday,6/20/2026,,,,,,,44.334904,-69.734199,04/13/2026
 Seminar,Marcio Barbosa + Rafael Araujo,Luiz Paulo Jiu Jitsu,Norwood,Massachusetts,Friday,4/24/2026,,,,,,,42.187364,-71.195971,04/13/2026
 Seminar,Justin ‘JFLO’ Flores,Invictus Training Center,Beverly,Massachusetts,Wednesday,5/13/2026,,,,,,,42.556659,-70.844960,04/15/2026
@@ -459,10 +456,6 @@ Workshop,Injury Prevention + Mobility,Imperium Martial Arts,North Reading,Massac
 Seminar,Dean Lister,Evolution Performance Center,Tewksbury,Massachusetts,Saturday,6/13/2026,,,,,,,42.612088,-71.227845,04/20/2026
 Seminar,Michael Pixley,Team Santos,Pawtucket,Rhode Island,Sunday,5/17/2026,,,,,,,41.874824,-71.373323,04/22/2026
 Seminar,Mike Pellegrino,Acadia Brazilian Jiu Jitsu,Ellsworth,Maine,Saturday,5/30/2026,,,,,,,44.582930,-68.480094,04/24/2026
-Open Mat,test,First Colony BJJ,Marblehead,Massachusetts,Saturday,5/2/2026,,,,,,,,,05/01/2026
-Charity Event,test24,First Colony BJJ,Seymour,Massachusetts,Saturday,5/2/2026,,,,,,,42.5874097,-72.6002294,05/01/2026
-Workshop,test33,First Colony BJJ,Rockland,Massachusetts,Friday,5/1/2026,,,,,,,42.1306563,-70.9161551,05/01/2026
-Charity Event,twst88,First Colony BJJ,Rockland,Massachusetts,Friday,5/1/2026,,,,,,,42.1306563,-70.9161551,05/01/2026
 Women's Only,Women’s Open Mat,The Academy,Portland,Maine,Sunday,4/26/2026,,,,,,,43.6590993,-70.2568189,04/26/2026
 Seminar,Andrew Than - BJJ for Beginners,310 Jiujitsu,Hudson,New Hampshire,Saturday,5/23/2026,,,,,,,42.7647542,-71.4398237,04/26/2026
 Seminar,Carlson Gracie Jr,Carlson Gracie RI,Westerly,Rhode Island,Friday,5/8/2026,,,,,,,41.3775987,-71.8272871,04/26/2026
@@ -475,4 +468,322 @@ Open Mat,Open Training for Everyone,Fight for Life,Marlborough,Massachusetts,Sat
 Comp,Newbreed BJJ,,Tiverton,Rhode Island,Saturday,6/27/2026,,,,,,,41.6259211,-71.2134231,04/29/2026
 Seminar,Rafael Leite,Gracie Gym,Windham,Maine,Thursday,5/7/2026,,,,,,,43.8342439,-70.4383893,04/29/2026
 Open Mat,Small Brawl: <165 Blue Belt+,FITE Fit,Glastonbury,Connecticut,Saturday,5/30/2026,,,,,,,41.7123218,-72.6081466,04/30/2026
-Seminar,Roberto Jimenez,Flow With The Go Jiu Jitsu,Seabrook,New Hampshire,Saturday,7/11/2026,,,,,,,42.8948055,-70.8711630,05/01/2026
+Seminar,Roberto Jimenez: GI,Flow With The Go Jiu Jitsu,Seabrook,New Hampshire,Saturday,7/11/2026,,,,,,,42.8948055,-70.8711630,05/01/2026
+Seminar,Dean Lister,Dosier Jiu Jitsu,Pittsfield,Massachusetts,Sunday,6/14/2026,,,,,,,42.4484778,-73.2541069,05/03/2026
+Seminar,Michael Pixley,Worcester MMA,Worcester,Massachusetts,Saturday,5/16/2026,,,,,,,42.2625621,-71.8018877,05/04/2026
+Comp,Versus Combat Series: Trials 2,,Bangor,Maine,Sunday,7/19/2026,,,,,,,44.8016255,-68.7713289,05/04/2026
+Seminar,Roberto Jimenez,Fifth Element Academy,Greenwich,Connecticut,Saturday,6/27/2026,,,,,,,41.0264862,-73.6284598,05/05/2026
+Seminar,Roberto Maia,Mass BJJ,Acton,Massachusetts,Sunday,5/31/2026,,,,,,,42.4850931,-71.4328400,05/05/2026
+Open Mat,Chill n’ Grill,Coventry BJJ,Coventry,Rhode Island,Saturday,6/27/2026,,,,,,,41.7000996,-71.6828444,05/06/2026
+Open Mat,Bring a Friend Open Mat,Valle JiuJitsu,Londonderry,New Hampshire,Saturday,5/30/2026,,,,,,,42.8650869,-71.3739532,05/06/2026
+Seminar,Jean Dalua Cartagena,Integrated Martial Arts,West Boylston,Massachusetts,Saturday,6/6/2026,,,,,,,42.3680073,-71.7845326,05/07/2026
+Grand Opening,GB Plaistow Soft Opening,Gracie Barra,Plaistow,New Hampshire,Monday,5/11/2026,,,,,,,42.8364781,-71.0947805,05/10/2026
+Open Mat,40+ Open Mat,Cruvinel Brothers,Monroe,Connecticut,Sunday,5/31/2026,,,,,,,41.3325962,-73.2073358,05/11/2026
+Seminar,Royce Gracie,Gracie Sports,Fairfield,Connecticut,Friday,7/17/2026,,,,,,,41.1412078,-73.2637258,05/12/2026
+Open Mat,Memorial Day Open Mat + BBQ: 10AM,Lauzon MMA,Canton,Massachusetts,Monday,5/25/2026,,,,,,,42.1584324,-71.1447732,05/12/2026
+Women's Only,Women’s Open Mat,Gate City MMA,Nashua,New Hampshire,Sunday,5/31/2026,,,,,,,42.7656251,-71.4677032,05/12/2026
+Comp (Invite),ASAP Fighting Championship,,Cranston,Rhode Island,Sunday,9/27/2026,,,,,,,41.7795880,-71.4366813,05/13/2026
+Open Mat,Kill The Cult: Open Mat,Integrated Martial Arts,Worcester,Massachusetts,Saturday,6/13/2026,,,,,,,42.2625621,-71.8018877,05/15/2026
+Seminar,Shawn Melanson,Steeple City Jiu Jitsu,North Adams,Massachusetts,Saturday,8/8/2026,,,,,,,42.6990349,-73.1118997,05/17/2026
+Open Mat,Memorial Day Open Mat: 11:30AM,310 Jiujitsu,Hudson,New Hampshire,Monday,5/25/2026,,,,,,,42.7655784,-71.4393423,05/18/2026
+Open Mat,Memorial Day Open Mat: 9AM,Gentle Art Dojo,Littleton,Massachusetts,Monday,5/25/2026,,,,,,,42.5375917,-71.5120096,05/18/2026
+Women's Only,Mat Sisters Open Mat,Team Lawton Martial Arts,Farmingdale,Maine,Friday,6/12/2026,,,,,,,44.2589664,-69.7763246,05/19/2026
+Open Mat,Memorial Day Open Mat: 10AM,RedZone Jiu Jitsu,Monroe,Connecticut,Monday,5/25/2026,,,,,,,41.3325962,-73.2073358,05/20/2026
+Open Mat,Memorial Day Open Mat: 9AM,Primal Jiujitsu,Derry,New Hampshire,Monday,5/25/2026,,,,,,,42.8808677,-71.3264492,05/20/2026
+Open Mat,Memorial Day Open Mat: 10AM,Precision Jiujitsu,Hudson,New Hampshire,Monday,5/25/2026,,,,,,,42.7655784,-71.4393423,05/20/2026
+Open Mat,Memorial Day Open Mat: 9AM,Giannetti Martial Arts,Whitman,Massachusetts,Monday,5/25/2026,,,,,,,42.0806617,-70.9355990,05/20/2026
+Open Mat,Memorial Day Open Mat: 10AM,Unit 232,Littleton,Massachusetts,Monday,5/25/2026,,,,,,,42.5375917,-71.5120096,05/20/2026
+Seminar,Bebeto Oliveira,Newaza Jiu Jitsu,Fitchburg,Massachusetts,Thursday,7/9/2026,,,,,,,42.5838984,-71.8038268,05/20/2026
+Open Mat,Special Open Mat,Fight for Life,Marlborough,Massachusetts,Friday,5/22/2026,,,,,,,42.3468589,-71.5525188,05/21/2026
+Open Mat,Memorial Day Open Mat: 6PM,BSF,Arlington,Massachusetts,Monday,5/25/2026,,,,,,,42.4153739,-71.1564428,05/21/2026
+Open Mat,Memorial Day Open Mat: 10AM,CT Submission Grappling,Bridgeport,Connecticut,Monday,5/25/2026,,,,,,,41.1792695,-73.1887863,05/21/2026
+Comp,Next Generation of Grappling,,Berlin,Connecticut,Friday,7/17/2026,,,,,,,41.6214880,-72.7456519,05/21/2026
+Comp,Flow Sub Only - Fall Open,,Rockland,Maine,Sunday,10/25/2026,,,,,,,44.123883,-69.130452,05/22/2026
+Open Mat,Memorial Day Open Mat: 9:30AM,Morselli Jiu Jitsu,Taunton,Massachusetts,Monday,5/25/2026,,,,,,,41.9019257,-71.0931485,05/22/2026
+Open Mat,Memorial Day Open Mat: 9:30AM,Grip BJJ,Hudson,Massachusetts,Monday,5/25/2026,,,,,,,42.3913503,-71.5676895,05/23/2026
+Open Mat,Memorial Day Open Mat: 10AM,Pajama Strangle Time,Providence,Rhode Island,Monday,5/25/2026,,,,,,,41.8239891,-71.4128343,05/23/2026
+Open Mat,Memorial Day Open Mat: 10AM,Secret Pages BJJ,Vernon,Connecticut,Monday,5/25/2026,,,,,,,41.8382921,-72.4663331,05/23/2026
+Open Mat,Memorial Day Open Mat: 11AM,Ronin BJJ,New Haven,Connecticut,Monday,5/25/2026,,,,,,,41.3082138,-72.9250518,05/24/2026
+Open Mat,Memorial Day Open Mat: 10AM,Hammer Jiu Jitsu,Fairfield,Connecticut,Monday,5/25/2026,,,,,,,41.1412078,-73.2637258,05/24/2026
+Open Mat,Memorial Day Open Mat: 6PM,Invictus Training Center,Beverly,Massachusetts,Monday,5/25/2026,,,,,,,42.5489744,-70.8781883,05/24/2026
+Open Mat,Memorial Day Open Mat: 6PM,Ironhold Jiu Jitsu,Agawam,Massachusetts,Monday,5/25/2026,,,,,,,42.0688621,-72.6151604,05/24/2026
+Open Mat,Memorial Day Open Mat: 12PM,Upper Level BJJ,Hudson,Massachusetts,Monday,5/25/2026,,,,,,,42.3913503,-71.5676895,05/24/2026
+Seminar,Charles Harriott,Team Lawton Martial Arts,Farmingdale,Maine,Monday,6/1/2026,,,,,,,44.2589664,-69.7763246,05/25/2026
+Seminar,Caio Terra,Worcester MMA,Worcester,Massachusetts,Sunday,7/26/2026,,,,,,,42.2625621,-71.8018877,05/26/2026
+Comp,Newbreed,,Tiverton,Rhode Island,Saturday,10/31/2026,,,,,,,41.6257406,-71.1663330,05/26/2026
+Comp,Grappling Industries,,New Haven,Connecticut,Saturday,12/19/2026,,,,,,,41.3082138,-72.9250518,05/26/2026
+Comp,NAGA Grappling,,Tiverton,Rhode Island,Saturday,9/12/2026,,,,,,,41.6257406,-71.1663330,05/26/2026
+Comp,Newbreed,,Hanover,Massachusetts,Saturday,8/22/2026,,,,,,,42.1131572,-70.8119859,05/26/2026
+Comp,NAGA Grappling,,Tyngsborough,Massachusetts,Saturday,8/15/2026,,,,,,,42.6761451,-71.4227726,05/26/2026
+Seminar,Nicky Ryan,The Academy,Portland,Maine,Thursday,7/2/2026,,,,,,,43.6573605,-70.2586618,05/27/2026
+Seminar,Shawn Melanson,VIA Academy,Milford,Connecticut,Sunday,7/19/2026,,,,,,,41.2222218,-73.0570603,05/27/2026
+Seminar,Shawn Melanson,Integrated Martial Arts,Worcester,Massachusetts,Sunday,9/6/2026,,,,,,,42.2625621,-71.8018877,08/03/2026
+Open Mat,Mega Mat Open Mat,Playground JiuJitsu,East Providence,Rhode Island,Sunday,6/7/2026,,,,,,,41.8194081,-71.3762570,05/29/2026
+Grand Opening,Opening Day + SLX/X Seminar,Shuhari Jiu Jitsu,Kennebunkport,Maine,Saturday,6/20/2026,,,,,,,43.3614989,-70.4771132,05/30/2026
+Seminar,Henry Akins,SBG East Coast,Dartmouth,Massachusetts,Saturday,7/25/2026,,,,,,,41.6386894,-70.9933545,05/30/2026
+Women's Only,Women’s Only Open Mat,Fenix BJJ,Woburn,Massachusetts,Saturday,6/13/2026,,,,,,,42.4792618,-71.1522766,06/01/2026
+Seminar,Rafael Leite,Bear Clan Jiu Jitsu,Oakland,Maine,Thursday,6/11/2026,,,,,,,44.5477088,-69.7160522,06/01/2026
+Kids Event,Kalel Santos + Leandro Lima Kids Gi,Kairos,Higganum,Connecticut,Sunday,6/7/2026,,,,,,,41.4855475,-72.5489000,06/02/2026
+Women's Only,Women’s Open Mat,Team Link,Webster,Massachusetts,Saturday,6/6/2026,,,,,,,42.0501373,-71.8803308,06/02/2026
+Comp (Invite),Fight Back - Women’s Only Invtnl.,,Boston,Massachusetts,Sunday,10/11/2026,,,,,,,42.3680073,-71.7845326,06/02/2026
+Kids Event,Youth Cross Training,Soulcraft Martial Arts,Hamden,Connecticut,Saturday,6/27/2026,,,,,,,41.3836233,-72.9020069,06/02/2026
+Open Mat,Holiday Open Mat: 9AM,310 Jiujitsu,Hudson,New Hampshire,Saturday,7/4/2026,,,,,,,42.7655784,-71.4393423,06/03/2026
+Seminar,Andrew Jacobs Judo for BJJ,Lauzon MMA,Raynham,Massachusetts,Saturday,6/13/2026,,,,,,,41.9487118,-71.0731008,06/03/2026
+Open Mat,Community BBQ + Open Mat,Fenix BJJ,Littleton,New Hampshire,Saturday,6/27/2026,,,,,,,44.3063899,-71.7710705,06/04/2026
+Open Mat,Soft Opening + Open Mat,Last Round Martial Arts,Skowhegan,Maine,Tuesday,6/9/2026,,,,,,,44.7558635,-69.6656301,06/04/2026
+Seminar,Daniel “Coyote” Souza,Cesario Team BJJ,Leominster,Massachusetts,Saturday,7/11/2026,,,,,,,42.5267443,-71.7614891,06/04/2026
+Seminar,Alex West,Integrated Martial Arts,Worcester,Massachusetts,Saturday,6/13/2026,,,,,,,42.2625621,-71.8018877,06/07/2026
+Grand Opening,Official Grand Opening,Z Team Jiu Jitsu,Fitchburg,Massachusetts,Sunday,6/28/2026,,,,,,,42.5838984,-71.8038268,06/07/2026
+Open Mat,Holiday Open Mat: 9AM,Giannetti Martial Arts,Whitman,Massachusetts,Saturday,7/4/2026,,,,,,,42.0806617,-70.9355990,06/07/2026
+Comp,CHQ: Proving Grounds III,,Berlin,Connecticut,Friday,7/17/2026,,,,,,,41.6214880,-72.7456519,06/08/2026
+Comp (Invite),Imperium Open III,Imperium Martial Arts,North Reading,Massachusetts,Saturday,8/29/2026,,,,,,,42.5750939,-71.0786653,06/08/2026
+Seminar,Mason Fowler,Giannetti Martial Arts,Whitman,Massachusetts,Saturday,7/11/2026,,,,,,,42.0806617,-70.9355990,06/10/2026
+Seminar,Shawn Melanson,Team Lawton Martial Arts,Farmingdale,Maine,Sunday,6/21/2026,,,,,,,44.2580122,-69.7748127,06/10/2026
+Seminar,Daniel Bin Yusuf: Lockdown,Four Horsemen BJJ,Barrington,New Hampshire,Saturday,6/20/2026,,,,,,,43.2231910,-71.0472110,06/11/2026
+Seminar,Gustavo Savaiva: Nogi,Invictus Training Center,Beverly,Massachusetts,Wednesday,7/22/2026,,,,,,,42.5489744,-70.8781883,06/13/2026
+Women's Only,Women’s Only Open Mat,Team Flo,Tyngsboro,Massachusetts,Saturday,7/11/2026,,,,,,,42.6658853,-71.4101576,06/13/2026
+Seminar,Shawn Melanson,Team Valhalla,Baileyville,Maine,Tuesday,6/16/2026,,,,,,,45.1549515,-67.4050134,06/13/2026
+Women's Only,Women’s Only Open Mat,Gate City MMA,Nashua,New Hampshire,Sunday,6/28/2026,,,,,,,42.7656251,-71.4677032,06/17/2026
+Seminar,Priit Mihkelson,Rutland AJJ,Rutland,Vermont,Saturday,1/16/2027,,,,,,,43.6084792,-72.9724768,06/17/2026
+Seminar,Priit Mihkelson,Middlebury Jiu Jitsu,Middlebury,Vermont,Sunday,1/17/2027,,,,,,,44.0142990,-73.1672290,06/17/2026
+Seminar,Mike “The Wizard” Wacker,Black Hole Jiu Jitsu,Seymour,Connecticut,Friday,6/26/2026,,,,,,,41.3943578,-73.0741697,06/17/2026
+Seminar,Mica Galvao,Morselli Jiu Jitsu,Taunton,Massachusetts,Thursday,7/9/2026,,,,,,,41.9019257,-71.0931485,06/18/2026
+Seminar,Sean Rubchinuk,First Class Fitness & MMA,Brunswick,Maine,Saturday,6/27/2026,,,,,,,43.9166529,-69.9659438,06/19/2026
+Seminar,Max McGarr *CNCLD,Acadia Brazilian Jiu Jitsu,Ellsworth,Maine,Friday,7/10/2026,,,,,,,44.5414596,-68.4243599,06/22/2026
+Seminar,Roberto Jimenez: NO GI,Flow With The Go Jiu Jitsu,Seabrook,New Hampshire,Sunday,7/12/2026,,,,,,,42.8948055,-70.8711630,05/01/2026
+Seminar,Mason Fowler,Broadway Jiu Jitsu,Boston,Massachusetts,Friday,7/10/2026,,,,,,,42.3588336,-71.0578303,06/23/2026
+Seminar,Rafael Formiga,Essencia BJJ,Trumbull,Connecticut,Friday,7/24/2026,,,,,,,41.2428742,-73.2006687,06/23/2026
+Open Mat,Holiday Open Mat: 10AM,Coventry BJJ,Coventry,Rhode Island,Sunday,7/5/2026,,,,,,,41.7000996,-71.6828444,06/24/2026
+Comp (Invite),Women’s World Champ. Grappling,,Sturbridge,Massachusetts,Saturday,9/19/2026,,,,,,,42.1084385,-72.0807772,06/27/2026
+Open Mat,Holiday Open Mat: 10AM,Clandestine Submissions,Sanford,Maine,Friday,7/3/2026,,,,,,,43.4387179,-70.7746224,06/28/2026
+Open Mat,Holiday Open Mat: 10AM,Clandestine Submissions,Sanford,Maine,Saturday,7/4/2026,,,,,,,43.4387179,-70.7746224,06/28/2026
+Open Mat,Holiday Open Mat: 10AM,Clandestine Submissions,Sanford,Maine,Sunday,7/5/2026,,,,,,,43.4387179,-70.7746224,06/28/2026
+Open Mat,Holiday Open Mat: 11AM,Middlebury Jiu Jitsu,Middlebury,Vermont,Saturday,7/4/2026,,,,,,,44.0142990,-73.1672290,06/29/2026
+Open Mat,Holiday Open Mat: 10AM,Summit Jiu Jitsu,Stamford,Connecticut,Saturday,7/4/2026,,,,,,,41.0534302,-73.5387341,06/29/2026
+Comp (Invite),Top Level Pro: Summer Jam,,South Windsor,Connecticut,Saturday,8/29/2026,,,,,,,41.8352395,-72.5562712,06/30/2026
+Open Mat,Holiday Open Mat: 10AM,Unit 232,Littleton,Massachusetts,Friday,7/3/2026,,,,,,,42.5375917,-71.5120096,06/30/2026
+Open Mat,Holiday Open Mat: 10AM,Unit 232,Littleton,Massachusetts,Saturday,7/4/2026,,,,,,,42.5375917,-71.5120096,06/30/2026
+Open Mat,Holiday Open Mat: 10AM,Unit 232,Littleton,Massachusetts,Sunday,7/5/2026,,,,,,,42.5375917,-71.5120096,06/30/2026
+Seminar,Alexandre “Lele” Papa Manara,Soneca BJJ,Worcester,Massachusetts,Friday,7/31/2026,,,,,,,42.2625621,-71.8018877,06/30/2026
+Open Mat,Holiday Open Mat: 11AM,Monadnock BJJ,Swanzey,New Hampshire,Saturday,7/4/2026,,,,,,,42.8723464,-72.3290406,06/30/2026
+Open Mat,Holiday Open Mat: 9AM,Clubhouse JiuJitsu,Portland,Maine,Friday,7/3/2026,,,,,,,43.6573605,-70.2586618,07/01/2026
+Open Mat,Holiday Open Mat: 10AM,Renzo Gracie Academy,Milford,Connecticut,Friday,7/3/2026,,,,,,,41.2222218,-73.0570603,07/02/2026
+Open Mat,Holiday Open Mat: 6PM,Renzo Gracie Academy,Milford,Connecticut,Friday,7/3/2026,,,,,,,41.2222218,-73.0570603,07/02/2026
+Open Mat,Holiday Open Mat: 10AM,Renzo Gracie Academy,Milford,Connecticut,Saturday,7/4/2026,,,,,,,41.2222218,-73.0570603,07/02/2026
+Open Mat,Holiday Open Mat: 10AM,Renzo Gracie Academy,Milford,Connecticut,Sunday,7/5/2026,,,,,,,41.2222218,-73.0570603,07/02/2026
+Open Mat,Holiday Open Mat: 11AM,CT Submission Grappling,Bridgeport,Connecticut,Saturday,7/4/2026,,,,,,,41.1792695,-73.1887863,07/02/2026
+Open Mat,Holiday Open Mat: 10AM,Blue Collar Jiu Jitsu,Mendon,Massachusetts,Saturday,7/4/2026,,,,,,,42.1075708,-71.5535197,07/02/2026
+Open Mat,Holiday Open Mat: 10AM,Blue Collar Jiu Jitsu,Mendon,Massachusetts,Sunday,7/5/2026,,,,,,,42.1075708,-71.5535197,07/02/2026
+Open Mat,Holiday Open Mat: 9AM,Morselli Jiu Jitsu,Taunton,Massachusetts,Saturday,7/4/2026,,,,,,,41.9019257,-71.0931485,07/02/2026
+Open Mat,Holiday Open Mat: 10AM,Hammer Jiu Jitsu,Fairfield,Connecticut,Saturday,7/4/2026,,,,,,,41.1412078,-73.2637258,07/02/2026
+Open Mat,Holiday Open Mat: 9AM,Flow With The Go Jiu Jitsu,Seabrook,New Hampshire,Friday,7/3/2026,,,,,,,42.8773076,-70.8706857,07/02/2026
+Open Mat,Holiday Open Mat: 9AM,Flow With The Go Jiu Jitsu,Seabrook,New Hampshire,Saturday,7/4/2026,,,,,,,42.8773076,-70.8706857,07/02/2026
+Open Mat,Holiday Open Mat: 11AM,Bear Clan Jiu Jitsu,Oakland,Maine,Saturday,7/4/2026,,,,,,,44.5477088,-69.7160522,07/02/2026
+Open Mat,Holiday Open Mat: 9AM,Port City BJJ,Kittery,Maine,Friday,7/3/2026,,,,,,,43.0856724,-70.7436580,07/02/2026
+Open Mat,Holiday Open Mat: 9AM,Port City BJJ,Kittery,Maine,Saturday,7/4/2026,,,,,,,43.0856724,-70.7436580,07/02/2026
+Open Mat,Holiday Open Mat: 9AM,Port City BJJ,Kittery,Maine,Sunday,7/5/2026,,,,,,,43.0856724,-70.7436580,07/02/2026
+Open Mat,Holiday Open Mat: 11AM,Atom JiuJitsu,Newton,Massachusetts,Friday,7/3/2026,,,,,,,42.3300435,-71.1948620,07/02/2026
+Open Mat,Holiday Open Mat: 9:30AM,Jiu Jitsu Life Academy,Wallingford,Connecticut,Saturday,7/4/2026,,,,,,,41.4564233,-72.8239356,07/03/2026
+Open Mat,Holiday Open Mat: 11AM,Tokyo Joe’s Studios,Hooksett,New Hampshire,Friday,7/3/2026,,,,,,,43.0939589,-71.4625160,07/03/2026
+Open Mat,Holiday Open Mat: 10AM,Tokyo Joe’s Studios,Hooksett,New Hampshire,Saturday,7/4/2026,,,,,,,43.0939589,-71.4625160,07/03/2026
+Open Mat,Holiday Open Mat: 12PM,Soneca BJJ,Worcester,Massachusetts,Friday,7/3/2026,,,,,,,42.2625621,-71.8018877,07/03/2026
+Open Mat,Holiday Open Mat: 10AM,Precision Jiujitsu,Hudson,New Hampshire,Sunday,7/5/2026,,,,,,,42.7655784,-71.4393423,07/04/2026
+Open Mat,Holiday Open Mat: 7PM,Orion BJJ,Brockton,Massachusetts,Sunday,7/5/2026,,,,,,,42.0834335,-71.0183787,07/04/2026
+Open Mat,Holiday Open Mat: 6PM,PQ Jiu Jitsu,Hanover,Massachusetts,Sunday,7/5/2026,,,,,,,42.1131572,-70.8119859,07/05/2026
+Open Mat,Holiday Open Mat: 12PM,CT Submission Grappling,Bridgeport,Connecticut,Sunday,7/5/2026,,,,,,,41.1792695,-73.1887863,07/05/2026
+Open Mat,"Women’s, LGBTQ+ Open Mat",Providence BJJ,Providence,Rhode Island,Sunday,7/12/2026,,,,,,,41.8239891,-71.4128343,07/06/2026
+Women's Only,Women’s Only Open Mat,Z Team Jiu Jitsu,Fitchburg,Massachusetts,Saturday,8/1/2026,,,,,,,42.5838984,-71.8038268,07/06/2026
+Seminar,Luigi Mondelli,Technique BJJ,Prospect,Connecticut,Saturday,8/1/2026,,,,,,,41.5023192,-72.9787163,07/07/2026
+Seminar,Tyler Menard,Last Round Martial Arts,Skowhegan,Maine,Saturday,8/22/2026,,,,,,,44.7558635,-69.6656301,07/07/2026
+Workshop,Allan Lima: Closed Guard,Combate Real School,Southbridge,Massachusetts,Saturday,7/18/2026,,,,,,,42.0750465,-72.0337376,07/08/2026
+Open Mat,Open Mat w/t Rafael Formiga,Rapadura BJJ,Newtown,Connecticut,Wednesday,7/22/2026,,,,,,,41.4134764,-73.3086445,07/09/2026
+Seminar,Jake Smith: Octopus Guard,Imperium Martial Arts,North Reading,Massachusetts,Monday,8/10/2026,,,,,,,42.5750939,-71.0786653,07/14/2026
+Comp,16 Man No Gi: $500 Prize,Middlebury Jiu Jitsu,Middlebury,Vermont,Sunday,8/9/2026,,,,,,,44.0142990,-73.1672290,07/14/2026
+Comp (Invite),CHQ: Rumble Royal No Gi,,Berlin,Connecticut,Saturday,8/29/2026,,,,,,,41.6214880,-72.7456519,07/15/2026
+Grand Opening,Grand Opn: Hiago Gama Seminar,Bella Art Jiu Jitsu,Millbury,Massachusetts,Saturday,8/8/2026,,,,,,,42.1913817,-71.7603934,07/16/2026
+Seminar,Joseph Capizzi,Montpelier Martial Arts,Montpelier,Vermont,Saturday,8/22/2026,,,,,,,44.2602244,-72.5750364,07/17/2026
+Seminar,Yuri Gabriel Rodrigues,Cristyan Jiu Jitsu,Hyannis,Massachusetts,Saturday,8/22/2026,,,,,,,41.6535345,-70.2823287,07/17/2026
+Women's Only,Mayara Custodio,Daniel Gracie Academy,Hyannis,Massachusetts,Saturday,9/19/2026,,,,,,,41.6535345,-70.2823287,07/20/2026
+Seminar,Daniel Gracie,Renzo Gracie Academy,Milford,Connecticut,Monday,8/3/2026,,,,,,,41.2222218,-73.0570603,07/21/2026
+Seminar,Junior Magal,617 BJJ,Somerville,Massachusetts,Friday,7/31/2026,,,,,,,42.3875968,-71.0994968,07/21/2026
+Women's Only,Women’s Only Open Mat,Gate City MMA,Nashua,New Hampshire,Sunday,8/30/2026,,,,,,,42.7656251,-71.4677032,07/21/2026
+Women's Only,Women’s Only Open Mat,Team Forsa,Woburn,Massachusetts,Sunday,8/16/2026,,,,,,,42.4792618,-71.1522766,07/21/2026
+Comp,United Grappling,,Manchester,New Hampshire,Saturday,9/19/2026,,,,,,,42.9956397,-71.4547891,07/21/2026
+Seminar,Hiago Gama,Karasu Tengu Academy,Nashua,New Hampshire,Saturday,7/25/2026,,,,,,,42.7656251,-71.4677032,07/22/2026
+Seminar,Ricardo Liborio,Black Wolf Shoreline,Madison,Connecticut,Sunday,8/23/2026,,,,,,,41.2794282,-72.5983151,07/22/2026
+Seminar,Rafael Formiga,Fit Club BJJ,Fairfield,Connecticut,Thursday,7/23/2026,,,,,,,41.1412078,-73.2637258,07/22/2026
+Seminar,Ricardo Liborio,Black Wolf Martial Arts,Orange,Connecticut,Saturday,8/22/2026,,,,,,,41.2784304,-73.0256609,07/22/2026
+Comp,Versus Combat Series: Trials 3,,Bangor,Maine,Sunday,9/27/2026,,,,,,,44.8016255,-68.7713289,07/23/2026
+Comp (Invite),Reality Fighting,,Uncasville,Connecticut,Friday,11/6/2026,,,,,,,41.4346637,-72.1099870,07/24/2026
+Seminar,Enderson & Larissa Dias,Renzo Gracie Academy,Smithfield,Rhode Island,Saturday,12/12/2026,,,,,,,41.9220433,-71.5495070,07/29/2026
+Open Mat,Community DJ Open Mat,Day 1 Jiujitsu,Newton,Massachusetts,Friday,8/7/2026,,,,,,,42.3300435,-71.1948620,07/29/2026
+Seminar,Maira Mazar,Atom JiuJitsu,Newton,Massachusetts,Saturday,8/8/2026,,,,,,,42.3300435,-71.1948620,07/29/2026
+Open Mat,Açaí & Porrada,Fight for Life,Marlborough,Massachusetts,Friday,7/31/2026,,,,,,,42.3468589,-71.5525188,07/30/2026
+Women's Only,TrueStrength: Women’s Open Mat,Complete Grappling,Avon,Connecticut,Saturday,9/19/2026,,,,,,,41.8098209,-72.8306541,07/30/2026
+Seminar,Mason Fowler,Renzo Gracie Academy,Smithfield,Rhode Island,Sunday,10/18/2026,,,,,,,41.9220433,-71.5495070,07/31/2026
+Workshop,Mat Ready: Knee & Shoulder Rehab,Invictus Training Center,Beverly,Massachusetts,Sunday,9/27/2026,,,,,,,42.5489744,-70.8781883,08/02/2026
+Open Mat,Mega Mat Open Mat,Pajama Strangle Time,Providence,Rhode Island,Sunday,8/9/2026,,,,,,,41.8239891,-71.4128343,08/03/2026
+Seminar,Mason Fowler,Black Bear BJJ,Augusta,Maine,Thursday,10/15/2026,,,,,,,44.3148027,-69.7743945,08/03/2026
+Women's Only,Women’s Only Open Mat,Team Link BJJ,Webster,Massachusetts,Saturday,8/8/2026,,,,,,,42.0501373,-71.8803308,08/03/2026
+Women's Only,Women’s Open Mat,Fenix BJJ,Tewksbury,Massachusetts,Saturday,8/8/2026,,,,,,,42.6106479,-71.2342248,08/05/2026
+Comp (Invite),ASAP Fighting Championship *CNCLD,,Cranston,Rhode Island,Sunday,11/1/2026,,,,,,,41.7795880,-71.4366813,08/05/2026
+Comp (Invite),ASAP Fighting Championship,,Cranston,Rhode Island,Sunday,1/10/2027,,,,,,,41.7795880,-71.4366813,08/05/2026
+Comp (Invite),ASAP Fighting Championship,,Cranston,Rhode Island,Saturday,3/6/2027,,,,,,,41.7795880,-71.4366813,08/05/2026
+Comp (Invite),ASAP Fighting Championship,,Cranston,Rhode Island,Sunday,6/6/2027,,,,,,,41.7795880,-71.4366813,08/05/2026
+Grand Opening,Grand Opn: Leon Davis Seminar,Tri Force South,Saunderstown,Rhode Island,Saturday,8/15/2026,,,,,,,41.5078795,-71.4245004,08/05/2026
+Comp (Invite),KTC Invitational,Integrated Martial Arts,Worcester,Massachusetts,Saturday,11/14/2026,,,,,,,42.2625621,-71.8018877,08/05/2026
+Seminar,Joe Moreira,Combate Real School,Southbridge,Massachusetts,Saturday,8/15/2026,,,,,,,42.0750465,-72.0337376,08/07/2026
+Seminar,Joe Moreira,Combate Real School,Southbridge,Massachusetts,Sunday,8/16/2026,,,,,,,42.0750465,-72.0337376,08/07/2026
+Workshop,Alex West Guest Class,Invictus Training Center,Beverly,Massachusetts,Saturday,8/8/2026,,,,,,,42.5489744,-70.8781883,08/07/2026
+Grand Opening,Compete Grappling Grand Opening,Complete Grappling,Avon,Connecticut,Saturday,9/12/2026,,,,,,,41.8098209,-72.8306541,08/07/2026
+Seminar,Adisa “The Bishop” Banjoko,Clandestine Submissions,Sanford,Maine,Saturday,8/29/2026,,,,,,,43.4387179,-70.7746224,08/08/2026
+Seminar,Gregor Gracie,Daniel Gracie Academy,Westborough,Massachusetts,Saturday,9/19/2026,,,,,,,42.2694308,-71.6129907,08/16/2026
+Grand Opening,Bridgewater Opening,Brazilian Top Team,Bridgewater,Massachusetts,Saturday,8/29/2026,,,,,,,41.9902206,-70.9754432,08/16/2026
+Comp,NAGA Grappling,,Springfield,Massachusetts,Saturday,10/10/2026,,,,,,,42.1018764,-72.5886727,08/17/2026
+Comp (Invite),Team Valor Grand Prix,,Boston,Massachusetts,Saturday,10/10/2026,,,,,,,42.3588336,-71.0578303,08/17/2026
+Comp,Fuji BJJ Fall Championship,,Middletown,Connecticut,Sunday,10/25/2026,,,,,,,41.5623178,-72.6509061,08/17/2026
+Comp,NAGA Grappling,,Newtown,Connecticut,Saturday,12/5/2026,,,,,,,41.4134764,-73.3086445,08/17/2026
+Comp (Invite),SubOnly Grand Prix: $500 Prize,,Middlebury,Vermont,Sunday,9/27/2026,,,,,,,44.0142990,-73.1672290,08/17/2026
+Comp (Invite),CJL: Commonwealth Cup,,Boston,Massachusetts,Saturday,10/18/2026,,,,,,,42.3588336,-71.0578303,08/17/2026
+Seminar,Andre Dedeco,Unita BJJ,Lebanon,New Hampshire,Saturday,9/12/2026,,,,,,,43.6430320,-72.2515870,08/17/2026
+Seminar,Rolles Gracie,Shoreline BJJ,Old Saybrook,Connecticut,Saturday,11/7/2026,,,,,,,41.2917652,-72.3761956,08/18/2026
+Seminar,Joe Moreira,Team Moreira,Biddeford,Maine,Saturday,8/22/2026,,,,,,,43.4925843,-70.4533844,08/19/2026
+Women's Only,Women’s Open Mat,Morselli Jiu Jitsu,Taunton,Massachusetts,Sunday,8/30/2026,,,,,,,41.9019257,-71.0931485,08/24/2026
+Seminar,Cesario de Souza,Cesario Team Bjj,Leominster,Massachusetts,Sunday,9/13/2026,,,,,,,42.5267443,-71.7614891,08/24/2026
+Comp (Invite),165& Under No Gi Comp: $250 Prize,Mohawk MMA,Medway,Massachusetts,Saturday,9/19/2026,,,,,,,42.1417641,-71.3967256,08/25/2026
+Grand Opening,Arete Jiu Jitsu Opening,Arete Jiu Jitsu,Westwood,Massachusetts,Saturday,8/29/2026,,,,,,,42.2186913,-71.2233829,08/25/2026
+Grand Opening,Arete Jiu Jitsu Opening,Arete Jiu Jitsu,Westwood,Massachusetts,Sunday,8/30/2026,,,,,,,42.2186913,-71.2233829,08/25/2026
+Seminar,Denis Araujo & Grace Kelly,Grip BJJ,Hudson,Massachusetts,Friday,8/28/2026,,,,,,,42.3913503,-71.5676895,08/26/2026
+Women's Only,Women’s Open Mat,Team Flo,Tewksbury,Massachusetts,Tuesday,9/15/2026,,,,,,,42.6106479,-71.2342248,08/27/2026
+Comp (Invite),LIJJN Team Series,Cruvinel Brothers,Monroe,Connecticut,Saturday,9/26/2026,,,,,,,41.3325962,-73.2073358,08/27/2026
+Seminar,Ryan Fennelly,Soulcraft Martial Arts,Hamden,Connecticut,Saturday,9/19/2026,,,,,,,41.3836233,-72.9020069,08/27/2026
+Grand Opening,Kairos Middletown Opening,Kairos,Middletown,Connecticut,Saturday,9/12/2026,,,,,,,41.5623178,-72.6509061,08/28/2026
+Comp (Invite),Cage Titans Grappling,,Plymouth,Massachusetts,Saturday,9/12/2026,,,,,,,41.9426657,-70.7618592,08/29/2026
+Seminar,Grand Opening with João Miyao,Gentle Art Dojo,Danvers,Massachusetts,Saturday,9/12/2026,,,,,,,42.5664984,-70.9362957,08/29/2026
+Seminar,Carlson Gracie Jr,Vermont BJJ Academy,Williston,Vermont,Saturday,10/10/2026,,,,,,,44.4385339,-73.0727666,08/30/2026
+Open Mat,Holiday Open Mat: 10:00AM,Gentle Art Dojo,Littleton,Massachusetts,Monday,9/7/2026,,,,,,,42.5375917,-71.5120096,08/30/2026
+Open Mat,Holiday Open Mat: 6:30PM,Technique BJJ,Prospect,Connecticut,Monday,9/7/2026,,,,,,,41.5023192,-72.9787163,08/31/2026
+Open Mat,10 Year Anniversary,Bazzani Martial Arts,Nashua,New Hampshire,Saturday,9/26/2026,,,,,,,42.7656251,-71.4677032,08/31/2026
+Seminar,Gary & Jeileen Alvarez: Guard Passing,CT Combat Training Center,Oakville,Connecticut,Saturday,9/26/2026,,,,,,,41.5879528,-73.0933248,08/31/2026
+Seminar,Rodrigo Antunes,Daniel Gracie Academy,Tewksbury,Massachusetts,Thursday,10/8/2026,,,,,,,42.6106479,-71.2342248,08/31/2026
+Open Mat,Holiday Open Mat: 10:30AM,Clandestine Submissions,Sanford,Maine,Monday,9/7/2026,,,,,,,43.4387179,-70.7746224,08/31/2026
+Open Mat,Meg Mat Open Mat,Carlson Gracie Team,Tiverton,Rhode Island,Sunday,9/6/2026,,,,,,,41.6257406,-71.1663330,09/01/2026
+Open Mat,Holiday Open Mat: 9:00AM,Giannetti Martial Arts,Whitman,Massachusetts,Monday,9/7/2026,,,,,,,42.0806617,-70.9355990,09/01/2026
+Comp,NAGA Grappling,,Hanover,Massachusetts,Saturday,11/14/2026,,,,,,,42.1131572,-70.8119859,09/01/2026
+Seminar,Bradley Barns *CNCLD,Forged Self Defense,Salem,Massachusetts,Saturday,9/26/2026,,,,,,,42.5195292,-70.8967226,09/02/2026
+Seminar,Chris Wojcik,High Hat BJJ,South Burlington,Vermont,Friday,11/13/2026,,,,,,,44.4642957,-73.1762730,09/02/2026
+Open Mat,Holiday Open Mat: 10:00AM,Unit 232,Littleton,Massachusetts,Monday,9/7/2026,,,,,,,42.5375917,-71.5120096,09/03/2026
+Comp (Invite),Collision Combat 10,CT Combat Training Center,Oakville,Connecticut,Sunday,1/17/2027,,,,,,,41.5879528,-73.0933248,11/02/2026
+Open Mat,Holiday Open Mat: 10:00AM,CT Submission Grappling,Bridgeport,Connecticut,Monday,9/7/2026,,,,,,,41.1792695,-73.1887863,09/03/2026
+Open Mat,Holiday Open Mat: 12:00PM,Ironhold Jiu Jitsu,Agawam,Massachusetts,Monday,9/7/2026,,,,,,,42.0688621,-72.6151604,09/03/2026
+Open Mat,Holiday Open Mat: 9:00AM,Primal Jiujitsu,Derry,New Hampshire,Monday,9/7/2026,,,,,,,42.8808677,-71.3264492,09/04/2026
+Comp (Invite),TLP: Thanksgiving Throwdown,,South Windsor,Connecticut,Saturday,11/21/2026,,,,,,,41.8352395,-72.5562712,09/04/2026
+Open Mat,Holiday Open Mat: 9:00AM,Pajama Strangle Time,Providence,Rhode Island,Monday,9/7/2026,,,,,,,41.8239891,-71.4128343,09/04/2026
+Open Mat,Holiday Open Mat: 10:00AM,Precision Jiujitsu,Hudson,New Hampshire,Monday,9/7/2026,,,,,,,42.7655784,-71.4393423,09/04/2026
+Open Mat,Holiday Open Mat: 10:00AM,Alchemy BJJ,Clinton,Massachusetts,Monday,9/7/2026,,,,,,,42.4212463,-71.6874099,09/04/2026
+Open Mat,Holiday Open Mat: 10:00AM,Mass BJJ The Valley,Devens,Massachusetts,Monday,9/7/2026,,,,,,,42.5389512,-71.6094356,09/04/2026
+Open Mat,Holiday Open Mat: 10:00AM,Tokyo Joe’s Studios,Hooksett,New Hampshire,Monday,9/7/2026,,,,,,,43.0939589,-71.4625160,09/04/2026
+Women's Only,Women’s Open Mat,Gate City MMA,Nashua,New Hampshire,Sunday,9/20/2026,,,,,,,42.7656251,-71.4677032,09/04/2026
+Open Mat,Holiday Open Mat: 12:00PM,Imperium Martial Arts,North Reading,Massachusetts,Monday,9/7/2026,,,,,,,42.5750939,-71.0786653,09/04/2026
+Open Mat,Holiday Open Mat: 9:00AM,Pine Tree Jiu Jitsu,Scarborough,Maine,Monday,9/7/2026,,,,,,,43.5899737,-70.3346065,09/06/2026
+Open Mat,Holiday Open Mat: 6:00PM,BSF,Arlington,Massachusetts,Monday,9/7/2026,,,,,,,42.4153739,-71.1564428,09/06/2026
+Open Mat,Holiday Open Mat: 10:00AM,Soneca BJJ,Worcester,Massachusetts,Monday,9/7/2026,,,,,,,42.2625621,-71.8018877,09/06/2026
+Open Mat,Holiday Open Mat: 9:00AM,Iron Lion Team,Bridgeport,Connecticut,Monday,9/7/2026,,,,,,,41.1792695,-73.1887863,09/06/2026
+Seminar,Luis Carlos Manimal *CNCLD,Gracie Sports HQ,Norwalk,Connecticut,Wednesday,9/16/2026,,,,,,,41.1175966,-73.4078968,09/09/2026
+Seminar,Walter Ordonez Wrestling,Hudson Combat Academy,Hudson,Massachusetts,Sunday,9/27/2026,,,,,,,42.3913503,-71.5676895,09/09/2026
+Self Defense,Fernanda Araujo,Team Fight Academy,Wakefield,Massachusetts,Saturday,9/12/2026,,,,,,,42.5064840,-71.0728306,09/09/2026
+Grand Opening,Mohawk Martial Arts Grand Opening,Mohawk MMA,Medway,Massachusetts,Saturday,9/19/2026,,,,,,,42.1417641,-71.3967256,09/14/2026
+Seminar,Junny Ocasio: K Guard,Clandestine Submissions,Sanford,Maine,Saturday,10/10/2026,,,,,,,43.4387179,-70.7746224,09/14/2026
+Seminar,Marcelo Alonso,Kevin Watson BJJ,Dover,New Hampshire,Saturday,10/24/2026,,,,,,,43.1981117,-70.8739761,09/15/2026
+Seminar,Carlson Gracie Jr,Kevin Watson BJJ,Dover,New Hampshire,Thursday,11/5/2026,,,,,,,43.1981117,-70.8739761,09/15/2026
+Women's Only,True Strength: Advanced No Gi,Ascension Athletics,Bristol,Connecticut,Sunday,10/11/2026,,,,,,,41.6711752,-72.9430128,09/15/2026
+Seminar,Marcelo Siqueira: Judo for BJJ,Off Your Back Academy,Salem,New Hampshire,Sunday,10/4/2026,,,,,,,42.7884957,-71.2009035,09/16/2026
+Workshop,Competition Rules Clinic,Technique BJJ,Prospect,Connecticut,Wednesday,10/7/2026,,,,,,,41.5023192,-72.9787163,09/16/2026
+Seminar,Dorian Olivarez,Invictus Training Center,Beverly,Massachusetts,Saturday,9/26/2026,,,,,,,42.5489744,-70.8781883,09/19/2026
+Women's Only,Women’s Open Mat *RESCHDLD,Morselli Jiu Jitsu,Taunton,Massachusetts,Sunday,9/27/2026,,,,,,,41.9019257,-71.0931485,09/19/2026
+Seminar,Julio Cesar,2002 JiuJitsu,Tewksbury,Massachusetts,Saturday,10/31/2026,,,,,,,42.6106479,-71.2342248,09/20/2026
+Seminar,Leandro Escobar,Underdog MMA,West Hartford,Connecticut,Tuesday,9/29/2026,,,,,,,41.7620447,-72.7420399,09/20/2026
+Seminar,Robert Diggle: Open Guard & Leg Lock,Mau Mau BJJ,Medford,Massachusetts,Friday,10/23/2026,,,,,,,42.4184296,-71.1061639,09/21/2026
+Seminar,Fabio de Araujo,Ricardo Cavalcanti BJJ,North Providence,Rhode Island,Sunday,10/4/2026,,,,,,,41.8500997,-71.4661703,09/21/2026
+Comp (Invite),Imperium Open 4,,North Reading,Massachusetts,Saturday,11/7/2026,,,,,,,42.5750939,-71.0786653,09/22/2026
+Seminar,Alehander Mariano,Fit Club BJJ,Fairfield,Connecticut,Tuesday,10/6/2026,,,,,,,41.1412078,-73.2637258,09/22/2026
+Comp (Invite),Fight 2 Win,,Tyngsboro,Massachusetts,Friday,10/16/2026,,,,,,,42.6658853,-71.4101576,09/23/2026
+Seminar,Veterans Day Seminar,BJJ 24/7/365,Methuen,Massachusetts,Wednesday,11/11/2026,,,,,,,42.7262016,-71.1908924,09/24/2026
+Women's Only,Women’s Open Mat,Morselli Jiu Jitsu,Taunton,Massachusetts,Sunday,10/4/2026,,,,,,,41.9019257,-71.0931485,09/25/2026
+Comp (Invite),Mongoose Winter Showdown,Mongoose Training Center,Middletown,Connecticut,Saturday,12/12/2026,,,,,,,41.5623178,-72.6509061,09/28/2026
+Comp (Invite),Sparring Exhibition,Iron Lion Team,Bridgeport,Connecticut,Sunday,12/6/2026,,,,,,,41.1792695,-73.1887863,09/28/2026
+Open Mat,Mega Mat Open Mat,Whaling City Athletic Club,New London,Connecticut,Sunday,10/4/2026,,,,,,,41.3556187,-72.0997804,09/29/2026
+Seminar,Mike Desrosiers,Unita BJJ,Lebanon,New Hampshire,Saturday,10/3/2026,,,,,,,43.6430320,-72.2515870,09/29/2026
+Seminar,Leandro Rothier,Invictus Training Center,Beverly,Massachusetts,Tuesday,10/20/2026,,,,,,,42.5489744,-70.8781883,09/30/2026
+Seminar,Lucas “Hulk” Barbosa,Gracie Sports HQ,Norwalk,Connecticut,Saturday,11/14/2026,,,,,,,41.1175966,-73.4078968,09/30/2026
+Seminar,Rafael Lovato,Day 1 Jiujitsu,Newton,Massachusetts,Saturday,10/17/2026,,,,,,,42.3300435,-71.1948620,09/30/2026
+Comp (Invite),LIJJN: Team Series,Cruvinel Brothers,Monroe,Connecticut,Saturday,10/24/2026,,,,,,,41.3325962,-73.2073358,10/03/2026
+Seminar,Chris Wojcik,Greenwich Jiu Jiutsu Academy,Greenwich,Connecticut,Sunday,11/15/2026,,,,,,,41.0264862,-73.6284598,10/05/2026
+Seminar,Piter Frank,Daniel Gracie Academy,Hyannis,Massachusetts,Sunday,11/1/2026,,,,,,,41.6535345,-70.2823287,10/05/2026
+Seminar,Matt Thornton,SBG East Coast,Dartmouth,Massachusetts,Saturday,11/7/2026,,,,,,,41.6386894,-70.9933545,10/07/2026
+Seminar,Matt Thornton,SBG East Coast,Dartmouth,Massachusetts,Sunday,11/8/2026,,,,,,,41.6386894,-70.9933545,10/07/2026
+Seminar,Michael Pixley,Fifth Element Academy,Greenwich,Connecticut,Sunday,1/23/2027,,,,,,,41.0264862,-73.6284598,11/06/2026
+Seminar,test,,Marblehead,Massachusetts,Sunday,6/8/2025,,,,,,,42.5000960,-70.8578253,10/08/2026
+Women's Only,Women’s Open Mat,Morselli Jiu Jitsu,Taunton,Massachusetts,Sunday,11/1/2026,,,,,,,41.9019257,-71.0931485,10/08/2026
+Women's Only,Women’s Only Open Mat,Fenix BJJ,Woburn,Massachusetts,Saturday,10/10/2026,,,,,,,42.4792618,-71.1522766,10/08/2026
+Seminar,Bruno Jacare Dias,FITE Fit,Glastonbury,Connecticut,Sunday,11/8/2026,,,,,,,41.7123218,-72.6081460,10/11/2026
+Women's Only,Women’s Open Mat,North Andover BJJ,North Andover,Massachusetts,Sunday,11/1/2026,,,,,,,42.7029687,-71.1309117,10/16/2026
+Grand Opening,Grand Opening,Hope BJJ,West Warwick,Rhode Island,Sunday,11/1/2026,,,,,,,41.7061296,-71.5221451,10/16/2026
+Open Mat,10 Year Anniversary,Ascension Athletics,Bristol,Connecticut,Saturday,10/24/2026,,,,,,,41.6711752,-72.9430128,10/19/2026
+Open Mat,Open House,Pathway Martial Arts,Worcester,Massachusetts,Sunday,11/1/2026,,,,,,,42.2625621,-71.8018877,10/19/2026
+Grand Opening,Grand Opening,Cruvinel Brothers,Norwalk,Connecticut,Sunday,11/1/2026,,,,,,,41.1175966,-73.4078968,10/20/2026
+Seminar,Joziah Fry Wrestling Clinic,American Grit MMA,Canton,Massachusetts,Saturday,11/7/2026,,,,,,,42.1584324,-71.1447732,10/20/2026
+Comp,Grappling Industries,,Hanover,Massachusetts,Saturday,1/2/2027,,,,,,,42.122956,-70.856310,10/22/2026
+Comp,NAGA Grappling,,Tiverton,Rhode Island,Saturday,1/9/2027,,,,,,,41.625944,-71.213379,10/22/2026
+Comp,Grappling Industries,,Milford,New Hampshire,Sunday,2/21/2027,,,,,,,42.818645,-71.673354,10/22/2026
+Comp,NAGA Grappling,,Hanover,Massachusetts,Saturday,2/27/2027,,,,,,,42.122956,-70.856310,10/22/2026
+Comp,Grappling Industries,,Newtown,Connecticut,Saturday,3/20/2027,,,,,,,41.399503,-73.293982,10/22/2026
+Comp,Grappling Industries,,Hanover,Massachusetts,Saturday,3/27/2027,,,,,,,42.122956,-70.856310,10/22/2026
+Comp,Fuji Spring Championship,,Middletown,Connecticut,Sunday,4/18/2027,,,,,,,41.562320,-72.650648,10/22/2026
+Comp,Grappling Industries,,Milford,New Hampshire,Saturday,5/22/2027,,,,,,,42.818645,-71.673354,10/22/2026
+Comp,Black Fly Kids Northeast Comp,,Rangeley,Maine,Sunday,06/27/2026,,,,,,,44.969379,-70.724751,10/22/2026
+Comp,Grappling Industries,,Hanover,Massachusetts,Saturday,7/10/2027,,,,,,,42.122956,-70.856310,10/22/2026
+Comp,Grappling Industries,,Milford,New Hampshire,Saturday,8/21/2027,,,,,,,42.818645,-71.673354,10/22/2026
+Comp,Grappling Industries,,Newtown,Connecticut,Saturday,8/28/2027,,,,,,,41.399503,-73.293982,10/22/2026
+Comp,Grappling Industries,,Hanover,Massachusetts,Saturday,10/9/2027,,,,,,,42.122956,-70.856310,10/22/2026
+Comp,Grappling Industries,,Milford,New Hampshire,Sunday,11/7/2027,,,,,,,42.818645,-71.673354,10/22/2026
+Comp,Grappling Industries,,Newtown,Connecticut,Saturday,11/20/2027,,,,,,,41.399503,-73.293982,10/22/2026
+Comp,Fuji Winter Championship,,Danvers,Massachusetts,Sunday,3/14/2027,,,,,,,42.5664984,-70.9362957,10/22/2026
+Seminar,Enderson & Larissa Dias,Renzo Gracie Academy,Smithfield,Rhode Island,Saturday,12/12/2026,,,,,,,41.9220433,-71.5495070,10/22/2026
+Open Mat,Mega Mat Open Mat,Regiment Training Center,Fall River,Massachusetts,Sunday,11/1/2026,,,,,,,41.7010642,-71.1546367,10/26/2026
+Women's Only,Women’s Open Mat,Bazzani Martial Arts,Nashua,New Hampshire,Sunday,11/15/2026,,,,,,,42.7656251,-71.4677032,10/26/2026
+Open Mat,1 Year Anniversary,Ironhold Jiu Jitsu,Agawam,Massachusetts,Saturday,11/7/2026,,,,,,,42.0688621,-72.6151604,10/27/2026
+Comp (Invite),Sparring Exhibition,Fighting Arts Academy,Milford,Connecticut,Sunday,12/6/2026,,,,,,,41.2222218,-73.0570603,10/27/2026
+Seminar,Michael Pixley,Blood Sweat and Tears,Peabody,Massachusetts,Friday,12/4/2026,,,,,,,42.5258965,-70.9272446,10/27/2026
+Open Mat,Holiday Open Mat: 11:30AM,Pajama Strangle Time,Providence,Rhode Island,Saturday,10/31/2026,,,,,,,41.8239891,-71.4128343,10/27/2026
+Comp (Invite),Versus Grappling 1,,Bangor,Maine,Saturday,11/21/2026,,,,,,,44.8016255,-68.7713289,10/29/2026
+Seminar,Dan The Manchild: Mussolini Lock,Invictus Training Center,Beverly,Massachusetts,Friday,11/13/2026,,,,,,,42.5489744,-70.8781883,10/29/2026
+Open Mat,Holiday Open Mat: 5:30PM,Arete Jiu Jitsu,Goffstown,New Hampshire,Friday,10/30/2026,,,,,,,43.0204450,-71.6002570,10/30/2026
+Open Mat,Holiday Open Mat: 10:00AM,RedZone Jiu Jitsu,Monroe,Connecticut,Saturday,10/31/2026,,,,,,,41.3325962,-73.2073358,10/30/2026
+Women's Only,Women’s Only Jiu Jitsu,RedZone Jiu Jitsu,Monroe,Connecticut,Thursday,11/12/2026,,,,,,,41.3325962,-73.2073358,10/30/2026
+Workshop,Crux PT: Free Injury Screen/Soft Tissue,The Lab,Westwood,Massachusetts,Saturday,11/7/2026,,,,,,,42.2186913,-71.2233829,11/01/2026
+Seminar,Mike Green: K Guard,Elements MMA,Keene,New Hampshire,Saturday,11/21/2026,,,,,,,42.9335970,-72.2784264,11/02/2026
+Women's Only,Women’s Open Mat,Team Flo,Tyngsboro,Massachusetts,Tuesday,11/10/2026,,,,,,,42.6658853,-71.4101576,11/02/2026
+Charity Event,Victor Hugo & Gustavo Saraiva,Unit 232,Littleton,Massachusetts,Saturday,12/5/2026,,,,,,,42.5375917,-71.5120096,11/02/2026
+Open Mat,Holiday Open Mat: 9:00AM,Giannetti Martial Arts,Whitman,Massachusetts,Thursday,11/26/2026,,,,,,,42.0806617,-70.9355990,11/02/2026
+Seminar,Rick Hawn: Judo for JiuJtsu,Arete Jiu Jitsu,Goffstown,New Hampshire,Saturday,11/21/2026,,,,,,,43.0204450,-71.6002570,11/02/2026
+Grand Opening,Grand Opening w/t Roberto Maia,Balance Point BJJ,Amherst,New Hampshire,Sunday,11/15/2026,,,,,,,42.8642874,-71.6252484,11/02/2026
+Charity Event,Ryan Fennelly: Knee Lever,Unit 232,Littleton,Massachusetts,Sunday,12/6/2026,,,,,,,42.5375917,-71.5120096,11/04/2026
+Charity Event,Henry Oberlander Tribute Open Mat,Connors Martial Arts Academy,Norwood,Massachusetts,Sunday,11/22/2026,,,,,,,42.1945430,-71.1994976,11/05/2026
+Charity Event,We Defy Open Mat,Port City BJJ,Kittery,Maine,Saturday,11/21/2026,,,,,,,43.0856724,-70.7436580,11/05/2026
+Seminar,Mathew Hitchcock,Silvestre BJJ,Sanford,Maine,Saturday,11/7/2026,,,,,,,43.4387179,-70.7746224,11/06/2026
+Seminar,Matt Serra,Worcester MMA,Worcester,Massachusetts,Saturday,11/21/2026,,,,,,,42.2625621,-71.8018877,11/06/2026
+Comp (Invite),Reality Fighting,,Uncasville,Connecticut,Friday,5/14/2027,,,,,,,41.4346637,-72.1099870,11/08/2026
+Comp (Invite),In House BJJ Tournament,Mohawk MMA,Medway,Massachusetts,Wednesday,11/25/2026,,,,,,,42.1417641,-71.3967256,11/09/2026
+Seminar,Michael Pixley,Clandestine Submissions,Sanford,Maine,Sunday,12/6/2026,,,,,,,43.4387179,-70.7746224,11/10/2026
+Open Mat,Holiday Open Mat: 10:00AM,Clandestine Submissions,Sanford,Maine,Thursday,11/26/2026,,,,,,,43.4387179,-70.7746224,11/10/2026
+Seminar,Rudolfo Vieira,Daniel Gracie Academy,Plymouth,Massachusetts,Sunday,12/13/2026,,,,,,,41.9426657,-70.7618592,11/10/2026
+Open Mat,Holiday Open Mat: 12:00PM,Clubhouse JiuJitsu,Portland,Maine,Wednesday,11/11/2026,,,,,,,43.6573605,-70.2586618,11/10/2026
+Grand Opening,Grand Opening,Fifth Element Academy,Greenwich,Connecticut,Saturday,11/21/2026,,,,,,,41.0264862,-73.6284598,11/10/2026
+Open House,Soft Opening + Workshop,Daniel Gracie Academy,Wareham,Massachusetts,Sunday,11/15/2026,,,,,,,41.7626037,-70.7217017,11/12/2026
+Seminar,Mat Santos,Playground JiuJitsu,East Providence,Rhode Island,Saturday,11/28/2026,,,,,,,41.8194081,-71.3762570,11/12/2026
+Charity Event,Self Defense and Charity,310 Jiujitsu,Hudson,New Hampshire,Friday,11/20/2026,,,,,,,42.7655784,-71.4393423,11/12/2026
+Grand Opening,Grand Opening,Team Link BJJ,Worcester,Massachusetts,Monday,1/4/2027,,,,,,,42.2625621,-71.8018877,11/13/2026
+Women's Only,Women’s Open Mat,Fenix BJJ,Tewksbury,Massachusetts,Saturday,11/21/2026,,,,,,,42.6106479,-71.2342248,11/17/2026
+Seminar,Adalberto “Buda” De Souza,American Top Team,Danbury,Connecticut,Saturday,12/5/2026,,,,,,,41.3948170,-73.4540111,11/17/2026
+Women's Only,Women’s Open Mat,Morselli Jiu Jitsu,Taunton,Massachusetts,Sunday,12/6/2026,,,,,,,41.9019257,-71.0931485,11/18/2026
