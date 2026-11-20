@@ -140,7 +140,7 @@ export function setViewUI(view, { $, onIndexViewOpen, fromNativeScroll = false }
   const evIn = $("eventsSearchInput");
   if(evIn){
     evIn.value = String(activeEventsState().q || "");
-    evIn.setAttribute("placeholder", view === "index" ? "Search index" : "Search events");
+    evIn.setAttribute("placeholder", view === "index" ? "Search gyms" : "Search events");
   }
 
   if(view === "index" && typeof onIndexViewOpen === "function") onIndexViewOpen();
