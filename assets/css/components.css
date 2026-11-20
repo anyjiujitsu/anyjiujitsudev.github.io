@@ -243,8 +243,8 @@ line-height: 1;
 }
 
 .filter-pill[data-has-selection="true"] .pill__dot{
-  background: #D16C4E;
-  box-shadow: 0 0 0 2px rgba(209,108,78,0.45);
+  background: var(--green);
+  box-shadow: none;
 }
 
 /* section: menus | purpose: dropdown / checklist menus */
