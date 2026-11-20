@@ -489,7 +489,14 @@ input[type="search"]{ font-size:16px; }
     max-width: 100%;
   }
   .pill{ gap: 2px; }
-  .pill__caret{ font-size: 6.6px; margin-left: 1px; }
+  /* Match COMPS arrow sizing and spacing without resizing the filters. */
+  .pill.filter-pill{ justify-content: space-between; }
+  .pill.filter-pill .pill__caret{
+    font-size: 10px;
+    margin-left: 0;
+    flex: 0 0 auto;
+    line-height: 1;
+  }
 }
 
 /* FINAL MOBILE TUNING: make the view toggle match desktop proportions (without scaling, so it stays crisp) */
@@ -640,7 +647,7 @@ nav.filters, .filters__inner, .pillRow{
   /* keep caret aligned with label */
   .pill__caret{
     position: relative;
-    top: 1px;
+    top: 0;
   }
 }
 
