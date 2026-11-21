@@ -423,3 +423,35 @@
 #viewComps .boston-results-row .boston-athlete-event {
   font-size: inherit;
 }
+
+
+/* COMPS medal placements: round, low-contrast badges beside W/L/B only.
+   The existing result tile is unchanged; standalone /opens/ is unaffected. */
+#viewComps .boston-result-badges {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+#viewComps .boston-result-badges .boston-result-pill--tile {
+  margin-top: 0;
+}
+#viewComps .boston-medal-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: clamp(19px, 2.4em, 25px);
+  height: clamp(19px, 2.4em, 25px);
+  border-radius: 50%;
+  font-size: inherit;
+  line-height: 1;
+  font-weight: 800;
+  color: rgba(38, 39, 37, .7);
+  box-shadow: none;
+}
+#viewComps .boston-medal-badge--gold { background: rgba(219, 178, 60, .52); }
+#viewComps .boston-medal-badge--silver { background: rgba(154, 159, 164, .43); }
+#viewComps .boston-medal-badge--bronze { background: rgba(190, 127, 79, .42); }

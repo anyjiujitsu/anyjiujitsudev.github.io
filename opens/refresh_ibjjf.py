@@ -1034,6 +1034,151 @@ def single_entrant_bye_fight(soup, roster_names):
     return None
 
 
+
+def _podium_match_participants(block):
+    """Explicitly completed, two-person match only (not a BYE or no-show)."""
+    competitors = []
+    for node in block.select('.match-card__competitor'):
+        name_node = node.select_one('.match-card__competitor-name')
+        if name_node is None:
+            continue
+        name = normalize_competitor_name(name_node.get_text(' ', strip=True))
+        if not name or key(name) == 'bye' or is_placeholder_name(name):
+            continue
+        if node.select_one('.match-card__disqualification'):
+            return None
+        desc = node.select_one('.match-card__competitor-description')
+        classes = set(node.get('class', [])) | set(desc.get('class', []) if desc else [])
+        club = node.select_one('.match-card__club-name, .match-card__competitor-club-name')
+        competitors.append({
+            'name': name,
+            'team': clean(club.get_text(' ', strip=True)) if club else '',
+            'loser': 'match-competitor--loser' in classes,
+            'bye': False,
+            'placeholder': False,
+        })
+    if len(competitors) != 2 or key(competitors[0]['name']) == key(competitors[1]['name']):
+        return None
+    winners = [c for c in competitors if not c['loser']]
+    losers = [c for c in competitors if c['loser']]
+    if len(winners) != 1 or len(losers) != 1:
+        return None
+    return winners[0], losers[0]
+
+
+def _division_final_and_semifinals(soup):
+    """Locate terminal card and direct feeders only in complete bracket trees.
+
+    The same strict provider position layout already used for result inference
+    is required for shared-bronze placement. No FIGHT number guessing.
+    """
+    groups = {}
+    for block in soup.select('.tournament-category__match, .tournament-category_match'):
+        container = _bracket_container(block)
+        if container is None:
+            continue
+        layout = next((int(m.group(1)) for cls in container.get('class', [])
+                       if (m := re.fullmatch(r'tournament-category__bracket-(\d+)', cls))), None)
+        pos = _bracket_match_position(block)
+        if layout not in (1, 3, 7, 15) or pos is None:
+            continue
+        ident = id(container)
+        if ident not in groups:
+            groups[ident] = {'layout': layout, 'parent': id(container.parent),
+                             'cards': {}, 'duplicate': False}
+        group = groups[ident]
+        if pos in group['cards']:
+            group['duplicate'] = True
+        group['cards'][pos] = block
+
+    ordered = list(groups.values())
+    if ordered and all(not g['duplicate'] for g in ordered):
+        for group in ordered:
+            group['tiers'] = _position_tiers(group['cards'], group['layout'])
+            if not group['tiers']:
+                break
+        else:
+            if len(ordered) == 1:
+                tail = ordered[0]
+                tiers = tail['tiers']
+                return (tail['cards'][tiers[-1][0]],
+                        [tail['cards'][i] for i in tiers[-2]] if len(tiers) >= 2 else [])
+            layouts = [g['layout'] for g in ordered]
+            if (len({g['parent'] for g in ordered}) == 1 and
+                    layouts in ([15, 15, 1], [15, 15, 15, 15, 3])):
+                positions = sorted(pos for g in ordered for pos in g['cards'])
+                if positions == list(range(positions[0], positions[0] + len(positions))):
+                    tail = ordered[-1]
+                    final = tail['cards'][tail['tiers'][-1][0]]
+                    if tail['layout'] == 1:
+                        semifinalists = [g['cards'][g['tiers'][-1][0]] for g in ordered[:-1]]
+                    else:
+                        semifinalists = [tail['cards'][i] for i in tail['tiers'][-2]]
+                    return final, semifinalists
+
+    # Older provider HTML sometimes omits bracket-position classes entirely.
+    # A uniquely labeled final can establish gold and silver, but WITHOUT
+    # positional connections we cannot identify either bronze confidently.
+    labeled_finals = [block for block in soup.select('.tournament-category__match, .tournament-category_match')
+                      if block.select_one('.tournament-category__final-label, .tournament-category_final-label')]
+    if len(labeled_finals) == 1:
+        return labeled_finals[0], []
+    return None, []
+
+
+def division_podium(soup):
+    """Conservative final standings: 1 champion, 1 runner-up, 2 shared bronzes.
+
+    The final MUST show one real named loser and one winner. The two losing
+    semifinalists get bronze only if their winners are proved to advance to
+    that exact final by the same identity checks used for match inference.
+    This never reads seed/rank numbers as placements or changes W/L/B.
+    """
+    final, semifinals = _division_final_and_semifinals(soup)
+    if final is None:
+        return {}
+    finalists = _podium_match_participants(final)
+    if finalists is None:
+        return {}
+    gold, silver = finalists
+    podium = {key(gold['name']): 1, key(silver['name']): 2}
+
+    if len(semifinals) == 2:
+        semifinal_results = [_podium_match_participants(semi) for semi in semifinals]
+        if all(semifinal_results):
+            finalists_used = set()
+            bronze = []
+            for semifinal, result in zip(semifinals, semifinal_results):
+                winner, loser = result
+                matches = [i for i, finalist in enumerate(finalists)
+                           if _verified_advancement_identity(semifinal, winner, final, finalist)]
+                if len(matches) != 1 or matches[0] in finalists_used:
+                    break
+                finalists_used.add(matches[0])
+                bronze.append(key(loser['name']))
+            if len(bronze) == 2 and len(set([*podium, *bronze])) == 4:
+                for name in bronze:
+                    podium[name] = 3
+
+    # Avoid identifying same-name competitors from different academies as the
+    # same person: ambiguous names never receive a placement badge.
+    names_to_clubs = defaultdict(set)
+    for block in soup.select('.tournament-category__match, .tournament-category_match'):
+        for competitor in block.select('.match-card__competitor'):
+            node = competitor.select_one('.match-card__competitor-name')
+            if node is None:
+                continue
+            name = key(normalize_competitor_name(node.get_text(' ', strip=True)))
+            club = competitor.select_one('.match-card__club-name, .match-card__competitor-club-name')
+            if name and club:
+                club_name = key(club.get_text(' ', strip=True))
+                if club_name:
+                    names_to_clubs[name].add(club_name)
+    for name in list(podium):
+        if len(names_to_clubs[name]) > 1:
+            podium.pop(name)
+    return podium
+
 def known_bracket_competitors(soup):
     """Find registered competitors on a loaded category page, including ranking.
 
@@ -1110,6 +1255,7 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity, competitio
         try:
             bracket_soup = get_soup(info['url'])
             fights = parse_fights(bracket_soup)
+            podium = division_podium(bracket_soup)
             capture_unresolved_bracket_evidence(bracket_soup, fights, info['url'])
             # A sole-entrant FINAL against BYE may have no FIGHT/Mat/Time
             # heading; recognize it from the bracket card itself.
@@ -1131,6 +1277,9 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity, competitio
                         row['time_type'] = 'listed fight' if fight.get('time') else 'completed result without published time'
                         row['fight_number'] = fight.get('number', '')
                         row['result'] = fight.get('result_map', {}).get(key(athlete['name']), '')
+                        row.pop('placement', None)  # Never carry a stale podium onto new results.
+                        if row['result'] in ('WIN', 'LOSS', 'BYE') and key(athlete['name']) in podium:
+                            row['placement'] = podium[key(athlete['name'])]
                         start = scheduled_at(fight, competition)
                         if start:
                             row['scheduled_at'] = start
@@ -1228,6 +1377,7 @@ def roster_from_brackets(comp):
                 raise fetched
             soup = fetched
             fights = parse_fights(soup)
+            podium = division_podium(soup)
             capture_unresolved_bracket_evidence(soup, fights, url)
             checked += 1
         except (requests.RequestException, ValueError) as exc:
@@ -1278,6 +1428,8 @@ def roster_from_brackets(comp):
                     'bracket_url': url, 'time_type': 'listed fight' if fight.get('time') else 'completed result without published time',
                     'fight_number': fight.get('number', ''), 'result': result,
                 }
+                if result in ('WIN', 'LOSS', 'BYE') and key(name) in podium:
+                    row['placement'] = podium[key(name)]
                 start = scheduled_at(fight, comp)
                 if start:
                     row['scheduled_at'] = start

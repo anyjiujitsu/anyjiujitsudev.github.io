@@ -356,7 +356,7 @@ async function getJson(path) {
 }
 function appendCell(parent, text, cls = '') { const span = document.createElement('span'); span.className = cls; span.textContent = text || '—'; parent.append(span); }
 // Display IBJJF divisions with a muted belt-color bar spanning age, gender, and weight.
-function appendBracketCell(parent, bracketText, resultText = '') {
+function appendBracketCell(parent, bracketText, resultText = '', placement = null) {
   const text = String(bracketText || '').trim();
   const parts = text.split(/\s*\/\s*/).map(part => part.trim());
   const colors = { white: '#dfd8c9', blue: '#647e9a', purple: '#877790', brown: '#886f60', black: '#3e403f', gray: '#8d908e', grey: '#8d908e', yellow: '#c0ae7c', orange: '#b68a68', green: '#6f8878' };
@@ -400,7 +400,22 @@ function appendBracketCell(parent, bracketText, resultText = '') {
     } else {
       pill.textContent = `-${result}-`;
     }
-    lines.append(pill);
+    const rank = Number(placement);
+    const integrated = Boolean(document.getElementById('viewComps')?.contains(rows));
+    if (integrated && [1, 2, 3].includes(rank) && compactResult) {
+      const badges = document.createElement('span');
+      badges.className = 'boston-result-badges';
+      const medal = document.createElement('span');
+      medal.className = `boston-medal-badge boston-medal-badge--${{1:'gold',2:'silver',3:'bronze'}[rank]}`;
+      medal.textContent = String(rank);
+      const place = {1:'Gold · 1st place',2:'Silver · 2nd place',3:'Bronze · shared 3rd place'}[rank];
+      medal.title = place;
+      medal.setAttribute('aria-label', place);
+      badges.append(pill, medal);
+      lines.append(badges);
+    } else {
+      lines.append(pill);
+    }
   }
   cell.append(bar, lines);
   parent.append(cell);
@@ -518,7 +533,7 @@ function renderAthletes(items) {
     event.title = athlete.competition_name || '';
     primary.append(academy, event);
     row.append(primary);
-    appendBracketCell(row, athlete.bracket || athlete.division || '—', athlete.result || '');
+    appendBracketCell(row, athlete.bracket || athlete.division || '—', athlete.result || '', athlete.placement);
     appendMatchTime(row, athlete, isFinished);
     appendCell(row, athlete.mat || '—'); appendCell(row, athlete.day || '—');
     (isFinished ? finishedCard : activeCard).append(row);
