@@ -588,10 +588,25 @@ function applySearch({ persist = true } = {}) {
   hasRenderedSearch = true;
   const found = (roster.athletes || []).filter(a => chosen.has(String(a.competition_id)) && (chosenAcademies.has(normalized(a.team)) || chosenAthletes.has(athleteKey(a))));
   found.sort((a,b) => {
-    const fa = ['WIN','LOSS','BYE'].includes(String(a.result || '').trim().toUpperCase()) ? 1 : 0;
-    const fb = ['WIN','LOSS','BYE'].includes(String(b.result || '').trim().toUpperCase()) ? 1 : 0;
-    const da=dayRank(a.day), db=dayRank(b.day);
-    return fa-fb || da-db || timeRank(a.time)-timeRank(b.time) || a.name.localeCompare(b.name);
+    const ra = String(a.result || '').trim().toUpperCase();
+    const rb = String(b.result || '').trim().toUpperCase();
+    const fa = ['WIN', 'LOSS', 'BYE'].includes(ra) ? 1 : 0;
+    const fb = ['WIN', 'LOSS', 'BYE'].includes(rb) ? 1 : 0;
+    if (fa !== fb) return fa - fb; // Active matches remain above finished matches.
+
+    const da = dayRank(a.day), db = dayRank(b.day);
+    const ta = timeRank(a.time), tb = timeRank(b.time);
+    if (!fa) return da - db || ta - tb || a.name.localeCompare(b.name); // Active: earliest first.
+
+    // Finished: dated/timed results newest first; unassigned matches and BYEs last.
+    if (ra === 'BYE' || rb === 'BYE') {
+      if (ra !== rb) return ra === 'BYE' ? 1 : -1;
+    }
+    const hasTimeA = ta !== 9999, hasTimeB = tb !== 9999;
+    if (hasTimeA !== hasTimeB) return hasTimeA ? -1 : 1;
+    const hasDayA = da !== 9999, hasDayB = db !== 9999;
+    if (hasDayA !== hasDayB) return hasDayA ? -1 : 1;
+    return (hasDayA ? db - da : 0) || (hasTimeA ? tb - ta : 0) || a.name.localeCompare(b.name);
   });
   renderAthletes(found);
   const loaded = new Set((roster.loaded_competition_ids || []).map(String));
