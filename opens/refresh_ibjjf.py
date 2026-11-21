@@ -812,7 +812,10 @@ def infer_final_walkovers(evidence_records):
             fights_by_number[int(fight['number'])].append((fight, block))
 
     for final, final_block, publish in evidence_records:
-        if not publish or final['result_map'] or not final_block.select_one(
+        # A real FINAL card need not have a scheduled time. Infer the result
+        # from the same verified feeder evidence even when it was not yet
+        # publishable as a scheduled match.
+        if final['result_map'] or not final_block.select_one(
             '.tournament-category__final-label, .tournament-category_final-label'
         ):
             continue
@@ -936,7 +939,15 @@ def parse_fights(soup):
         # Advancement requires a mapped direct edge, not just a later final.
         infer_advancement_from_bracket_positions(pairs)
         infer_final_walkovers(evidence_records)
-        return [f for f, _, publish in evidence_records if publish]
+        # Publish a genuinely existing, unscheduled FINAL only after the
+        # narrowly verified walkover inference resolves its winner. Never
+        # create a match from a placeholder or an unresolved feeder.
+        return [f for f, block, publish in evidence_records
+                if publish or (f.get('result_source') in
+                               ('double-no-show-feeder', 'single-eliminated-feeder')
+                               and block.select_one(
+                                   '.tournament-category__final-label, .tournament-category_final-label')
+                               and list(f.get('result_map', {}).values()) == ['WIN'])]
 
     container = soup.select_one('main') or soup.body or soup
     lines = [clean(v) for v in container.get_text('\n', strip=True).splitlines()]
@@ -1027,13 +1038,42 @@ def single_entrant_bye_fight(soup, roster_names):
         all_names = {n for n in all_names if n and not is_placeholder_name(n)}
         if all_names != {name_key}:
             continue
-        return {
+        # Preserve existing BYE recovery. Medal eligibility is an additional,
+        # stricter check and never changes which BYE rows are detected.
+        final_index = _sole_final_bye_card_index(soup, name)
+        recovered = {
             'number': '', 'mat': '', 'time': '', 'day': '', 'date': '',
             'competitors': [{'name': name, 'loser': False, 'bye': False, 'placeholder': False}],
             'result_map': {name_key: 'BYE'}
         }
+        if final_index is not None:
+            recovered['bracket_card_index'] = final_index
+            recovered['verified_solo_final'] = True
+        return recovered
     return None
 
+
+
+def _sole_final_bye_card_index(soup, athlete_name):
+    """Verify ONE named category entrant and a FINAL card explicitly against BYE.
+
+    A preliminary-round BYE, a single athlete from one selected academy, or
+    an unknown opponent is never enough to award gold.
+    """
+    name = key(athlete_name)
+    actual = {key(normalize_competitor_name(n.get_text(' ', strip=True)))
+              for n in soup.select('.match-card__competitor-name')
+              if key(n.get_text(' ', strip=True)) != 'bye'}
+    actual = {n for n in actual if n and not is_placeholder_name(n)}
+    if actual != {name}:
+        return None
+    matches = [(i, card) for i, card in enumerate(soup.select(
+        '.tournament-category__match, .tournament-category_match'))
+        if card.select_one('.tournament-category__final-label, .tournament-category_final-label')
+        and re.search(r'(?<!\w)BYE(?!\w)', card.get_text(' ', strip=True), re.I)
+        and any(key(normalize_competitor_name(n.get_text(' ', strip=True))) == name
+                for n in card.select('.match-card__competitor-name'))]
+    return matches[0][0] if len(matches) == 1 else None
 
 
 def _podium_match_participants(block):
@@ -1181,16 +1221,14 @@ def division_podium(soup):
     return podium
 
 
-def division_medal_matches(soup):
-    """Map podium awards to the exact match card where each medal was earned.
+def division_medal_matches(soup, fights=None):
+    """Map medals only to the deciding match, including verified unusual finals.
 
-    Gold and silver belong to the final; each shared bronze belongs to the
-    corresponding semifinal loss. Do not stamp a division placement on every
-    earlier match fought by the same athlete.
+    Normal finals and shared bronzes retain their existing strict logic. A
+    true one-entrant FINAL/BYE or a final resolved by the already-verified
+    no-show feeder inference can also earn gold, never an unplayed final.
     """
     standings = division_podium(soup)
-    if not standings:
-        return {}
     final, semifinals = _division_final_and_semifinals(soup)
     if final is None:
         return {}
@@ -1217,6 +1255,26 @@ def division_medal_matches(soup):
         if result is not None:
             _, loser = result
             award(semifinal, loser, 3)
+
+    # For these finals there is no conventional runner-up to identify from
+    # two named, completed slots. Use only outcomes verified by parse_fights,
+    # and never infer medals from the rankings/seed table.
+    if not standings and fights is not None:
+        final_idx = card_indexes[id(final)]
+        final_fights = [f for f in fights if f.get('bracket_card_index') == final_idx]
+        if len(final_fights) == 1:
+            fight = final_fights[0]
+            people = [c for c in fight.get('competitors', [])
+                      if not c.get('bye') and not c.get('placeholder') and key(c.get('name'))]
+            if len(people) == 1:
+                name = key(people[0]['name'])
+                outcome = fight.get('result_map', {}).get(name)
+                if (outcome == 'WIN' and fight.get('result_source') in
+                        ('double-no-show-feeder', 'single-eliminated-feeder')):
+                    awards[(final_idx, name)] = 1
+                elif (outcome == 'BYE' and
+                      _sole_final_bye_card_index(soup, name) == final_idx):
+                    awards[(final_idx, name)] = 1
     return awards
 
 
@@ -1228,7 +1286,10 @@ def medal_for_fight(fight, athlete_name, medal_matches):
     athlete_key = key(athlete_name)
     rank = medal_matches.get((card_index, athlete_key))
     result = fight.get('result_map', {}).get(athlete_key, '')
-    if rank == 1 and result == 'WIN':
+    if rank == 1 and result in ('WIN', 'BYE'):
+        return 1
+    # One-entrant final fallback when the page has an unusual match wrapper.
+    if rank is None and fight.get('verified_solo_final') and result == 'BYE':
         return 1
     if rank in (2, 3) and result == 'LOSS':
         return rank
@@ -1310,7 +1371,7 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity, competitio
         try:
             bracket_soup = get_soup(info['url'])
             fights = parse_fights(bracket_soup)
-            medal_matches = division_medal_matches(bracket_soup)
+            medal_matches = division_medal_matches(bracket_soup, fights)
             capture_unresolved_bracket_evidence(bracket_soup, fights, info['url'])
             # A sole-entrant FINAL against BYE may have no FIGHT/Mat/Time
             # heading; recognize it from the bracket card itself.
@@ -1433,7 +1494,7 @@ def roster_from_brackets(comp):
                 raise fetched
             soup = fetched
             fights = parse_fights(soup)
-            medal_matches = division_medal_matches(soup)
+            medal_matches = division_medal_matches(soup, fights)
             capture_unresolved_bracket_evidence(soup, fights, url)
             checked += 1
         except (requests.RequestException, ValueError) as exc:
