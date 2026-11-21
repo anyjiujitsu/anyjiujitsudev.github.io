@@ -845,7 +845,7 @@ def parse_fights(soup):
     evidence_records = []
 
     blocks = soup.select('.tournament-category__match, .tournament-category_match')
-    for block in blocks:
+    for card_index, block in enumerate(blocks):
         header_node = block.select_one('.tournament-category__match-header, .tournament-category_match-header, .bracket-match-header')
         header_text = clean(header_node.get_text(' ', strip=True) if header_node else '')
         fields = parse_header_fields(header_text)
@@ -924,7 +924,8 @@ def parse_fights(soup):
 
         # Retain a card only if scheduled or it proves a completed result.
         # Otherwise an undated placeholder must not become a new match.
-        fight = {**fields, 'competitors': competitors, 'result_map': result_map}
+        fight = {**fields, 'competitors': competitors, 'result_map': result_map,
+                 'bracket_card_index': card_index}
         # Save the initial publication decision BEFORE inferring a result. A
         # non-scheduled card may provide evidence but must not create a new row.
         publish = bool((fields['mat'] and fields['time'] and fields['day']) or result_map)
@@ -1179,6 +1180,60 @@ def division_podium(soup):
             podium.pop(name)
     return podium
 
+
+def division_medal_matches(soup):
+    """Map podium awards to the exact match card where each medal was earned.
+
+    Gold and silver belong to the final; each shared bronze belongs to the
+    corresponding semifinal loss. Do not stamp a division placement on every
+    earlier match fought by the same athlete.
+    """
+    standings = division_podium(soup)
+    if not standings:
+        return {}
+    final, semifinals = _division_final_and_semifinals(soup)
+    if final is None:
+        return {}
+    cards = soup.select('.tournament-category__match, .tournament-category_match')
+    card_indexes = {id(block): index for index, block in enumerate(cards)}
+    awards = {}
+
+    def award(block, athlete, rank):
+        athlete_key = key(athlete['name'])
+        index = card_indexes.get(id(block))
+        if index is not None and standings.get(athlete_key) == rank:
+            awards[(index, athlete_key)] = rank
+
+    finalists = _podium_match_participants(final)
+    if finalists is not None:
+        winner, loser = finalists
+        award(final, winner, 1)
+        award(final, loser, 2)
+
+    # division_podium verified BOTH direct semifinal advancements before
+    # awarding either shared bronze. No third-place fight is invented.
+    for semifinal in semifinals:
+        result = _podium_match_participants(semifinal)
+        if result is not None:
+            _, loser = result
+            award(semifinal, loser, 3)
+    return awards
+
+
+def medal_for_fight(fight, athlete_name, medal_matches):
+    """Only attach a medal to that athlete's verified deciding match result."""
+    card_index = fight.get('bracket_card_index')
+    if card_index is None:
+        return None  # Text-only fallback cannot identify the exact bracket card.
+    athlete_key = key(athlete_name)
+    rank = medal_matches.get((card_index, athlete_key))
+    result = fight.get('result_map', {}).get(athlete_key, '')
+    if rank == 1 and result == 'WIN':
+        return 1
+    if rank in (2, 3) and result == 'LOSS':
+        return rank
+    return None
+
 def known_bracket_competitors(soup):
     """Find registered competitors on a loaded category page, including ranking.
 
@@ -1255,7 +1310,7 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity, competitio
         try:
             bracket_soup = get_soup(info['url'])
             fights = parse_fights(bracket_soup)
-            podium = division_podium(bracket_soup)
+            medal_matches = division_medal_matches(bracket_soup)
             capture_unresolved_bracket_evidence(bracket_soup, fights, info['url'])
             # A sole-entrant FINAL against BYE may have no FIGHT/Mat/Time
             # heading; recognize it from the bracket card itself.
@@ -1278,8 +1333,9 @@ def fill_assignments(athletes, bracket_entries, previous_by_identity, competitio
                         row['fight_number'] = fight.get('number', '')
                         row['result'] = fight.get('result_map', {}).get(key(athlete['name']), '')
                         row.pop('placement', None)  # Never carry a stale podium onto new results.
-                        if row['result'] in ('WIN', 'LOSS', 'BYE') and key(athlete['name']) in podium:
-                            row['placement'] = podium[key(athlete['name'])]
+                        placement = medal_for_fight(fight, athlete['name'], medal_matches)
+                        if placement is not None:
+                            row['placement'] = placement
                         start = scheduled_at(fight, competition)
                         if start:
                             row['scheduled_at'] = start
@@ -1377,7 +1433,7 @@ def roster_from_brackets(comp):
                 raise fetched
             soup = fetched
             fights = parse_fights(soup)
-            podium = division_podium(soup)
+            medal_matches = division_medal_matches(soup)
             capture_unresolved_bracket_evidence(soup, fights, url)
             checked += 1
         except (requests.RequestException, ValueError) as exc:
@@ -1428,8 +1484,9 @@ def roster_from_brackets(comp):
                     'bracket_url': url, 'time_type': 'listed fight' if fight.get('time') else 'completed result without published time',
                     'fight_number': fight.get('number', ''), 'result': result,
                 }
-                if result in ('WIN', 'LOSS', 'BYE') and key(name) in podium:
-                    row['placement'] = podium[key(name)]
+                placement = medal_for_fight(fight, name, medal_matches)
+                if placement is not None:
+                    row['placement'] = placement
                 start = scheduled_at(fight, comp)
                 if start:
                     row['scheduled_at'] = start
