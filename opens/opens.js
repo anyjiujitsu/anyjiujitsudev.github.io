@@ -40,7 +40,7 @@ let roster = { athletes: [], loaded_competition_ids: [], errors: {} };
 let hasRenderedSearch = false;
 let rosterFingerprint = '';
 let refreshInFlight = false;
-const ROSTER_POLL_MS = 120000; // Check the published dataset every two minutes.
+const ROSTER_POLL_MS = 30000; // Check for published updates every 30 seconds while COMPS is visible.
 const normalized = v => String(v || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
 const SAVED_SEARCH_KEY = 'opens:last-search:v1';
 function saveSearch() {
@@ -349,8 +349,8 @@ window.visualViewport?.addEventListener('resize', () => requestAnimationFrame(fi
 window.visualViewport?.addEventListener('scroll', () => requestAnimationFrame(fitAthleteMenu));
 document.addEventListener('pointerdown', e => { if (!$('athletePicker').contains(e.target)) setAthleteMenu(false); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') setAthleteMenu(false); });
-async function getJson(path) {
-  const response = await fetch(path, { cache: 'no-store' });
+async function getJson(path, cache = 'no-store') {
+  const response = await fetch(path, { cache });
   if (!response.ok) throw new Error(`Could not read ${path} (HTTP ${response.status}).`);
   return response.json();
 }
@@ -648,10 +648,10 @@ initialize();
 // reload that published snapshot independently of the Python scrape interval.
 // This never triggers a scrape, changes admin settings, or edits saved selections.
 async function checkPublishedRoster() {
-  if (refreshInFlight || document.visibilityState === 'hidden') return;
+  if (refreshInFlight || document.visibilityState === 'hidden' || !isCompsVisible()) return;
   refreshInFlight = true;
   try {
-    const next = await getJson(new URL('./athletes.json', import.meta.url).href);
+    const next = await getJson(new URL('./athletes.json', import.meta.url).href, 'no-cache');
     if (!Array.isArray(next.athletes)) throw new Error('Invalid athlete dataset');
     // updated_at changes on every successful scrape, even if no match changed.
     // Compare actual published data to avoid flickering the list unnecessarily.
@@ -692,12 +692,23 @@ async function checkPublishedRoster() {
     refreshInFlight = false;
   }
 }
+// Poll only while the browser tab and COMPS slide are active. Observe the
+// existing slide selector so native swipes and button taps both trigger a check.
+function isCompsVisible() {
+  return $('tabComps')?.getAttribute('aria-selected') === 'true';
+}
 setInterval(checkPublishedRoster, ROSTER_POLL_MS);
 setInterval(updateMatchCountdowns, 1000);
 function refreshVisibleMatches() {
-  if (document.visibilityState === 'hidden') return;
+  if (document.visibilityState === 'hidden' || !isCompsVisible()) return;
   updateMatchCountdowns();
   checkPublishedRoster();
 }
 document.addEventListener('visibilitychange', refreshVisibleMatches);
 window.addEventListener('focus', refreshVisibleMatches);
+const compsTab = $('tabComps');
+if (compsTab) {
+  new MutationObserver(refreshVisibleMatches).observe(compsTab, {
+    attributes: true, attributeFilter: ['aria-selected']
+  });
+}
