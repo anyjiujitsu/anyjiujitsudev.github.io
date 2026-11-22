@@ -222,11 +222,19 @@ export function wireViewToggle({ $, onIndexViewOpen } = {}){
   const initialIndex = ["events", "index", "comps"].indexOf(initialView);
   if(viewShell){
     const previousBehavior = viewShell.style.scrollBehavior;
+    const previousSnap = viewShell.style.scrollSnapType;
     viewShell.style.scrollBehavior = "auto";
-    viewShell.scrollLeft = initialIndex * viewShell.clientWidth;
+    viewShell.style.scrollSnapType = "none";
+    viewShell.scrollTo({ left: initialIndex * viewShell.clientWidth, behavior: "instant" });
+    viewShell.style.scrollSnapType = previousSnap;
     viewShell.style.scrollBehavior = previousBehavior;
   }
   setViewUI(initialView, { $, onIndexViewOpen, fromNativeScroll:true });
+  // Page was shielded by an inline head script before the first paint.
+  // Reveal only after the native slider and header agree on the restored view.
+  requestAnimationFrame(() => {
+    document.documentElement.classList.remove("anyjj-restoring-view");
+  });
 
   // A single route for tab clicks. The thumb only follows the physical scroll.
   const views = ["events", "index", "comps"];
