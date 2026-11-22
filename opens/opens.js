@@ -489,55 +489,125 @@ function appendMatchTime(row, match, isFinished) {
   time.append(meter);
 }
 
+// Keep DOM nodes for unchanged matches. A stable fight identity is intentionally
+// independent of result, placement, mat and time so status updates can move a
+// card without replacing the other cards on screen.
+const finishedResult = athlete => ['WIN', 'LOSS', 'BYE'].includes(String(athlete.result || '').trim().toUpperCase());
+function matchIdentity(athlete) {
+  return JSON.stringify([
+    String(athlete.competition_id || ''),
+    String(athlete.bracket_url || athlete.bracket || athlete.division || ''),
+    normalized(athlete.name), normalized(athlete.team),
+    String(athlete.fight_number || athlete.scheduled_at || athlete.time || '')
+  ]);
+}
+function createMatchRow(athlete) {
+  const isFinished = finishedResult(athlete);
+  const row = document.createElement('div'); row.className = 'boston-results-row';
+  if (isFinished) row.classList.add('is-finished');
+  const primary = document.createElement('span');
+  const a = document.createElement('a'); a.href = athlete.bracket_url || `https://ibjjf.com/events/${encodeURIComponent(athlete.competition_id)}/athletes-list-by-academy-teams`;
+  a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = athlete.name; primary.append(a);
+  const academy = document.createElement('small');
+  academy.className = 'boston-athlete-academy';
+  academy.textContent = athlete.team || 'Team unavailable';
+  academy.title = academy.textContent;
+  const event = document.createElement('small');
+  event.className = 'boston-athlete-event';
+  event.textContent = String(athlete.competition_name || '')
+    .replace(/\b(?:international|jiu[-– ]jitsu|championships?)\b/gi, '')
+    .replace(/\s{2,}/g, ' ').replace(/\s+([.,-])/g, '$1').trim();
+  event.title = athlete.competition_name || '';
+  primary.append(academy, event);
+  row.append(primary);
+  appendBracketCell(row, athlete.bracket || athlete.division || '—', athlete.result || '', athlete.placement);
+  appendMatchTime(row, athlete, isFinished);
+  appendCell(row, athlete.mat || '—'); appendCell(row, athlete.day || '—');
+  return row;
+}
+function orderedMatchKeys(items) {
+  const counts = new Map();
+  return items.map(athlete => {
+    const base = matchIdentity(athlete);
+    const occurrence = counts.get(base) || 0;
+    counts.set(base, occurrence + 1);
+    // Rare duplicate fight identifiers: distinguish using the scheduled time.
+    // This affects only duplicates; ordinary matches retain identity if re-timed.
+    return { athlete, base, occurrence };
+  }).map(({ athlete, base, occurrence }) => {
+    if (counts.get(base) === 1) return { athlete, key: base };
+    return { athlete, key: base + ':' + String(athlete.scheduled_at || athlete.time || occurrence) };
+  });
+}
+function reconcileCard(card, entries, previous) {
+  const keep = new Set();
+  // insertBefore only when the existing node is out of position; this moves
+  // actual DOM elements without clearing the card or flashing its siblings.
+  entries.forEach(({ athlete, key }, index) => {
+    keep.add(key);
+    const signature = JSON.stringify(athlete);
+    const existing = previous.get(key);
+    let row;
+    if (existing) {
+      row = existing.node;
+      if (existing.signature !== signature) {
+        const updated = createMatchRow(athlete);
+        row.className = updated.className;
+        row.replaceChildren(...updated.childNodes);
+      }
+    } else {
+      row = createMatchRow(athlete);
+    }
+    previous.set(key, { node: row, signature });
+    const current = card.children[index];
+    if (current !== row) card.insertBefore(row, current || null);
+  });
+  for (const node of [...card.children]) {
+    if (!entries.some(entry => previous.get(entry.key)?.node === node)) node.remove();
+  }
+  return keep;
+}
+const visibleMatchNodes = new Map();
 function renderAthletes(items) {
   updateActiveCount(items);
-  rows.replaceChildren();
-  if (!items.length) { const blank = document.createElement('div'); blank.className = 'boston-empty'; blank.textContent = 'No athletes matched your search in the available rosters.'; rows.append(blank); return; }
-  const isFinishedMatch = athlete => ['WIN', 'LOSS', 'BYE'].includes(String(athlete.result || '').trim().toUpperCase());
-  const upcoming = items.filter(athlete => !isFinishedMatch(athlete));
-  const finishedItems = items.filter(isFinishedMatch);
-  const ordered = upcoming.concat(finishedItems);
-  // Separate the active and finished match cardbodies without changing row content.
-  const activeCard = document.createElement('div');
-  activeCard.className = 'boston-match-card boston-match-card--active';
-  if (upcoming.length) rows.append(activeCard);
-  let finishedCard = null;
-  let finishedSectionStarted = false;
-  for (const athlete of ordered) {
-    const isFinished = isFinishedMatch(athlete);
-    if (isFinished && !finishedSectionStarted) {
-      const divider = document.createElement('div');
-      divider.className = 'boston-finished-divider';
-      divider.textContent = 'FINISHED MATCHES';
-      rows.append(divider);
-      finishedCard = document.createElement('div');
-      finishedCard.className = 'boston-match-card boston-match-card--finished';
-      rows.append(finishedCard);
-      finishedSectionStarted = true;
-    }
-    const row = document.createElement('div'); row.className = 'boston-results-row';
-    if (isFinished) row.classList.add('is-finished');
-    const primary = document.createElement('span');
-    const a = document.createElement('a'); a.href = athlete.bracket_url || `https://ibjjf.com/events/${encodeURIComponent(athlete.competition_id)}/athletes-list-by-academy-teams`;
-    a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = athlete.name; primary.append(a);
-    // Display-only presentation: keep the complete academy name in dropdowns and saved data.
-    const academy = document.createElement('small');
-    academy.className = 'boston-athlete-academy';
-    academy.textContent = athlete.team || 'Team unavailable';
-    academy.title = academy.textContent;
-    const event = document.createElement('small');
-    event.className = 'boston-athlete-event';
-    event.textContent = String(athlete.competition_name || '')
-      .replace(/\b(?:international|jiu[-– ]jitsu|championships?)\b/gi, '')
-      .replace(/\s{2,}/g, ' ').replace(/\s+([.,-])/g, '$1').trim();
-    event.title = athlete.competition_name || '';
-    primary.append(academy, event);
-    row.append(primary);
-    appendBracketCell(row, athlete.bracket || athlete.division || '—', athlete.result || '', athlete.placement);
-    appendMatchTime(row, athlete, isFinished);
-    appendCell(row, athlete.mat || '—'); appendCell(row, athlete.day || '—');
-    (isFinished ? finishedCard : activeCard).append(row);
+  if (!items.length) {
+    rows.replaceChildren();
+    visibleMatchNodes.clear();
+    const blank = document.createElement('div'); blank.className = 'boston-empty';
+    blank.textContent = 'No athletes matched your search in the available rosters.';
+    rows.append(blank);
+    return;
   }
+  const entries = orderedMatchKeys(items);
+  const active = entries.filter(entry => !finishedResult(entry.athlete));
+  const finished = entries.filter(entry => finishedResult(entry.athlete));
+  let activeCard = rows.querySelector('.boston-match-card--active');
+  let finishedCard = rows.querySelector('.boston-match-card--finished');
+  let divider = rows.querySelector('.boston-finished-divider');
+  if (active.length && !activeCard) {
+    activeCard = document.createElement('div');
+    activeCard.className = 'boston-match-card boston-match-card--active';
+  }
+  if (finished.length && !finishedCard) {
+    finishedCard = document.createElement('div');
+    finishedCard.className = 'boston-match-card boston-match-card--finished';
+  }
+  if (finished.length && !divider) {
+    divider = document.createElement('div');
+    divider.className = 'boston-finished-divider';
+    divider.textContent = 'FINISHED MATCHES';
+  }
+  // Place containers in their final order; do not replace existing containers.
+  const expected = [active.length ? activeCard : null, finished.length ? divider : null,
+    finished.length ? finishedCard : null].filter(Boolean);
+  expected.forEach((node, index) => {
+    if (rows.children[index] !== node) rows.insertBefore(node, rows.children[index] || null);
+  });
+  for (const node of [...rows.children]) if (!expected.includes(node)) node.remove();
+  if (active.length) reconcileCard(activeCard, active, visibleMatchNodes);
+  if (finished.length) reconcileCard(finishedCard, finished, visibleMatchNodes);
+  const keys = new Set(entries.map(entry => entry.key));
+  for (const key of visibleMatchNodes.keys()) if (!keys.has(key)) visibleMatchNodes.delete(key);
   updateMatchCountdowns();
 }
 // Calendar day first, then actual clock time; missing assignments sort last.
@@ -565,6 +635,7 @@ $('clearAllButton').addEventListener('click', () => {
   syncAthleteSearchClear();
   updateLabel(); showOptions(); updateAcademies(); updateAthletes();
   rows.replaceChildren();
+  visibleMatchNodes.clear();
   updateActiveCount([]);
   const empty = document.createElement('div');
   empty.className = 'boston-empty'; empty.textContent = ' ';
@@ -577,6 +648,7 @@ function applySearch({ persist = true } = {}) {
   if (!chosen.size || (!chosenAcademies.size && !chosenAthletes.size)) {
     hasRenderedSearch = false;
     rows.replaceChildren();
+    visibleMatchNodes.clear();
     updateActiveCount([]);
     const empty = document.createElement('div');
     empty.className = 'boston-empty';
