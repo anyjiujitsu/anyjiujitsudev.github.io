@@ -1,6 +1,25 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <script>
+    // Run synchronously in <head>: prevent the default EVENTS view from flashing
+    // before the module restores a saved GYMS or COMPS view for this tab.
+    try {
+      if (["index", "comps"].includes(sessionStorage.getItem("anyjj:active-view:v1"))) {
+        document.documentElement.classList.add("anyjj-restoring-view");
+      }
+    } catch (_) {}
+  </script>
+  <style>
+    /* Preserve layout without showing the wrong slide/header during restoration. */
+    .anyjj-restoring-view #viewShell,
+    .anyjj-restoring-view #viewTitle,
+    .anyjj-restoring-view #viewToggle,
+    .anyjj-restoring-view #eventsFilters,
+    .anyjj-restoring-view #compsFilters,
+    .anyjj-restoring-view #headerCounts { visibility: hidden !important; }
+  </style>
+
 
   <meta property="og:type" content="website">
 <meta property="og:title" content="ANY N.E. GRAPPLING (DEV)">
@@ -32,7 +51,7 @@
   <link rel="stylesheet" href="opens/countdown.css?v=2" />
   <link rel="stylesheet" href="assets/css/comps-integration.css" />
 <!-- IMPORTANT: repo references main.js (no sequence) -->
-  <script type="module" src="assets/js/main.js?v=remember-tab-view-1"></script>
+  <script type="module" src="assets/js/main.js?v=selected-view-no-flash-1"></script>
 </head>
 
 <body>
