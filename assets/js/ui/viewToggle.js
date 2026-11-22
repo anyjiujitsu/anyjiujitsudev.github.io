@@ -6,6 +6,21 @@ import { state, setView } from "../state.js?v=20260212-902";
 import { refreshEventsPillDots } from "./pills.js?v=20260210-911";
 
 const VIEW_LOCKED = false;
+const SAVED_VIEW_KEY = "anyjj:active-view:v1";
+const VALID_VIEWS = new Set(["events", "index", "comps"]);
+
+function readSavedView(){
+  try {
+    const saved = sessionStorage.getItem(SAVED_VIEW_KEY);
+    return VALID_VIEWS.has(saved) ? saved : "events";
+  } catch (_) { return "events"; }
+}
+
+function saveSelectedView(view){
+  if(!VALID_VIEWS.has(view)) return;
+  try { sessionStorage.setItem(SAVED_VIEW_KEY, view); } catch (_) {}
+}
+
 
 let viewShellW = 0;
 let lastViewTitleMode = null; // null | "events" | "index" | "comps"
@@ -92,6 +107,7 @@ export function setActiveEventsQuery(val, setters){
 export function setViewUI(view, { $, onIndexViewOpen, fromNativeScroll = false } = {}){
   const previousView = state.view;
   setView(view);
+  saveSelectedView(view);
   if(view === "comps" && !window.__compsModuleStarted){
     window.__compsModuleStarted = true;
     for (const prefix of ["academy", "athlete"]) {
@@ -140,7 +156,7 @@ export function setViewUI(view, { $, onIndexViewOpen, fromNativeScroll = false }
   const evIn = $("eventsSearchInput");
   if(evIn){
     evIn.value = String(activeEventsState().q || "");
-    evIn.setAttribute("placeholder", view === "index" ? "Search gyms" : "Search events");
+    evIn.setAttribute("placeholder", view === "index" ? "Search index" : "Search events");
   }
 
   if(view === "index" && typeof onIndexViewOpen === "function") onIndexViewOpen();
@@ -199,6 +215,18 @@ export function wireViewToggle({ $, onIndexViewOpen } = {}){
     tabIndex?.setAttribute("aria-disabled", "true");
     return;
   }
+
+  // Restore the selected view for this tab on reload. New tabs default
+  // to EVENTS; do not restore the previous vertical scroll position.
+  const initialView = readSavedView();
+  const initialIndex = ["events", "index", "comps"].indexOf(initialView);
+  if(viewShell){
+    const previousBehavior = viewShell.style.scrollBehavior;
+    viewShell.style.scrollBehavior = "auto";
+    viewShell.scrollLeft = initialIndex * viewShell.clientWidth;
+    viewShell.style.scrollBehavior = previousBehavior;
+  }
+  setViewUI(initialView, { $, onIndexViewOpen, fromNativeScroll:true });
 
   // A single route for tab clicks. The thumb only follows the physical scroll.
   const views = ["events", "index", "comps"];
