@@ -455,3 +455,14 @@
 #viewComps .boston-medal-badge--gold { background: rgba(219, 178, 60, .52); }
 #viewComps .boston-medal-badge--silver { background: rgba(154, 159, 164, .43); }
 #viewComps .boston-medal-badge--bronze { background: rgba(190, 127, 79, .42); }
+
+/* Manually activated tracking-complete notice. Results stay accessible beneath it. */
+.comps-tracking-splash { background:#f0eddf; border:1px solid #d6dbcf; color:#294b39; border-radius:11px; margin:10px 0 17px; padding:15px; font-size:12px; line-height:1.5; }
+.comps-tracking-splash[hidden] { display:none!important; }
+.comps-splash-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; letter-spacing:.03em; font-size:12px; }
+.comps-splash-heading button { border:0; background:transparent; font:inherit; color:inherit; font-size:22px; line-height:1; padding:0 4px; cursor:pointer; }
+.comps-tracking-splash p { margin:10px 0; }
+.comps-splash-subheading { display:block; border-top:1px solid #ccd4c6; padding-top:12px; font-size:11px; letter-spacing:.02em; }
+.comps-splash-entry { display:flex; flex-direction:column; gap:2px; padding:10px 0; border-bottom:1px solid #d7dbd1; }
+.comps-splash-entry:last-child { border-bottom:0; }
+.comps-splash-entry small { font-size:11px; opacity:.75; }

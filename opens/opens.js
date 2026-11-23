@@ -716,6 +716,52 @@ async function initialize() {
 updateActiveCount([]);
 initialize();
 
+// Admin-controlled tracking announcement. Independent from the scraper and match data.
+const splashCard = document.createElement('section');
+splashCard.className = 'comps-tracking-splash';
+splashCard.hidden = true;
+splashCard.setAttribute('aria-label','Tracking status');
+($('bostonResults') || rows).before(splashCard);
+let lastSplashFingerprint = '';
+let splashDismissedFingerprint = '';
+async function checkTrackingSplash(){
+  if(document.visibilityState==='hidden' || !isCompsVisible())return;
+  try{
+    const [settings,catalog]=await Promise.all([
+      getJson(new URL('./splash.json',import.meta.url).href,'no-cache'),
+      getJson(new URL('../admin/matches-competitions.json',import.meta.url).href,'no-cache')
+    ]);
+    const active = settings.active === true;
+    const ids=Array.isArray(settings.competition_ids)?settings.competition_ids.map(String):[];
+    const fingerprint=JSON.stringify([active,ids,settings.updated_at]);
+    if(fingerprint===lastSplashFingerprint)return;
+    lastSplashFingerprint=fingerprint;
+    splashCard.replaceChildren();
+    if(!active || splashDismissedFingerprint===fingerprint){splashCard.hidden=true;return;}
+    const head=document.createElement('div');head.className='comps-splash-heading';
+    const title=document.createElement('strong');title.textContent='TRACKING COMPLETE';
+    const close=document.createElement('button');close.type='button';close.textContent='×';close.setAttribute('aria-label','Dismiss tracking notice');
+    close.addEventListener('click',()=>{splashDismissedFingerprint=fingerprint;splashCard.hidden=true;});
+    head.append(title,close);
+    const message=document.createElement('p');message.textContent='Competition has finished. All matches shown are from completed matches and live tracking is not running.';
+    const nextTitle=document.createElement('strong');nextTitle.className='comps-splash-subheading';nextTitle.textContent='LIVE TRACKING WILL CONTINUE FOR';
+    const list=document.createElement('div');list.className='comps-splash-list';
+    const comps=(catalog.competitions||[]).filter(c=>ids.includes(String(c.id)))
+      .sort((a,b)=>String(a.brackets_release_date||'9999').localeCompare(String(b.brackets_release_date||'9999'))||a.name.localeCompare(b.name));
+    for(const comp of comps){
+      const entry=document.createElement('div');entry.className='comps-splash-entry';
+      const name=document.createElement('span');name.textContent=comp.name;
+      const date=document.createElement('small');
+      if(/^\d{4}-\d{2}-\d{2}$/.test(comp.brackets_release_date||'')){
+        const dt=new Date(`${comp.brackets_release_date}T12:00:00Z`);
+        date.textContent=Number.isNaN(dt.getTime())?'Brackets release: Not announced':`Brackets release: ${dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'})}`;
+      }else date.textContent='Brackets release: Not announced';
+      entry.append(name,date);list.append(entry);
+    }
+    if(!comps.length){const noSelection=document.createElement('p');noSelection.textContent='Upcoming competitions will be announced soon.';list.append(noSelection);}
+    splashCard.append(head,message,nextTitle,list);splashCard.hidden=false;
+  }catch(error){console.warn('Tracking splash unavailable:',error);}
+}
 // Background GitHub Actions updates athletes.json; a long-lived browser tab must
 // reload that published snapshot independently of the Python scrape interval.
 // This never triggers a scrape, changes admin settings, or edits saved selections.
@@ -770,11 +816,13 @@ function isCompsVisible() {
   return $('tabComps')?.getAttribute('aria-selected') === 'true';
 }
 setInterval(checkPublishedRoster, ROSTER_POLL_MS);
+setInterval(checkTrackingSplash, 30000);
 setInterval(updateMatchCountdowns, 1000);
 function refreshVisibleMatches() {
   if (document.visibilityState === 'hidden' || !isCompsVisible()) return;
   updateMatchCountdowns();
   checkPublishedRoster();
+  checkTrackingSplash();
 }
 document.addEventListener('visibilitychange', refreshVisibleMatches);
 window.addEventListener('focus', refreshVisibleMatches);
