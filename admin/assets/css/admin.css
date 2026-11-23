@@ -847,3 +847,16 @@ body > .adminMatchesMenu[hidden] {display:none !important;}
 @media (max-width:430px) {
   #adminViewToggle .viewToggle__thumb { width:calc(33.333333333% - 2px); }
 }
+
+/* Tracking splash controls: scoped exclusively to MATCHES admin. */
+.adminSplashCard { margin-bottom:16px; }
+.adminSplashRadios { display:flex; flex-wrap:wrap; gap:20px; font-size:12px; }
+.adminSplashRadios label { display:inline-flex; align-items:center; gap:6px; cursor:pointer; }
+.adminSplashRadios input,.adminSplashOptions input { accent-color:var(--green,#286442); }
+.adminSplashSearch { box-sizing:border-box; width:100%; margin:10px 0 6px; }
+.adminSplashOptions { max-height:240px; overflow-y:auto; border:1px solid #0002; border-radius:9px; padding:4px 10px; overscroll-behavior:contain; }
+.adminSplashChoice { display:flex; align-items:flex-start; gap:9px; padding:11px 2px; border-bottom:1px solid #0001; font-size:12px; line-height:1.4; cursor:pointer; }
+.adminSplashChoice:last-child { border-bottom:0; }
+.adminSplashChoice input { flex:none; margin-top:2px; width:16px; height:16px; }
+.adminSplashChoice span { display:block; min-width:0; }
+.adminSplashChoice small { display:block; font-size:10px; opacity:.65; margin-top:3px; }

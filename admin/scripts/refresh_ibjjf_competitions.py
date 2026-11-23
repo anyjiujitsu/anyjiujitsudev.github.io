@@ -72,6 +72,21 @@ async def discover_list(page, url):
     return candidates
 
 
+def bracket_release_date(body):
+    """Extract only the specifically labeled IBJJF Brackets Release Date.
+
+    Return an ISO date, or an empty string if absent/ambiguous.
+    """
+    match = re.search(r'Brackets\s+Release\s+Date\s*[:\-]?\s*([A-Za-z]+\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4})', body, re.I)
+    if not match:
+        return ''
+    value = re.sub(r'(\d)(?:st|nd|rd|th)\b', r'\1', match.group(1), flags=re.I)
+    try:
+        return datetime.strptime(value.replace(',', ''), '%B %d %Y').date().isoformat()
+    except ValueError:
+        return ''
+
+
 async def resolve_one(context, slug, record, semaphore):
     async with semaphore:
         page = await context.new_page()
@@ -114,7 +129,9 @@ async def resolve_one(context, slug, record, semaphore):
             event_id = winners[0]
             if len(title) < 8 or len(title) > 240:
                 title = record['name']
-            return {'id': event_id, 'name': title, 'url': record['url']}
+            page_text = await page.locator('body').inner_text(timeout=10000)
+            return {'id': event_id, 'name': title, 'url': record['url'],
+                    'brackets_release_date': bracket_release_date(page_text)}
         except Exception as err:
             print(f'Cannot resolve {slug}: {err}', flush=True)
             return None

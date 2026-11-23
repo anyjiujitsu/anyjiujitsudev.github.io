@@ -1,4 +1,4 @@
-import { initMatchesPreview } from './modules/matches.js';
+import { initMatchesPreview } from './modules/matches.js?v=tracking-splash-1';
 // admin.js
 // purpose: admin panel bootstrap only; feature logic lives in modules/*
 

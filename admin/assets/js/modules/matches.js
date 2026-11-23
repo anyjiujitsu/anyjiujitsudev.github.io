@@ -23,6 +23,45 @@ export async function initMatchesPreview(){
   let currentConfig = {enabled:false,refresh_minutes:10,competitions:[]};
   let requestPending = false;
   let competitions = [];
+  const splashOptions = document.getElementById('splashOptions');
+  const splashFilter = document.getElementById('splashFilter');
+  const splashSave = document.getElementById('splashSave');
+  const splashStatus = document.getElementById('splashSaveStatus');
+  const splashSelected = new Set();
+  function splashDate(comp){
+    const iso = comp.brackets_release_date;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(iso || '')) return 'Brackets date not announced';
+    const date = new Date(`${iso}T12:00:00Z`);
+    return Number.isNaN(date.getTime()) ? 'Brackets date not announced' : `Brackets: ${date.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'})}`;
+  }
+  function drawSplashOptions(){
+    if(!splashOptions)return;
+    splashOptions.replaceChildren();
+    const query = splashFilter.value.trim().toLowerCase();
+    const visible = competitions.filter(c => c.name.toLowerCase().includes(query))
+      .sort((a,b) => Number(splashSelected.has(b.id))-Number(splashSelected.has(a.id)) ||
+        String(a.brackets_release_date||'9999').localeCompare(String(b.brackets_release_date||'9999')) || a.name.localeCompare(b.name));
+    if(!visible.length){splashOptions.textContent = 'No matching competitions in the catalog.';return;}
+    for(const comp of visible){
+      const label=document.createElement('label'); label.className='adminSplashChoice';
+      const input=document.createElement('input');input.type='checkbox';input.checked=splashSelected.has(comp.id);
+      input.addEventListener('change',()=>{if(input.checked)splashSelected.add(comp.id);else splashSelected.delete(comp.id);drawSplashOptions();});
+      const content=document.createElement('span');content.textContent=comp.name;
+      const date=document.createElement('small');date.textContent=splashDate(comp);content.append(date);
+      label.append(input,content);splashOptions.append(label);
+    }
+  }
+  splashFilter?.addEventListener('input',drawSplashOptions);
+  async function loadSplash(){
+    const response=await fetch(`../opens/splash.json?t=${Date.now()}`,{cache:'no-store'});
+    if(!response.ok)throw new Error(`Splash settings unavailable: HTTP ${response.status}`);
+    const settings=await response.json();
+    splashSelected.clear();
+    (settings.competition_ids||[]).forEach(id=>splashSelected.add(String(id)));
+    document.querySelector(`input[name="splashState"][value="${settings.active?'active':'inactive'}"]`).checked=true;
+    drawSplashOptions();
+  }
+
   function drawCurrent(){
     currentComps.replaceChildren();
     const values = currentConfig.competitions || [];
@@ -279,7 +318,8 @@ export async function initMatchesPreview(){
     if (!res.ok) throw new Error(`Competition catalog unavailable (HTTP ${res.status})`);
     const data = await res.json();
     if(!Array.isArray(data.competitions))throw new Error('Invalid competition catalog');
-    competitions = data.competitions.filter(c=>c.id && c.name).map(c=>({id:String(c.id),name:String(c.name)}));
+    competitions = data.competitions.filter(c=>c.id && c.name).map(c=>({id:String(c.id),name:String(c.name),brackets_release_date:String(c.brackets_release_date||''),url:String(c.url||'')}));
+    drawSplashOptions();
     const valid = new Set(competitions.map(c=>c.id));
     // Keep selected configured IDs even if the catalog has not been refreshed.
     draw();update();
@@ -293,6 +333,25 @@ export async function initMatchesPreview(){
     const fallbackKey = `admin_github_token_${String(owner).toLowerCase().replace(/[^a-z0-9]+/g,'_')}_${String(repo).toLowerCase().replace(/[^a-z0-9]+/g,'_')}`;
     return localStorage.getItem(explicit || fallbackKey) || localStorage.getItem('anyjj_admin_github_token') || '';
   }
+  splashSave?.addEventListener('click',async()=>{
+    splashSave.disabled=true;splashStatus.textContent='Saving splash settings…';
+    try {
+      const token=await getToken();if(!token)throw new Error('Enter your GitHub token first.');
+      const active=document.querySelector('input[name="splashState"]:checked')?.value==='active';
+      const url=`${endpoint}/contents/opens/splash.json`;
+      const read=await fetch(`${url}?ref=${encodeURIComponent(branch)}`,{headers:headers(token),cache:'no-store'});
+      if(!read.ok && read.status!==404)throw new Error(`Cannot read splash settings: HTTP ${read.status}`);
+      const sha=read.ok?(await read.json()).sha:null;
+      const payload=JSON.stringify({active,competition_ids:[...splashSelected],updated_at:new Date().toISOString()},null,2)+'\n';
+      const encoded=btoa(Array.from(new TextEncoder().encode(payload),b=>String.fromCharCode(b)).join(''));
+      const body={message:'Update tracking splash settings',content:encoded,branch};if(sha)body.sha=sha;
+      const response=await fetch(url,{method:'PUT',headers:{...headers(token),'Content-Type':'application/json'},body:JSON.stringify(body)});
+      if(!response.ok)throw new Error(`Save failed: HTTP ${response.status} ${(await response.text()).slice(0,150)}`);
+      splashStatus.textContent=active && currentConfig.enabled?'Saved. WARNING: scraper is RUNNING; public notice may conflict with live tracking.':'Saved. Changes appear after GitHub Pages publishes.';
+    }catch(error){splashStatus.textContent=error.message;}
+    finally{splashSave.disabled=false;}
+  });
+  try{await loadSplash();}catch(err){splashStatus.textContent=`Unable to load splash settings: ${err.message}`;}
   try { await loadConfig(); } catch (err) { saveStatus.textContent = `Unable to read active config: ${err.message}`; }
   let active = false;
   let pollTimer = null;

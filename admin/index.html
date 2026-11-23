@@ -17,7 +17,7 @@
   <!-- Admin-specific layout (light)
        NOTE: different deployments have placed admin.css in different locations.
        We include safe fallback paths so styling never drops out. -->
-  <link rel="stylesheet" href="assets/css/admin.css" />
+  <link rel="stylesheet" href="assets/css/admin.css?v=tracking-splash-1" />
   
 </head>
 
@@ -240,6 +240,17 @@
               <p class="adminMatchesFooter">Active configuration stored in opens/config.json.</p>
             </div>
           </div>
+          <div class="adminCard adminSplashCard">
+            <div class="adminCardHeader">TRACKING SPLASH</div>
+            <div class="adminForm">
+              <div class="adminMatchesCurrentRow"><span class="adminLabel">STATUS</span><div class="adminSplashRadios" role="group" aria-label="Tracking splash status"><label><input type="radio" name="splashState" value="active"> ACTIVE</label><label><input type="radio" name="splashState" value="inactive" checked> INACTIVE</label></div></div>
+              <label class="adminLabel" for="splashFilter">UPCOMING COVERAGE</label>
+              <input class="adminInput adminSplashSearch" id="splashFilter" type="search" placeholder="Search competitions…" autocomplete="off" />
+              <div class="adminSplashOptions" id="splashOptions" role="group" aria-label="Upcoming competition choices"></div>
+              <p class="adminMatchesMenuNote">Shares the IMPORT COMPS catalog. REFRESH COMPS updates both lists; your checked selections are preserved.</p>
+              <div class="adminMatchesFooter"><button type="button" class="adminSelect adminMatchesStateButton" id="splashSave">SAVE SPLASH</button> <span id="splashSaveStatus" role="status" aria-live="polite"></span></div>
+            </div>
+          </div>
           <div class="adminCard">
             <div class="adminCardHeader">IMPORT COMPS</div>
             <div class="adminForm">
@@ -275,7 +286,7 @@
 
   </div>
 
-  <script type="module" src="assets/js/admin.js?v=opens-config-1"></script>
+  <script type="module" src="assets/js/admin.js?v=tracking-splash-1"></script>
 
   <script>
     (function(){
