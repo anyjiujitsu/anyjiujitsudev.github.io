@@ -73,11 +73,14 @@ async def discover_list(page, url):
 
 
 def bracket_release_date(body):
-    """Extract only the specifically labeled IBJJF Brackets Release Date.
-
-    Return an ISO date, or an empty string if absent/ambiguous.
-    """
-    match = re.search(r'Brackets\s+Release\s+Date\s*[:\-]?\s*([A-Za-z]+\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4})', body, re.I)
+    """Read the labeled date, not the adjacent schedule or registration date."""
+    # IBJJF renders the label and date as separate blocks in the event page.
+    # Sometimes the label's punctuation/line break differs between templates.
+    match = re.search(
+        r'Brackets?\s+Release\s+Date\s*[:\-]?\s*'
+        r'([A-Za-z]+\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4})',
+        body, re.I
+    )
     if not match:
         return ''
     value = re.sub(r'(\d)(?:st|nd|rd|th)\b', r'\1', match.group(1), flags=re.I)
@@ -129,6 +132,10 @@ async def resolve_one(context, slug, record, semaphore):
             event_id = winners[0]
             if len(title) < 8 or len(title) > 240:
                 title = record['name']
+            try:
+                await page.get_by_text(re.compile(r'Brackets?\s+Release\s+Date', re.I)).first.wait_for(state='visible', timeout=4500)
+            except Exception:
+                pass  # Not all IBJJF competitions announce a date.
             page_text = await page.locator('body').inner_text(timeout=10000)
             return {'id': event_id, 'name': title, 'url': record['url'],
                     'brackets_release_date': bracket_release_date(page_text)}
@@ -161,7 +168,8 @@ async def main():
         old = verified.get(item['id'])
         if old is None or len(item['name']) > len(old['name']):
             verified[item['id']] = item
-    print(f'Verified {len(verified)} IDs from {len(candidates)} event pages', flush=True)
+    dated = sum(bool(item.get('brackets_release_date')) for item in verified.values())
+    print(f'Verified {len(verified)} IDs from {len(candidates)} event pages; {dated} have bracket-release dates', flush=True)
     if not verified:
         raise SystemExit('No verifiable numeric event IDs. Existing catalog remains unchanged.')
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
