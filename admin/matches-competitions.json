@@ -1,66 +1,78 @@
 {
   "source": "IBJJF official event listings and detail pages",
-  "updated_at": "2026-11-15T23:42:41.996738+00:00",
+  "updated_at": "2026-11-23T19:43:56.984652+00:00",
   "competitions": [
     {
-      "id": "3364",
-      "name": "Atlanta Fall International Open IBJJF Jiu-Jitsu Championship 2026",
-      "url": "https://ibjjf.com/events/atlanta-fall-international-open-ibjjf-jiu-jitsu-championship-2026"
+      "id": "3167",
+      "name": "Asian Kids IBJJF Jiu-Jitsu Championship 2026",
+      "url": "https://ibjjf.com/events/asian-kids-ibjjf-jiu-jitsu-championship-2026",
+      "brackets_release_date": "2026-12-02"
     },
     {
-      "id": "3365",
-      "name": "Atlanta Fall International Open IBJJF Jiu-Jitsu No-Gi Championship 2026",
-      "url": "https://ibjjf.com/events/atlanta-fall-international-open-ibjjf-jiu-jitsu-no-gi-championship-2026"
+      "id": "3383",
+      "name": "Balneário Camboriú International Open IBJJF Jiu-Jitsu Championship 2026",
+      "url": "https://ibjjf.com/events/balneario-camboriu-international-open-ibjjf-jiu-jitsu-championship-2026",
+      "brackets_release_date": "2026-11-27"
     },
     {
-      "id": "3366",
-      "name": "Atlanta Fall Kids International Open IBJJF Jiu-Jitsu Championship 2026",
-      "url": "https://ibjjf.com/events/atlanta-fall-kids-international-open-ibjjf-jiu-jitsu-championship-2026"
+      "id": "3384",
+      "name": "Balneário Camboriú International Open IBJJF Jiu-Jitsu No-Gi Championship 2026",
+      "url": "https://ibjjf.com/events/balneario-camboriu-international-open-ibjjf-jiu-jitsu-no-gi-championship-2026",
+      "brackets_release_date": "2026-11-27"
+    },
+    {
+      "id": "3385",
+      "name": "Balneário Camboriú Kids International Open IBJJF Jiu-Jitsu Championship 2026",
+      "url": "https://ibjjf.com/events/balneario-camboriu-kids-international-open-ibjjf-jiu-jitsu-championship-2026",
+      "brackets_release_date": "2026-11-27"
     },
     {
       "id": "3409",
       "name": "European IBJJF Jiu-Jitsu Championship 2027",
-      "url": "https://ibjjf.com/events/european-ibjjf-jiu-jitsu-championship-2027"
+      "url": "https://ibjjf.com/events/european-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-01-12"
     },
     {
-      "id": "3398",
-      "name": "Madre de Deus International Open IBJJF Jiu-Jitsu Championship 2026",
-      "url": "https://ibjjf.com/events/madre-de-deus-international-open-ibjjf-jiu-jitsu-championship-2026"
+      "id": "3164",
+      "name": "Japanese National IBJJF Jiu-Jitsu Championship 2026",
+      "url": "https://ibjjf.com/events/japanese-national-ibjjf-jiu-jitsu-championship-2026",
+      "brackets_release_date": "2026-12-02"
     },
     {
-      "id": "3399",
-      "name": "Madre de Deus International Open IBJJF Jiu-Jitsu No-Gi Championship 2026",
-      "url": "https://ibjjf.com/events/madre-de-deus-international-open-ibjjf-jiu-jitsu-no-gi-championship-2026"
+      "id": "3165",
+      "name": "Japanese National IBJJF Jiu-Jitsu No-Gi Championship 2026",
+      "url": "https://ibjjf.com/events/japanese-national-ibjjf-jiu-jitsu-no-gi-championship-2026",
+      "brackets_release_date": "2026-12-02"
     },
     {
-      "id": "3400",
-      "name": "Madre de Deus Kids International Open IBJJF Jiu-Jitsu Championship 2026",
-      "url": "https://ibjjf.com/events/madre-de-deus-kids-international-open-ibjjf-jiu-jitsu-championship-2026"
-    },
-    {
-      "id": "3256",
-      "name": "New Jersey Fall International Open IBJJF Jiu-Jitsu Championship 2026",
-      "url": "https://ibjjf.com/events/new-jersey-fall-international-open-ibjjf-jiu-jitsu-championship-2026"
-    },
-    {
-      "id": "3257",
-      "name": "New Jersey Fall International Open IBJJF Jiu-Jitsu No-Gi Championship 2026",
-      "url": "https://ibjjf.com/events/new-jersey-fall-international-open-ibjjf-jiu-jitsu-no-gi-championship-2026"
-    },
-    {
-      "id": "3258",
-      "name": "New Jersey Fall Kids International Open IBJJF Jiu-Jitsu Championship 2026",
-      "url": "https://ibjjf.com/events/new-jersey-fall-kids-international-open-ibjjf-jiu-jitsu-championship-2026"
+      "id": "3166",
+      "name": "Master International Jiu-Jitsu Championship - Asia 2026",
+      "url": "https://ibjjf.com/events/master-international-jiu-jitsu-championship-asia-2026",
+      "brackets_release_date": "2026-12-02"
     },
     {
       "id": "3452",
       "name": "Pan IBJJF Jiu-Jitsu Championship 2027",
-      "url": "https://ibjjf.com/events/pan-ibjjf-jiu-jitsu-championship-2027"
+      "url": "https://ibjjf.com/events/pan-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-03-15"
+    },
+    {
+      "id": "3405",
+      "name": "Paris Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "url": "https://ibjjf.com/events/paris-fall-international-open-ibjjf-jiu-jitsu-championship-2026",
+      "brackets_release_date": "2026-11-27"
+    },
+    {
+      "id": "3406",
+      "name": "Paris Fall International Open IBJJF Jiu-Jitsu No-Gi Championship 2026",
+      "url": "https://ibjjf.com/events/paris-fall-international-open-ibjjf-jiu-jitsu-no-gi-championship-2026",
+      "brackets_release_date": "2026-11-27"
     },
     {
       "id": "3033",
       "name": "World IBJJF Jiu-Jitsu No-Gi Championship 2026",
-      "url": "https://ibjjf.com/events/world-ibjjf-jiu-jitsu-no-gi-championship-2026"
+      "url": "https://ibjjf.com/events/world-ibjjf-jiu-jitsu-no-gi-championship-2026",
+      "brackets_release_date": "2026-12-09"
     }
   ]
 }
