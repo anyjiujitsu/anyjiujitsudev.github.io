@@ -456,13 +456,17 @@
 #viewComps .boston-medal-badge--silver { background: rgba(154, 159, 164, .43); }
 #viewComps .boston-medal-badge--bronze { background: rgba(190, 127, 79, .42); }
 
-/* Manually activated tracking-complete notice. Results stay accessible beneath it. */
-.comps-tracking-splash { background:#f0eddf; border:1px solid #d6dbcf; color:#294b39; border-radius:11px; margin:10px 0 17px; padding:15px; font-size:12px; line-height:1.5; }
+/* Tracking status announcement: compact, segmented mobile-first presentation. */
+.comps-tracking-splash { margin:10px 0 17px; padding:0; border:1px solid #cbd4c7; border-radius:11px; background:#f5f1e7; color:#234c31; overflow:hidden; font-size:12px; line-height:1.48; }
 .comps-tracking-splash[hidden] { display:none!important; }
-.comps-splash-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; letter-spacing:.03em; font-size:12px; }
-.comps-splash-heading button { border:0; background:transparent; font:inherit; color:inherit; font-size:22px; line-height:1; padding:0 4px; cursor:pointer; }
-.comps-tracking-splash p { margin:10px 0; }
-.comps-splash-subheading { display:block; border-top:1px solid #ccd4c6; padding-top:12px; font-size:11px; letter-spacing:.02em; }
-.comps-splash-entry { display:flex; flex-direction:column; gap:2px; padding:10px 0; border-bottom:1px solid #d7dbd1; }
-.comps-splash-entry:last-child { border-bottom:0; }
-.comps-splash-entry small { font-size:11px; opacity:.75; }
+.comps-splash-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 13px; background:#234c31; color:#f4eee1; font-size:11px; font-weight:700; letter-spacing:.055em; }
+.comps-splash-heading button { border:0; background:transparent; color:#f4eee1; font:inherit; font-size:22px; line-height:1; padding:0 2px; cursor:pointer; min-width:25px; min-height:25px; }
+.comps-tracking-splash .comps-splash-message { margin:0; padding:12px 13px 13px; background:#f5f1e7; color:#344439; font-size:12px; font-weight:400; }
+.comps-splash-future { border-top:1px solid #ced7cc; background:#e5e9e2; padding:12px 13px 6px; }
+.comps-splash-subheading { display:block; margin:0 0 5px; color:#234c31; font-size:10px; letter-spacing:.055em; font-weight:700; }
+.comps-splash-list { display:grid; gap:0; }
+.comps-splash-entry { display:flex; flex-direction:column; gap:3px; padding:10px 0; border-top:1px solid rgba(35,76,49,.15); }
+.comps-splash-entry:first-child { border-top:0; }
+.comps-splash-name { color:#1e3d2c; font-size:12px; font-weight:600; }
+.comps-splash-entry small { color:#536b59; font-size:11px; opacity:1; }
+.comps-splash-empty { margin:7px 0 10px; color:#536b59; font-size:11px; }

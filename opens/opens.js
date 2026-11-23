@@ -724,43 +724,62 @@ splashCard.setAttribute('aria-label','Tracking status');
 ($('bostonResults') || rows).before(splashCard);
 let lastSplashFingerprint = '';
 let splashDismissedFingerprint = '';
+let splashRequestInFlight = false;
 async function checkTrackingSplash(){
-  if(document.visibilityState==='hidden' || !isCompsVisible())return;
-  try{
-    const [settings,catalog]=await Promise.all([
-      getJson(new URL('./splash.json',import.meta.url).href,'no-cache'),
-      getJson(new URL('../admin/matches-competitions.json',import.meta.url).href,'no-cache')
-    ]);
+  if (document.visibilityState === 'hidden' || !isCompsVisible() || splashRequestInFlight) return;
+  splashRequestInFlight = true;
+  try {
+    // The notice must not depend on a successful competition-catalog fetch.
+    const settings = await getJson(new URL('./splash.json', import.meta.url).href, 'no-store');
     const active = settings.active === true;
-    const ids=Array.isArray(settings.competition_ids)?settings.competition_ids.map(String):[];
-    const fingerprint=JSON.stringify([active,ids,settings.updated_at]);
-    if(fingerprint===lastSplashFingerprint)return;
-    lastSplashFingerprint=fingerprint;
-    splashCard.replaceChildren();
-    if(!active || splashDismissedFingerprint===fingerprint){splashCard.hidden=true;return;}
-    const head=document.createElement('div');head.className='comps-splash-heading';
-    const title=document.createElement('strong');title.textContent='TRACKING COMPLETE';
-    const close=document.createElement('button');close.type='button';close.textContent='×';close.setAttribute('aria-label','Dismiss tracking notice');
-    close.addEventListener('click',()=>{splashDismissedFingerprint=fingerprint;splashCard.hidden=true;});
-    head.append(title,close);
-    const message=document.createElement('p');message.textContent='Competition has finished. All matches shown are from completed matches and live tracking is not running.';
-    const nextTitle=document.createElement('strong');nextTitle.className='comps-splash-subheading';nextTitle.textContent='LIVE TRACKING WILL CONTINUE FOR';
-    const list=document.createElement('div');list.className='comps-splash-list';
-    const comps=(catalog.competitions||[]).filter(c=>ids.includes(String(c.id)))
-      .sort((a,b)=>String(a.brackets_release_date||'9999').localeCompare(String(b.brackets_release_date||'9999'))||a.name.localeCompare(b.name));
-    for(const comp of comps){
-      const entry=document.createElement('div');entry.className='comps-splash-entry';
-      const name=document.createElement('span');name.textContent=comp.name;
-      const date=document.createElement('small');
-      if(/^\d{4}-\d{2}-\d{2}$/.test(comp.brackets_release_date||'')){
-        const dt=new Date(`${comp.brackets_release_date}T12:00:00Z`);
-        date.textContent=Number.isNaN(dt.getTime())?'Brackets release: Not announced':`Brackets release: ${dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'})}`;
-      }else date.textContent='Brackets release: Not announced';
-      entry.append(name,date);list.append(entry);
+    const ids = Array.isArray(settings.competition_ids) ? settings.competition_ids.map(String) : [];
+    const fingerprint = JSON.stringify([active, ids, settings.updated_at]);
+    if (!active || splashDismissedFingerprint === fingerprint) {
+      lastSplashFingerprint = fingerprint;
+      splashCard.hidden = true;
+      return;
     }
-    if(!comps.length){const noSelection=document.createElement('p');noSelection.textContent='Upcoming competitions will be announced soon.';list.append(noSelection);}
-    splashCard.append(head,message,nextTitle,list);splashCard.hidden=false;
-  }catch(error){console.warn('Tracking splash unavailable:',error);}
+    // Show the status message as soon as settings are read; catalog lookup can finish later.
+    let catalog = { competitions: [] };
+    try {
+      catalog = await getJson(new URL('../admin/matches-competitions.json', import.meta.url).href, 'no-store');
+    } catch(error) { console.warn('Tracking splash catalog unavailable:', error); }
+    const comps = (catalog.competitions || []).filter(c => ids.includes(String(c.id)))
+      .sort((a,b) => String(a.brackets_release_date || '9999').localeCompare(String(b.brackets_release_date || '9999')) || a.name.localeCompare(b.name));
+    const contentFingerprint = JSON.stringify([fingerprint, comps]);
+    if (lastSplashFingerprint === contentFingerprint && !splashCard.hidden) return;
+    lastSplashFingerprint = contentFingerprint;
+    splashCard.replaceChildren();
+    const head = document.createElement('div'); head.className = 'comps-splash-heading';
+    const title = document.createElement('strong'); title.textContent = 'TRACKING COMPLETE';
+    const close = document.createElement('button'); close.type = 'button'; close.textContent = '×'; close.setAttribute('aria-label', 'Dismiss tracking notice');
+    close.addEventListener('click', () => { splashDismissedFingerprint = fingerprint; splashCard.hidden = true; });
+    head.append(title, close);
+    const message = document.createElement('p'); message.className = 'comps-splash-message';
+    message.textContent = 'Competition has finished. All matches shown are completed results. Live tracking is currently inactive.';
+    const future = document.createElement('div'); future.className = 'comps-splash-future';
+    const nextTitle = document.createElement('strong'); nextTitle.className = 'comps-splash-subheading'; nextTitle.textContent = 'LIVE TRACKING WILL CONTINUE FOR';
+    const list = document.createElement('div'); list.className = 'comps-splash-list';
+    for(const comp of comps){
+      const entry = document.createElement('div'); entry.className = 'comps-splash-entry';
+      const name = document.createElement('span'); name.className = 'comps-splash-name'; name.textContent = comp.name;
+      const date = document.createElement('small');
+      if (/^\d{4}-\d{2}-\d{2}$/.test(comp.brackets_release_date || '')) {
+        const dt = new Date(`${comp.brackets_release_date}T12:00:00Z`);
+        date.textContent = Number.isNaN(dt.getTime()) ? 'Brackets release · Date not announced' : `Brackets release · ${dt.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric', timeZone:'UTC'})}`;
+      } else date.textContent = 'Brackets release · Date not announced';
+      entry.append(name,date); list.append(entry);
+    }
+    if(!comps.length){
+      const empty = document.createElement('p'); empty.className = 'comps-splash-empty';
+      empty.textContent = ids.length ? 'Upcoming competition details are temporarily unavailable.' : 'Upcoming competitions will be announced soon.';
+      list.append(empty);
+    }
+    future.append(nextTitle, list);
+    splashCard.append(head,message,future);
+    splashCard.hidden = false;
+  } catch(error) { console.warn('Tracking splash settings unavailable:', error); }
+  finally { splashRequestInFlight = false; }
 }
 // Background GitHub Actions updates athletes.json; a long-lived browser tab must
 // reload that published snapshot independently of the Python scrape interval.
@@ -817,6 +836,8 @@ function isCompsVisible() {
 }
 setInterval(checkPublishedRoster, ROSTER_POLL_MS);
 setInterval(checkTrackingSplash, 30000);
+// Run immediately on module load (including restored COMPS sessions on mobile).
+checkTrackingSplash();
 setInterval(updateMatchCountdowns, 1000);
 function refreshVisibleMatches() {
   if (document.visibilityState === 'hidden' || !isCompsVisible()) return;
