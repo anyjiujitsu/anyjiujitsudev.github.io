@@ -1,12 +1,78 @@
 {
   "source": "IBJJF official event listings and detail pages",
-  "updated_at": "2026-11-23T19:43:56.984652+00:00",
+  "updated_at": "2026-11-24T02:49:52.520745+00:00",
   "competitions": [
+    {
+      "id": "3474",
+      "name": "Albuquerque International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/albuquerque-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-02-12"
+    },
+    {
+      "id": "3475",
+      "name": "Albuquerque International Open IBJJF Jiu-Jitsu No-Gi Championship 2027",
+      "url": "https://ibjjf.com/events/albuquerque-international-open-ibjjf-jiu-jitsu-no-gi-championship-2027",
+      "brackets_release_date": "2027-02-12"
+    },
+    {
+      "id": "3476",
+      "name": "Albuquerque Kids International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/albuquerque-kids-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-02-12"
+    },
     {
       "id": "3167",
       "name": "Asian Kids IBJJF Jiu-Jitsu Championship 2026",
       "url": "https://ibjjf.com/events/asian-kids-ibjjf-jiu-jitsu-championship-2026",
       "brackets_release_date": "2026-12-02"
+    },
+    {
+      "id": "3428",
+      "name": "Atlanta Winter International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/atlanta-winter-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-01-22"
+    },
+    {
+      "id": "3429",
+      "name": "Atlanta Winter International Open IBJJF Jiu-Jitsu No-Gi Championship 2027",
+      "url": "https://ibjjf.com/events/atlanta-winter-international-open-ibjjf-jiu-jitsu-no-gi-championship-2027",
+      "brackets_release_date": "2027-01-22"
+    },
+    {
+      "id": "3430",
+      "name": "Atlanta Winter Kids International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/atlanta-winter-kids-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-01-22"
+    },
+    {
+      "id": "3431",
+      "name": "Atlanta Winter Kids International Open IBJJF Jiu-Jitsu No-Gi Championship 2027",
+      "url": "https://ibjjf.com/events/atlanta-winter-kids-international-open-ibjjf-jiu-jitsu-no-gi-championship-2027",
+      "brackets_release_date": "2027-01-22"
+    },
+    {
+      "id": "3442",
+      "name": "Austin Winter International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/austin-winter-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-02-19"
+    },
+    {
+      "id": "3443",
+      "name": "Austin Winter International Open IBJJF Jiu-Jitsu No-Gi Championship 2027",
+      "url": "https://ibjjf.com/events/austin-winter-international-open-ibjjf-jiu-jitsu-no-gi-championship-2027",
+      "brackets_release_date": "2027-02-19"
+    },
+    {
+      "id": "3444",
+      "name": "Austin Winter Kids International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/austin-winter-kids-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-02-19"
+    },
+    {
+      "id": "3445",
+      "name": "Austin Winter Kids International Open IBJJF Jiu-Jitsu No-Gi Championship 2027",
+      "url": "https://ibjjf.com/events/austin-winter-kids-international-open-ibjjf-jiu-jitsu-no-gi-championship-2027",
+      "brackets_release_date": "2027-02-19"
     },
     {
       "id": "3383",
@@ -27,10 +93,64 @@
       "brackets_release_date": "2026-11-27"
     },
     {
+      "id": "3483",
+      "name": "Campeonato Sul-Brasileiro de Jiu-Jitsu 2027",
+      "url": "https://ibjjf.com/events/campeonato-sul-brasileiro-de-jiu-jitsu-2027",
+      "brackets_release_date": "2027-01-29"
+    },
+    {
+      "id": "3425",
+      "name": "Dallas Winter International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/dallas-winter-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-01-15"
+    },
+    {
+      "id": "3426",
+      "name": "Dallas Winter International Open IBJJF Jiu-Jitsu No-Gi Championship 2027",
+      "url": "https://ibjjf.com/events/dallas-winter-international-open-ibjjf-jiu-jitsu-no-gi-championship-2027",
+      "brackets_release_date": "2027-01-15"
+    },
+    {
+      "id": "3427",
+      "name": "Dallas Winter Kids International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/dallas-winter-kids-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-01-15"
+    },
+    {
+      "id": "3335",
+      "name": "Dublin Fall International Open IBJJF Jiu-Jitsu Championship 2026",
+      "url": "https://ibjjf.com/events/dublin-fall-international-open-ibjjf-jiu-jitsu-championship-2026",
+      "brackets_release_date": "2026-12-04"
+    },
+    {
+      "id": "3336",
+      "name": "Dublin Fall International Open IBJJF Jiu-Jitsu No-Gi Championship 2026",
+      "url": "https://ibjjf.com/events/dublin-fall-international-open-ibjjf-jiu-jitsu-no-gi-championship-2026",
+      "brackets_release_date": "2026-12-04"
+    },
+    {
+      "id": "3337",
+      "name": "Dublin Fall Kids International Open IBJJF Jiu-Jitsu Championship 2026",
+      "url": "https://ibjjf.com/events/dublin-fall-kids-international-open-ibjjf-jiu-jitsu-championship-2026",
+      "brackets_release_date": "2026-12-04"
+    },
+    {
       "id": "3409",
       "name": "European IBJJF Jiu-Jitsu Championship 2027",
       "url": "https://ibjjf.com/events/european-ibjjf-jiu-jitsu-championship-2027",
       "brackets_release_date": "2027-01-12"
+    },
+    {
+      "id": "3477",
+      "name": "Geneva International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/geneva-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-03-12"
+    },
+    {
+      "id": "3478",
+      "name": "Geneva International Open IBJJF Jiu-Jitsu No-Gi Championship 2027",
+      "url": "https://ibjjf.com/events/geneva-international-open-ibjjf-jiu-jitsu-no-gi-championship-2027",
+      "brackets_release_date": "2027-03-12"
     },
     {
       "id": "3164",
@@ -45,10 +165,100 @@
       "brackets_release_date": "2026-12-02"
     },
     {
+      "id": "3484",
+      "name": "Kids International IBJJF Jiu-Jitsu Championship - Florianópolis 2027",
+      "url": "https://ibjjf.com/events/kids-international-ibjjf-jiu-jitsu-championship-florianopolis-2027",
+      "brackets_release_date": "2027-01-29"
+    },
+    {
+      "id": "3381",
+      "name": "Kids International IBJJF Jiu-Jitsu Championship - Las Vegas 2026",
+      "url": "https://ibjjf.com/events/kids-international-ibjjf-jiu-jitsu-championship-las-vegas-2026",
+      "brackets_release_date": "2026-12-09"
+    },
+    {
+      "id": "3382",
+      "name": "Kids International IBJJF Jiu-Jitsu No-Gi Championship - Las Vegas 2026",
+      "url": "https://ibjjf.com/events/kids-international-ibjjf-jiu-jitsu-no-gi-championship-las-vegas-2026",
+      "brackets_release_date": "2026-12-09"
+    },
+    {
+      "id": "3486",
+      "name": "London International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/london-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-02-12"
+    },
+    {
+      "id": "3487",
+      "name": "London International Open IBJJF Jiu-Jitsu No-Gi Championship 2027",
+      "url": "https://ibjjf.com/events/london-international-open-ibjjf-jiu-jitsu-no-gi-championship-2027",
+      "brackets_release_date": "2027-02-12"
+    },
+    {
+      "id": "3435",
+      "name": "Los Angeles Winter International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/los-angeles-winter-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-01-29"
+    },
+    {
+      "id": "3436",
+      "name": "Los Angeles Winter International Open IBJJF Jiu-Jitsu No-Gi Championship 2027",
+      "url": "https://ibjjf.com/events/los-angeles-winter-international-open-ibjjf-jiu-jitsu-no-gi-championship-2027",
+      "brackets_release_date": "2027-01-29"
+    },
+    {
+      "id": "3437",
+      "name": "Los Angeles Winter Kids International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/los-angeles-winter-kids-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-01-29"
+    },
+    {
+      "id": "3438",
+      "name": "Los Angeles Winter Kids International Open IBJJF Jiu-Jitsu No-Gi Championship 2027",
+      "url": "https://ibjjf.com/events/los-angeles-winter-kids-international-open-ibjjf-jiu-jitsu-no-gi-championship-2027",
+      "brackets_release_date": "2027-01-29"
+    },
+    {
+      "id": "3491",
+      "name": "Madrid International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/madrid-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-03-05"
+    },
+    {
+      "id": "3492",
+      "name": "Madrid International Open IBJJF Jiu-Jitsu No-Gi Championship 2027",
+      "url": "https://ibjjf.com/events/madrid-international-open-ibjjf-jiu-jitsu-no-gi-championship-2027",
+      "brackets_release_date": "2027-03-05"
+    },
+    {
       "id": "3166",
       "name": "Master International Jiu-Jitsu Championship - Asia 2026",
       "url": "https://ibjjf.com/events/master-international-jiu-jitsu-championship-asia-2026",
       "brackets_release_date": "2026-12-02"
+    },
+    {
+      "id": "3440",
+      "name": "Memphis International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/memphis-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-02-05"
+    },
+    {
+      "id": "3441",
+      "name": "Memphis International Open IBJJF Jiu-Jitsu No-Gi Championship 2027",
+      "url": "https://ibjjf.com/events/memphis-international-open-ibjjf-jiu-jitsu-no-gi-championship-2027",
+      "brackets_release_date": "2027-02-05"
+    },
+    {
+      "id": "3488",
+      "name": "Orange County Winter International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/orange-county-winter-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-02-26"
+    },
+    {
+      "id": "3489",
+      "name": "Orange County Winter Kids International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/orange-county-winter-kids-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-02-26"
     },
     {
       "id": "3452",
@@ -67,6 +277,66 @@
       "name": "Paris Fall International Open IBJJF Jiu-Jitsu No-Gi Championship 2026",
       "url": "https://ibjjf.com/events/paris-fall-international-open-ibjjf-jiu-jitsu-no-gi-championship-2026",
       "brackets_release_date": "2026-11-27"
+    },
+    {
+      "id": "3459",
+      "name": "Rio Summer International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/rio-summer-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-01-07"
+    },
+    {
+      "id": "3460",
+      "name": "Rio Summer International Open IBJJF Jiu-Jitsu No-Gi Championship 2027",
+      "url": "https://ibjjf.com/events/rio-summer-international-open-ibjjf-jiu-jitsu-no-gi-championship-2027",
+      "brackets_release_date": "2027-01-07"
+    },
+    {
+      "id": "3461",
+      "name": "Rio Summer Kids International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/rio-summer-kids-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-01-07"
+    },
+    {
+      "id": "3462",
+      "name": "Rio Summer Kids International Open IBJJF Jiu-Jitsu No-Gi Championship 2027",
+      "url": "https://ibjjf.com/events/rio-summer-kids-international-open-ibjjf-jiu-jitsu-no-gi-championship-2027",
+      "brackets_release_date": "2027-01-07"
+    },
+    {
+      "id": "3432",
+      "name": "San Jose Winter International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/san-jose-winter-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-01-15"
+    },
+    {
+      "id": "3433",
+      "name": "San Jose Winter International Open IBJJF Jiu-Jitsu No-Gi Championship 2027",
+      "url": "https://ibjjf.com/events/san-jose-winter-international-open-ibjjf-jiu-jitsu-no-gi-championship-2027",
+      "brackets_release_date": "2027-01-15"
+    },
+    {
+      "id": "3434",
+      "name": "San Jose Winter Kids International Open IBJJF Jiu-Jitsu Championship 2027",
+      "url": "https://ibjjf.com/events/san-jose-winter-kids-international-open-ibjjf-jiu-jitsu-championship-2027",
+      "brackets_release_date": "2027-01-15"
+    },
+    {
+      "id": "3269",
+      "name": "Waco International Open IBJJF Jiu-Jitsu Championship 2026",
+      "url": "https://ibjjf.com/events/waco-international-open-ibjjf-jiu-jitsu-championship-2026",
+      "brackets_release_date": "2026-12-04"
+    },
+    {
+      "id": "3270",
+      "name": "Waco International Open IBJJF Jiu-Jitsu No-Gi Championship 2026",
+      "url": "https://ibjjf.com/events/waco-international-open-ibjjf-jiu-jitsu-no-gi-championship-2026",
+      "brackets_release_date": "2026-12-04"
+    },
+    {
+      "id": "3271",
+      "name": "Waco Kids International Open IBJJF Jiu-Jitsu Championship 2026",
+      "url": "https://ibjjf.com/events/waco-kids-international-open-ibjjf-jiu-jitsu-championship-2026",
+      "brackets_release_date": "2026-12-04"
     },
     {
       "id": "3033",
