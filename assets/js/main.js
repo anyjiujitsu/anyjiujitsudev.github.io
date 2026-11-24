@@ -11,7 +11,7 @@ import { applyDistanceFilter } from "./utils/geo.js?v=20260212-902";
 import { initEventsPills, initIndexPills } from "./ui/pills.js?v=20260210-911";
 import { wireSearch, wireSearchSuggestions } from "./ui/search.js?v=20260427-eventszip-directapply";
 import { closePricingPopup, wirePricingPopup } from "./ui/pricing.js";
-import { activeEventsState, setActiveEventsQuery, setViewUI, wireViewToggle } from "./ui/viewToggle.js?v=tracking-splash-3";
+import { activeEventsState, setActiveEventsQuery, setViewUI, wireViewToggle } from "./ui/viewToggle.js?v=tracking-splash-4";
 import { dirToIndexEventRow, ensureDistanceOriginOptions, filterIndexDirectoryAsEvents, syncDistanceUIFromState } from "./indexDirectory.js";
 
 let directoryRows = [];
