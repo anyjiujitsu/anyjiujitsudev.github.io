@@ -15,8 +15,8 @@ from playwright.async_api import async_playwright
 
 OUTPUT = Path(__file__).resolve().parents[1] / 'matches-competitions.json'
 BASE = 'https://ibjjf.com'
-LISTINGS = [BASE + '/events/calendar', BASE + '/events', BASE + '/']
-SKIP_SLUGS = {'calendar', 'results', 'upcoming', 'my-first-championship', 'registration', 'ranking'}
+LISTINGS = [BASE + '/events/championships', BASE + '/events/calendar', BASE + '/events', BASE + '/']
+SKIP_SLUGS = {'calendar', 'championships', 'results', 'upcoming', 'my-first-championship', 'registration', 'ranking'}
 EVENT_ID = re.compile(r'(?:/events/|/tournaments/)(\d+)(?:/|$|[?#])', re.I)
 COMP_KEYWORDS = ('championship', 'open', 'copa', 'campeonato', 'grand prix', 'trials', 'masters')
 
