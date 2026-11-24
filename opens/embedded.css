@@ -456,17 +456,47 @@
 #viewComps .boston-medal-badge--silver { background: rgba(154, 159, 164, .43); }
 #viewComps .boston-medal-badge--bronze { background: rgba(190, 127, 79, .42); }
 
-/* Tracking status announcement: compact, segmented mobile-first presentation. */
-.comps-tracking-splash { margin:10px 0 17px; padding:0; border:1px solid #cbd4c7; border-radius:11px; background:#f5f1e7; color:#234c31; overflow:hidden; font-size:12px; line-height:1.48; }
+/* Tracking notice: original ANY forest-green and cream palette, timeline and cards. */
+.comps-tracking-splash { margin:10px 0 17px; padding:0; border:1px solid #cdd1c9; border-radius:12px; background:#f5f1e7; color:#173725; overflow:hidden; font-size:12px; line-height:1.4; }
 .comps-tracking-splash[hidden] { display:none!important; }
-.comps-splash-heading { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 13px; background:#234c31; color:#f4eee1; font-size:11px; font-weight:700; letter-spacing:.055em; }
-.comps-splash-heading button { border:0; background:transparent; color:#f4eee1; font:inherit; font-size:22px; line-height:1; padding:0 2px; cursor:pointer; min-width:25px; min-height:25px; }
-.comps-tracking-splash .comps-splash-message { margin:0; padding:12px 13px 13px; background:#f5f1e7; color:#344439; font-size:12px; font-weight:400; }
-.comps-splash-future { border-top:1px solid #ced7cc; background:#e5e9e2; padding:12px 13px 6px; }
-.comps-splash-subheading { display:block; margin:0 0 5px; color:#234c31; font-size:10px; letter-spacing:.055em; font-weight:700; }
-.comps-splash-list { display:grid; gap:0; }
-.comps-splash-entry { display:flex; flex-direction:column; gap:3px; padding:10px 0; border-top:1px solid rgba(35,76,49,.15); }
-.comps-splash-entry:first-child { border-top:0; }
-.comps-splash-name { color:#1e3d2c; font-size:12px; font-weight:600; }
-.comps-splash-entry small { color:#536b59; font-size:11px; opacity:1; }
-.comps-splash-empty { margin:7px 0 10px; color:#536b59; font-size:11px; }
+.comps-splash-heading { display:flex; align-items:center; gap:10px; padding:10px 12px; background:var(--page-header-color,#234c31); color:#fff; letter-spacing:.045em; }
+.comps-splash-heading strong { flex:1; min-width:0; font-size:11px; line-height:1.25; font-weight:800; }
+.comps-splash-alert { display:grid; place-items:center; flex:0 0 23px; width:23px; height:23px; border-radius:50%; background:#f6f3e8; color:var(--page-header-color,#234c31); font-size:18px; line-height:1; font-weight:900; border-right:0; }
+.comps-splash-alert::after { content:''; position:absolute; }
+.comps-splash-heading button { border:0; background:transparent; color:#fff; font:inherit; font-size:23px; line-height:1; padding:0 2px; cursor:pointer; min-width:28px; min-height:28px; }
+.comps-tracking-splash .comps-splash-message { margin:0; padding:12px 13px 13px; color:#202920; font-size:11.5px; font-weight:400; }
+.comps-splash-future { padding:5px 10px 12px; }
+.comps-splash-subheading { display:flex; align-items:center; gap:9px; text-align:center; color:var(--page-header-color,#234c31); font-size:10px; letter-spacing:.115em; font-weight:800; margin:1px 0 14px; white-space:nowrap; }
+.comps-splash-subheading::before,.comps-splash-subheading::after { content:''; flex:1; height:1px; min-width:8px; background:#9baaa0; }
+.comps-splash-list { display:flex; flex-direction:column; gap:10px; max-height:calc(3 * 94px + 2 * 10px); overflow-y:auto; overscroll-behavior:contain; scrollbar-width:thin; scrollbar-color:#9caea0 transparent; padding:1px 1px 2px 0; }
+.comps-splash-item { display:grid; grid-template-columns:31px minmax(0,1fr); align-items:center; column-gap:8px; position:relative; min-height:94px; }
+.comps-splash-item:not(:last-child)::before { content:''; position:absolute; top:50%; bottom:-50%; left:14px; width:2px; background:#7d9c84; z-index:0; }
+.comps-splash-number { display:grid; place-items:center; position:relative; z-index:1; width:28px; height:28px; border-radius:50%; background:#164e2f; color:#fff; font-size:14px; font-weight:700; }
+.comps-splash-entry { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); gap:9px; align-items:center; min-height:88px; padding:10px 10px; background:#faf7ef; border:1px solid #e1e0d7; border-radius:11px; box-shadow:0 2px 3px rgba(0,0,0,.09); }
+.comps-splash-name { color:#112c1d; font-size:11px; font-weight:750; line-height:1.23; overflow-wrap:anywhere; }
+.comps-splash-date-group { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; border-left:1px solid #a3aca3; padding-left:8px; min-width:0; }
+.comps-splash-date-label { color:#173d28; font-size:7px; letter-spacing:.065em; font-weight:800; white-space:nowrap; }
+.comps-splash-date { display:block; max-width:100%; padding:4px 7px; border-radius:999px; background:#1c5835; color:#fff; text-align:center; font-size:10px; font-weight:750; white-space:nowrap; }
+.comps-splash-item[data-tier="2"] .comps-splash-number,.comps-splash-item[data-tier="2"] .comps-splash-date { background:#4e8061; }
+.comps-splash-item[data-tier="3"] .comps-splash-number,.comps-splash-item[data-tier="3"] .comps-splash-date { background:#7ca387; }
+.comps-splash-item[data-tier="2"] .comps-splash-name { color:#355f45; }
+.comps-splash-item[data-tier="3"] .comps-splash-name { color:#456c52; }
+.comps-splash-empty { margin:7px 8px 12px; color:#536b59; font-size:11px; }
+@media (min-width:600px) {
+ .comps-tracking-splash { font-size:14px; }
+ .comps-splash-heading { padding:13px 17px; }
+ .comps-splash-heading strong { font-size:14px; }
+ .comps-tracking-splash .comps-splash-message { font-size:14px; padding:15px 18px; }
+ .comps-splash-future { padding:10px 20px 20px; }
+ .comps-splash-subheading { font-size:12px; }
+ .comps-splash-name { font-size:14px; }
+ .comps-splash-date-label { font-size:10px; }
+ .comps-splash-date { font-size:12px; }
+ .comps-splash-entry { padding:13px 16px; }
+}
+@media (max-width:360px) {
+ .comps-splash-date-label { font-size:6px; }
+ .comps-splash-date { font-size:9px; padding:3px 5px; }
+ .comps-splash-name { font-size:10px; }
+ .comps-splash-entry { gap:5px; padding:8px 7px; }
+}

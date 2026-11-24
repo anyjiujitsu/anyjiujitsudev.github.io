@@ -716,59 +716,69 @@ async function initialize() {
 updateActiveCount([]);
 initialize();
 
-// Admin-controlled tracking announcement. Independent from the scraper and match data.
+// Admin-controlled tracking notice. Shown once per tab session, never on
+// ordinary refreshes or filter changes. It does not change match state.
+const SPLASH_SEEN_KEY = 'anyjj:tracking-splash-seen:v1';
+let splashSeenThisSession = false;
+try { splashSeenThisSession = sessionStorage.getItem(SPLASH_SEEN_KEY) === '1'; } catch (_) {}
 const splashCard = document.createElement('section');
 splashCard.className = 'comps-tracking-splash';
 splashCard.hidden = true;
-splashCard.setAttribute('aria-label','Tracking status');
+splashCard.setAttribute('aria-label', 'Live tracking status');
 ($('bostonResults') || rows).before(splashCard);
-let lastSplashFingerprint = '';
-let splashDismissedFingerprint = '';
 let splashRequestInFlight = false;
 async function checkTrackingSplash(){
-  if (document.visibilityState === 'hidden' || !isCompsVisible() || splashRequestInFlight) return;
+  if (document.visibilityState === 'hidden' || !isCompsVisible() || splashRequestInFlight || (splashSeenThisSession && splashCard.hidden)) return;
   splashRequestInFlight = true;
   try {
-    // The notice must not depend on a successful competition-catalog fetch.
     const settings = await getJson(new URL('./splash.json', import.meta.url).href, 'no-store');
-    const active = settings.active === true;
-    const ids = Array.isArray(settings.competition_ids) ? settings.competition_ids.map(String) : [];
-    const fingerprint = JSON.stringify([active, ids, settings.updated_at]);
-    if (!active || splashDismissedFingerprint === fingerprint) {
-      lastSplashFingerprint = fingerprint;
+    // Admin deactivation hides a still-open notice; it never reopens during this tab session.
+    if (splashSeenThisSession) {
+      if (settings.active !== true) splashCard.hidden = true;
+      return;
+    }
+    if (settings.active !== true || splashSeenThisSession) {
       splashCard.hidden = true;
       return;
     }
-    // Show the status message as soon as settings are read; catalog lookup can finish later.
+    const ids = Array.isArray(settings.competition_ids) ? settings.competition_ids.map(String) : [];
     let catalog = { competitions: [] };
     try {
       catalog = await getJson(new URL('../admin/matches-competitions.json', import.meta.url).href, 'no-store');
-    } catch(error) { console.warn('Tracking splash catalog unavailable:', error); }
+    } catch (error) { console.warn('Tracking splash catalog unavailable:', error); }
     const comps = (catalog.competitions || []).filter(c => ids.includes(String(c.id)))
       .sort((a,b) => String(a.brackets_release_date || '9999').localeCompare(String(b.brackets_release_date || '9999')) || a.name.localeCompare(b.name));
-    const contentFingerprint = JSON.stringify([fingerprint, comps]);
-    if (lastSplashFingerprint === contentFingerprint && !splashCard.hidden) return;
-    lastSplashFingerprint = contentFingerprint;
     splashCard.replaceChildren();
     const head = document.createElement('div'); head.className = 'comps-splash-heading';
-    const title = document.createElement('strong'); title.textContent = 'TRACKING COMPLETE';
+    const alert = document.createElement('span'); alert.className = 'comps-splash-alert'; alert.textContent = '!'; alert.setAttribute('aria-hidden', 'true');
+    const title = document.createElement('strong'); title.textContent = 'NO ACTIVE TRACKING AT THIS TIME.';
     const close = document.createElement('button'); close.type = 'button'; close.textContent = '×'; close.setAttribute('aria-label', 'Dismiss tracking notice');
-    close.addEventListener('click', () => { splashDismissedFingerprint = fingerprint; splashCard.hidden = true; });
-    head.append(title, close);
+    close.addEventListener('click', () => { splashCard.hidden = true; });
+    head.append(alert, title, close);
     const message = document.createElement('p'); message.className = 'comps-splash-message';
-    message.textContent = 'Competition has finished. All matches shown are completed results. Live tracking is currently inactive.';
+    message.textContent = 'All current competitions have finished and live tracking is disabled. Matches shown are completed, and can be viewed until the next active competition.';
     const future = document.createElement('div'); future.className = 'comps-splash-future';
-    const nextTitle = document.createElement('strong'); nextTitle.className = 'comps-splash-subheading'; nextTitle.textContent = 'LIVE TRACKING WILL CONTINUE FOR';
+    const nextTitle = document.createElement('strong'); nextTitle.className = 'comps-splash-subheading'; nextTitle.textContent = 'UPCOMING LIVE TRACKING';
     const list = document.createElement('div'); list.className = 'comps-splash-list';
-    for(const comp of comps){
+    for(const [index, comp] of comps.entries()){
+      const item = document.createElement('div'); item.className = 'comps-splash-item';
+      // Opacity stops decreasing after the third item.
+      item.dataset.tier = String(Math.min(index + 1, 3));
+      const number = document.createElement('span'); number.className = 'comps-splash-number'; number.textContent = String(index + 1);
       const entry = document.createElement('div'); entry.className = 'comps-splash-entry';
       const name = document.createElement('span'); name.className = 'comps-splash-name'; name.textContent = comp.name;
-      const date = document.createElement('small');
+      const dateGroup = document.createElement('div'); dateGroup.className = 'comps-splash-date-group';
+      const dateLabel = document.createElement('span'); dateLabel.className = 'comps-splash-date-label';
+      dateLabel.textContent = '▢  BRACKETS RELEASE';
+      const date = document.createElement('span'); date.className = 'comps-splash-date';
       if (/^\d{4}-\d{2}-\d{2}$/.test(comp.brackets_release_date || '')) {
         const dt = new Date(`${comp.brackets_release_date}T12:00:00Z`);
-        date.textContent = Number.isNaN(dt.getTime()) ? 'Brackets release · Date not announced' : `Brackets release · ${dt.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric', timeZone:'UTC'})}`;
-      } else date.textContent = 'Brackets release · Date not announced';
-      entry.append(name,date); list.append(entry);
+        date.textContent = Number.isNaN(dt.getTime()) ? 'DATE NOT ANNOUNCED' : dt.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric', timeZone:'UTC'}).toUpperCase();
+      } else date.textContent = 'DATE NOT ANNOUNCED';
+      dateGroup.append(dateLabel, date);
+      entry.append(name, dateGroup);
+      item.append(number, entry);
+      list.append(item);
     }
     if(!comps.length){
       const empty = document.createElement('p'); empty.className = 'comps-splash-empty';
@@ -776,8 +786,10 @@ async function checkTrackingSplash(){
       list.append(empty);
     }
     future.append(nextTitle, list);
-    splashCard.append(head,message,future);
+    splashCard.append(head, message, future);
     splashCard.hidden = false;
+    splashSeenThisSession = true;
+    try { sessionStorage.setItem(SPLASH_SEEN_KEY, '1'); } catch (_) {}
   } catch(error) { console.warn('Tracking splash settings unavailable:', error); }
   finally { splashRequestInFlight = false; }
 }
