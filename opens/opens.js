@@ -769,7 +769,17 @@ async function checkTrackingSplash(){
       const name = document.createElement('span'); name.className = 'comps-splash-name'; name.textContent = comp.name;
       const dateGroup = document.createElement('div'); dateGroup.className = 'comps-splash-date-group';
       const dateLabel = document.createElement('span'); dateLabel.className = 'comps-splash-date-label';
-      dateLabel.textContent = '▢  BRACKETS RELEASE';
+      // Inline SVG keeps the calendar outline reliable in iOS Safari.
+      const calendar = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      calendar.setAttribute('class', 'comps-splash-calendar');
+      calendar.setAttribute('viewBox', '0 0 24 24');
+      calendar.setAttribute('aria-hidden', 'true');
+      const calendarPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      calendarPath.setAttribute('d', 'M8 2v4 M16 2v4 M3 10h18 M5 4h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z');
+      calendar.append(calendarPath);
+      const dateLabelText = document.createElement('span');
+      dateLabelText.textContent = 'BRACKETS RELEASE';
+      dateLabel.append(calendar, dateLabelText);
       const date = document.createElement('span'); date.className = 'comps-splash-date';
       if (/^\d{4}-\d{2}-\d{2}$/.test(comp.brackets_release_date || '')) {
         const dt = new Date(`${comp.brackets_release_date}T12:00:00Z`);
